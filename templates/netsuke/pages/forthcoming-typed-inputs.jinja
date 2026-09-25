@@ -1,0 +1,310 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}Typed Inputs (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('typed-inputs') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('typed-inputs') %}
+                    A worker count of zero should fail before pytest starts, not halfway through a test run. RFC 0022 proposes an optional
+                    <code>inputs</code> mapping: types, defaults, and choices for the handful of values a manifest's callers are meant to set,
+                    validated before any command runs. Ordinary <code>vars</code> stay exactly as they are.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> The released compiler has no <code>inputs</code> mapping and the CLI has no <code>--input</code> option. Nothing on this page is implemented.</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Proposed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0022-typed-task-inputs.md" class="hm-link">RFC 0022</a> has status Proposed, created 19 September 2026, and landed in the documentation-only <a href="https://github.com/leynos/netsuke/commit/54837e9" class="hm-link">commit 54837e9</a>. It builds on the parameter model of <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0003-versioned-local-bundles.md#6-parameter-model" class="hm-link">RFC 0003</a>, which is itself still Proposed.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:task" aria-hidden="true"></span> <span><strong>Planned as phase 21.</strong> The <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#21-typed-inputs-with-one-parameter-contract" class="hm-link">progressive-enhancement roadmap</a> splits the work into five tasks; none is ticked.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>No release named.</strong> The CLI option's placement in canonical metadata, profile overlay details, and the exact integer and path-normalization contracts are to be ratified before implementation. &ldquo;No release should force a broad migration merely because this optional vocabulary exists.&rdquo;</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why typed inputs
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Today <code>vars</code> are global strings, numbers, Booleans, or lists handed to Jinja (see
+                    <a href="/netsuke/docs/templating/" class="hm-link">templating</a>). Nothing says which of them a caller may set, what type they
+                    must be, or what range is sensible. The RFC's diagnosis: &ldquo;Raw flag strings combine user intent, argument transport, and
+                    tool-specific syntax.&rdquo;
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Fail before the first command</h3>
+                        <p class="text-xs text-charcoal-mid">Validation should reject an invalid worker count before anything starts, while argv handling stays with RFC 0001's <a href="{{ fc.href('structured-commands', 'invoke') }}" class="hm-link">structured commands</a>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">One parameter contract</h3>
+                        <p class="text-xs text-charcoal-mid">Root inputs reuse RFC 0003's bundle-parameter types, validation, and redaction. The RFC explicitly refuses &ldquo;a rival parameter system&rdquo;.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not another config loader</h3>
+                        <p class="text-xs text-charcoal-mid">Profiles and their OrthoConfig integration stay with roadmap phase 5. This RFC supplies task-input semantics, not another loader, profile store, or command metadata generator.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="declaring" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:data-format" aria-hidden="true"></span> Declaring inputs
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Adoption is one value at a time. The RFC's own example promotes a single worker count and leaves everything else untyped.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-4">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Existing-style fragment, still valid (RFC 0022 &sect;3)</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+vars:
+  workers: 2
+
+actions:
+  - name: test
+    command: "pytest -n {{ workers }}"
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0022 &sect;3 (verbatim)</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+inputs:
+  workers:
+    type: integer
+    minimum: 1
+    default: 2
+    description: Number of pytest workers
+    expose: non-secret
+
+actions:
+  - name: test
+    command:
+      invoke: pytest -n {{ inputs.workers }}
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid mb-8 max-w-3xl">
+                    Writing <code>inputs.workers</code> instead of <code>workers</code> is the promotion. There is no implicit alias and no mutation
+                    of <code>vars</code>. Adopting an input also does not silently turn a legacy shell string into direct execution; the example
+                    switches to <code>invoke</code> because the RFC recommends structured invocation for dynamic arguments.
+                </p>
+
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Field</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">type</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Required. Exactly one of <code>string</code>, <code>bool</code>, <code>integer</code>, <code>path</code>, <code>sequence&lt;string&gt;</code>, <code>sequence&lt;path&gt;</code>, or <code>mapping&lt;string, string&gt;</code>. No <code>enum</code> or <code>argv</code> type.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">default</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Literal data, never a Jinja program. No default means required.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">minimum, maximum</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Integer bounds. Inverted ranges and defaults that break their own contract are rejected.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">choices</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">A nonempty, duplicate-free list. A string with <code>choices</code> is the enum.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">description</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Optional human description.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">expose</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Values are redacted by default; only the exact declaration <code>expose: non-secret</code> allows ordinary inspection.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Adapted: field names from RFC 0022 &sect;4, not an RFC example</p>
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+inputs:
+  mode:
+    type: string
+    choices: [debug, release]
+    default: debug
+    expose: non-secret
+{% endraw %}{% endhighlight %}
+                </div>
+            </section>
+
+            <section id="validation" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:rule" aria-hidden="true"></span> Validation before execution
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Roadmap <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#211-validate-values-before-executing-a-manifest" class="hm-link">21.1</a>
+                    validates values before Jinja expansion, so a bad value never reaches a template, let alone a process. Root inputs and bundle
+                    parameters are to accept and reject the same values.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Strict, not helpful</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;A Boolean is not an integer; <code>1.0</code> is not silently accepted as <code>1</code>. Strings remain strings, including empty strings.&rdquo; Null is not an omitted value. Out-of-range integers are rejected.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">A path is not a permission</h3>
+                        <p class="text-xs text-charcoal-mid"><code>path</code> checks encoding and lexical shape without creating files. Whatever later opens, runs, or deletes that path applies its own workspace and operator constraints &mdash; including <a href="{{ fc.href('artefacts', 'cleanup') }}" class="hm-link">scoped cleanup</a>, which accepts artefact names, never raw paths.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Immutable namespace</h3>
+                        <p class="text-xs text-charcoal-mid"><code>inputs</code> cannot change during manifest expansion. A manifest that already defines <code>vars.inputs</code> and opts in gets a targeted migration diagnostic rather than a silent overwrite; one that does not opt in is untouched.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Bounded</h3>
+                        <p class="text-xs text-charcoal-mid">Existing evaluation budgets cap definition count, collection depth, element count, byte size, and diagnostics, applied before expensive allocation. Collections are homogeneous and validated element by element.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="callers" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Callers and profiles
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The RFC proposes one CLI option, <code>--input NAME=VALUE</code>, on commands that compile a manifest. Parsing is type-directed,
+                    not shell splitting or YAML evaluation: strings and paths keep the text after the first <code>=</code> exactly; integers are
+                    signed decimal, no floats; Booleans are exactly <code>true</code> or <code>false</code>; sequences and mappings are JSON with
+                    duplicate keys rejected. Unknown names and repeated occurrences are errors.
+                </p>
+                <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-2" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Adapted: the RFC names the option but gives no full command line</div>
+                    {% highlight 'netsuke-console' %}
+$ netsuke build --input workers=4
+{% endhighlight %}
+                </div>
+                <p class="text-xs text-charcoal-mid mb-8">Against the declaration above, <code>--input workers=0</code> would fail <code>minimum: 1</code> before any command starts.</p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Precedence, highest first</h3>
+                        <ol class="space-y-2 text-sm text-charcoal-mid list-decimal pl-5">
+                            <li>Explicit CLI input</li>
+                            <li>Explicitly selected profile input</li>
+                            <li>Resolved configuration input</li>
+                            <li>Manifest default</li>
+                        </ol>
+                        <p class="text-xs text-charcoal-mid mt-3">No environment variable supplies an input in the first version. The value is validated once and keeps its winning source and bounded provenance for the sources it shadowed. Operator ceilings apply after selection; a project cannot override them.</p>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Profiles, bundles, plans</h3>
+                        <p class="text-sm text-charcoal-mid mb-3">&ldquo;Profiles bind input values; they do not replace input definitions.&rdquo; A bundle receives explicit values through <code>with</code>, as <code>bundle.params</code>, never the importer's whole <code>inputs</code>. Root inputs must not wait on bundles.</p>
+                        <p class="text-sm text-charcoal-mid">Resolved values used by an action or a <a href="{{ fc.href('states', 'evidence') }}" class="hm-link">state</a> join its existing fingerprint; unused inputs must not change a command's argv. Generated plans freeze their values, so replay never reads a different ambient profile.</p>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid mt-6">Roadmap: <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#212-bind-explicit-callers-and-profiles-to-the-same-interface" class="hm-link">21.2, bind explicit callers and profiles to the same interface</a>.</p>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start mb-8">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:security" aria-hidden="true"></span>
+                    <p class="text-sm text-charcoal-mid">
+                        <strong>The guarantee belongs to <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#2-the-shallow-end-contract" class="hm-link">RFC 0025</a>.</strong>
+                        Ordinary variables remain supported. Across the whole proposal set, unused state or context declarations never cause runtime
+                        probes, installation, network access, or resource acquisition, and the additions introduce no new inspection-time execution. The quickstart manifest stays a release-acceptance fixture, and basic usage is &ldquo;a supported destination, not a
+                        temporary migration stage.&rdquo; Supported basic manifests get no new maturity messages under default settings, including any
+                        hint that untyped usage is deprecated.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">What stays optional</h3>
+                        <ul class="space-y-2 text-sm text-charcoal-mid">
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Existing untyped manifests keep their parse, execution, and diagnostic behaviour under the default policy.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Promoting one value needs no context, state, bundle, or annotation of its neighbours. Internal variables stay untyped unless their author says otherwise.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Older Netsuke releases must reject the new syntax with a useful version remedy, not ignore it.</span></li>
+                        </ul>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Why not mandatory</h3>
+                        <p class="text-sm text-charcoal-mid">&ldquo;Mandatory annotations would obstruct onboarding.&rdquo; And the opposite mistake: &ldquo;Implicit promotion of every variable would unexpectedly create a public API.&rdquo; The design sits between them &mdash; public only when an author says so.</p>
+                    </div>
+                </div>
+                <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">The route in, one step at a time</h3>
+                <ol class="space-y-3 text-sm text-charcoal-mid list-decimal pl-5 max-w-3xl">
+                    <li>Keep <code>vars</code>. Nothing changes.</li>
+                    <li>Promote the one value callers actually set, as <code>inputs.workers</code> above.</li>
+                    <li>Set it from the command line with <code>--input</code>, or bind it in a profile.</li>
+                    <li>Pass it on to a bundle explicitly through <code>with</code>.</li>
+                    <li>If a project wants it enforced, the opt-in <code>typed-inputs</code> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#5-initial-rule-contracts" class="hm-link">maturity rule</a> checks named subjects only; it never guesses which variables are public.</li>
+                </ol>
+                <p class="text-xs text-charcoal-mid mt-4">Roadmap <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#213-demonstrate-useful-annotation-without-broad-migration" class="hm-link">21.3</a> sets the bar: &ldquo;no context, state, or bundle is required to use a validated worker count.&rdquo;</p>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Planned, not existing. RFC 0022 &sect;8 and roadmap phase 21 set these acceptance requirements.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">One corpus, two consumers</h3>
+                        <p class="text-xs text-charcoal-mid">The same value corpus runs through bundle and task-input validation: false-as-integer, overflow, whitespace, empty strings, duplicate keys, invalid constraints, required values, unknown names, hostile argv elements, Windows paths, and collection order.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Properties</h3>
+                        <p class="text-xs text-charcoal-mid">Property tests for source precedence, normalization stability, and redaction of rejected values. Every precedence pair is tested, with redaction checked in errors, verbose output, and JSON.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Observed, not rendered</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;Compare actual child argv, not just rendered YAML.&rdquo; The unmodified hello-world fixture is retained, and plan replay is tested against a later, changed ambient profile.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">Determinism is part of the contract: collection order is preserved and mapping keys canonicalized. A maturity setting &ldquo;cannot disable type correctness, resource limits, or capability checks for an opted-in declaration.&rdquo; And the honest limit: typed data alone does not stop a tool-specific flag bag from overriding the declared worker policy.</p>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    RFC 0022 does not mention accessibility or localization. It says nothing about how input diagnostics render in Netsuke's
+                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a>. What it does say concerns what a
+                    diagnostic contains and what it must withhold:
+                </p>
+                <ul class="space-y-2 text-sm text-charcoal-mid max-w-3xl mb-6">
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A validation error shows the name, expected type, constraint, source location, and remedy, &ldquo;without echoing a rejected secret-looking value&rdquo;. Human output, JSON, verbose output, snapshots, and telemetry share that boundary.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Values are redacted by default. &ldquo;Redaction is not secret storage&rdquo;: the RFC introduces no secret type and promises no confidentiality for values passed as process arguments or persisted in plans.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Input documentation flows through the existing documentation and schema pipelines, &ldquo;without a parallel input-help renderer&rdquo;, and inspection names the effective profile, source, and contract without running a build.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#8-evaluation-and-diagnostics" class="hm-link">RFC 0025 &sect;8</a> tells maturity diagnostics, including <code>typed-inputs</code> findings, to &ldquo;Reuse Fluent localization&rdquo; and not to leak input values. Netsuke's existing <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a> are that surface.</span></li>
+                </ul>
+                <p class="text-xs text-charcoal-mid max-w-3xl">The RFC does not say whether an input's <code>description</code> can be translated.</p>
+            </section>
+
+{{ fc.footer('typed-inputs') }}
+
+        </main>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,298 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}Owned Artefacts (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('artefacts') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('artefacts') %}
+                    Every repository grows a cleanup list, and every cleanup list drifts away from whatever produces the files. RFC 0023 proposes
+                    optional named artefacts: exact paths a manifest claims to own, and one bounded cleanup operation that previews its scope,
+                    asks for consent, and deletes nothing it has not validated.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> The released compiler has no <code>artefacts</code> mapping, <code>produces</code> field, or <code>clean_owned</code> operation, and <code>netsuke clean</code> has no <code>--artefact</code> option.</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Proposed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0023-artefact-ownership-and-scoped-cleanup.md" class="hm-link">RFC 0023</a> has status Proposed, created 19 September 2026, and landed in the documentation-only <a href="https://github.com/leynos/netsuke/commit/54837e9" class="hm-link">commit 54837e9</a>.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:task" aria-hidden="true"></span> <span><strong>Planned as phase 24.</strong> The <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#24-owned-artefacts-and-bounded-cleanup" class="hm-link">progressive-enhancement roadmap</a> splits the work into six tasks; none is ticked.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>No release named.</strong> Supported-platform deletion primitives, resource-lease identity, ownership and source conflict rules, and concrete operator limits are to be ratified before implementation.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why ownership
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Today <code>netsuke clean</code> runs <code>ninja -t clean</code>, which removes the file outputs Ninja tracks and nothing else
+                    (see <a href="/netsuke/docs/cli/#clean-maintenance" class="hm-link">the CLI reference</a>). Anything an action writes &mdash; a
+                    benchmark report, a cache, a prepared environment &mdash; falls outside it, so projects reach for a shell recipe, and
+                    &ldquo;shell fragments obscure path, symlink, and error semantics.&rdquo;
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Different retention decisions</h3>
+                        <p class="text-xs text-charcoal-mid">A report, a shared tool cache, a temporary directory, and a prepared environment should not share one blunt deletion rule.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Existing owners stay put</h3>
+                        <p class="text-xs text-charcoal-mid">Ninja keeps ordinary output cleaning, the runtime keeps its dyndep sidecars, and RFC 0010 keeps command-local temporary directories. Nothing infers ownership from command text.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">An assertion, not a proof</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;Ownership is an assertion by the manifest author, not proof that a directory contains no valuable files.&rdquo; The design makes scope inspectable and enforces its bounds without claiming to sandbox recipes.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="declaring" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:box" aria-hidden="true"></span> Declaring ownership
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    An artefact has a required <code>path</code> and optional <code>kind</code>, <code>role</code>, and <code>create_parent</code>. The
+                    smallest declaration owns one directory and needs nothing else &mdash; no state, typed input, context, or package provider.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0023 &sect;3 (verbatim)</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+artefacts:
+  build-output:
+    path: build
+    kind: directory
+
+actions:
+  - name: clean-build
+    command:
+      clean_owned: [build-output]
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0023 &sect;3 (verbatim; the command is illustrative)</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+artefacts:
+  benchmark-report:
+    path: dist/benchmarks/microbenchmarks.json
+    role: report
+    create_parent: true
+
+actions:
+  - name: benchmark
+    produces: [benchmark-report]
+    command:
+      invoke: python benchmarks/run.py --output dist/benchmarks/microbenchmarks.json
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid mb-8 max-w-3xl">
+                    <code>produces</code> &ldquo;records ownership and expected outputs; it does not make a benchmark incremental or authorize replay
+                    of an old result.&rdquo; A declared output that is missing after the producer succeeds is a producer failure. Partial outputs from a
+                    failed run are kept for inspection, never quietly removed or reused as evidence.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Exact paths</h3>
+                        <p class="text-xs text-charcoal-mid"><code>path</code> names exactly one workspace-relative object. <code>kind</code> defaults to <code>file</code>; recursive ownership needs an explicit <code>directory</code>. No globs in the first version.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">A directory claims its subtree</h3>
+                        <p class="text-xs text-charcoal-mid">Including children created later. The preview must say so plainly, and the claim is unsuitable for a directory shared with source files or another owner's mutable state.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">One owner, one producer</h3>
+                        <p class="text-xs text-charcoal-mid">Overlapping or case-equivalent roots are rejected, as are multiple producers. Roles &mdash; <code>generated</code> (default), <code>report</code>, <code>cache</code>, <code>environment</code> &mdash; describe intent, not a deletion or caching rule.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cleanup" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:clean" aria-hidden="true"></span> Scoped cleanup
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Cleanup has two front doors and one implementation. In a recipe, <code>clean_owned: [NAME, ...]</code> is an execution unit in the
+                    <a href="{{ fc.href('structured-commands') }}" class="hm-link">structured command</a> union; it names artefacts only and
+                    &ldquo;never accepts raw shell paths.&rdquo; On the command line, <code>clean</code> gains a repeatable <code>--artefact NAME</code>.
+                    Both share the same planner, validator, deleter, and structured results.
+                </p>
+                <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-6" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed commands, RFC 0023 &sect;5 (verbatim)</div>
+                    {% highlight 'netsuke-console' %}
+$ netsuke clean --artefact build-output --dry-run
+$ netsuke clean --artefact build-output --force --no-input
+{% endhighlight %}
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Preview</h3>
+                        <p class="text-xs text-charcoal-mid">A dry-run lists normalized roots, recursive ownership, existing and missing objects, retained siblings, and any rejected scope. It is &ldquo;a read-only plan, not a reusable authorization token&rdquo;: execution resolves and validates again. A plan that exceeds its bounds fails rather than truncating.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Consent</h3>
+                        <p class="text-xs text-charcoal-mid">The existing <code>--dry-run</code>, <code>--force</code>, and <code>--no-input</code> flags; no cleanup-specific confirmation framework. A noninteractive destructive run without explicit consent fails before deleting. &ldquo;<code>--force</code> skips confirmation, not validation, ownership conflicts, or bounds.&rdquo;</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Protected scope</h3>
+                        <p class="text-xs text-charcoal-mid">Paths anchor at the workspace capability. Absolute paths, empty paths, the workspace root, parent traversal, and platform escape forms are rejected. The manifest, loaded configuration, known runtime scripts, declared sources, <code>.git</code>, and Netsuke's runtime directories are protected; a directory claim containing one is invalid.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Filesystem safety</h3>
+                        <p class="text-xs text-charcoal-mid">Never follow a symlink or Windows reparse point during traversal; no lexical <code>starts_with</code> checks and no ambient <code>rm -rf</code>. Removing a hard link never truncates the shared file. Exceeding a bound in the admission pass causes zero deletions.</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Plain <code>clean</code> is unchanged.</strong> Without <code>--artefact</code>, <code>netsuke clean</code> keeps its Ninja-output
+                        behaviour. With it, only the selected roots are cleaned: no Ninja outputs, environments, caches, or runtime directories join
+                        implicitly. Roadmap: <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#242-delete-only-validated-scope-through-one-implementation" class="hm-link">24.2</a>.
+                    </p>
+                </div>
+            </section>
+
+            <section id="lifecycle" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:renew" aria-hidden="true"></span> Lifecycle and migration
+                </h2>
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Environments and states</h3>
+                        <p class="text-sm text-charcoal-mid">
+                            An <code>environment</code> artefact may name the same path as a <a href="{{ fc.href('states', 'evidence') }}" class="hm-link">managed state</a>.
+                            When it is selected for cleanup, Netsuke acquires the state's integrity lease and invalidates its readiness records before any
+                            deletion, failure paths included. &ldquo;Probe success from before cleanup cannot establish subsequent readiness.&rdquo; Neither
+                            feature requires the other: the artefact-only path never demands a state declaration.
+                        </p>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Leases and ordering</h3>
+                        <p class="text-sm text-charcoal-mid">
+                            Cleanup takes an exclusive lease over each selected root, ordered canonically, sharing the state-resource identity boundary
+                            rather than a second lock system. A selected build that both cleans and produces or consumes the same resource is rejected:
+                            &ldquo;A Ninja pool would serialize access but would not establish the user's intended order.&rdquo; Separate invocations are the
+                            remedy.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Migrating Cuprum</h3>
+                        <p class="text-xs text-charcoal-mid">Declare disjoint output roots first, and keep unmatched wildcard cleanup as an ordinary command until a separate safe file-selection contract exists. Unrestricted glob deletion is explicitly not added just to reproduce a long shell command.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not delivery</h3>
+                        <p class="text-xs text-charcoal-mid">No remote delivery, content-addressed store, or provenance attestation. The main roadmap's <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#54-delivery-and-feedback" class="hm-link">delivery task 5.4.2</a> waits for ownership to be modelled; this RFC models it and stops there.</p>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid mt-6">Roadmap: <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#243-integrate-lifecycle-invalidation-and-staged-migration" class="hm-link">24.3, lifecycle invalidation and staged migration</a>.</p>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start mb-8">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:security" aria-hidden="true"></span>
+                    <p class="text-sm text-charcoal-mid">
+                        <strong>The guarantee belongs to <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#2-the-shallow-end-contract" class="hm-link">RFC 0025</a>.</strong>
+                        No heuristic promotes a redirection to an ownership claim. Across the proposal set, unused state or context declarations never cause runtime probes,
+                        installation, network access, or resource acquisition. The quickstart manifest stays a release-acceptance fixture, and basic usage
+                        is &ldquo;a supported destination, not a temporary migration stage.&rdquo; RFC 0023 calls itself &ldquo;an opt-in improvement rather than
+                        an onboarding prerequisite.&rdquo;
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">What stays optional</h3>
+                        <ul class="space-y-2 text-sm text-charcoal-mid">
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Plain commands, existing targets, and existing <code>clean</code> behaviour remain supported; the hello-world and legacy <code>clean</code> fixtures stay unchanged.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>No target needs an artefact declaration. &ldquo;Requiring an artefact declaration for every existing target would make an optional benefit contagious.&rdquo;</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A declaration with no producer is still useful for a legacy build directory: declaration, bounded preview, and authorization are enough.</span></li>
+                        </ul>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">The route in, one step at a time</h3>
+                        <ol class="space-y-3 text-sm text-charcoal-mid list-decimal pl-5">
+                            <li>Keep <code>netsuke clean</code> for Ninja outputs.</li>
+                            <li>Declare one owned directory with only <code>path</code> and <code>kind</code>, and clean it with <code>clean_owned</code>.</li>
+                            <li>Preview with <code>clean --artefact NAME --dry-run</code> before trusting it.</li>
+                            <li>Name producers with <code>produces</code> for reports and other action outputs.</li>
+                            <li>Tie an <code>environment</code> artefact to a <a href="{{ fc.href('states', 'declaring') }}" class="hm-link">state</a>, if the project uses states.</li>
+                            <li>Opt in to the <code>owned-cleanup</code> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#5-initial-rule-contracts" class="hm-link">maturity rule</a> for selected cleanup actions.</li>
+                        </ol>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid">Roadmap <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#241-establish-ownership-before-permitting-deletion" class="hm-link">24.1</a> establishes ownership before any deletion is permitted, and task 24.3.2 must &ldquo;demonstrate that the one-directory feature works without state syntax.&rdquo;</p>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Planned, not existing. RFC 0023 &sect;8 and roadmap phase 24 set these acceptance requirements for code that deletes files.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Properties</h3>
+                        <p class="text-xs text-charcoal-mid">Canonical-path uniqueness, scope normalization, protected roots, and duplicate selection.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Adversarial end to end</h3>
+                        <p class="text-xs text-charcoal-mid">Symlinks, reparse points, root replacement, hard links, permission errors, case collisions, interrupted partial deletion, entry-budget overflow, and missing paths. External sentinel files must remain unchanged.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Previews that write nothing</h3>
+                        <p class="text-xs text-charcoal-mid">Zero filesystem writes in dry-run, including no preparation or probe execution; refusal without consent; fresh validation on replay; and bounds that <code>--force</code> cannot bypass.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    The design refuses claims it cannot back. &ldquo;No claim of race freedom is acceptable until adversarial replacement tests pass on each
+                    supported platform.&rdquo; Cleanup &ldquo;is not an atomic transaction and must never report rollback that it did not perform.&rdquo; Without
+                    source-control metadata Netsuke cannot identify every source file, and the contract must say so. A later <code>cargo clean</code>
+                    recipe keeps Cargo's semantics, outside Netsuke's guarantee.
+                </p>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    RFC 0023 does not mention accessibility or localization, and makes no promise about how a cleanup preview renders in Netsuke's
+                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a>. What it does require bears directly on
+                    anyone deciding, from text alone, whether to delete something:
+                </p>
+                <ul class="space-y-2 text-sm text-charcoal-mid max-w-3xl mb-6">
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>The preview must state recursive scope &ldquo;plainly&rdquo;, and an interactive run asks for confirmation only after displaying it.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Partial failures report exact removed, retained, and failed objects rather than a summary verdict.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Command and recipe forms return the same structured results, so machine-readable output does not depend on which door was used.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#8-evaluation-and-diagnostics" class="hm-link">RFC 0025 &sect;8</a> tells maturity diagnostics, including <code>owned-cleanup</code> findings, to &ldquo;Reuse Fluent localization&rdquo;, the machinery behind Netsuke's existing <a href="/netsuke/docs/cli/#localization" class="hm-link">locale catalogues</a>.</span></li>
+                </ul>
+                <p class="text-xs text-charcoal-mid max-w-3xl">Task 24.3.2 documents ownership assertions, recursive scope, retained caches, preview limitations, and external-command boundaries. Whether cleanup messages themselves are localized is not stated.</p>
+            </section>
+
+{{ fc.footer('artefacts') }}
+
+        </main>
+    </div>
+
+{% endblock %}

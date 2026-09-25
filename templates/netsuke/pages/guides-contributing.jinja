@@ -72,7 +72,7 @@
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:development" aria-hidden="true"></span> Development Workflow
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-                    Netsuke is written in Rust. You will need a recent stable Rust toolchain and <code>ninja</code> installed on your PATH.
+                    Netsuke is written in Rust and builds on a pinned nightly (<code>{{ netsuke_rust_nightly }}</code>, for the Polonius borrow checker), which <code>rustup</code> installs from the checkout's <code>rust-toolchain.toml</code>. <code>ninja</code> must be on <code>PATH</code>. On Linux the checkout also links with the pinned <code>mold</code>: <code>make install-build-tools</code> installs it into <code>~/.local/bin</code>, and <code>make check-build-tools</code> confirms it is present and at the pinned version. Every gate target runs that check first, so a missing linker is reported as such rather than as a link error. The make targets add <code>~/.local/bin</code> to <code>PATH</code> for themselves; a bare <code>cargo</code> command needs it added by hand.
                 </p>
 
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
@@ -81,6 +81,10 @@
 # Clone the repository
 $ git clone https://github.com/leynos/netsuke.git
 $ cd netsuke
+
+# Linux: install the pinned mold linker (once)
+$ make install-build-tools
+$ export PATH="$HOME/.local/bin:$PATH"
 
 # Build in release mode
 $ cargo build --release

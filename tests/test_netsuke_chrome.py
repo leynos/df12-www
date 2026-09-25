@@ -24,7 +24,11 @@ from df12_pages.jinja_highlight import HighlightExtension
 from df12_pages.subsite_homepage import SubSiteHomePageBuilder
 
 NETSUKE_TEMPLATES = Path("templates/netsuke").resolve()
-TEMPLATE_VARS: dict[str, object] = {"netsuke_version": "0.0.0-test"}
+TEMPLATE_VARS: dict[str, object] = {
+    "netsuke_version": "0.0.0-test",
+    "netsuke_release_date": "1 January 2000",
+    "netsuke_rust_nightly": "nightly-2000-01-01",
+}
 TRAFFIC_LIGHTS = 3
 ACTION_COUNT = 2
 
@@ -39,6 +43,21 @@ DOCS_SLUGS = [
     "configuration",
     "security",
 ]
+
+
+# Every forthcoming preview, in the order forthcoming_data.jinja lists them.
+PREVIEW_KEYS = (
+    "system-facts",
+    "standard-library",
+    "structured-commands",
+    "modules",
+    "testing-framework",
+    "property-testing",
+    "linter",
+    "states",
+    "typed-inputs",
+    "artefacts",
+)
 
 
 def _render_page(tmp_path: Path, template: str, output_slug: str) -> BeautifulSoup:
@@ -682,11 +701,8 @@ class TestPreviewPagesAndTokens:
     @pytest.mark.parametrize(
         ("template", "slug"),
         [
-            ("pages/forthcoming-linter.jinja", "forthcoming/linter"),
-            (
-                "pages/forthcoming-testing-framework.jinja",
-                "forthcoming/testing-framework",
-            ),
+            (f"pages/forthcoming-{key}.jinja", f"forthcoming/{key}")
+            for key in PREVIEW_KEYS
         ],
     )
     def test_preview_sidebar_is_labelled_and_marks_itself(

@@ -1,0 +1,394 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}States and Probes (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('states') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('states') %}
+                    A directory timestamp cannot prove that a virtual environment holds the right interpreter, and last week's successful
+                    install cannot prove that a service still answers. RFC 0021 proposes optional named states: a condition, the evidence
+                    that checks it, and an optional recipe that prepares it &mdash; verified every time, prepared at most once, and never
+                    repaired behind anyone's back.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> Nothing on this page is implemented. The released compiler does not accept <code>states</code>, <code>ensure_state</code>, or any other syntax shown here.</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Proposed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0021-managed-states-and-probes.md" class="hm-link">RFC 0021</a> has status Proposed, created 19 September 2026. It landed in <a href="https://github.com/leynos/netsuke/commit/54837e9" class="hm-link">commit 54837e9</a>, which its own message calls documentation only: no runtime implementation, schema changes, or accepted ADRs.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:task" aria-hidden="true"></span> <span><strong>Planned as phase 23.</strong> The <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#23-verified-preparation-without-mandatory-environments" class="hm-link">progressive-enhancement roadmap</a> splits the work into eight tasks; none is ticked. The roadmap says it &ldquo;tracks proposed work, not implemented features&rdquo;.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>No release named.</strong> The RFC calls its examples &ldquo;proposed fragments, not current-release promises&rdquo;, and leaves the <code>python-venv</code> inspection contract, the portable lease implementation, record retention limits, and operator probe-policy fields to be ratified before implementation.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why states
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Today a manifest expresses preparation as an ordinary command &mdash; <code>command: uv sync</code> &mdash; and Ninja decides
+                    freshness by timestamp. That is fine until the question stops being &ldquo;is this file newer?&rdquo; and becomes &ldquo;is
+                    this environment usable?&rdquo;. States are, informally, the sensors of the system; Netsuke's own vocabulary is
+                    <em>states</em>, <em>probes</em>, and <em>external functional checks</em>, and the rest of this page uses it.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Timestamps are not evidence</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;A directory timestamp cannot establish that a virtual environment contains the requested interpreter and packages.&rdquo; A state checks the thing itself, on every use.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Guards must not build</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;A test that requires an already-installed extension must not silently build it.&rdquo; A requirement that quietly repairs itself tests the repair, not the precondition.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not a new scheduler</h3>
+                        <p class="text-xs text-charcoal-mid">State operations are execution units on RFC 0001's <a href="{{ fc.href('structured-commands') }}" class="hm-link">structured runner</a>, not a template-time subprocess facility. Cargo, uv, and friends keep dependency resolution and incremental compilation.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="declaring" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:dashboard" aria-hidden="true"></span> Declaring a state
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A state definition carries <code>kind</code>, kind-specific configuration, an optional <code>path</code>, <code>identity</code>,
+                    and optional <code>prepare</code>, <code>probe</code>, and <code>accept_degraded</code>. <code>kind</code> selects a documented
+                    built-in probe; there is no <code>probe: builtin</code> boilerplate. The smallest useful state checks that a directory exists:
+                </p>
+                <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0021 &sect;3 (verbatim)</p>
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+states:
+  build-directory:
+    kind: directory
+    path: build
+    prepare:
+      invoke: python -c "from pathlib import Path; Path('build').mkdir(exist_ok=True)"
+
+actions:
+  - name: prepare-directory
+    command:
+      ensure_state: build-directory
+{% endraw %}{% endhighlight %}
+                </div>
+                <p class="text-sm text-charcoal-mid mb-8 max-w-3xl">It promises only that <code>build</code> is a directory, &ldquo;not that its contents form a valid build&rdquo;. Unknown fields, duplicate names, unresolved references, and unsupported kinds fail before execution.</p>
+
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size]" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Kind</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">What the built-in probe claims</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">directory, file</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The declared object has that type, checked without following symlinks. No content-freshness claim.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">python-venv</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The actual interpreter, its environment prefix, and any declared interpreter constraint. It &ldquo;must not advertise package-set verification that it does not implement.&rdquo;</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">custom</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Nothing of its own. Requires an explicit external probe and cannot claim more than that probe supplies. May omit <code>path</code> to observe a service, which does not authorize network access or remote mutation.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="probes" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:activity" aria-hidden="true"></span> Probes and external functional checks
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Built-in probes serve the ordinary case. When a project needs a condition no built-in knows about, it adds an external
+                    functional check: a repository-owned executable that reports through the optional <code>nagios</code> protocol. No Nagios
+                    installation, daemon, or metric parser is involved &mdash; only the plugin exit-status convention.
+                </p>
+                <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0021 &sect;3 (verbatim)</p>
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+states:
+  dev-env:
+    kind: python-venv
+    path: .venv
+    identity:
+      files: [pyproject.toml, uv.lock, tools/check_dev_env.py]
+    prepare:
+      invoke: uv sync --locked --group dev
+    probe:
+      external:
+        invoke: python tools/check_dev_env.py
+      protocol: nagios
+
+actions:
+  - name: test
+    command:
+      - ensure_state: dev-env
+      - invoke: uv run --no-sync pytest
+{% endraw %}{% endhighlight %}
+                </div>
+                <p class="text-sm text-charcoal-mid mb-8 max-w-3xl">
+                    The built-in environment checks still run. The external check adds a condition; &ldquo;it cannot bypass the built-in checks
+                    or forge preparation identity.&rdquo; The script is project code, not shipped tooling, and a lockfile digest records what
+                    preparation was given, not whether the installation is still intact.
+                </p>
+
+                <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Exit codes</h3>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <caption class="visually-hidden">Nagios-style statuses and their Netsuke interpretation, RFC 0021 table 1</caption>
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Exit</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Probe result</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Default state-operation behaviour</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-charcoal-mid">0</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-success-text">ready</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Continue only if every other condition passes.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-charcoal-mid">1</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-warning-text">degraded</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Stop without repair; explicit acceptance may continue.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-charcoal-mid">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">not_ready</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">An ensure may prepare once; a requirement never prepares.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-charcoal-mid">3</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-base-content">unknown</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Stop without repair.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-charcoal-mid mb-6">Table from RFC 0021 &sect;6. The statuses follow the <a href="https://nagios-plugins.org/doc/guidelines.html" class="hm-link">Nagios plugin guidelines</a>.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">The exit status is authoritative</h3>
+                        <p class="text-xs text-charcoal-mid">Any other exit, a signal, a spawn failure, a timeout, malformed output encoding, or an exhausted output budget is <code>unknown</code>, with a distinct reason. &ldquo;A success-looking message cannot convert a failing exit into readiness.&rdquo; The first stdout line is a human summary; a <code>|</code> performance suffix may be kept but never controls anything.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Bounded, and honest about it</h3>
+                        <p class="text-xs text-charcoal-mid">Proposed defaults: a ten-second deadline and 64&nbsp;KiB of combined output, adjustable with <code>probe.timeout_seconds</code> and <code>probe.max_output_bytes</code> under operator caps. Only <code>invoke</code>, <code>env</code>, <code>cwd</code>, and an allowed <code>shell</code> are accepted in <code>probe.external</code>. The runner &ldquo;must not claim a read-only or network sandbox that it does not supply.&rdquo;</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="operations" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> Require, ensure, prepare
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The proposal adds exactly three single-key operations to the structured command union. Readiness is defined separately from
+                    repair, and there is &ldquo;no automatic repair loop or fallback runner.&rdquo;
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="font-mono text-sm text-primary mb-2">require_state</div>
+                        <p class="text-xs text-charcoal-mid">Verifies readiness and never prepares anything.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="font-mono text-sm text-primary mb-2">ensure_state</div>
+                        <p class="text-xs text-charcoal-mid">Verifies; prepares once when the state is definitely not ready and preparation is declared and authorized; then verifies again.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="font-mono text-sm text-primary mb-2">prepare_state</div>
+                        <p class="text-xs text-charcoal-mid">Explicitly runs preparation and then verification, leaving incremental work to the ecosystem tool. A separate authorized request, not a consequence of a failed probe.</p>
+                    </div>
+                </div>
+                <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Adapted from RFC 0021 &sect;5 and &sect;9; the <code>built-extension</code> definition is omitted</p>
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+actions:
+  - name: extension-tests
+    command:
+      - require_state: built-extension
+      - invoke: uv run --no-sync pytest tests/extension
+{% endraw %}{% endhighlight %}
+                </div>
+                <p class="text-sm text-charcoal-mid mb-6 max-w-3xl">
+                    This is the guard the RFC's Cuprum canary wants: <code>require_state</code> reports a missing extension without running
+                    Maturin to build it. Failure stops the rest of the action, and a state with no preparation recipe yields &ldquo;an actionable
+                    unmet-precondition result, not an inferred installer.&rdquo;
+                </p>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>The result algebra.</strong> <code>ready</code>, <code>not_ready</code>, <code>degraded</code>, and <code>unknown</code>.
+                        <code>degraded</code> fails a requirement by default and never triggers repair; <code>accept_degraded: true</code> may admit it
+                        within operator policy, and the warning stays visible. <code>unknown</code> never authorizes preparation, and an inspection error
+                        outranks a repair decision: one unknown check blocks repair even when another says not-ready.
+                    </p>
+                </div>
+            </section>
+
+            <section id="evidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:locked" aria-hidden="true"></span> Evidence and leases
+                </h2>
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Identity</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">
+                            <code>identity.files</code> lists exact paths, not shell patterns. Identity covers the normalized definition, the probe
+                            implementation and version, the preparation plan, relevant declared input values, the declared files' contents, and the
+                            resolved execution settings; it excludes irrelevant <a href="{{ fc.href('typed-inputs', 'callers') }}" class="hm-link">typed inputs</a>.
+                            Files an external probe uses must participate. Diagnostics distinguish a declared command from a verified executable and
+                            disclose unmodelled ambient dependencies.
+                        </p>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Records</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">
+                            A persistent record &ldquo;proves only that a particular preparation completed and passed verification. It is never a
+                            reusable live probe result.&rdquo; Mutable state is validated on every operation: no timestamp stamps, no unqualified success
+                            stamps, no default time-to-live. A removed or corrupted record means no trusted evidence, not success. Records are published
+                            atomically, only after verification, so interrupted preparation leaves none.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Leases</h3>
+                        <p class="text-xs text-charcoal-mid">Before its first command, an action acquires a workspace-scoped advisory lease for every state it references, in canonical order, and holds them through its last consumer. They are integrity locks for cooperating invocations; unmanaged commands and other programs do not take part, and the guarantee must say so.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Scheduling</h3>
+                        <p class="text-xs text-charcoal-mid">State operations stay inside ordinary Ninja-scheduled action edges. State evidence is not a Ninja output, so a state-using action must be always-run; an incremental file target with state operations is rejected rather than risk skipping a readiness check because an unrelated output is up to date.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Cleanup and teardown</h3>
+                        <p class="text-xs text-charcoal-mid">No automatic removal after failure and no undeclared teardown. <a href="{{ fc.href('artefacts', 'lifecycle') }}" class="hm-link">Artefact ownership</a> is a separate optional contract; when an owned environment is cleaned, its records are invalidated under the same lease before anything is deleted.</p>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid">Roadmap: <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#232-execute-leased-state-operations-with-durable-evidence" class="hm-link">23.2, leased state operations with durable evidence</a>, building on the shared lease seam in <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#202-make-the-common-boundaries-independently-consumable" class="hm-link">20.2</a>.</p>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start mb-8">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:security" aria-hidden="true"></span>
+                    <p class="text-sm text-charcoal-mid">
+                        <strong>The guarantee belongs to <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#2-the-shallow-end-contract" class="hm-link">RFC 0025</a>.</strong>
+                        Unused state declarations never cause runtime probes, installation, network access, or resource acquisition. No heuristic
+                        promotes <code>uv sync</code> to a state. The quickstart manifest stays a release-acceptance fixture, and basic usage is
+                        &ldquo;a supported destination, not a temporary migration stage.&rdquo; RFC 0021 defers to it by name.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">What stays optional</h3>
+                        <ul class="space-y-2 text-sm text-charcoal-mid">
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>A plain <code>command: uv sync</code> remains valid. A state earns its place only when an author needs an explicit precondition, validated reuse, or a shared preparation contract.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Adoption is per action. No context, typed input, ownership declaration, maturity policy, or bundle is compulsory.</span></li>
+                            <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Help, <code>check</code>, graph generation, context inspection, and dry-run never run a probe or a preparation.</span></li>
+                        </ul>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Quickstart manifest, as RFC 0025 &sect;2 fixes it</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+netsuke_version: "1.0.0"
+
+targets:
+  - name: hello.txt
+    command: "echo 'Hello from Netsuke!' > hello.txt"
+
+defaults:
+  - hello.txt
+{% endraw %}{% endhighlight %}
+                        </div>
+                        <p class="text-xs text-charcoal-mid mt-2">A normal hello-world build must start zero probes and create no state records.</p>
+                    </div>
+                </div>
+                <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">The route in, one step at a time</h3>
+                <ol class="space-y-3 text-sm text-charcoal-mid list-decimal pl-5 max-w-3xl">
+                    <li>A <code>directory</code> or <code>file</code> state with <code>ensure_state</code>: presence, nothing more.</li>
+                    <li>A <code>python-venv</code> state with <code>identity</code> and <code>prepare</code>, so preparation is recorded against its inputs.</li>
+                    <li><code>require_state</code> on guards that must never build what they check.</li>
+                    <li>An external functional check under the <code>nagios</code> protocol, then <code>kind: custom</code> for conditions no built-in covers.</li>
+                    <li>The opt-in <code>verified-states</code> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#5-initial-rule-contracts" class="hm-link">maturity rule</a>, for a project that wants selected actions checked for a state operation before their first command.</li>
+                </ol>
+                <p class="text-xs text-charcoal-mid mt-4">The RFC's delivery order matches: &ldquo;built-in probes and explicit operation semantics first, then external functional checks&rdquo;. See roadmap <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#231-define-readiness-separately-from-execution-and-repair" class="hm-link">23.1</a> and <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#233-admit-external-functional-checks-without-implicit-repair" class="hm-link">23.3</a>.</p>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Every item below is a planned acceptance requirement from RFC 0021 &sect;9 and roadmap phase 23. None exists yet. The roadmap asks
+                    for Proptest over algebraic invariants, bounded Kani harnesses for pure transition logic where useful, and subprocess end-to-end
+                    tests for process, filesystem, and locking boundaries.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Properties</h3>
+                        <p class="text-xs text-charcoal-mid">Unknown never authorizes repair; degraded requires explicit acceptance; ensure performs at most one preparation attempt; only verified success creates a record.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Hostile probes</h3>
+                        <p class="text-xs text-charcoal-mid">Every exit code, empty and multiline output, performance suffixes, non-UTF-8 data, terminal escapes, huge simultaneous output, hung descendants, cancellation, and &ldquo;a failure message containing apparent success text&rdquo;. Collection must stay bounded and every process reaped.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">End to end</h3>
+                        <p class="text-xs text-charcoal-mid">Delete a package or interpreter component after successful preparation; change identity inputs; contend on one resource from separate processes; interrupt between preparation and record publication.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">A real migration</h3>
+                        <p class="text-xs text-charcoal-mid">The Cuprum canary (<a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#234-validate-state-value-in-a-real-migration" class="hm-link">roadmap 23.4</a>) must show fresh detection of a removed component, never a stale probe counted as a cache hit, and zero probes for the unchanged hello-world selection.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">The limits are stated as plainly as the guarantees. &ldquo;State annotations do not make an untrusted checkout safe to execute.&rdquo; An observational convention &ldquo;must not be described as an operating-system sandbox.&rdquo;</p>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    RFC 0021 does not mention accessibility. It makes no promise about how state results appear in Netsuke's
+                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output mode</a>, and this page does not invent one.
+                    What the design does say bears on anyone reading probe output through a screen reader or a log:
+                </p>
+                <ul class="space-y-2 text-sm text-charcoal-mid max-w-3xl mb-6">
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Probe arguments and output are redacted through the shared diagnostic policy, messages are bounded, and terminal control sequences are escaped. Raw probe output never becomes a metric label.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>The first stdout line of an external probe is a human summary; the rest is bounded diagnostic data. A preparation-identity mismatch and a functional failure keep distinct reason codes.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Roadmap task 23.4.2 publishes state diagnostics and a probe author guide, and adds &ldquo;metadata and localization through existing surfaces&rdquo; &mdash; the <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a> Netsuke already ships.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md#8-evaluation-and-diagnostics" class="hm-link">RFC 0025 &sect;8</a> tells maturity diagnostics, including <code>verified-states</code> findings, to &ldquo;Reuse Fluent localization&rdquo; and never to leak probe output.</span></li>
+                </ul>
+                <p class="text-xs text-charcoal-mid max-w-3xl">Probe authors write their own summary line; the RFC says nothing about localizing it.</p>
+            </section>
+
+{{ fc.footer('states') }}
+
+        </main>
+    </div>
+
+{% endblock %}

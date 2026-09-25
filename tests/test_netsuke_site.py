@@ -3,7 +3,7 @@
 The Netsuke content pages route through ``config/pages.yaml`` and render from
 ``templates/netsuke/``. These tests load the real configuration, render the
 sub-site's content pages into a temporary directory, and assert the properties
-that the v0.1.0-beta3 refresh introduced and that nothing else checks: the
+that the v0.1.0-beta3 and beta4 refreshes introduced and that nothing else checks: the
 forthcoming-capability routes exist, every page carries the configured release
 version rather than a stale literal, no Jinja artefact leaks into the output,
 and the forthcoming pages light up the Roadmap navigation item through the
@@ -32,11 +32,19 @@ if typ.TYPE_CHECKING:
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PAGES_YAML = REPO_ROOT / "config" / "pages.yaml"
 
-FORTHCOMING_SLUGS = (
-    "forthcoming",
-    "forthcoming/linter",
-    "forthcoming/testing-framework",
-)
+PREVIEW_TITLES = {
+    "forthcoming/system-facts": "System Facts",
+    "forthcoming/standard-library": "Standard Library Expansion",
+    "forthcoming/structured-commands": "Structured Commands",
+    "forthcoming/modules": "Reusable Modules",
+    "forthcoming/testing-framework": "Netsukefile Testing Framework",
+    "forthcoming/property-testing": "Property Testing",
+    "forthcoming/linter": "Netsukefile Linter",
+    "forthcoming/states": "States and Probes",
+    "forthcoming/typed-inputs": "Typed Inputs",
+    "forthcoming/artefacts": "Owned Artefacts",
+}
+FORTHCOMING_SLUGS = ("forthcoming", *PREVIEW_TITLES)
 
 # Text that only reaches the output when a `{% raw %}` block or a template
 # variable was mishandled.
@@ -84,17 +92,13 @@ class TestForthcomingRoutes:
     """The forthcoming-capability pages are routed, titled, and navigable."""
 
     def test_config_routes_every_forthcoming_page(self, netsuke: SubSiteConfig) -> None:
-        """``pages.yaml`` registers the hub and both preview pages."""
+        """``pages.yaml`` registers the hub and every preview page."""
         slugs = {cp.output_slug for cp in netsuke.content_pages}
         assert set(FORTHCOMING_SLUGS) <= slugs
 
     @pytest.mark.parametrize(
         ("slug", "title"),
-        [
-            ("forthcoming", "Forthcoming Capabilities"),
-            ("forthcoming/linter", "Netsukefile Linter"),
-            ("forthcoming/testing-framework", "Netsukefile Testing Framework"),
-        ],
+        [("forthcoming", "Forthcoming Capabilities"), *PREVIEW_TITLES.items()],
     )
     def test_forthcoming_page_renders_with_expected_title(
         self, rendered: dict[str, BeautifulSoup], slug: str, title: str
@@ -113,22 +117,63 @@ class TestForthcomingRoutes:
         for slug in FORTHCOMING_SLUGS:
             assert _current_nav_labels(rendered[slug]) == {"Roadmap"}, slug
 
-    def test_hub_links_both_previews(self, rendered: dict[str, BeautifulSoup]) -> None:
-        """The hub, the docs hub, and the roadmap all link to both previews."""
-        for slug in ("forthcoming", "docs", "roadmap"):
-            hrefs = {a["href"] for a in rendered[slug].select("main a[href]")}
-            assert "/netsuke/forthcoming/linter/" in hrefs, slug
-            assert "/netsuke/forthcoming/testing-framework/" in hrefs, slug
+    @pytest.mark.parametrize("slug", ["forthcoming", "docs", "guides", "roadmap"])
+    def test_hubs_link_every_preview(
+        self, rendered: dict[str, BeautifulSoup], slug: str
+    ) -> None:
+        """The previews hub, the docs and guides hubs, and the roadmap list them all."""
+        hrefs = {str(a["href"]) for a in rendered[slug].select("main a[href]")}
+        missing = sorted(p for p in PREVIEW_TITLES if f"/netsuke/{p}/" not in hrefs)
+        assert not missing, f"{slug} does not link {missing}"
+
+    def test_roadmap_links_into_every_preview_section_it_names(
+        self, rendered: dict[str, BeautifulSoup]
+    ) -> None:
+        """Each capability track on the roadmap deep-links into its preview."""
+        hrefs = {str(a["href"]) for a in rendered["roadmap"].select("main a[href]")}
+        for preview in PREVIEW_TITLES:
+            deep = [h for h in hrefs if h.startswith(f"/netsuke/{preview}/#")]
+            assert deep, f"the roadmap links no section of {preview}"
+
+    def test_every_in_site_fragment_link_resolves(
+        self, rendered: dict[str, BeautifulSoup]
+    ) -> None:
+        """A link to ``/netsuke/<page>/#id`` lands on an element with that id.
+
+        The preview sidebars and the roadmap's deep links are generated from
+        ``forthcoming_data.jinja``, which refuses an anchor it does not list;
+        this checks the other half, that the page really carries it.
+        """
+        ids = {
+            slug: {str(el["id"]) for el in soup.select("[id]")}
+            for slug, soup in rendered.items()
+        }
+        broken = set()
+        for slug, soup in rendered.items():
+            for anchor in soup.select("a[href]"):
+                href = str(anchor["href"])
+                path, _, fragment = href.partition("#")
+                if not fragment:
+                    continue
+                if not path:
+                    target = slug
+                elif path.startswith("/netsuke/"):
+                    target = path.removeprefix("/netsuke/").rstrip("/")
+                else:
+                    continue
+                if target in ids and fragment not in ids[target]:
+                    broken.add(f"{slug} -> {href}")
+        assert not broken, f"fragment links with no target: {sorted(broken)}"
 
 
 class TestReleaseAlignment:
     """Every page reflects the configured release and renders cleanly."""
 
-    def test_configured_version_is_the_beta3_release(
+    def test_configured_version_is_the_beta4_release(
         self, netsuke: SubSiteConfig
     ) -> None:
         """The single source of truth names the current release."""
-        assert netsuke.template_vars["netsuke_version"] == "0.1.0-beta3"
+        assert netsuke.template_vars["netsuke_version"] == "0.1.0-beta4"
 
     def test_no_page_leaks_jinja_artefacts(
         self, rendered: dict[str, BeautifulSoup]
@@ -152,11 +197,12 @@ class TestReleaseAlignment:
     def test_no_page_mentions_the_superseded_version_as_current(
         self, rendered: dict[str, BeautifulSoup]
     ) -> None:
-        """The release card and pills never fall back to the beta2 literal."""
+        """The release card and pills never fall back to an earlier literal."""
         for slug in ("install", "roadmap"):
             kickers = rendered[slug].select(".hm-kicker")
             pills = " ".join(el.get_text(" ") for el in kickers)
             assert "beta2" not in pills, slug
+            assert "beta3" not in pills, slug
 
     def test_kicker_labels_are_not_double_escaped(
         self, rendered: dict[str, BeautifulSoup]

@@ -1305,8 +1305,12 @@ sites:
     base_path: /netsuke/
     template_vars:
       # Single source of truth for the current Netsuke release shown on the
-      # sub-site. Bump this once per release.
-      netsuke_version: "0.1.0-beta3"
+      # sub-site. Bump these together once per release: the version, the
+      # date its release notes carry, and the nightly toolchain that
+      # rust-toolchain.toml pins for source builds.
+      netsuke_version: "0.1.0-beta4"
+      netsuke_release_date: "25 September 2026"
+      netsuke_rust_nightly: "nightly-2026-08-23"
     theme:
       site_name: Netsuke
       hero_eyebrow: Netsuke Documentation
@@ -1437,15 +1441,55 @@ sites:
         template: pages/forthcoming.jinja
         output_slug: forthcoming
         nav_href: /netsuke/roadmap/
-      - key: forthcoming-linter
-        label: Netsukefile Linter
-        template: pages/forthcoming-linter.jinja
-        output_slug: forthcoming/linter
+      - key: forthcoming-system-facts
+        label: System Facts
+        template: pages/forthcoming-system-facts.jinja
+        output_slug: forthcoming/system-facts
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-standard-library
+        label: Standard Library Expansion
+        template: pages/forthcoming-standard-library.jinja
+        output_slug: forthcoming/standard-library
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-structured-commands
+        label: Structured Commands
+        template: pages/forthcoming-structured-commands.jinja
+        output_slug: forthcoming/structured-commands
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-modules
+        label: Reusable Modules
+        template: pages/forthcoming-modules.jinja
+        output_slug: forthcoming/modules
         nav_href: /netsuke/roadmap/
       - key: forthcoming-testing-framework
         label: Netsukefile Testing Framework
         template: pages/forthcoming-testing-framework.jinja
         output_slug: forthcoming/testing-framework
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-property-testing
+        label: Property Testing
+        template: pages/forthcoming-property-testing.jinja
+        output_slug: forthcoming/property-testing
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-linter
+        label: Netsukefile Linter
+        template: pages/forthcoming-linter.jinja
+        output_slug: forthcoming/linter
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-states
+        label: States and Probes
+        template: pages/forthcoming-states.jinja
+        output_slug: forthcoming/states
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-typed-inputs
+        label: Typed Inputs
+        template: pages/forthcoming-typed-inputs.jinja
+        output_slug: forthcoming/typed-inputs
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-artefacts
+        label: Owned Artefacts
+        template: pages/forthcoming-artefacts.jinja
+        output_slug: forthcoming/artefacts
         nav_href: /netsuke/roadmap/
     pages: {}
 

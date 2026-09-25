@@ -1,0 +1,420 @@
+{#
+  Single source of truth for the forthcoming-capability previews.
+
+  The hub's card grid, every preview page's sidebar, header chip, and
+  previous/next footer, and the roadmap's links into a preview's sections
+  all render from the ordered `previews` list below, so adding a preview,
+  renaming a section, or retargeting a release means editing one entry.
+
+  Each entry carries:
+
+  key       the page's slug under /netsuke/forthcoming/
+  title     the page's <h1> and card heading
+  short     the sidebar and footer label
+  icon      the Carbon icon on the hub card
+  tile      the utility class that colours the card's icon tile
+  target    the release the preview is aimed at, or none when no release
+            has been named upstream
+  stage     how far the work has got: a sketch, a proposed RFC, or a
+            branch with code on it
+  summary   the hub card's copy; trusted template data, so it may carry
+            <code> and is rendered unescaped
+  sections  the page's in-page anchors, in order; `link` refuses an anchor
+            that is not listed here, so a roadmap link cannot point at a
+            section that was renamed away
+  sources   the upstream documents the page is written from
+
+  The list is ordered by how near each capability is: named releases
+  first, earliest first, then proposals with no release.
+#}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "docs_nav.jinja" as docsnav %}
+{% set previews = [
+    {
+        'key': 'system-facts',
+        'title': 'System Facts',
+        'short': 'System Facts',
+        'icon': 'carbon:bare-metal-server',
+        'tile': 'bg-primary',
+        'target': 'v0.1.1',
+        'stage': 'Sketch',
+        'summary': 'A small, pure <code>host</code> descriptor &mdash; operating system, family, architecture, executable suffix, and path separators &mdash; so a manifest can say &ldquo;this action is PowerShell-specific&rdquo; without sniffing <code>OS=Windows_NT</code>.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why facts'},
+            {'id': 'descriptor', 'label': 'The host descriptor'},
+            {'id': 'uses', 'label': 'What it replaces'},
+            {'id': 'today', 'label': 'What a manifest knows today'},
+            {'id': 'boundaries', 'label': 'Where facts stop'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md', 'label': 'RFC 0006 (platform contract)'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#67-probe-host-state-through-injected-query-gated-seams', 'label': 'Roadmap 6.7'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/users-guide.md', 'label': "User's guide"},
+        ],
+    },
+    {
+        'key': 'standard-library',
+        'title': 'Standard Library Expansion',
+        'short': 'Standard Library',
+        'icon': 'carbon:function-math',
+        'tile': 'bg-accent',
+        'target': 'v0.1.x',
+        'stage': 'Proposed RFC',
+        'summary': 'Structured data readers, configuration layering, build matrices with stable ordering, version tests, cross-platform path text, and Git-aware quality-gate selection &mdash; every helper pure, bounded, and capability-scoped.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why expand it'},
+            {'id': 'contract', 'label': 'The helper contract'},
+            {'id': 'families', 'label': 'Helper families'},
+            {'id': 'quality-gates', 'label': 'Proportionate quality gates'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md', 'label': 'RFC 0006'},
+            {'href': 'https://github.com/leynos/netsuke/pull/697', 'label': 'Child RFCs (PR #697)'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#6-template-standard-library-expansion', 'label': 'Roadmap phase 6'},
+        ],
+    },
+    {
+        'key': 'structured-commands',
+        'title': 'Structured Commands',
+        'short': 'Structured Commands',
+        'icon': 'carbon:terminal',
+        'tile': 'bg-success',
+        'target': 'v0.2.0',
+        'stage': 'Proposed RFC',
+        'summary': 'Argv-safe <code>invoke</code> blocks where an interpolated value can never become syntax: per-command environments and working directories, private temporary directories, shell-free pipelines, and an allow-list of named shells.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why structure'},
+            {'id': 'invoke', 'label': 'Argv-safe commands'},
+            {'id': 'environment', 'label': 'Environment & directories'},
+            {'id': 'bindings', 'label': 'Bindings & scratch space'},
+            {'id': 'streams', 'label': 'Streams & pipelines'},
+            {'id': 'shells', 'label': 'Named shells'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0001-structured-command-blocks.md', 'label': 'RFC 0001'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0009-structured-command-working-directories.md', 'label': 'RFC 0009'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0010-runtime-bindings-and-secure-tempdirs.md', 'label': 'RFC 0010'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0011-allow-listed-structured-command-shells.md', 'label': 'RFC 0011'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/adr-019-structured-command-shell-selection.md', 'label': 'ADR-019'},
+        ],
+    },
+    {
+        'key': 'modules',
+        'title': 'Reusable Modules',
+        'short': 'Reusable Modules',
+        'icon': 'carbon:assembly-cluster',
+        'tile': 'bg-accent',
+        'target': 'v0.2.0',
+        'stage': 'Proposed RFC',
+        'summary': 'Manifest composition in three layers: repository-relative includes with namespaces, versioned local bundles with typed parameters and private declarations, and digest-pinned external bundles that build offline from a verified cache.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why modules'},
+            {'id': 'includes', 'label': 'Includes'},
+            {'id': 'bundles', 'label': 'Local bundles'},
+            {'id': 'external', 'label': 'Pinned external bundles'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0002-repository-relative-includes.md', 'label': 'RFC 0002'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0003-versioned-local-bundles.md', 'label': 'RFC 0003'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0004-digest-pinned-external-bundles.md', 'label': 'RFC 0004'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/roadmap-composition.md', 'label': 'Composition roadmap'},
+        ],
+    },
+    {
+        'key': 'testing-framework',
+        'title': 'Netsukefile Testing Framework',
+        'short': 'Testing Framework',
+        'icon': 'carbon:test-tool',
+        'tile': 'bg-success',
+        'target': 'v0.3.0',
+        'stage': 'Proposed RFC',
+        'summary': 'Manifest-time tests under <code>netsuke test</code> that run through the same compiler as the build. A YAML test dialect beside the manifest, mock and fixture engines so a test never touches the real host, and assertions over the expanded manifest, the build graph, and the generated Ninja.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why manifest tests'},
+            {'id': 'layout', 'label': 'Test tree and files'},
+            {'id': 'steps', 'label': 'Given, when, then'},
+            {'id': 'mocks', 'label': 'Doubles and fixtures'},
+            {'id': 'command', 'label': 'The command'},
+            {'id': 'example', 'label': 'Worked example'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+            {'id': 'design', 'label': 'Under the bonnet'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md', 'label': 'RFC 0007'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md', 'label': 'UX and semantic design'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md', 'label': 'Technical design'},
+        ],
+    },
+    {
+        'key': 'property-testing',
+        'title': 'Property Testing',
+        'short': 'Property Testing',
+        'icon': 'carbon:chart-scatter',
+        'tile': 'bg-success',
+        'target': none,
+        'stage': 'Proposed RFC',
+        'summary': 'The testing framework&rsquo;s next step: quantified assertions over every generated action, bounded <code>forall</code> generation with seeded replay, built-in metamorphic mutations, and a lint that names the rules no property covers.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why properties'},
+            {'id': 'observation', 'label': 'Observing actions'},
+            {'id': 'generation', 'label': 'Bounded generation'},
+            {'id': 'mutations', 'label': 'Metamorphic mutations'},
+            {'id': 'coverage', 'label': 'Coverage and replay'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0012-netsukefile-property-testing.md', 'label': 'RFC 0012'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md', 'label': 'RFC 0007'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#10-property-based-testing-of-generated-build-scripts', 'label': 'Roadmap phase 10'},
+        ],
+    },
+    {
+        'key': 'linter',
+        'title': 'Netsukefile Linter',
+        'short': 'Netsukefile Linter',
+        'icon': 'carbon:rule-test',
+        'tile': 'bg-primary',
+        'target': 'v0.4.0',
+        'stage': 'Implemented on a branch',
+        'summary': 'Deterministic manifest linting under <code>netsuke check</code>, inspired by mbake. Named rules covering correctness, caching, portability, and clarity; per-rule severity policy; an explainable rule reference; and findings that share the compiler&rsquo;s own diagnostics envelope. Findings never mutate the manifest.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why a linter'},
+            {'id': 'command', 'label': 'The command'},
+            {'id': 'rules', 'label': 'Rule catalogue'},
+            {'id': 'policy', 'label': 'Policy & suppression'},
+            {'id': 'output', 'label': 'Output'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+            {'id': 'architecture', 'label': 'How it works'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md', 'label': 'Linter design'},
+            {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md', 'label': 'Rule reference'},
+            {'href': 'https://github.com/leynos/netsuke/pull/621', 'label': 'PR #621'},
+        ],
+    },
+    {
+        'key': 'states',
+        'title': 'States and Probes',
+        'short': 'States and Probes',
+        'icon': 'carbon:dashboard',
+        'tile': 'bg-accent',
+        'target': none,
+        'stage': 'Proposed RFC',
+        'summary': 'Named states for what must be ready before a command runs &mdash; a directory, a virtual environment, a working service &mdash; checked by built-in probes or external functional checks, prepared at most once, and never repaired behind your back.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why states'},
+            {'id': 'declaring', 'label': 'Declaring a state'},
+            {'id': 'probes', 'label': 'Probes and functional checks'},
+            {'id': 'operations', 'label': 'Require, ensure, prepare'},
+            {'id': 'evidence', 'label': 'Evidence and leases'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0021-managed-states-and-probes.md', 'label': 'RFC 0021'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md', 'label': 'RFC 0025'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#23-verified-preparation-without-mandatory-environments', 'label': 'Roadmap phase 23'},
+        ],
+    },
+    {
+        'key': 'typed-inputs',
+        'title': 'Typed Inputs',
+        'short': 'Typed Inputs',
+        'icon': 'carbon:data-format',
+        'tile': 'bg-success',
+        'target': none,
+        'stage': 'Proposed RFC',
+        'summary': 'Optional types, defaults, and choices for the values a manifest takes, validated before anything runs, with one parameter contract shared by the command line, profiles, and callers.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why typed inputs'},
+            {'id': 'declaring', 'label': 'Declaring inputs'},
+            {'id': 'validation', 'label': 'Validation before execution'},
+            {'id': 'callers', 'label': 'Callers and profiles'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0022-typed-task-inputs.md', 'label': 'RFC 0022'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md', 'label': 'RFC 0025'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#21-typed-inputs-with-one-parameter-contract', 'label': 'Roadmap phase 21'},
+        ],
+    },
+    {
+        'key': 'artefacts',
+        'title': 'Owned Artefacts',
+        'short': 'Owned Artefacts',
+        'icon': 'carbon:box',
+        'tile': 'bg-primary',
+        'target': none,
+        'stage': 'Proposed RFC',
+        'summary': 'Declare which paths a build owns and who produces them, then clean exactly that scope with <code>clean --artefact</code> &mdash; validated before anything is deleted, and never a wildcard.',
+        'sections': [
+            {'id': 'status', 'label': 'Status'},
+            {'id': 'why', 'label': 'Why ownership'},
+            {'id': 'declaring', 'label': 'Declaring ownership'},
+            {'id': 'cleanup', 'label': 'Scoped cleanup'},
+            {'id': 'lifecycle', 'label': 'Lifecycle and migration'},
+            {'id': 'shallow-end', 'label': 'From the shallow end'},
+            {'id': 'confidence', 'label': 'Confidence'},
+            {'id': 'access', 'label': 'Accessibility & localization'},
+        ],
+        'sources': [
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0023-artefact-ownership-and-scoped-cleanup.md', 'label': 'RFC 0023'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0025-progressive-enhancement-and-maturity-policies.md', 'label': 'RFC 0025'},
+            {'href': 'https://github.com/leynos/netsuke/blob/main/docs/roadmap-progressive-enhancement.md#24-owned-artefacts-and-bounded-cleanup', 'label': 'Roadmap phase 24'},
+        ],
+    },
+] %}
+
+{#
+  The href of a preview, or of one of its sections.
+
+  An unknown preview or an unlisted section calls an undefined function,
+  which fails the build rather than publishing a link to nowhere.
+#}
+{% macro href(key, section=none) -%}
+{%- set found = namespace(entry=none) -%}
+{%- for p in previews if p.key == key %}{% set found.entry = p %}{% endfor -%}
+{%- if found.entry is none %}{{ raise_unknown_preview(key) }}{% endif -%}
+{%- if section and section not in (found.entry.sections | map(attribute='id') | list) %}{{ raise_unknown_preview_section(key ~ '#' ~ section) }}{% endif -%}
+/netsuke/forthcoming/{{ key }}/{% if section %}#{{ section }}{% endif %}
+{%- endmacro %}
+
+{#- The chip text naming how near a preview is. -#}
+{% macro target_label(entry) -%}
+{%- if entry.target %}Preview targeted at {{ entry.target }}{% else %}Proposed &middot; no release named{% endif -%}
+{%- endmacro %}
+
+{#- The status chip: a primary dot for a named release, a muted one otherwise. -#}
+{% macro chip(entry) -%}
+<span class="hm-chip"><span class="w-2 h-2 rounded-full {{ 'bg-primary' if entry.target else 'bg-base-300' }} mr-1.5"></span> {{ target_label(entry) }}</span>
+{%- endmacro %}
+
+{#
+  The preview sidebar: every preview, with the current one's sections
+  nested beneath it, then the current page's sources.
+#}
+{% macro sidebar(key) -%}
+{%- set links = [{'href': '/netsuke/forthcoming/', 'label': 'All previews'}] -%}
+{%- set ns = namespace(sources=[]) -%}
+{%- for p in previews -%}
+    {%- set _ = links.append({'href': '/netsuke/forthcoming/' ~ p.key ~ '/', 'label': p.short, 'active': p.key == key}) -%}
+    {%- if p.key == key -%}
+        {%- set ns.sources = p.sources -%}
+        {%- for s in p.sections %}{% set _ = links.append({'href': '#' ~ s.id, 'label': s.label, 'sub': true}) %}{% endfor -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- if not ns.sources %}{{ raise_unknown_preview(key) }}{% endif -%}
+{{ docsnav.sidebar(sections=[
+    {'title': 'Forthcoming', 'links': links},
+    {'title': 'Sources', 'links': ns.sources},
+], search=false, nav_label='Preview pages') }}
+{%- endmacro %}
+
+{#
+  The page header: breadcrumb, kicker, release chip, title, and the lede
+  passed as the call body.
+#}
+{% macro header(key) -%}
+{%- set found = namespace(entry=none) -%}
+{%- for p in previews if p.key == key %}{% set found.entry = p %}{% endfor -%}
+{%- if found.entry is none %}{{ raise_unknown_preview(key) }}{% endif -%}
+            {{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': found.entry.short}]) }}
+
+            <!-- Page Header -->
+            <div class="mb-12 border-b border-stone-light pb-8">
+                <div class="flex items-center flex-wrap gap-3 mb-4">
+                    {{ ui.kicker('Forthcoming capability', dot='bg-primary') }}
+                    {{ chip(found.entry) }}
+                    <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-warning mr-1.5"></span> {{ found.entry.stage }}</span>
+                </div>
+                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-base-content mb-6">{{ found.entry.title }}</h1>
+                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+                    {{ caller() }}
+                </p>
+            </div>
+{%- endmacro %}
+
+{#- Previous and next previews in list order; the ends lead back to the hub. -#}
+{% macro footer(key) -%}
+{%- set ns = namespace(prev=none, next=none) -%}
+{%- for p in previews -%}
+    {%- if p.key == key -%}
+        {%- if not loop.first %}{% set ns.prev = previews[loop.index0 - 1] %}{% endif -%}
+        {%- if not loop.last %}{% set ns.next = previews[loop.index0 + 1] %}{% endif -%}
+    {%- endif -%}
+{%- endfor -%}
+{{ docsnav.footer_nav(
+    {'kicker': 'Previous preview', 'label': ns.prev.short, 'href': '/netsuke/forthcoming/' ~ ns.prev.key ~ '/'} if ns.prev
+        else {'kicker': 'Back', 'label': 'Forthcoming capabilities', 'href': '/netsuke/forthcoming/'},
+    {'kicker': 'Next preview', 'label': ns.next.short, 'href': '/netsuke/forthcoming/' ~ ns.next.key ~ '/'} if ns.next
+        else {'kicker': 'Back', 'label': 'Forthcoming capabilities', 'href': '/netsuke/forthcoming/'}
+) }}
+{%- endmacro %}
+
+{#- The hub's card grid. -#}
+{% macro cards() -%}
+            <div class="grid md:grid-cols-2 gap-8">
+                {%- for p in previews %}
+                <a href="/netsuke/forthcoming/{{ p.key }}/" class="hm-card hm-card--interactive p-8 block h-full group">
+                    <div class="flex items-center justify-between gap-4 mb-6">
+                        <div class="w-12 h-12 shrink-0 rounded-lg {{ p.tile }} text-white flex items-center justify-center text-xl">
+                            <span class="iconify" data-icon="{{ p.icon }}" aria-hidden="true"></span>
+                        </div>
+                        {{ chip(p) }}
+                    </div>
+                    <h2 class="font-serif text-2xl font-bold text-base-content mb-3 group-hover:text-primary transition-colors">{{ p.title }}</h2>
+                    <p class="text-charcoal-mid text-sm leading-relaxed mb-6">{{ p.summary | safe }}</p>
+                    <span class="inline-flex items-center text-sm font-bold text-primary">Read the preview <span class="iconify ml-2" data-icon="carbon:arrow-right" aria-hidden="true"></span></span>
+                </a>
+                {%- endfor %}
+            </div>
+{%- endmacro %}
+
+{#-
+  A compact index of every preview, for the docs and guides hubs: one row
+  per preview with its icon, title, and release chip.
+-#}
+{% macro index_list() -%}
+                <ul class="grid md:grid-cols-2 gap-3">
+                    {%- for p in previews %}
+                    <li class="min-w-0">
+                        <a href="/netsuke/forthcoming/{{ p.key }}/" class="group flex items-center gap-3 p-4 h-full bg-white rounded-xl border border-base-300 shadow-xs hover:shadow-paper hover:border-primary transition-all">
+                            <span class="w-9 h-9 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center" aria-hidden="true"><span class="iconify" data-icon="{{ p.icon }}"></span></span>
+                            <span class="min-w-0 flex-1">
+                                <span class="block font-bold text-base-content text-sm group-hover:text-primary transition-colors">{{ p.title }}</span>
+                                <span class="block text-xs text-charcoal-mid mt-0.5">{{ target_label(p) }}</span>
+                            </span>
+                        </a>
+                    </li>
+                    {%- endfor %}
+                </ul>
+{%- endmacro %}

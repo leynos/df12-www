@@ -41,7 +41,7 @@
                             <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">fetch()</code>
                             <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Network</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. HTTPS is the only allowed scheme by default; the <code>--fetch-*</code> CLI options widen or narrow the policy. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Downloads content from a URL. HTTPS is the only allowed scheme by default; the <code>--fetch-*</code> CLI options widen or narrow the <a href="/netsuke/docs/security/#network-policy" class="hm-link">policy</a>. Since v0.1.0-beta4 every redirect is rechecked against it (at most five hops), and a project <code>.netsuke.toml</code> can only narrow it. Pass <code>cache=true</code> to cache the result in <code>.netsuke/fetch</code>. Marks the template as impure.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             fetch("https://example.com/data", cache=true)
                         </div>
@@ -53,7 +53,7 @@
                             <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">command_available()</code>
                             <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Discovery</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Returns <code>true</code> when an executable can be found on <code>PATH</code>, <code>false</code> otherwise. Accepts the same keyword arguments as <code>which</code>. Ideal in <code>when</code> conditions.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Returns <code>true</code> when an executable can be found on <code>PATH</code>, <code>false</code> otherwise. Accepts the same keyword arguments as <code>which</code>, including <code>cwd_mode</code>; since v0.1.0-beta4 it searches only <code>PATH</code> unless told otherwise. Ideal in <code>when</code> conditions.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             when: command_available('pandoc')
                         </div>
@@ -77,7 +77,7 @@
                             <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">env()</code>
                             <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">Data</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Reads one required environment variable. There is no default-value argument; a missing or non-Unicode value is an error.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Reads one required environment variable. There is no default-value argument; a missing or non-Unicode value is an error. Since v0.1.0-beta4 the operator's <code>env_allow_var</code> and <code>env_block_var</code> lists govern which names it may read; a refused name fails with &ldquo;Access to an environment variable is blocked.&rdquo; See <a href="/netsuke/docs/security/#env-access" class="hm-link">environment access</a>.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
                             env("CC")
                         </div>
@@ -147,13 +147,25 @@
                 <h3 class="font-serif text-lg font-bold text-base-content mb-4 flex items-center">
                     <span class="iconify text-primary mr-2" data-icon="carbon:document-view" aria-hidden="true"></span> File content filters
                 </h3>
+                <div class="bg-warning/5 border border-warning/30 rounded-lg p-5 mb-6 max-w-3xl">
+                    <div class="flex flex-wrap items-center gap-3 mb-2">
+                        <h4 class="font-bold text-base-content text-sm">One read policy for <code>contents</code>, <code>linecount</code>, <code>hash</code>, and <code>digest</code></h4>
+                        <span class="text-xs font-mono text-warning-text bg-warning/10 px-2 py-1 rounded">Breaking in v0.1.0-beta4</span>
+                    </div>
+                    <ul class="space-y-1.5 text-xs text-charcoal-mid list-disc pl-4">
+                        <li>Each read stops at 8 MiB by default. <code>max_bytes=N</code> lowers the budget for one call; a larger value is clamped to the ceiling.</li>
+                        <li>A symbolic link as the final path component is refused (on Windows, any reparse point). <code>follow_symlinks=true</code> accepts a relative-target link; an absolute-target link is still refused.</li>
+                        <li>The opened object must be a regular file, so FIFOs and device nodes are refused.</li>
+                    </ul>
+                    <p class="text-xs text-charcoal-mid mt-2">Details and the trust model are on the <a href="/netsuke/docs/security/#file-reads" class="hm-link">security page</a>.</p>
+                </div>
                 <div class="grid md:grid-cols-2 gap-6 mb-10">
                     <div class="function-card bg-white p-6 rounded-xl border border-base-300 transition-all duration-300 group cursor-pointer">
                         <div class="flex justify-between items-start mb-3">
                             <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">contents</code>
                             <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional encoding argument; <code>'utf-8'</code> (alias <code>'utf8'</code>) is currently the only supported encoding.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Reads a file's content as a string. Accepts an optional encoding argument; <code>'utf-8'</code> (alias <code>'utf8'</code>) is currently the only supported encoding, and other byte sequences are an error.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
 {% raw %}                            {{ "VERSION" | contents }}
 {% endraw %}                        </div>
@@ -173,7 +185,7 @@
                             <code class="text-primary font-bold font-mono text-sm bg-primary/5 px-2 py-1 rounded">linecount</code>
                             <span class="text-xs text-charcoal-light border border-base-300 px-1.5 rounded">File</span>
                         </div>
-                        <p class="text-sm text-charcoal-mid mb-4">Counts the number of lines in a text file. Does not load the entire file into memory.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Counts the number of lines in a UTF-8 text file, reading within the shared byte budget.</p>
                         <div class="text-xs font-mono text-stone-light bg-base-content p-3 rounded group-hover:bg-charcoal-mid transition-colors">
 {% raw %}                            {{ "src/main.c" | linecount }}
 {% endraw %}                        </div>
@@ -319,8 +331,14 @@
                             Resolves executables using the current <code>PATH</code> without marking the template impure.
 {% raw %}                            Available as both a filter (<code>{{ 'clang++' | which }}</code>) and a function (<code>{{ which('clang++') }}</code>).
 {% endraw %}                            On Windows, an extensionless name is matched against the effective <code>PATHEXT</code>, so <code>which('cargo')</code> finds <code>cargo.exe</code>.
-                            Set <code>NETSUKE_WHICH_WORKSPACE=0</code> to disable the workspace-tree fallback search used when a command is absent from <code>PATH</code>.
                         </p>
+                        <div class="bg-warning/5 border border-warning/30 rounded-lg p-4 mb-6 max-w-2xl">
+                            <div class="flex flex-wrap items-center gap-3 mb-2">
+                                <h4 class="font-bold text-base-content text-sm">Workspace search is opt-in</h4>
+                                <span class="text-xs font-mono text-warning-text bg-warning/10 px-2 py-1 rounded">Breaking in v0.1.0-beta4</span>
+                            </div>
+                            <p class="text-xs text-charcoal-mid">The default lookup searches only <code>PATH</code>. Beta3 fell back to a recursive workspace search when <code>PATH</code> was empty or unset; that fallback is gone, and such a lookup now reports the command missing. A trusted manifest that needs the old search asks for it with <code>cwd_mode='workspace-recursive'</code> &mdash; and only for a checkout it trusts, because the search can resolve an executable the checkout supplies. <code>NETSUKE_WHICH_WORKSPACE=0</code> (or <code>false</code>, <code>off</code>) switches that explicit mode off.</p>
+                        </div>
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <h4 class="font-bold text-base-content text-xs uppercase tracking-wide mb-3">Keyword arguments</h4>
@@ -339,14 +357,14 @@
                                     </div>
                                     <div class="flex items-start">
                                         <span class="text-primary w-24 shrink-0">cwd_mode</span>
-                                        <span class="text-charcoal-mid"><code>auto</code> | <code>always</code> | <code>never</code> &mdash; control the bounded project-directory fallback search</span>
+                                        <span class="text-charcoal-mid">Choose the search domain. <code>auto</code> (default): <code>PATH</code> only. <code>always</code>: prepend the workspace root or current directory. <code>never</code>: exclude it. <code>workspace-recursive</code>: scan the workspace tree after <code>PATH</code>.</span>
                                     </div>
                                 </div>
                             </div>
                             <div>
                                 <h4 class="font-bold text-base-content text-xs uppercase tracking-wide mb-3">Diagnostic codes</h4>
                                 <div class="space-y-2 text-xs font-mono text-charcoal-mid">
-                                    <div><code class="text-accent">netsuke::jinja::which::not_found</code> &mdash; executable not on PATH; includes a preview of the scanned PATH</div>
+                                    <div><code class="text-accent">netsuke::jinja::which::not_found</code> &mdash; executable not found; includes a preview of the scanned PATH and, unless that mode was already chosen, a hint pointing at <code>cwd_mode="workspace-recursive"</code></div>
                                     <div><code class="text-accent">netsuke::jinja::which::args</code> &mdash; unknown or invalid keyword argument</div>
                                 </div>
                                 <div class="mt-4 text-xs font-mono text-stone-light bg-base-content p-3 rounded">

@@ -8,7 +8,7 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {{ docsnav.sidebar('configuration') }}
+        {{ docsnav.sidebar('configuration', sub_links=[{'href': '#configuration', 'label': 'Layers and keys'}, {'href': '#policy-exceptions', 'label': 'Security exceptions'}, {'href': '#budget-keys', 'label': 'Budget keys'}, {'href': '#diagnostics', 'label': 'Diagnostics'}]) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
@@ -17,7 +17,7 @@
             {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Configuration'}]) }}
 
             {% call chrome.page_header('Reference', 'Configuration') %}
-                Configuration layers belong to the CLI, the environment, and config files rather than hidden defaults: one discovered base file &lt; project <code>.netsuke.toml</code> &lt; environment variables &lt; CLI flags.
+                Configuration layers belong to the CLI, the environment, and config files rather than hidden defaults: one discovered base file &lt; project <code>.netsuke.toml</code> and its <code>extends</code> chain &lt; environment variables &lt; CLI flags. Fetch grants, <code>env()</code> allow rules, and evaluation budgets are the deliberate exceptions.
             {% endcall %}
 
             <section id="configuration" class="mb-20">
@@ -26,8 +26,8 @@
                 </h2>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     When neither <code>--config</code> nor <code>NETSUKE_CONFIG</code> selects a file, Netsuke layers configuration in this order, with later entries overriding earlier ones:
-                    <strong>one discovered base winner (user configuration, otherwise system configuration, otherwise built-in defaults) &lt; project <code>.netsuke.toml</code> &lt; <code>NETSUKE_</code> environment variables &lt; CLI flags</strong>.
-                    Automatic discovery picks exactly one base file rather than merging system and user scopes, then appends the project layer so project values can override it while fields present only in the winner remain available. An explicit selector bypasses discovery entirely: the selected file replaces the discovered base and project layers, and environment variables and flags still apply on top. A flag on the command line always wins, and project config files can be overridden per-invocation without editing them.
+                    <strong>one discovered base winner (user configuration, otherwise system configuration, otherwise built-in defaults) &lt; project <code>.netsuke.toml</code> and its <code>extends</code> chain &lt; <code>NETSUKE_</code> environment variables &lt; CLI flags</strong>.
+                    Automatic discovery picks exactly one base file rather than merging system and user scopes, then appends the project layer so project values can override it while fields present only in the winner remain available. An explicit selector bypasses discovery entirely: the selected file replaces the discovered base and project layers, and environment variables and flags still apply on top. A flag on the command line always wins, and project config files can be overridden per-invocation without editing them. Three security-sensitive settings do not follow this order; see <a href="#policy-exceptions" class="hm-link">security exceptions</a>.
                 </p>
 
                 <div class="bg-warning/5 border border-warning/30 rounded-lg p-4 flex items-start mb-6 max-w-3xl">
@@ -70,8 +70,12 @@
                             <div><code class="text-success-text">NETSUKE_NINJA</code>=<code class="text-warning-text">/opt/ninja/bin/ninja</code></div>
                             <div><code class="text-success-text">NETSUKE_WINDOWS_SHELL</code>=<code class="text-warning-text">bash</code></div>
                             <div><code class="text-success-text">NETSUKE_WHICH_WORKSPACE</code>=<code class="text-warning-text">0</code></div>
+                            <div><code class="text-success-text">NETSUKE_TRUST_PROJECT_FETCH_POLICY</code>=<code class="text-warning-text">true</code></div>
+                            <div><code class="text-success-text">NETSUKE_ENV_ALLOW_VAR</code>=<code class="text-warning-text">'["CI"]'</code></div>
+                            <div><code class="text-success-text">NETSUKE_ENV_BLOCK_VAR</code>=<code class="text-warning-text">'["GITHUB_TOKEN"]'</code></div>
+                            <div><code class="text-success-text">NETSUKE_MANIFEST_FUEL</code>=<code class="text-warning-text">50000000</code></div>
                         </div>
-                        <p class="text-xs text-charcoal-mid mt-3">Policy values are matched case-insensitively. <code>NETSUKE_JSON</code> accepts <code>true</code>/<code>1</code> and <code>false</code>/<code>0</code>; anything else is a validation error rather than a silent fallback. <code>NETSUKE_NINJA</code> overrides the Ninja executable used by <code>build</code> and <code>clean</code>; empty or non-UTF-8 values fall back to <code>ninja</code> on <code>PATH</code>.</p>
+                        <p class="text-xs text-charcoal-mid mt-3">Policy values are matched case-insensitively. <code>NETSUKE_JSON</code> accepts <code>true</code>/<code>1</code> and <code>false</code>/<code>0</code>; anything else is a validation error rather than a silent fallback. <code>NETSUKE_NINJA</code> overrides the Ninja executable used by <code>build</code> and <code>clean</code>; empty or non-UTF-8 values fall back to <code>ninja</code> on <code>PATH</code>. <code>NETSUKE_WHICH_WORKSPACE</code> set to <code>0</code>, <code>false</code>, or <code>off</code> switches off the explicit <code>cwd_mode="workspace-recursive"</code> search; it no longer governs a default fallback, because <code>which</code> has none. The two <code>NETSUKE_ENV_*_VAR</code> variables take serialized JSON arrays, not bare names.</p>
                     </div>
                 </div>
 
@@ -91,9 +95,9 @@
                                 <span class="hm-config-keys__label" id="config-keys-label-output" data-config-keys-label="output">Output</span>
                                 <p class="hm-config-keys__note" id="config-keys-note-output" data-config-keys-note="output">What Netsuke prints, and how. Progress, accessible mode, emoji, and colour each auto-detect the terminal; set one explicitly to override the guess. <code>locale</code> picks the language messages are written in.</p>
                             </div>
-                            <div class="hm-config-keys__key" data-config-keys-key="network">
-                                <span class="hm-config-keys__label" id="config-keys-label-network" data-config-keys-label="network">Network</span>
-                                <p class="hm-config-keys__note" id="config-keys-note-network" data-config-keys-note="network">What the <code>fetch()</code> helper is allowed to reach. Choose whether unlisted hosts are denied by default, then name the hosts to allow or block.</p>
+                            <div class="hm-config-keys__key" data-config-keys-key="policy">
+                                <span class="hm-config-keys__label" id="config-keys-label-policy" data-config-keys-label="policy">Policy</span>
+                                <p class="hm-config-keys__note" id="config-keys-note-policy" data-config-keys-note="policy">What the <code>fetch()</code> and <code>env()</code> helpers may reach. Choose whether unlisted hosts are denied, name the hosts to allow or block, and list the environment variables a manifest may read. Allow entries belong in operator configuration: a project file cannot grant them on its own authority.</p>
                             </div>
                         </div>
                         <div class="hm-config-keys__panels" data-config-keys-panels>
@@ -124,17 +128,76 @@ json = false
 verbose = false
 {% endhighlight %}
                             </div>
-                            <div class="hm-config-keys__panel" id="config-keys-panel-network" data-config-keys-panel="network" role="group" aria-labelledby="config-keys-label-network">
+                            <div class="hm-config-keys__panel" id="config-keys-panel-policy" data-config-keys-panel="policy" role="group" aria-labelledby="config-keys-label-policy">
 {% highlight 'toml' %}
 # Network policy for the fetch() helper
 fetch_default_deny = false
+# Allow entries in a project .netsuke.toml are ignored
+# unless the operator enables trust_project_fetch_policy
+fetch_allow_scheme = ["https"]
 fetch_allow_host = ["*.example.com"]
 fetch_block_host = ["metadata.internal"]
+# Operator layers only; a project cannot set it for itself
+trust_project_fetch_policy = false
+# env() access: exact names, a block always wins
+env_allow_var = ["CI", "PACKAGE_REGISTRY_TOKEN"]
+env_block_var = ["AWS_SECRET_ACCESS_KEY"]
 {% endhighlight %}
                             </div>
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <section id="policy-exceptions" class="mb-20 pt-10 border-t border-stone-light">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
+                        <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:security" aria-hidden="true"></span> Security exceptions to precedence
+                    </h2>
+                    <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                </div>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A checkout's own <code>.netsuke.toml</code> is a request, not an order. For three kinds of setting, the primary project file can tighten what the operator allows but never loosen it. System and user configuration, <code>NETSUKE_</code> variables, and CLI flags are the operator layers. Files pulled in through <code>extends</code> keep ordinary file-layer precedence for fetch and <code>env()</code> policy.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Fetch policy</h3>
+                        <p class="text-xs text-charcoal-mid">Project <code>fetch_allow_scheme</code> and <code>fetch_allow_host</code> are ignored unless an operator sets <code>trust_project_fetch_policy</code>. A project may turn <code>fetch_default_deny</code> on but not off, and its block entries always count. <a href="/netsuke/docs/security/#network-policy" class="hm-link">Network policy</a>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm"><code>env()</code> access</h3>
+                        <p class="text-xs text-charcoal-mid">Project <code>env_allow_var</code> entries are removed before the policy is composed, so they can neither widen the allowlist nor switch on default-deny. Project <code>env_block_var</code> entries accumulate. <a href="/netsuke/docs/security/#env-access" class="hm-link">Environment access</a>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Evaluation budgets</h3>
+                        <p class="text-xs text-charcoal-mid">A project value, including one from its <code>extends</code> chain, may lower a <code>manifest_*</code> ceiling but cannot raise one set by the defaults, user configuration, the environment, or the CLI. <a href="/netsuke/docs/security/#resource-budgets" class="hm-link">Resource budgets</a>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="budget-keys" class="mb-20 pt-10 border-t border-stone-light">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
+                        <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:meter" aria-hidden="true"></span> Budget keys
+                    </h2>
+                    <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                </div>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Seven keys bound manifest evaluation. They are not in <code>docs/sample-netsuke.toml</code>; the names and defaults below come from the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#resource-budgets" class="hm-link">users' guide</a> and the CLI definition. Each has a <code>NETSUKE_</code> variable (the key in upper case) and a <code>--manifest-*</code> flag. Values must be positive integers.
+                </p>
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
+{% highlight 'toml' %}
+# Defaults shown; set these in trusted configuration
+manifest_evaluation_fuel = 1000000           # MiniJinja instructions per evaluation
+manifest_fuel = 100000000                    # MiniJinja instructions per manifest
+manifest_rendered_value_bytes = 1048576      # 1 MiB per rendered value
+manifest_rendered_manifest_bytes = 16777216  # 16 MiB across all rendered values
+manifest_source_bytes = 4194304              # 4 MiB of template source
+manifest_foreach_cardinality = 10000         # values per foreach
+manifest_expanded_entries = 50000            # targets and actions after expansion
+{% endhighlight %}
+                </div>
+                <p class="text-xs text-charcoal-mid max-w-3xl">A breach reports <code>Manifest resource budget exhausted</code> with the stage and limit, under the JSON code <code>netsuke::runner::manifest_budget_exceeded</code>.</p>
             </section>
 
             <section id="diagnostics" class="mb-20 pt-10 border-t border-stone-light">
@@ -155,7 +218,7 @@ fetch_block_host = ["metadata.internal"]
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <h3 class="font-bold text-base-content mb-3 text-sm">Metrics snapshot</h3>
-                        <p class="text-xs text-charcoal-mid">With <code>--verbose</code>, Netsuke emits one final <code>metrics snapshot</code> debug event before exiting: bounded counters and histograms for configuration loading (<code>config_load_total</code>, <code>config_load_duration_seconds</code>), cached discovery, raw CLI path validation, and legacy recipe execution. It is an in-process diagnostic record, not a metrics endpoint. JSON mode suppresses all of this tracing so stderr stays a single machine-readable document.</p>
+                        <p class="text-xs text-charcoal-mid">With <code>--verbose</code>, Netsuke emits one final <code>metrics snapshot</code> debug event before exiting: bounded counters and histograms for configuration loading (<code>config_load_total</code>, <code>config_load_duration_seconds</code>), cached discovery, raw CLI path validation, and legacy recipe execution. Since v0.1.0-beta4 it also carries <code>netsuke_runner_manifest_structures_total</code>, which counts manifest structural summaries and records only integer collection sizes, and <code>netsuke_manifest_env_lookups_total</code>, which counts <code>env()</code> lookups by <code>outcome</code> (<code>success</code>, <code>blocked</code>, <code>not_present</code>, <code>not_unicode</code>) without naming a variable. It is an in-process diagnostic record, not a metrics endpoint. JSON mode suppresses all of this tracing so stderr stays a single machine-readable document.</p>
                     </div>
                 </div>
             </section>

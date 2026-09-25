@@ -1,0 +1,253 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}Standard Library Expansion (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+{% set rm = 'https://github.com/leynos/netsuke/blob/main/docs/roadmap.md' %}
+{% set rfc = 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md' %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('standard-library') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('standard-library') %}
+                    A Netsukefile that needs a field out of JSON, a layered configuration, a build matrix, or a version check reaches for
+                    <code>shell()</code> today. RFC 0006 proposes absorbing those operations into the template language as pure, bounded,
+                    capability-classified helpers, so the generated graph stays byte-for-byte reproducible and <code>netsuke help targets</code>
+                    can answer more questions without executing anything.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> No helper from the expansion ships. All 49 tasks in <a href="{{ rm }}#6-template-standard-library-expansion" class="hm-link">roadmap phase 6</a> are unticked. The <a href="/netsuke/docs/standard-library/" class="hm-link">shipped standard library</a> is documented separately.</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Specified.</strong> <a href="{{ rfc }}" class="hm-link">RFC 0006</a> (status Proposed, created 26 August 2026) was merged to <code>main</code> as a specification. Its release target: after v0.1.0 final, and &ldquo;no part of this RFC may land in the v0.1.0 hardening release&rdquo;. It names v0.1.x and v0.2.x as targets.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Being split.</strong> Open PR <a href="https://github.com/leynos/netsuke/pull/697" class="hm-link">#697</a> divides the accepted set among focused child RFCs 0013 to 0020, of which only <a href="https://github.com/leynos/netsuke/blob/6-1-1-split-rfc-0006-set-into-focused-child-rfcs-and-task/docs/rfcs/0013-structured-data-interchange-helpers.md" class="hm-link">RFC 0013, structured data interchange</a>, is written; it adds a test suite asserting that every accepted helper has exactly one owner.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Adjacent work in flight.</strong> Open PR <a href="https://github.com/leynos/netsuke/pull/702" class="hm-link">#702</a> (roadmap 3.14.8) implements <code>env(name, default=...)</code> and a <code>compact</code> filter. <code>shell_escape</code> and <code>shell_join</code>, on which RFC 0006's <code>shell_quote</code> depends, are not on that branch yet.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why expand it
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Fifty-seven new helpers &mdash; forty-one filters and sixteen tests &mdash; across ten capability groups, surveyed from
+                    ansible-core and filtered hard. The RFC's own case for the volume: &ldquo;the alternative is not a smaller standard
+                    library; it is the same operations expressed as shell pipelines that Netsuke can neither audit nor reproduce.&rdquo;
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Measured by subprocesses removed</h3>
+                        <p class="text-xs text-charcoal-mid">The roadmap states the value plainly: it is &ldquo;measured by the manifest operations that no longer require a subprocess, not by name parity with Ansible&rdquo;.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Stolen one at a time</h3>
+                        <p class="text-xs text-charcoal-mid">Ansible's generic <code>lookup(...)</code> dispatcher is rejected; useful capabilities come across as typed, named helpers. One name per capability: no alias families, no <code>win_*</code> variants where a <code>dialect</code> argument will do.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Mostly pure</h3>
+                        <p class="text-xs text-charcoal-mid">Fifty-two of the fifty-seven are pure. Four read the filesystem and one reads the environment. None reads the clock, the network, or a subprocess, so most of the new surface is also available to <code>netsuke help targets</code>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contract" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:document-protected" aria-hidden="true"></span> The helper contract
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    RFC 0006 &sect;6 is normative: &ldquo;A child issue that does not satisfy every clause below for every helper it adds is not
+                    complete.&rdquo; <a href="{{ rm }}#61-settle-the-standard-library-contract-before-the-volume-arrives" class="hm-link">Roadmap step 6.1</a>
+                    builds the shared machinery before any family lands.
+                </p>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Clause</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">What it requires</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows text-sm text-charcoal-mid">
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.1 Purity classes</td><td class="px-6 py-4">Exactly one label per helper: pure, or clock-, environment-, filesystem-, network-, or subprocess-observing. Only pure helpers are available in manifest queries.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.2 Query availability</td><td class="px-6 py-4">Every non-pure helper registers in the query environment as an always-failing stub with a localized diagnostic &mdash; &ldquo;they must never simply be absent&rdquo;. A test exercises each registration.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.3 Determinism</td><td class="px-6 py-4">&ldquo;A <code>Netsukefile</code> compiled twice from the same inputs must produce the same generated Ninja byte for byte.&rdquo; No hash-table ordering, LF everywhere, dialect-driven separators, C locale, no unseeded randomness.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.4 Capability boundary</td><td class="px-6 py-4">Filesystem through the injected <code>cap_std</code> handle, environment through an injected reader. &ldquo;A path outside the capability boundary is an error, never a <code>false</code> result.&rdquo;</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.5 Platform contract</td><td class="px-6 py-4">Unix, Windows, and unsupported-platform behaviour documented. Lexical helpers take <code>dialect</code>: <code>host</code>, <code>posix</code>, or <code>windows</code>. A helper that cannot honour its contract fails with a typed diagnostic naming the platform and the capability.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.6 Types and errors</td><td class="px-6 py-4">Enumerated accepted kinds, no silent coercion, strict undefined, <code>none</code> as a value, duplicates rejected by default, checked overflow, and unknown option values that list the valid set.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.7 Canonical equality</td><td class="px-6 py-4">Values are equal when their RFC 8785 canonical JSON is byte-identical. Deduplication keeps first appearance.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.8 Resource bounds</td><td class="px-6 py-4">Rejects unreasonable expansion <em>before</em> allocating: 8 MiB input and depth 128 for parsers, 100,000 YAML alias nodes, 100,000 tuples for <code>product</code> and <code>combinations</code>, 10,000 for <code>permutations</code>, 1 MiB compiled patterns.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.9 Diagnostics</td><td class="px-6 py-4">A domain error enum per group; Fluent keys under <code>stdlib.&lt;module&gt;.&lt;condition&gt;</code>; machine codes of the form <code>netsuke::jinja::&lt;module&gt;::&lt;reason&gt;</code>.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.10 Naming</td><td class="px-6 py-4">&ldquo;Netsuke registers exactly <strong>one</strong> name per capability.&rdquo;</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap font-medium text-primary">6.11 Docs and tests</td><td class="px-6 py-4">A guide entry with its purity label, an executed <code>tested-example</code>, unit, property, and integration tests, a query-disposition test, and an inventory row.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-charcoal-mid max-w-3xl">Where host probing comes up &mdash; the filesystem predicates and <code>expandvars</code> of roadmap 6.7 &mdash; the separate <a href="{{ fc.href('system-facts') }}" class="hm-link">system facts sketch</a> covers what a manifest can learn about its host without probing at all.</p>
+            </section>
+
+            <section id="families" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:function-math" aria-hidden="true"></span> Helper families
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Shallow end first. Each panel gives signatures exactly as the RFC heads them, and each family links its roadmap step.
+                    Every one is proposed.
+                </p>
+                {% set families = [
+                    {'title': 'Read structured data without a subprocess', 'step': '6.2', 'anchor': '62-read-structured-data-without-a-subprocess',
+                     'body': 'Duplicate keys are rejected with the key and byte offset: &ldquo;last-key-wins is a silent data-loss trapdoor in a build manifest&rdquo;. <code>to_yaml</code> quotes <code>yes</code>, <code>no</code>, <code>on</code>, and <code>off</code> so the Norway problem cannot reach a generated file. Specified in detail by child RFC 0013.',
+                     'code': "text | from_json\ntext | from_yaml_all\nvalue | to_yaml(indent=2, sort_keys=false, explicit_start=false)"},
+                    {'title': 'Make configuration layering expressible', 'step': '6.3', 'anchor': '63-make-configuration-layering-expressible',
+                     'body': '<code>combine</code> keeps first-appearance key order and offers <code>replace</code>, <code>keep</code>, <code>append</code>, and <code>prepend</code> list policies. The RFC states outright that recursive merging is not associative, with a worked counterexample.',
+                     'code': "mapping | combine(*others, recursive=false, list_merge='replace')\nsequence | items2dict(key_name='key', value_name='value', duplicates='error')"},
+                    {'title': 'Build matrices with stable ordering', 'step': '6.4', 'anchor': '64-make-build-matrices-expressible-with-stable-ordering',
+                     'body': '<code>product</code> is &ldquo;for build matrices over target triples, feature sets, and optimization levels&rdquo;. Cardinality is checked before allocation, and the roadmap test deliberately varies hash state to catch any helper reimplemented over a hash set.',
+                     'code': "a | product(*others, repeat=1)\n{{ records | selectattr('tags', 'contains', 'rust') | list }}"},
+                    {'title': 'Text and version conditions', 'step': '6.5', 'anchor': '65-make-text-and-version-conditions-expressible',
+                     'body': 'One regular-expression dialect, <code>netsuke-regex-v1</code>, over the Rust <code>regex</code> crate. Version comparison is strict SemVer with a required operator: &ldquo;<code>1.82</code> is not a Semantic Version and is rejected&rdquo;. Whether to tolerate a <code>v</code> prefix is an open question.',
+                     'code': "value | regex_replace(pattern, replacement, ignorecase=false, multiline=false, count=0, mandatory_count=0)\n{% if compiler_version is version('1.82.0', '>=') %}"},
+                    {'title': 'Path text for a platform other than the host', 'step': '6.6', 'anchor': '66-compose-path-text-for-a-platform-other-than-the-host',
+                     'body': 'Python lets <code>[\'/safe/root\', \'/etc/passwd\'] | path_join</code> yield <code>/etc/passwd</code>; &ldquo;that is a trapdoor in a build manifest and Netsuke refuses it&rdquo;. A Unix host must parse a Windows path exactly as a Windows host would.',
+                     'code': "parts | path_join(dialect='host')\npath | relpath(start, dialect='host')"},
+                    {'title': 'Probe host state through query-gated seams', 'step': '6.7', 'anchor': '67-probe-host-state-through-injected-query-gated-seams',
+                     'body': 'The four filesystem-observing and one environment-observing helpers of the set. All run through injected seams and are refused under <code>help targets</code>; <code>mount</code> may ship Unix-only, with an explicit error on Windows rather than a silent <code>false</code>.',
+                     'code': "path is link_exists\ntext | expandvars(dialect='host', missing='error')"},
+                    {'title': 'File text and stable identities', 'step': '6.8', 'anchor': '68-generate-file-text-and-stable-identities',
+                     'body': '<code>to_uuid</code> is UUIDv5 under a frozen Netsuke namespace. A block <code>comment</code> whose text contains the closing marker is an error, so comment text cannot escape into the generated file as live syntax. <code>human_readable</code> and <code>human_to_bytes</code> are locale-independent.',
+                     'code': "text | to_uuid(namespace=<Netsuke namespace>)\ntext | comment(style='hash', prefix=none)"},
+                    {'title': 'Timestamps without the clock', 'step': '6.9', 'anchor': '69-convert-explicit-timestamps-without-reading-the-clock',
+                     'body': 'Parsing and formatting are pure and never read the clock. A closed specifier set, the C locale, and no zone database: <code>%Z</code> is refused and IANA zone names are rejected. Identical manifests produce identical text on machines with different locales.',
+                     'code': "text | to_datetime(format='%Y-%m-%d %H:%M:%S', timezone='UTC')\ntimestamp | strftime(format)"},
+                ] %}
+                <div class="space-y-6">
+                    {% for f in families %}
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+                            <h3 class="font-bold text-base-content text-sm">{{ f.title }}</h3>
+                            <a href="{{ rm }}#{{ f.anchor }}" class="hm-link text-xs font-mono">Roadmap {{ f.step }}</a>
+                        </div>
+                        <p class="text-xs text-charcoal-mid mb-4">{{ f.body | safe }}</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{{ f.code | safe }}{% endhighlight %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start mt-8">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Deliberately deferred.</strong> Seeded <code>shuffle</code> and <code>random</code>, <code>log</code>/<code>pow</code>/<code>root</code>,
+                        and <code>type_debug</code> wait on <a href="{{ rm }}#610-decide-the-deferred-candidates-on-evidence-rather-than-parity" class="hm-link">roadmap 6.10</a>,
+                        which adopts a candidate only with a named consumer. Unseeded randomness stays rejected permanently.
+                    </p>
+                </div>
+            </section>
+
+            <section id="quality-gates" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:logo-git" aria-hidden="true"></span> Proportionate quality gates
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    <a href="{{ rm }}#611-select-proportionate-quality-gates-from-git-changes" class="hm-link">Roadmap step 6.11</a> sits outside
+                    RFC 0006's Ansible-derived set but follows the same contract. It exposes the paths changed between two commits as typed
+                    data, and a pure filter to test them, so a manifest can leave an expensive gate out of the graph when nothing it checks
+                    has changed. The <a href="https://github.com/leynos/netsuke/blob/main/docs/git-change-detection-helpers-design.md" class="hm-link">design</a>
+                    is Proposed; <a href="https://github.com/leynos/netsuke/blob/main/docs/adr-015-use-bounded-git-cli-for-change-detection.md" class="hm-link">ADR-015</a>
+                    governs the bounded Git adapter.
+                </p>
+                <p class="text-xs text-charcoal-mid mb-2">The design document's motivating example (proposed)</p>
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+targets:
+  - name: lint-rust
+    when: >-
+      git_changed_files('origin/main...HEAD')
+      | matches_glob('**/*.rs', 'Cargo.toml', 'Cargo.lock')
+    command: cargo clippy --workspace --all-targets --all-features -- -D warnings
+{% endraw %}{% endhighlight %}
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm"><code>git_changed_files(range)</code></h3>
+                        <p class="text-xs text-charcoal-mid">Accepts exactly <code>A..B</code> and <code>A...B</code>, rejecting malformed and option-like endpoints before Git starts. Runs fixed argument vectors with <code>--no-lazy-fetch</code>, parses NUL-delimited output, and returns sorted, de-duplicated paths. Impure: it flips the render's impurity flag before Git runs and is a named failing stub under <code>help targets</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm"><code>matches_glob(*patterns)</code></h3>
+                        <p class="text-xs text-charcoal-mid">Pure and variadic: true when any path matches any pattern, with semantics aligned to <code>glob()</code>. At most 64 patterns and 65,536 pattern bytes, checked before anything is compiled. Every path is validated even after an early match.</p>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid max-w-3xl">Scope is narrow on purpose: no working-tree inspection, no untracked files, and no per-linter file selection. The helper decides whether a target enters the graph; it does not change Ninja's incremental model. The roadmap's success test: the documented example omits its Rust target for a Python-only changeset and includes it for every Rust path class.</p>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Every new helper is additive. A manifest that uses none of them compiles as it does today, and the existing
+                    <code>basename</code> and <code>dirname</code> gain <code>dialect</code> as an optional argument rather than changing
+                    behaviour. The route in, in order:
+                </p>
+                <ol class="space-y-4 text-sm text-charcoal-mid max-w-3xl list-decimal pl-5">
+                    <li><strong>Today.</strong> The <a href="/netsuke/docs/standard-library/" class="hm-link">shipped standard library</a> &mdash; path filters, <code>glob</code>, <code>which</code>, <code>command_available</code>, and collection filters &mdash; covers most manifests.</li>
+                    <li><strong>First step.</strong> Replace one <code>shell('jq ...')</code> with <code>from_json</code>, or one <code>--version</code> scrape with the <code>version</code> test. Both are pure, so <code>help targets</code> can evaluate them.</li>
+                    <li><strong>Next.</strong> Layer configuration with <code>combine</code> and expand matrices with <code>product</code>, trusting the ordering to be stable.</li>
+                    <li><strong>Cross-platform.</strong> Compose paths with an explicit <code>dialect</code>, and read the host's own conventions from the <a href="{{ fc.href('system-facts') }}" class="hm-link">system facts sketch</a> once it lands.</li>
+                    <li><strong>Deep end.</strong> Probe the host through the 6.7 predicates, and gate expensive checks on a Git changeset.</li>
+                </ol>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">All planned. The phase's success criterion is written as tests, not prose.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Byte-identical output, tested end to end</h3>
+                        <p class="text-xs text-charcoal-mid">A representative matrix manifest must compile twice to byte-identical Ninja. The layering step's example must do the same in an isolated workspace.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Property tests where laws exist</h3>
+                        <p class="text-xs text-charcoal-mid">Round trips for encoders and serializers, ordering and idempotence for set algebra, composition laws for <code>combine</code>, <code>path_join</code>, and <code>normpath</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Query disposition cannot be forgotten</h3>
+                        <p class="text-xs text-charcoal-mid">Roadmap 6.1.6's contract test makes it impossible to add a non-pure helper without deciding how it behaves under <code>help targets</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Documentation that runs</h3>
+                        <p class="text-xs text-charcoal-mid">Every guide example is executed by the existing documentation-example tests, and the maintained inventory is test-enforced so it cannot drift. PR #697's coverage suite proves each accepted helper has exactly one owning child RFC.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <ul class="space-y-3 text-sm text-charcoal-mid max-w-3xl">
+                    <li><strong>Every message is a Fluent key.</strong> Netsuke ships 35 locales, and the new diagnostics join that set.</li>
+                    <li><strong>Codes survive translation.</strong> Each error carries a stable <code>netsuke::jinja::&lt;module&gt;::&lt;reason&gt;</code> code, the shape <code>netsuke::jinja::which::not_found</code> already uses. #702 puts the code in the Fluent text so the diagnostic stays greppable in every locale.</li>
+                    <li><strong>A gap, named.</strong> The query-restriction message is built with <code>format!</code> and is not localized today. Roadmap 6.1.5 fixes it.</li>
+                    <li><strong>Output that ignores the reader's locale.</strong> Pinning the C locale and ASCII digits is a determinism rule, and it also means a build log reads the same wherever it is read.</li>
+                    <li><strong>Where the design is silent.</strong> The RFC says nothing about screen-reader-specific rendering of helper diagnostics beyond what the shared reporter already provides.</li>
+                </ul>
+            </section>
+
+{{ fc.footer('standard-library') }}
+
+        </main>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,388 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}System Facts (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('system-facts') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('system-facts') %}
+                    A manifest can ask whether <code>cargo-nextest</code> is installed. It cannot ask which operating system it is running on.
+                    The sketch below proposes a small, pure <code>host</code> descriptor &mdash; operating system, family, architecture,
+                    executable suffix, and both path separators &mdash; so that &ldquo;this action is PowerShell-specific&rdquo; becomes a
+                    fact a manifest reads rather than a guess it makes from <code>OS=Windows_NT</code>.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> No template variable, global, or function exposes the host's operating system, architecture, or path conventions today.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:pen" aria-hidden="true"></span> <span><strong>A sketch, not a specification.</strong> There is no RFC, ADR, roadmap task, or issue. The design source is a short note from the project's maintainer, quoted in full below. Field names, value spellings, and the shape of the surface are all still open.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Intended near the front of v0.1.1.</strong> It is not part of the v0.1.0 hardening release, and nothing on this page ships with it.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why first-class host facts
+                </h2>
+                <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">The maintainer's sketch</p>
+                <blockquote class="bg-white p-6 rounded-xl border border-base-300 border-l-4 border-l-primary shadow-xs text-sm text-charcoal-mid mb-8 max-w-3xl space-y-3">
+                    <p><strong>First-class host facts.</strong> There is no documented Jinja surface equivalent to <code>host.os</code>, <code>host.family</code>, <code>host.arch</code>, <code>host.exe_suffix</code>, <code>host.path_separator</code>, <code>host.path_list_separator</code>. <code>command_available()</code> can select between installed tools, but it cannot reliably express &ldquo;this action is PowerShell-specific&rdquo;, &ldquo;use NUL rather than /dev/null&rdquo;, or &ldquo;select the Windows path convention&rdquo;.</p>
+                    <p>The current standard library knows about platform behaviour internally, for example PATHEXT and home-directory resolution, but does not expose a stable host descriptor to manifests. This would be a small, pure capability with disproportionate value. It would remove a lot of probing through ambient environment variables such as <code>OS=Windows_NT</code>. It belongs near the front of v0.1.1.</p>
+                </blockquote>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Prior art</h3>
+                        <p class="text-xs text-charcoal-mid">Ansible gathers facts about each host before a play runs. The idea is the same &mdash; describe the machine once, let the rest of the file read it &mdash; minus the gathering. Ansible's fact collection runs code on the target; this descriptor would spawn no subprocess and read no environment variable.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">The knowledge already exists</h3>
+                        <p class="text-xs text-charcoal-mid"><code>which</code> matches names against <code>PATHEXT</code> on Windows, and <code>expanduser</code> walks a different chain of home-directory variables on each platform. Netsuke already branches on the host internally; it simply keeps the answer to itself.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Small on purpose</h3>
+                        <p class="text-xs text-charcoal-mid">Six fields, all fixed for a given host. No probing, no timestamps, no inventory of installed software. Everything that genuinely has to be discovered stays with the helpers that discover it, behind their existing gates.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="descriptor" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:data-structured" aria-hidden="true"></span> The host descriptor
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The sketch names six fields. What each is for follows from the problems the sketch lists; what each would contain has
+                    not been decided. The example values are there to make the rows concrete.
+                </p>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Field</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">What it answers</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Illustrative values</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.os</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Which operating system Netsuke is running on. The field a PowerShell-only or macOS-only action would test.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid"><code>linux</code>, <code>macos</code>, <code>windows</code></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.family</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The broader lineage, so a manifest can say &ldquo;any Unix&rdquo; without listing every Unix.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid"><code>unix</code>, <code>windows</code></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.arch</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The processor architecture of the host, for choosing a prebuilt tool or naming an output directory.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid"><code>x86_64</code>, <code>aarch64</code></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.exe_suffix</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The suffix an executable carries on this host, so an output name need not be spelt twice.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid"><code>.exe</code>, or empty</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.path_separator</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The separator between components of one path.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid"><code>\</code>, <code>/</code></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.path_list_separator</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The separator between entries of a path list such as <code>PATH</code>.</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid"><code>;</code>, <code>:</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:help" aria-hidden="true"></span>
+                    <div class="text-xs text-charcoal-mid space-y-2">
+                        <p><strong>Illustrative; spellings not yet decided.</strong> The values in the right-hand column are examples, not a vocabulary. Whether the operating system is <code>macos</code> or <code>darwin</code>, whether a Unix without a better name gets a family at all, and whether architecture follows Rust's spelling or another convention are open.</p>
+                        <p>So are the field names themselves, and whether the descriptor is a global <code>host</code> object, a function, or something else. A global named <code>host</code> would also have to settle what happens to a manifest that already declares a variable called <code>host</code>; the roadmap's <code>git_changed_files</code> work reserves its name against shadowing, which is one precedent, not a decision.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="uses" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:compare" aria-hidden="true"></span> What it replaces
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The three problems the sketch names, each as a manifest would have to write it on <code>main</code> today and as it might
+                    read with a descriptor. The <code>when</code> key and inline Jinja expressions are real manifest structure; <code>when</code>
+                    is evaluated while Netsuke loads the manifest and decides whether an entry enters the build graph at all. Every
+                    <code>host.*</code> reference is invented for illustration.
+                </p>
+
+                <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">A PowerShell-only action</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">On Windows, recipes run under <code>powershell.exe</code> unless <code>NETSUKE_WINDOWS_SHELL=bash</code> selects a Git Bash-compatible runtime. An action written in PowerShell syntax belongs on Windows only. <code>command_available("pwsh")</code> does not say that: PowerShell installs on Linux too. Sniffing <code>OS</code> works on Windows and fails everywhere else, because <code>env()</code> treats an absent variable as an error.</p>
+                <div class="grid md:grid-cols-2 gap-6 mb-10">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-accent-text mb-2">Today: ambient probing</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+actions:
+  - name: sign-installer
+    # Fails to load where OS is unset:
+    # env() has no default on main.
+    when: env('OS') == 'Windows_NT'
+    command: "Set-AuthenticodeSignature ..."
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-success-text mb-2">Illustrative sketch, not final syntax</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+actions:
+  - name: sign-installer
+    when: host.os == 'windows'
+    command: "Set-AuthenticodeSignature ..."
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">NUL rather than /dev/null</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">Discarding a tool's report file means naming the null device, and its name depends on the host. With <a href="https://github.com/leynos/netsuke/pull/702" class="hm-link">#702</a>'s <code>env(name, default=...)</code> the probe at least stops failing; it is still a guess from an environment variable, and still subject to the manifest's <code>env_allow_var</code> policy.</p>
+                <div class="grid md:grid-cols-2 gap-6 mb-10">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-accent-text mb-2">With #702 (in flight): still a guess</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+vars:
+  null_device: >-
+    {{ 'NUL' if env('OS', default='') == 'Windows_NT'
+       else '/dev/null' }}
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-success-text mb-2">Illustrative sketch, not final syntax</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+vars:
+  null_device: >-
+    {{ 'NUL' if host.family == 'windows'
+       else '/dev/null' }}
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">An executable's output name</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">Today the choice is two near-identical targets with complementary guards, or one target whose name is wrong on one platform. A suffix field collapses them.</p>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-accent-text mb-2">Today: duplicated per platform</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+targets:
+  - name: dist/tool.exe
+    when: env('OS', default='') == 'Windows_NT'
+    command: "cc src/main.c -o {{ outs }}"
+  - name: dist/tool
+    when: env('OS', default='') != 'Windows_NT'
+    command: "cc src/main.c -o {{ outs }}"
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-success-text mb-2">Illustrative sketch, not final syntax</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+targets:
+  - name: "dist/tool{{ host.exe_suffix }}"
+    command: "cc src/main.c -o {{ outs }}"
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid max-w-3xl">The &ldquo;today&rdquo; samples that pass a <code>default</code> to <code>env()</code> depend on <a href="https://github.com/leynos/netsuke/pull/702" class="hm-link">#702</a>, which is open; on <code>main</code> and in v{{ netsuke_version }}, <code>env()</code> takes a name only.</p>
+            </section>
+
+            <section id="today" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:search" aria-hidden="true"></span> What a manifest knows today
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Nothing in the shipped <a href="/netsuke/docs/standard-library/" class="hm-link">standard library</a> describes the host
+                    directly. What a manifest can learn, it learns by asking a specific question through a specific helper, and each helper
+                    has its own gate. None of them runs under <code>netsuke help targets</code>: a <code>when</code> that needs one keeps
+                    its entry and marks it conditional instead.
+                </p>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-8" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Question</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Helper</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">How it is gated</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Is a tool installed, and where?</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">command_available(name)<br>which(name)</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Reads an injectable <code>PATH</code> and, on Windows, <code>PATHEXT</code>. <code>cwd_mode</code> chooses the search domain: <code>auto</code> searches <code>PATH</code> only, <code>always</code> and <code>never</code> add or exclude the working directory, and <code>workspace-recursive</code> scans the checkout &mdash; opt-in, because it can resolve a checkout-controlled executable. <code>NETSUKE_WHICH_WORKSPACE=0</code> switches that mode off.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">An environment variable</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">env(name)</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Required: an absent variable is an error. Read through an injectable <code>EnvReader</code> and checked against <code>env_allow_var</code> and <code>env_block_var</code> before any value is read. A project file cannot grant itself access.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Which files exist</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">glob(pattern)</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Metadata checks go through the capability scoped to the pattern's literal prefix. The match walk itself still uses ambient filesystem access, which the user's guide says plainly.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">What kind of file a path is</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">is file, is dir, is symlink, &hellip;</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Through the capability-scoped directory handle. A missing path is <code>false</code>, and so, on non-Unix hosts, are the special-file tests such as <code>is pipe</code>.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The home directory</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">path | expanduser</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Resolved from a platform-specific chain of variables and fails rather than passing <code>~</code> through.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">The time</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">now()</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Reads an injected clock provider, which tests pin to a fixed instant.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Remote content</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">fetch(url)</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Bounded by the network policy: HTTPS only by default, redirects revalidated, and a project cannot widen it. Marks the render impure.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Planned probes: roadmap 6.7</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#67-probe-host-state-through-injected-query-gated-seams" class="hm-link">Roadmap step 6.7</a>
+                    asks &ldquo;whether existence probing and environment expansion can be added without a second ambient-authority path and
+                    without any helper silently disappearing from a manifest query&rdquo;. Its four tasks are unticked; the signatures come from
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md" class="hm-link">RFC 0006</a> and
+                    are covered with the rest of the expansion on the <a href="{{ fc.href('standard-library') }}" class="hm-link">standard library preview</a>.
+                </p>
+                <ul class="space-y-2 text-sm text-charcoal-mid max-w-3xl">
+                    <li><strong>6.7.1</strong> &mdash; <code>path is exists</code> and <code>path is link_exists</code>. A dangling link is <code>false</code> for the first and <code>true</code> for the second; a path outside the capability boundary is an error.</li>
+                    <li><strong>6.7.2</strong> &mdash; <code>path is same_file(other)</code> and <code>path is mount</code>. <code>mount</code> may ship Unix-only, with an explicit Windows error: &ldquo;Silently returning <code>false</code> on Windows is not an acceptable fallback.&rdquo;</li>
+                    <li><strong>6.7.3</strong> &mdash; <code>glob(pattern, files_only=false)</code>, an option on the existing function rather than a second glob.</li>
+                    <li><strong>6.7.4</strong> &mdash; <code>text | expandvars(dialect='host', missing='error')</code>, through an injected reader and excluded from queries exactly as <code>env</code> is.</li>
+                </ul>
+            </section>
+
+            <section id="boundaries" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:border-full" aria-hidden="true"></span> Where facts stop
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The sketch calls the descriptor &ldquo;small&rdquo; and &ldquo;pure&rdquo;. Those two words carry most of the design, and
+                    they draw the boundary against everything else a manifest might want to know.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Pure, and fixed per host</h3>
+                        <p class="text-xs text-charcoal-mid">Every field describes the machine, not its state, so the same manifest on the same host reads the same values every time. Nothing is probed: no subprocess, no environment variable, no filesystem read. That is what separates a fact from <code>env('OS')</code>, which a caller can set to anything.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Readable under <code>help targets</code></h3>
+                        <p class="text-xs text-charcoal-mid">RFC 0006 admits only pure helpers to the read-only query environment behind <code>netsuke help targets</code>. A descriptor that is genuinely pure could qualify, which would let a query resolve a <code>host.os</code> guard instead of marking the entry conditional. That follows from the sketch's word &ldquo;pure&rdquo;; no document yet decides it.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">The platform contract, and <code>dialect</code></h3>
+                        <p class="text-xs text-charcoal-mid">RFC 0006 &sect;6.5 requires every new helper to document its Unix, Windows, and unsupported-platform behaviour, and to fail with a typed diagnostic naming the platform rather than return a plausible wrong answer. Its lexical path helpers take <code>dialect='host'</code>, <code>'posix'</code>, or <code>'windows'</code>. A dialect is a choice of parser &mdash; which may deliberately <em>not</em> be the host's, for cross-compilation &mdash; so it is not a host fact. A descriptor would tell a manifest which dialect <code>host</code> means; it would not replace the argument.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not runtime state</h3>
+                        <p class="text-xs text-charcoal-mid">Whether a toolchain is prepared, or which interpreter version it resolved to, is runtime state and belongs to the <a href="{{ fc.href('states') }}" class="hm-link">managed states and probes</a> proposal. RFC 0021 lets built-in probes fold interpreter and platform facts into a state's identity, explicitly not as a template-time facility. Host facts are the opposite end: known before the manifest renders, and never the result of running anything.</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:help" aria-hidden="true"></span>
+                    <div class="text-xs text-charcoal-mid space-y-2">
+                        <p><strong>Open questions the sketch does not answer.</strong> The field names and their value vocabulary. Whether the surface is a global <code>host</code> object. Where the values come from &mdash; the compilation target of the Netsuke binary, or the running system &mdash; and whether those can differ in practice. Which diagnostic a manifest gets on a host whose operating system has no agreed name.</p>
+                        <p>Two limits worth stating now. The descriptor describes the host Netsuke runs on, not a cross-compilation target. And on Windows it would not say which interpreter runs a recipe: PowerShell by default, Bash when <code>NETSUKE_WINDOWS_SHELL=bash</code> is set. &ldquo;Windows&rdquo; and &ldquo;PowerShell recipe&rdquo; are usually, not always, the same thing.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A manifest that builds on one platform needs none of this, and nothing about it would change. The route deeper, in order:
+                </p>
+                <ol class="space-y-4 text-sm text-charcoal-mid max-w-3xl list-decimal pl-5">
+                    <li><strong>Today: select tools, not platforms.</strong> <code>command_available()</code> in complementary <code>when</code> guards is shipped and tested: the user's guide picks <code>cargo nextest run</code> or <code>cargo test</code> at load time, and exactly one action enters the graph. Where the real question is &ldquo;is this tool here?&rdquo;, that is still the right answer.</li>
+                    <li><strong>Today: bound what the environment can tell a manifest.</strong> Where a manifest does read variables, <code>env_allow_var</code> and <code>env_block_var</code> in <code>netsuke.toml</code> limit which ones.</li>
+                    <li><strong>Planned: guard on the host.</strong> Replace an <code>OS</code> probe with a descriptor field in a <code>when</code>. One line per guard, and the guard stops depending on an environment variable.</li>
+                    <li><strong>Planned: name outputs portably.</strong> Fold duplicated per-platform targets into one, using the suffix and separator fields.</li>
+                    <li><strong>Planned: compose paths for another platform.</strong> Reach for the <code>dialect</code> argument and the other path helpers on the <a href="{{ fc.href('standard-library') }}" class="hm-link">standard library preview</a> when the platform in question is not the host.</li>
+                </ol>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-success-text mb-3 text-sm">Existing</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li>The <code>command_available</code> example in the user's guide is an executed documentation test. Host-context examples run against stub commands and a controlled <code>PATH</code>, environment, and fixture directory, never developer-installed tools.</li>
+                            <li><code>env()</code> and <code>now()</code> read injected seams, so tests control their values without mutating the process environment or the clock.</li>
+                            <li>Every manifest evaluation runs inside fixed resource budgets, enforced before a recipe runs or a query answers.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-warning-text mb-3 text-sm">Planned</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li>Roadmap 6.1.6 adds a contract test that makes it impossible to register a helper without deciding its query disposition; a descriptor would fall under it like anything else.</li>
+                            <li>Roadmap 6.7.2 is exercised on Unix and Windows continuous integration.</li>
+                            <li>For the descriptor itself, nothing is written down yet. A pure value fixed per host is about as testable as a template input gets, and the design should say how it is injected for tests before it says anything else.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The sketch is silent here, and this page will not invent a promise for it. What it would inherit is concrete.
+                </p>
+                <ul class="space-y-3 text-sm text-charcoal-mid max-w-3xl">
+                    <li><strong>Localized diagnostics.</strong> Netsuke's diagnostics go through Fluent across 35 shipped locales, and RFC 0006 requires every new helper's messages to do the same, with a stable machine code of the form <code>netsuke::jinja::&lt;module&gt;::&lt;reason&gt;</code> that survives translation.</li>
+                    <li><strong>A known gap.</strong> The diagnostic a restricted helper raises under <code>help targets</code> is still built with <code>format!</code> and is not localized; file tests are currently absent from the query environment rather than failing with a named diagnostic. Roadmap 6.1.5 closes both.</li>
+                    <li><strong>Accessible query output.</strong> <code>help targets</code> marks an unresolved guard <code>[&#9671; conditional]</code>, or <code>[? conditional]</code> in the ASCII theme, and JSON output carries a boolean <code>conditional</code> field. A query-safe descriptor would mean fewer such marks, not a new format.</li>
+                    <li><strong>No disclosure.</strong> Environment-lookup telemetry records an outcome and never a variable's name or value. A descriptor that reads no environment has nothing to disclose.</li>
+                </ul>
+            </section>
+
+{{ fc.footer('system-facts') }}
+
+        </main>
+    </div>
+
+{% endblock %}

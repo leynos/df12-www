@@ -545,8 +545,9 @@ def _run_git_rev_parse(root: Path) -> str:
 def _run_git_status(root: Path, paths: cabc.Sequence[str]) -> str:
     """Return ``git status --porcelain`` for ``paths`` in the checkout.
 
-    Untracked files are listed and ignored ones, such as a locally built
-    extension or bytecode, are not.
+    Untracked files are listed one by one whatever the user's
+    ``status.showUntrackedFiles`` setting, and ignored ones, such as a locally
+    built extension or bytecode, are not.
 
     Raises
     ------
@@ -556,7 +557,16 @@ def _run_git_status(root: Path, paths: cabc.Sequence[str]) -> str:
         If ``git`` is not on ``PATH``.
     """
     return subprocess.run(  # noqa: S603 - fixed argv; the paths are fixed names
-        ["git", "-C", str(root), "status", "--porcelain", "--", *paths],  # noqa: S607 - git is resolved on PATH
+        [  # noqa: S607 - git is resolved on PATH
+            "git",
+            "-C",
+            str(root),
+            "status",
+            "--porcelain",
+            "--untracked-files=all",
+            "--",
+            *paths,
+        ],
         check=True,
         capture_output=True,
         text=True,

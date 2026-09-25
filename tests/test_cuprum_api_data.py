@@ -771,6 +771,37 @@ def test_source_identity_refuses_uncommitted_package_changes(
     assert watched == [builder.SOURCE_PATHS], "the package and metadata are checked"
 
 
+def test_the_status_check_sees_untracked_files_git_config_would_hide(
+    tmp_path: PathType,
+) -> None:
+    """An untracked module is found even with ``status.showUntrackedFiles=no``."""
+    root = tmp_path / "checkout"
+    (root / "cuprum").mkdir(parents=True)
+    (root / "cuprum" / "__init__.py").write_text("", encoding="utf-8")
+    (root / "pyproject.toml").write_text(
+        '[project]\nversion = "1.0"\n', encoding="utf-8"
+    )
+    _git("init", "-q", str(root))
+    _git("-C", str(root), "add", "-A")
+    _git(
+        "-C",
+        str(root),
+        "-c",
+        "user.name=t",
+        "-c",
+        "user.email=t@example.com",
+        "commit",
+        "-q",
+        "-m",
+        "fixture",
+    )
+    _git("-C", str(root), "config", "status.showUntrackedFiles", "no")
+    (root / "cuprum" / "added").mkdir()
+    (root / "cuprum" / "added" / "module.py").write_text("", encoding="utf-8")
+    with pytest.raises(builder.SourceIdentityError, match=r"cuprum/added/module\.py"):
+        builder.source_identity(root)
+
+
 def test_source_identity_wraps_a_failing_status(tmp_path: PathType) -> None:
     """A failing ``git status`` becomes a named error, not a raw one."""
 

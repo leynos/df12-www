@@ -20,11 +20,15 @@ from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup, Tag
+from jinja2 import Environment, FileSystemLoader
+from jinja2.exceptions import UndefinedError
 
 from df12_pages.config import load_site_config
+from df12_pages.jinja_highlight import HighlightExtension
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_CUPRUM = REPO_ROOT / "public" / "cuprum"
+CUPRUM_TEMPLATES = REPO_ROOT / "templates" / "cuprum"
 COMPILED_STYLESHEET = PUBLIC_CUPRUM / "assets" / "styles" / "cuprum.css"
 LEGAL_PAGES = ("privacy-policy", "terms-of-use", "code-of-conduct")
 #: The home page, eight content pages, and the three shared legal pages.
@@ -391,3 +395,119 @@ def test_every_configured_route_is_published_with_its_markers(
         for marker in _required_markers(route):
             assert soup.select_one(marker) is not None, f"{route} lacks {marker!r}"
         assert len(soup.select("h1")) == 1, f"{route}: expected one h1"
+
+
+#: A representative sample: the home page, a job sheet, a guide, and an API
+#: page. The layout's scripts are chrome shared by every page, so a sample
+#: catches a regression without walking the whole published tree.
+_SCRIPT_SAMPLE_PAGES = (
+    PUBLIC_CUPRUM / "index.html",
+    PUBLIC_CUPRUM / "examples" / "deployment-helper" / "index.html",
+    PUBLIC_CUPRUM / "docs" / "guides" / "run-a-command" / "index.html",
+    PUBLIC_CUPRUM / "docs" / "api" / "commands" / "index.html",
+)
+_EXPECTED_SCRIPTS = (
+    "/cuprum/assets/js/copy-code.js",
+    "/cuprum/assets/js/routemap.js",
+)
+
+
+@pytest.mark.timeout(300)
+def test_pages_load_the_copy_code_and_routemap_scripts(built_site: Path) -> None:
+    """Every page carries the two deferred chrome scripts, in order."""
+    assert built_site.is_dir()
+    for page in _SCRIPT_SAMPLE_PAGES:
+        assert page.is_file(), page
+        scripts = _soup(page).select("script[src]")
+        sources = [
+            _attr(script, "src")
+            for script in scripts
+            if _attr(script, "src") in _EXPECTED_SCRIPTS
+        ]
+        assert sources == list(_EXPECTED_SCRIPTS), f"{page}: {sources}"
+        for src in _EXPECTED_SCRIPTS:
+            script = next(s for s in scripts if _attr(s, "src") == src)
+            assert script.has_attr("defer"), f"{page}: {src} is not deferred"
+
+
+#: Call sites in the guides that exercise each shape `api.ref` resolves: a
+#: plain export, a dotted member, and a dotted module entry with a label.
+_API_REF_CALL_SITES = (
+    ("docs/guides/run-a-command", "SafeCmd"),
+    ("docs/guides/output", "SafeCmd.lines"),
+    ("docs/guides/migrate", "cuprum.sinks"),
+)
+
+
+def _expected_ref_href(name: str) -> str:
+    """Return the href `api.ref(name)` should produce, from the generated data."""
+    head, _, member = name.partition(".")
+    for group in _api_groups():
+        entries = typ.cast("list[dict[str, object]]", group["entries"])
+        for e in entries:
+            members = typ.cast("list[dict[str, object]]", e.get("members") or [])
+            member_names = [m["name"] for m in members]
+            is_member = e["name"] == head and bool(member) and member in member_names
+            if e["name"] == name or is_member:
+                return f"/cuprum/docs/api/{group['slug']}/#{name}"
+    message = f"no generated API entry matches {name!r}"
+    raise AssertionError(message)
+
+
+@pytest.mark.parametrize(("slug", "name"), _API_REF_CALL_SITES)
+@pytest.mark.timeout(300)
+def test_api_ref_links_to_the_named_entry(
+    built_site: Path, slug: str, name: str
+) -> None:
+    """A reference from a guide points at a real anchor on the right group page."""
+    assert built_site.is_dir()
+    page = PUBLIC_CUPRUM / slug / "index.html"
+    assert page.is_file(), page
+    expected_href = _expected_ref_href(name)
+    anchors = [
+        a for a in _soup(page).select("a[href]") if _attr(a, "href") == expected_href
+    ]
+    assert anchors, f"{page}: no link to {expected_href!r}"
+
+    target_path, _, anchor_id = expected_href.partition("#")
+    target_page = REPO_ROOT / "public" / target_path.strip("/") / "index.html"
+    assert target_page.is_file(), target_page
+    assert _soup(target_page).find(id=anchor_id) is not None, (
+        f"{target_page}: no element with id {anchor_id!r}"
+    )
+
+
+def _api_jinja_environment() -> Environment:
+    """Return a Jinja environment configured like `ContentPageGenerator`'s.
+
+    Loading from `templates/cuprum` lets `_api.jinja` resolve its own
+    `_icons.jinja` and `data/api.jinja` imports; `api.ref` needs no other
+    template variables to build a link or to fail on a missing one.
+    """
+    return Environment(
+        loader=FileSystemLoader(str(CUPRUM_TEMPLATES)),
+        autoescape=True,
+        trim_blocks=True,
+        lstrip_blocks=True,
+        extensions=[HighlightExtension],
+    )
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["NoSuchName", "SafeCmd.no_such_member"],
+    ids=["unknown-export", "unknown-member"],
+)
+def test_api_ref_fails_the_build_for_an_unknown_reference(name: str) -> None:
+    """`api.ref` calls the deliberately undefined `raise_missing_reference`.
+
+    Nothing defines that global, so referencing a name or member the
+    generated data does not have raises `UndefinedError`, which is how a
+    stale reference fails the build today rather than publishing quietly.
+    """
+    env = _api_jinja_environment()
+    template = env.from_string(
+        f"{{% import '_api.jinja' as api %}}{{{{ api.ref({name!r}) }}}}"
+    )
+    with pytest.raises(UndefinedError):
+        template.render()

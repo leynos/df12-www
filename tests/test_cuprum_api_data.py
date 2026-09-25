@@ -494,6 +494,22 @@ def test_a_missing_import_reports_the_name_not_a_submodule(
     assert "no source for module" not in str(excinfo.value)
 
 
+def test_a_syntax_error_module_is_refused(tmp_path: PathType) -> None:
+    """A module that does not parse is named in the error, not swallowed."""
+    root = _write_package(tmp_path)
+    _write_module(root, "broken.py", "def broken(:\n    pass\n")
+    with pytest.raises(ApiSourceError, match=r"cannot parse module 'pkg\.broken'"):
+        load_api(root, "pkg", ("pkg.broken",))
+
+
+def test_a_non_utf8_module_is_refused(tmp_path: PathType) -> None:
+    """A module that is not valid UTF-8 is refused rather than raising raw."""
+    root = _write_package(tmp_path)
+    (root / "pkg" / "broken.py").write_bytes(b"\xff\xfe\x00\x01")
+    with pytest.raises(ApiSourceError, match=r"cannot read module 'pkg\.broken'"):
+        load_api(root, "pkg", ("pkg.broken",))
+
+
 def test_a_relative_submodule_import_resolves_to_the_module(
     tmp_path: PathType,
 ) -> None:
@@ -718,3 +734,104 @@ def test_release_spellings_compare_by_number(
     else:
         with pytest.raises(builder.ReleaseMismatchError, match="but the site"):
             builder.check_release(identity, release)
+
+
+def test_source_identity_reads_version_and_commit(tmp_path: PathType) -> None:
+    """The happy path reads the version from TOML and the commit from git."""
+    identity = builder.source_identity(
+        tmp_path,
+        read_pyproject=lambda _root: '[project]\nname = "pkg"\nversion = "1.2.3"\n',
+        run_git=lambda _root: _COMMIT,
+    )
+    assert identity == {"version": "1.2.3", "commit": _COMMIT}
+
+
+def test_source_identity_wraps_an_unreadable_pyproject(tmp_path: PathType) -> None:
+    """An ``OSError`` reading ``pyproject.toml`` becomes a named error."""
+
+    def read_pyproject(_root: PathType) -> str:
+        raise OSError("boom")
+
+    with pytest.raises(
+        builder.SourceIdentityError, match=r"cannot read pyproject\.toml"
+    ):
+        builder.source_identity(
+            tmp_path, read_pyproject=read_pyproject, run_git=lambda _root: _COMMIT
+        )
+
+
+def test_source_identity_wraps_malformed_toml(tmp_path: PathType) -> None:
+    """TOML that does not parse becomes a named error, not a raw exception."""
+    with pytest.raises(
+        builder.SourceIdentityError, match=r"cannot parse pyproject\.toml"
+    ):
+        builder.source_identity(
+            tmp_path,
+            read_pyproject=lambda _root: "not = valid = toml",
+            run_git=lambda _root: _COMMIT,
+        )
+
+
+def test_source_identity_wraps_a_pyproject_without_version(
+    tmp_path: PathType,
+) -> None:
+    """A ``pyproject.toml`` with no ``[project] version`` is refused."""
+    with pytest.raises(
+        builder.SourceIdentityError, match=r"names no \[project\] version"
+    ):
+        builder.source_identity(
+            tmp_path,
+            read_pyproject=lambda _root: '[project]\nname = "pkg"\n',
+            run_git=lambda _root: _COMMIT,
+        )
+
+
+def test_source_identity_wraps_a_failing_git(tmp_path: PathType) -> None:
+    """A non-zero git exit becomes a named error."""
+
+    def run_git(_root: PathType) -> str:
+        raise subprocess.CalledProcessError(1, ["git"])
+
+    with pytest.raises(builder.SourceIdentityError, match="cannot resolve the commit"):
+        builder.source_identity(
+            tmp_path,
+            read_pyproject=lambda _root: '[project]\nversion = "1.0"\n',
+            run_git=run_git,
+        )
+
+
+def test_source_identity_wraps_a_missing_git(tmp_path: PathType) -> None:
+    """A missing ``git`` executable becomes a named error, not a raw one."""
+
+    def run_git(_root: PathType) -> str:
+        raise FileNotFoundError("git")
+
+    with pytest.raises(builder.SourceIdentityError, match="cannot resolve the commit"):
+        builder.source_identity(
+            tmp_path,
+            read_pyproject=lambda _root: '[project]\nversion = "1.0"\n',
+            run_git=run_git,
+        )
+
+
+def test_main_refuses_before_writing_when_identity_fails(
+    tmp_path: PathType,
+) -> None:
+    """A checkout with no ``pyproject.toml`` stops the run before any output."""
+    root = tmp_path / "missing"
+    root.mkdir()
+    output = tmp_path / "api.jinja"
+    pages = _pages_config(tmp_path / "pages.yaml", "1.0")
+    args = [
+        "--cuprum-root",
+        str(root),
+        "--output",
+        str(output),
+        "--pages-config",
+        str(pages),
+    ]
+    with pytest.raises(
+        builder.SourceIdentityError, match=r"cannot read pyproject\.toml"
+    ):
+        builder.main(args)
+    assert not output.exists()

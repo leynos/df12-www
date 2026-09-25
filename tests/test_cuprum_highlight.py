@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import typing as typ
 
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
@@ -15,7 +16,13 @@ from scripts.generate_cuprum_pygments_css import (
     END,
     STYLESHEET,
     build_css,
+    main,
 )
+
+if typ.TYPE_CHECKING:
+    from pathlib import Path
+
+    import pytest
 
 #: The code ground the sub-site sets every highlighted block on.
 CODE_GROUND = "#101817"
@@ -148,3 +155,62 @@ def test_generator_writes_to_the_tracked_stylesheet() -> None:
         "styles",
         "syntax.css",
     ), f"unexpected stylesheet target: {STYLESHEET}"
+
+
+def test_main_writes_the_generated_block_to_a_new_file(
+    tmp_path: Path,
+) -> None:
+    """With no existing file, ``main`` writes exactly the generated block."""
+    stylesheet = tmp_path / "syntax.css"
+    main(stylesheet)
+    assert stylesheet.read_text(encoding="utf-8") == build_css() + "\n"
+
+
+def test_main_replaces_a_stale_block_and_keeps_handwritten_css(
+    tmp_path: Path,
+) -> None:
+    """``main`` replaces only the marked block, leaving layout CSS untouched."""
+    stylesheet = tmp_path / "syntax.css"
+    above = ".code-scroll {\n  overflow-x: auto;\n}\n"
+    below = f".{CSS_CLASS} pre {{\n  margin: 0;\n}}\n"
+    stale_block = f"{BEGIN}\n/* stale */\n{END}\n"
+    stylesheet.write_text(f"{above}\n{stale_block}\n{below}", encoding="utf-8")
+
+    main(stylesheet)
+
+    updated = stylesheet.read_text(encoding="utf-8")
+    start, end = updated.find(BEGIN), updated.find(END)
+    assert start != -1, "the rewritten file should carry the BEGIN marker"
+    assert end != -1, "the rewritten file should carry the END marker"
+    assert updated[: len(above)] == above, (
+        "handwritten CSS above the block should be byte-identical"
+    )
+    assert updated.endswith(below), (
+        "handwritten CSS below the block should be byte-identical"
+    )
+    assert updated[start : end + len(END)] == build_css(), (
+        "the replaced block should equal build_css()'s output"
+    )
+
+
+def test_main_is_idempotent_and_reports_unchanged(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Running ``main`` twice leaves the file byte-identical on the second run."""
+    stylesheet = tmp_path / "syntax.css"
+    main(stylesheet)
+    capsys.readouterr()
+
+    main(stylesheet)
+
+    first_run = stylesheet.read_text(encoding="utf-8")
+    captured = capsys.readouterr()
+    assert "unchanged" in captured.out, (
+        "the second run should report the file as unchanged"
+    )
+
+    main(stylesheet)
+    assert stylesheet.read_text(encoding="utf-8") == first_run, (
+        "a third run should not change the file again"
+    )

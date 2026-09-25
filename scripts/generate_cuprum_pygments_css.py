@@ -79,18 +79,46 @@ def build_css() -> str:
     return "\n".join(lines)
 
 
-def main() -> int:
-    """Rewrite the marked block in the stylesheet."""
-    css = STYLESHEET.read_text(encoding="utf-8") if STYLESHEET.exists() else ""
+def rewrite(existing: str) -> str:
+    """Return ``existing`` with the marked block replaced or appended.
+
+    Parameters
+    ----------
+    existing : str
+        The stylesheet's current contents, or ``""`` when the file does not
+        yet exist.
+
+    Returns
+    -------
+    str
+        The stylesheet contents with the ``BEGIN``..``END`` block set to
+        :func:`build_css`'s output. When ``existing`` carries no marker, the
+        block is appended, separated from any handwritten CSS by a blank
+        line.
+    """
     block = build_css()
     pattern = re.compile(re.escape(BEGIN) + r".*?" + re.escape(END), re.DOTALL)
-    if pattern.search(css):
-        updated = pattern.sub(lambda _match: block, css)
-    else:
-        updated = (css.rstrip("\n") + "\n\n" if css.strip() else "") + block + "\n"
+    if pattern.search(existing):
+        return pattern.sub(lambda _match: block, existing)
+    prefix = existing.rstrip("\n") + "\n\n" if existing.strip() else ""
+    return prefix + block + "\n"
+
+
+def main(stylesheet: Path = STYLESHEET) -> int:
+    """Rewrite the marked block in ``stylesheet``.
+
+    Parameters
+    ----------
+    stylesheet : Path
+        The stylesheet to rewrite. Defaults to the tracked
+        ``src/static/cuprum/assets/styles/syntax.css``; a test may pass a
+        temporary path instead.
+    """
+    css = stylesheet.read_text(encoding="utf-8") if stylesheet.exists() else ""
+    updated = rewrite(css)
     if updated != css:
-        STYLESHEET.parent.mkdir(parents=True, exist_ok=True)
-        STYLESHEET.write_text(updated, encoding="utf-8")
+        stylesheet.parent.mkdir(parents=True, exist_ok=True)
+        stylesheet.write_text(updated, encoding="utf-8")
         sys.stdout.write("syntax.css updated\n")
     else:
         sys.stdout.write("syntax.css unchanged\n")

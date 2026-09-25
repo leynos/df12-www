@@ -110,6 +110,54 @@ class TestBuildLibrariesConfig:
         with pytest.raises(SiteConfigError, match="'external' must be true or false"):
             _build_libraries_config({**VALID_LIBRARIES, "links": [link]})
 
+    @pytest.mark.parametrize(
+        "href",
+        [
+            "github.com/leynos/rstest-bdd",
+            "/cuprum/",
+            "ftp://example.com/lib",
+            "https://",
+            "javascript:alert(1)",
+        ],
+    )
+    def test_external_href_must_be_an_absolute_http_url(self, href: str) -> None:
+        """A scheme-less external href would resolve as a path on this site."""
+        link = {**VALID_LINKS[1], "href": href, "external": True}
+        with pytest.raises(SiteConfigError, match="absolute http"):
+            _build_libraries_config({**VALID_LIBRARIES, "links": [link]})
+
+    @pytest.mark.parametrize(
+        "href",
+        [
+            "https://example.com/cuprum/",
+            "//example.com/cuprum/",
+            "mailto:someone@example.com",
+            "javascript:alert(1)",
+        ],
+    )
+    def test_local_href_must_stay_on_the_site(self, href: str) -> None:
+        """A local link with a scheme or host could leave the site."""
+        link = {**VALID_LINKS[0], "href": href}
+        with pytest.raises(SiteConfigError, match="path on this site"):
+            _build_libraries_config({**VALID_LIBRARIES, "links": [link]})
+
+    @pytest.mark.parametrize(
+        ("href", "external"),
+        [
+            ("cuprum/", False),
+            ("/cuprum/docs/", False),
+            ("../cuprum/#install", False),
+            ("https://github.com/leynos/rstest-bdd", True),
+            ("HTTP://example.com", True),
+        ],
+    )
+    def test_matching_hrefs_are_accepted(self, href: str, *, external: bool) -> None:
+        """Paths are accepted for local links and http(s) URLs for external ones."""
+        link = {**VALID_LINKS[0], "href": href, "external": external}
+        libraries = _build_libraries_config({**VALID_LIBRARIES, "links": [link]})
+        assert libraries is not None, "a valid link should build the group"
+        assert libraries.links[0].href == href, "the href should be kept verbatim"
+
 
 def test_shipped_config_lists_cuprum_and_rstest_bdd() -> None:
     """The homepage's Tools section lists the two initial libraries."""
@@ -126,6 +174,9 @@ def test_shipped_config_lists_cuprum_and_rstest_bdd() -> None:
 def test_rendered_homepage_lists_libraries_in_the_tools_section(tmp_path: Path) -> None:
     """The group renders inside #systems, with a labelled heading."""
     homepage = dc.replace(_homepage(), output=tmp_path / "index.html")
+    libraries = homepage.systems.libraries
+    assert libraries is not None, "homepage.systems.libraries should be configured"
+    expected = {link.label: link for link in libraries.links}
     soup = BeautifulSoup(HomePageBuilder(homepage).run().read_text(), "html.parser")
 
     group = soup.select_one("#systems section.libraries")
@@ -143,6 +194,19 @@ def test_rendered_homepage_lists_libraries_in_the_tools_section(tmp_path: Path) 
     assert "target" not in links["Cuprum"].attrs
     assert links["rstest-bdd"]["target"] == "_blank"
     assert "noopener" in links["rstest-bdd"]["rel"]
+
+    for label, anchor in links.items():
+        link = expected[label]
+        description = anchor.select_one(".library-card__description")
+        assert description is not None, f"{label}: card has no description"
+        assert description.get_text(strip=True) == link.description, (
+            f"{label}: description text does not match the configured value"
+        )
+        meta = anchor.select_one(".library-card__meta")
+        assert meta is not None, f"{label}: card has no meta"
+        assert link.meta_label in meta.get_text(" ", strip=True), (
+            f"{label}: meta text does not contain the configured meta_label"
+        )
 
 
 def test_rendered_homepage_omits_the_group_without_libraries(tmp_path: Path) -> None:

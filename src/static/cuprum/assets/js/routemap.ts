@@ -68,14 +68,28 @@
     requestFrame(callback: () => void): void;
   }
 
+  /* The decoded element id a fragment link names, or null when its
+     percent-encoding is malformed and so names no element. */
+  function fragmentId(href: string): string | null {
+    try {
+      return decodeURIComponent(href.replace(/^#/, ""));
+    } catch {
+      return null;
+    }
+  }
+
   /* Pair each distinct fragment in the route map with its section in `doc`,
-     in the order the strip lists them. Links to a missing section are
-     ignored; later links to a section already found join its links. */
+     in the order the strip lists them. Links to a missing section, or with a
+     fragment that cannot be decoded, are ignored rather than stopping the
+     scan; later links to a section already found join its links. */
   function collectTargets(doc: Document, nav: HTMLElement): Target[] {
     var byId = new Map<string, Target>();
     var links = nav.querySelectorAll<HTMLAnchorElement>("a[data-cu-routemap-link]");
     for (const link of links) {
-      const id = decodeURIComponent((link.getAttribute("href") ?? "").replace(/^#/, ""));
+      const id = fragmentId(link.getAttribute("href") ?? "");
+      if (id === null) {
+        continue;
+      }
       const existing = byId.get(id);
       if (existing) {
         existing.links.push(link);
@@ -222,6 +236,7 @@
   if (typeof module !== "undefined" && module.exports) {
     module.exports = {
       pickActiveIndex: pickActiveIndex,
+      fragmentId: fragmentId,
       collectTargets: collectTargets,
       createRouteMapController: createRouteMapController,
       SLACK: SLACK,

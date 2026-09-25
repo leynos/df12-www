@@ -277,10 +277,26 @@ class _Resolver:
         return True
 
     def tree(self, module: str) -> ast.Module:
-        """Return the parsed source of ``module``, parsing it once."""
+        """Return the parsed source of ``module``, parsing it once.
+
+        Raises
+        ------
+        ApiSourceError
+            If ``module``'s source file cannot be read, is not valid UTF-8,
+            or does not parse as Python.
+        """
         if module not in self._trees:
-            source = self._path(module).read_text(encoding="utf-8")
-            self._trees[module] = ast.parse(source)
+            path = self._path(module)
+            try:
+                source = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError) as error:
+                msg = f"cannot read module {module!r} from {path}: {error}"
+                raise ApiSourceError(msg) from error
+            try:
+                self._trees[module] = ast.parse(source)
+            except SyntaxError as error:
+                msg = f"cannot parse module {module!r} from {path}: {error}"
+                raise ApiSourceError(msg) from error
         return self._trees[module]
 
     def relpath(self, module: str) -> str:
@@ -602,7 +618,9 @@ def load_api(
     Raises
     ------
     ApiSourceError
-        If a name cannot be traced to a definition inside the package.
+        If a name cannot be traced to a definition inside the package, or if
+        a source file cannot be read, is not valid UTF-8, or does not parse
+        as Python.
     """
     resolver = _Resolver(root, package)
     names = public_names(root / package / "__init__.py")

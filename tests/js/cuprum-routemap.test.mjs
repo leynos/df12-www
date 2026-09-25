@@ -21,7 +21,25 @@ import fc from "fast-check";
 
 const require = createRequire(import.meta.url);
 const SCRIPT = join("public", "cuprum", "assets", "js", "routemap.js");
-const { pickActiveIndex, collectTargets, createRouteMapController } = require(`../../${SCRIPT}`);
+const { pickActiveIndex, fragmentId, collectTargets, createRouteMapController } = require(
+  `../../${SCRIPT}`,
+);
+
+/* happy-dom's document is shared by every test file in the process, so the
+   `scrollHeight` the fixtures define is put back as it was after each test. */
+const ORIGINAL_SCROLL_HEIGHT = Object.getOwnPropertyDescriptor(
+  document.documentElement,
+  "scrollHeight",
+);
+
+/** Restore `document.documentElement.scrollHeight` to its original definition. */
+function restoreScrollHeight() {
+  if (ORIGINAL_SCROLL_HEIGHT) {
+    Object.defineProperty(document.documentElement, "scrollHeight", ORIGINAL_SCROLL_HEIGHT);
+  } else {
+    delete document.documentElement.scrollHeight;
+  }
+}
 
 /* One list of links, as `_routemap_links` renders it. */
 const LINKS = `
@@ -184,6 +202,7 @@ describe("pickActiveIndex", () => {
 describe("collectTargets", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+    restoreScrollHeight();
   });
 
   test("drops missing sections and gathers repeated links under one target", () => {
@@ -203,11 +222,38 @@ describe("collectTargets", () => {
     expect(targets[0].links.map((link) => link.textContent)).toEqual(["one", "again"]);
     expect(targets[0].el).toBe(document.getElementById("problem"));
   });
+
+  test("skips a malformed fragment and keeps scanning", () => {
+    document.body.innerHTML = `
+      <nav data-cu-routemap>
+        <a href="#%E0%A4%A" data-cu-routemap-link>malformed</a>
+        <a href="#problem" data-cu-routemap-link>one</a>
+        <a href="#caf%C3%A9" data-cu-routemap-link>encoded</a>
+      </nav>
+      <section id="problem"></section>
+      <section id="café"></section>`;
+    const targets = collectTargets(document, document.querySelector("nav"));
+    expect(targets.map((target) => target.id)).toEqual(["problem", "café"]);
+  });
+});
+
+describe("fragmentId", () => {
+  test("decodes a fragment and strips its hash", () => {
+    expect(fragmentId("#caf%C3%A9")).toBe("café");
+    expect(fragmentId("problem")).toBe("problem");
+    expect(fragmentId("#")).toBe("");
+  });
+
+  test("returns null for malformed percent-encoding instead of throwing", () => {
+    expect(fragmentId("#%E0%A4%A")).toBeNull();
+    expect(fragmentId("#%")).toBeNull();
+  });
 });
 
 describe("the route map controller", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+    restoreScrollHeight();
   });
 
   test("a map that names no section on the page marks and schedules nothing", () => {
@@ -278,6 +324,7 @@ describe("the route map controller", () => {
 describe("the route map in the document", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+    restoreScrollHeight();
   });
 
   test("marks the section being read in both lists", () => {
@@ -332,6 +379,7 @@ describe("the route map in the document", () => {
 describe("several route maps on one page", () => {
   afterEach(() => {
     document.body.innerHTML = "";
+    restoreScrollHeight();
   });
 
   test("each map marks its own sections and names its own in its summary", () => {

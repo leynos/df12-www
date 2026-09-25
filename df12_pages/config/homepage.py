@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing as typ
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from .helpers import _as_int, _normalize_classes, _optional_str
 from .models import (
@@ -226,13 +227,14 @@ def _build_library_links(
                     "and 'meta_label'."
                 )
                 raise SiteConfigError(msg)
+        external = _library_link_external(rest.get("external", True))
         links.append(
             LibraryLinkConfig(
                 label=_library_link_text(label, "label"),
                 description=_library_link_text(description, "description"),
-                href=_library_link_text(href, "href"),
+                href=_library_link_href(href, external=external),
                 meta_label=_library_link_text(meta_label, "meta_label"),
-                external=_library_link_external(rest.get("external", True)),
+                external=external,
             )
         )
     return links
@@ -246,6 +248,26 @@ def _library_link_text(value: object, field: str) -> str:
         case _:
             msg = f"Library links require a non-empty string for '{field}'."
             raise SiteConfigError(msg)
+
+
+def _library_link_href(value: object, *, external: bool) -> str:
+    """Return a library link's href, checked against its `external` flag.
+
+    An external link must be an absolute http or https URL with a host, since
+    a bare ``github.com/...`` would resolve as a path on this site. A local
+    link must be a path with no scheme or host, so it cannot leave the site.
+    """
+    href = _library_link_text(value, "href")
+    parts = urlsplit(href)
+    if external:
+        if parts.scheme.lower() in {"http", "https"} and parts.hostname:
+            return href
+        msg = f"External library link {href!r} must be an absolute http(s) URL."
+        raise SiteConfigError(msg)
+    if not parts.scheme and not parts.netloc:
+        return href
+    msg = f"Local library link {href!r} must be a path on this site."
+    raise SiteConfigError(msg)
 
 
 def _library_link_external(value: object) -> bool:

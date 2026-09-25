@@ -15,6 +15,7 @@ out of the reference unnoticed.
 from __future__ import annotations
 
 import argparse
+import collections.abc as cabc
 import html
 import json
 import re
@@ -344,6 +345,10 @@ class ReleaseMismatchError(Exception):
     """Raised when the checkout is not the release the site documents."""
 
 
+class SourceIdentityError(Exception):
+    """Raised when the checkout's version or commit cannot be determined."""
+
+
 def inline_html(text: str, known: frozenset[str]) -> str:
     """Render reStructuredText inline markup in ``text`` as escaped HTML.
 
@@ -487,27 +492,96 @@ def group_entries(entries: list[ApiEntry]) -> list[dict[str, typ.Any]]:
     ]
 
 
-def source_identity(root: Path) -> dict[str, str]:
+#: What :func:`source_identity` needs to read ``pyproject.toml``. Injecting
+#: it rather than calling :meth:`Path.read_text` inline is what lets the
+#: environmental failures below be exercised without a filesystem.
+type PyprojectReader = cabc.Callable[[Path], str]
+
+#: The same, for resolving the checkout's commit.
+type GitRunner = cabc.Callable[[Path], str]
+
+
+def _read_pyproject(root: Path) -> str:
+    """Read ``pyproject.toml`` from a checkout.
+
+    Raises
+    ------
+    OSError
+        If the file is missing or cannot be read.
+    """
+    return (root / "pyproject.toml").read_text(encoding="utf-8")
+
+
+def _run_git_rev_parse(root: Path) -> str:
+    """Return the full commit SHA checked out at ``root``.
+
+    Raises
+    ------
+    subprocess.CalledProcessError
+        If ``git`` exits non-zero, such as when ``root`` is not a checkout.
+    FileNotFoundError
+        If ``git`` is not on ``PATH``.
+    """
+    return subprocess.run(  # noqa: S603 - fixed argv; the path is the checkout root
+        ["git", "-C", str(root), "rev-parse", "HEAD"],  # noqa: S607 - git is resolved on PATH
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+def source_identity(
+    root: Path,
+    *,
+    read_pyproject: PyprojectReader = _read_pyproject,
+    run_git: GitRunner = _run_git_rev_parse,
+) -> dict[str, str]:
     """Return the checkout's package version and commit.
 
     Parameters
     ----------
     root : Path
         The Cuprum checkout.
+    read_pyproject : PyprojectReader
+        Reads ``pyproject.toml``'s text from the checkout. Defaults to
+        reading the real file; a test injects a fake to exercise the
+        failures below without a filesystem.
+    run_git : GitRunner
+        Resolves the checkout's commit. Defaults to running ``git
+        rev-parse HEAD``; a test injects a fake for the same reason.
 
     Returns
     -------
     dict[str, str]
         ``version`` from ``pyproject.toml`` and the full ``commit`` SHA.
+
+    Raises
+    ------
+    SourceIdentityError
+        If ``pyproject.toml`` cannot be read or parsed, names no
+        ``project.version``, or the checkout's commit cannot be resolved.
     """
-    project = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
-    commit = subprocess.run(  # noqa: S603 - fixed argv; the path is the checkout root
-        ["git", "-C", str(root), "rev-parse", "HEAD"],  # noqa: S607 - git is resolved on PATH
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-    return {"version": str(project["project"]["version"]), "commit": commit}
+    try:
+        text = read_pyproject(root)
+    except OSError as error:
+        msg = f"cannot read pyproject.toml in {root}: {error}"
+        raise SourceIdentityError(msg) from error
+    try:
+        project = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as error:
+        msg = f"cannot parse pyproject.toml in {root}: {error}"
+        raise SourceIdentityError(msg) from error
+    try:
+        version = str(project["project"]["version"])
+    except (KeyError, TypeError) as error:
+        msg = f"{root}/pyproject.toml names no [project] version"
+        raise SourceIdentityError(msg) from error
+    try:
+        commit = run_git(root)
+    except (subprocess.CalledProcessError, OSError) as error:
+        msg = f"cannot resolve the commit checked out at {root}: {error}"
+        raise SourceIdentityError(msg) from error
+    return {"version": version, "commit": commit}
 
 
 def documented_release(pages_config: Path) -> str:
@@ -650,6 +724,9 @@ def main(argv: list[str] | None = None) -> int:
 
     Raises
     ------
+    SourceIdentityError
+        When the checkout's version or commit cannot be determined, raised
+        before anything is written.
     ReleaseMismatchError
         When the checkout is not the release ``config/pages.yaml`` documents.
     """

@@ -1061,7 +1061,13 @@ The generator also refuses a checkout whose `pyproject.toml` version is not the
 release `cuprum_pypi` in `config/pages.yaml` documents, normalizing both under
 PEP 440 first, so `0.2.0-beta1` in the checkout matches `0.2.0b1` in the
 config. A mismatch raises `ReleaseMismatchError` before anything is written;
-`--pages-config` points the check at a different configuration file.
+`--pages-config` points the check at a different configuration file. The
+checkout must also be clean under `cuprum/` and `pyproject.toml`: the generator
+reads the working tree but records `HEAD` as the source commit, so uncommitted
+or untracked files there raise `SourceIdentityError` rather than being credited
+to a commit that does not contain them. Ignored files, such as a locally built
+extension, do not count. An unreadable or malformed `config/pages.yaml` raises
+`PagesConfigError`.
 
 The guides under `/cuprum/docs/guides/` are written for the site, each a
 template that sets `guide_slug` and extends `pages/_docs_guide.jinja`, with its

@@ -133,6 +133,8 @@ class TestBuildLibrariesConfig:
             "//example.com/cuprum/",
             "mailto:someone@example.com",
             "javascript:alert(1)",
+            "/\\evil.com/",
+            "\\\\evil.com",
         ],
     )
     def test_local_href_must_stay_on_the_site(self, href: str) -> None:

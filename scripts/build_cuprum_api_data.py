@@ -27,6 +27,7 @@ from pathlib import Path
 
 from packaging.version import InvalidVersion, Version
 from ruamel.yaml import YAML
+from ruamel.yaml.error import YAMLError
 
 if __package__:
     from .atomic_write import atomic_write
@@ -349,6 +350,10 @@ class SourceIdentityError(Exception):
     """Raised when the checkout's version or commit cannot be determined."""
 
 
+class PagesConfigError(Exception):
+    """Raised when the site configuration cannot be read or parsed."""
+
+
 def inline_html(text: str, known: frozenset[str]) -> str:
     """Render reStructuredText inline markup in ``text`` as escaped HTML.
 
@@ -500,6 +505,13 @@ type PyprojectReader = cabc.Callable[[Path], str]
 #: The same, for resolving the checkout's commit.
 type GitRunner = cabc.Callable[[Path], str]
 
+#: The same, for listing uncommitted changes under the given paths.
+type GitStatusRunner = cabc.Callable[[Path, cabc.Sequence[str]], str]
+
+#: What the generator reads from a Cuprum checkout: the package and its
+#: metadata. Uncommitted changes there would be misattributed to ``HEAD``.
+SOURCE_PATHS = ("cuprum", "pyproject.toml")
+
 
 def _read_pyproject(root: Path) -> str:
     """Read ``pyproject.toml`` from a checkout.
@@ -530,11 +542,33 @@ def _run_git_rev_parse(root: Path) -> str:
     ).stdout.strip()
 
 
+def _run_git_status(root: Path, paths: cabc.Sequence[str]) -> str:
+    """Return ``git status --porcelain`` for ``paths`` in the checkout.
+
+    Untracked files are listed and ignored ones, such as a locally built
+    extension or bytecode, are not.
+
+    Raises
+    ------
+    subprocess.CalledProcessError
+        If ``git`` exits non-zero, such as when ``root`` is not a checkout.
+    FileNotFoundError
+        If ``git`` is not on ``PATH``.
+    """
+    return subprocess.run(  # noqa: S603 - fixed argv; the paths are fixed names
+        ["git", "-C", str(root), "status", "--porcelain", "--", *paths],  # noqa: S607 - git is resolved on PATH
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+
+
 def source_identity(
     root: Path,
     *,
     read_pyproject: PyprojectReader = _read_pyproject,
     run_git: GitRunner = _run_git_rev_parse,
+    run_git_status: GitStatusRunner = _run_git_status,
 ) -> dict[str, str]:
     """Return the checkout's package version and commit.
 
@@ -549,6 +583,10 @@ def source_identity(
     run_git : GitRunner
         Resolves the checkout's commit. Defaults to running ``git
         rev-parse HEAD``; a test injects a fake for the same reason.
+    run_git_status : GitStatusRunner
+        Lists uncommitted changes under :data:`SOURCE_PATHS`. The generator
+        reads the working tree, so a clean tree is what makes the recorded
+        commit describe what was read.
 
     Returns
     -------
@@ -559,11 +597,12 @@ def source_identity(
     ------
     SourceIdentityError
         If ``pyproject.toml`` cannot be read or parsed, names no
-        ``project.version``, or the checkout's commit cannot be resolved.
+        ``project.version``, the checkout's commit cannot be resolved, or
+        the package or its metadata has uncommitted changes.
     """
     try:
         text = read_pyproject(root)
-    except OSError as error:
+    except (OSError, UnicodeDecodeError) as error:
         msg = f"cannot read pyproject.toml in {root}: {error}"
         raise SourceIdentityError(msg) from error
     try:
@@ -581,6 +620,19 @@ def source_identity(
     except (subprocess.CalledProcessError, OSError) as error:
         msg = f"cannot resolve the commit checked out at {root}: {error}"
         raise SourceIdentityError(msg) from error
+    try:
+        changes = run_git_status(root, SOURCE_PATHS)
+    except (subprocess.CalledProcessError, OSError) as error:
+        msg = f"cannot check {root} for uncommitted changes: {error}"
+        raise SourceIdentityError(msg) from error
+    if changes.strip():
+        listed = ", ".join(line[3:] for line in changes.splitlines() if line)
+        msg = (
+            f"{root} has uncommitted changes under {' and '.join(SOURCE_PATHS)} "
+            f"({listed}); commit or discard them so the reference matches "
+            f"{commit[:8]}"
+        )
+        raise SourceIdentityError(msg)
     return {"version": version, "commit": commit}
 
 
@@ -599,10 +651,22 @@ def documented_release(pages_config: Path) -> str:
 
     Raises
     ------
+    PagesConfigError
+        When the configuration cannot be read, is not valid UTF-8, or is not
+        valid YAML.
     ReleaseMismatchError
         When the configuration names no Cuprum release.
     """
-    config = YAML(typ="safe").load(pages_config.read_text(encoding="utf-8"))
+    try:
+        text = pages_config.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as error:
+        msg = f"cannot read {pages_config}: {error}"
+        raise PagesConfigError(msg) from error
+    try:
+        config = YAML(typ="safe").load(text)
+    except YAMLError as error:
+        msg = f"cannot parse {pages_config}: {error}"
+        raise PagesConfigError(msg) from error
     try:
         release = config["sites"]["cuprum"]["template_vars"]["cuprum_pypi"]
     except (KeyError, TypeError) as error:
@@ -725,7 +789,10 @@ def main(argv: list[str] | None = None) -> int:
     Raises
     ------
     SourceIdentityError
-        When the checkout's version or commit cannot be determined, raised
+        When the checkout's version or commit cannot be determined, or its
+        package has uncommitted changes, raised before anything is written.
+    PagesConfigError
+        When ``config/pages.yaml`` cannot be read or parsed, also raised
         before anything is written.
     ReleaseMismatchError
         When the checkout is not the release ``config/pages.yaml`` documents.

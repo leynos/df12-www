@@ -31,6 +31,7 @@ from scripts.cuprum_api_parser import (
 )
 
 if typ.TYPE_CHECKING:
+    import collections.abc as cabc
     from pathlib import Path as PathType
 
 PACKAGE = {
@@ -326,6 +327,7 @@ def test_check_mode_reports_drift(
         '[project]\nname = "pkg"\nversion = "1.0"\n', encoding="utf-8"
     )
     _git("init", "-q", str(root))
+    _git("-C", str(root), "add", "-A")
     _git(
         "-C",
         str(root),
@@ -335,7 +337,6 @@ def test_check_mode_reports_drift(
         "user.email=t@example.com",
         "commit",
         "-q",
-        "--allow-empty",
         "-m",
         "fixture",
     )
@@ -742,8 +743,97 @@ def test_source_identity_reads_version_and_commit(tmp_path: PathType) -> None:
         tmp_path,
         read_pyproject=lambda _root: '[project]\nname = "pkg"\nversion = "1.2.3"\n',
         run_git=lambda _root: _COMMIT,
+        run_git_status=lambda _root, _paths: "",
     )
     assert identity == {"version": "1.2.3", "commit": _COMMIT}
+
+
+def test_source_identity_refuses_uncommitted_package_changes(
+    tmp_path: PathType,
+) -> None:
+    """A dirty package would be read from the tree but credited to ``HEAD``."""
+    watched: list[tuple[str, ...]] = []
+
+    def run_git_status(_root: PathType, paths: cabc.Sequence[str]) -> str:
+        watched.append(tuple(paths))
+        return " M cuprum/sh.py\n?? cuprum/extra.py\n"
+
+    with pytest.raises(
+        builder.SourceIdentityError,
+        match=r"uncommitted changes .*cuprum/sh\.py, cuprum/extra\.py",
+    ):
+        builder.source_identity(
+            tmp_path,
+            read_pyproject=lambda _root: '[project]\nversion = "1.0"\n',
+            run_git=lambda _root: _COMMIT,
+            run_git_status=run_git_status,
+        )
+    assert watched == [builder.SOURCE_PATHS], "the package and metadata are checked"
+
+
+def test_source_identity_wraps_a_failing_status(tmp_path: PathType) -> None:
+    """A failing ``git status`` becomes a named error, not a raw one."""
+
+    def run_git_status(_root: PathType, _paths: cabc.Sequence[str]) -> str:
+        raise subprocess.CalledProcessError(128, ["git", "status"])
+
+    with pytest.raises(builder.SourceIdentityError, match="uncommitted changes: "):
+        builder.source_identity(
+            tmp_path,
+            read_pyproject=lambda _root: '[project]\nversion = "1.0"\n',
+            run_git=lambda _root: _COMMIT,
+            run_git_status=run_git_status,
+        )
+
+
+@pytest.mark.parametrize(
+    ("contents", "message"),
+    [
+        (None, r"cannot read module __init__\.py"),
+        (b"\xff\xfe__all__ = []", r"cannot read module __init__\.py"),
+        (b"__all__ = [", r"cannot parse module __init__\.py"),
+    ],
+    ids=["missing", "not-utf8", "syntax-error"],
+)
+def test_a_broken_package_init_is_refused(
+    tmp_path: PathType, contents: bytes | None, message: str
+) -> None:
+    """The package ``__init__.py`` is read under the same error contract."""
+    root = _write_package(tmp_path)
+    init = root / "pkg" / "__init__.py"
+    if contents is None:
+        init.unlink()
+    else:
+        init.write_bytes(contents)
+    with pytest.raises(ApiSourceError, match=message):
+        load_api(root, "pkg")
+
+
+@pytest.mark.parametrize(
+    ("contents", "message"),
+    [
+        (None, r"cannot read .*pages\.yaml"),
+        (b"\xff\xfesites: {}", r"cannot read .*pages\.yaml"),
+        (b"sites: [unclosed", r"cannot parse .*pages\.yaml"),
+    ],
+    ids=["missing", "not-utf8", "malformed-yaml"],
+)
+def test_a_broken_site_config_is_a_named_error(
+    tmp_path: PathType, contents: bytes | None, message: str
+) -> None:
+    """The site configuration fails as ``PagesConfigError``, not a raw error."""
+    pages = tmp_path / "pages.yaml"
+    if contents is not None:
+        pages.write_bytes(contents)
+    with pytest.raises(builder.PagesConfigError, match=message):
+        builder.documented_release(pages)
+
+
+def test_source_identity_wraps_an_undecodable_pyproject(tmp_path: PathType) -> None:
+    """A ``pyproject.toml`` that is not UTF-8 becomes a named error."""
+    (tmp_path / "pyproject.toml").write_bytes(b"\xff\xfe[project]")
+    with pytest.raises(builder.SourceIdentityError, match=r"cannot read pyproject"):
+        builder.source_identity(tmp_path, run_git=lambda _root: _COMMIT)
 
 
 def test_source_identity_wraps_an_unreadable_pyproject(tmp_path: PathType) -> None:

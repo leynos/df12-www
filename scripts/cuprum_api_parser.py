@@ -214,6 +214,23 @@ def _fields(
     return fields, _paragraphs(prose)
 
 
+def _parse_source(path: Path, label: str) -> ast.Module:
+    """Read and parse one source file, raising :class:`ApiSourceError` on failure.
+
+    ``label`` names the file in the message, as a module or a file name.
+    """
+    try:
+        source = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as error:
+        msg = f"cannot read module {label} from {path}: {error}"
+        raise ApiSourceError(msg) from error
+    try:
+        return ast.parse(source)
+    except SyntaxError as error:
+        msg = f"cannot parse module {label} from {path}: {error}"
+        raise ApiSourceError(msg) from error
+
+
 def public_names(package_init: Path) -> list[str]:
     """Return the ``__all__`` list declared in ``package_init``.
 
@@ -230,9 +247,10 @@ def public_names(package_init: Path) -> list[str]:
     Raises
     ------
     ApiSourceError
-        If the module declares no literal ``__all__`` list or tuple.
+        If the file cannot be read, is not valid UTF-8, or does not parse as
+        Python, or if the module declares no literal ``__all__`` list or tuple.
     """
-    tree = ast.parse(package_init.read_text(encoding="utf-8"))
+    tree = _parse_source(package_init, package_init.name)
     for node in tree.body:
         if (
             isinstance(node, ast.Assign)
@@ -286,17 +304,7 @@ class _Resolver:
             or does not parse as Python.
         """
         if module not in self._trees:
-            path = self._path(module)
-            try:
-                source = path.read_text(encoding="utf-8")
-            except (OSError, UnicodeDecodeError) as error:
-                msg = f"cannot read module {module!r} from {path}: {error}"
-                raise ApiSourceError(msg) from error
-            try:
-                self._trees[module] = ast.parse(source)
-            except SyntaxError as error:
-                msg = f"cannot parse module {module!r} from {path}: {error}"
-                raise ApiSourceError(msg) from error
+            self._trees[module] = _parse_source(self._path(module), repr(module))
         return self._trees[module]
 
     def relpath(self, module: str) -> str:

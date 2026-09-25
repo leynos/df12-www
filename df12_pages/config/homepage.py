@@ -264,7 +264,9 @@ def _library_link_href(value: object, *, external: bool) -> str:
             return href
         msg = f"External library link {href!r} must be an absolute http(s) URL."
         raise SiteConfigError(msg)
-    if not parts.scheme and not parts.netloc:
+    # Browsers read a backslash in an http(s) URL as a slash, so `/\\host`
+    # would reach another host even though urlsplit sees no netloc in it.
+    if not parts.scheme and not parts.netloc and "\\" not in href:
         return href
     msg = f"Local library link {href!r} must be a path on this site."
     raise SiteConfigError(msg)

@@ -28,8 +28,8 @@
     "bump": "uv run pages bump"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.7",
-    "@happy-dom/global-registrator": "20.11.2",
+    "@biomejs/biome": "2.5.14",
+    "@happy-dom/global-registrator": "20.14.5",
     "@iconify-json/carbon": "^1.2.25",
     "@swc/core": "^1.16.1",
     "@tailwindcss/cli": "^4.1.15",
@@ -38,8 +38,8 @@
     "chokidar-cli": "^3.0.0",
     "concurrently": "^10.0.3",
     "daisyui": "^5.3.7",
-    "fast-check": "4.9.0",
-    "happy-dom": "20.11.2",
+    "fast-check": "4.10.1",
+    "happy-dom": "20.14.5",
     "http-server": "^14.1.1",
     "minisearch": "7.2.0",
     "sharp": "^0.35.3",

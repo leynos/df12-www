@@ -102,12 +102,17 @@
      ]},
 
     {'group': 'preview', 'preview': 'system-facts', 'title': 'System facts',
-     'blurb': 'A pure, stable description of the host, so a manifest can choose a convention without probing the environment.',
-     'source': R ~ '67-probe-host-state-through-injected-query-gated-seams',
+     'blurb': 'An opt-in, immutable description of the host, collected once per run, so a manifest can choose a convention without probing the environment.',
+     'source': R ~ '30-opt-in-host-facts-without-hidden-discovery',
      'items': [
-        {'text': 'A <code>host</code> descriptor: operating system, family, architecture, executable suffix, and path separators', 'section': 'descriptor'},
-        {'text': 'Replacing <code>OS=Windows_NT</code> sniffing and <code>/dev/null</code> guesswork in manifests', 'section': 'uses'},
-        {'text': 'Query-gated host probes: <code>exists</code>, <code>link_exists</code>, <code>same_file</code>, <code>mount</code>, and <code>expandvars</code>', 'section': 'today', 'task': ('6.7', R ~ '67-probe-host-state-through-injected-query-gated-seams')},
+        {'text': 'Accept RFC 0029 and settle the snapshot, grant, and diagnostic types', 'section': 'status', 'task': ('30.1', R ~ '301-settle-the-host-facts-contract-before-collecting-anything')},
+        {'text': 'An explicit <code>host_facts</code> opt-in under an operator authority ceiling', 'section': 'opt-in', 'task': ('30.2.1', R ~ '302-ship-the-platform-only-slice-end-to-end')},
+        {'text': 'Platform facts collected once into an immutable <code>host</code>: operating system, family, architecture, executable suffix, and path separators', 'section': 'descriptor', 'task': ('30.2.2', R ~ '302-ship-the-platform-only-slice-end-to-end')},
+        {'text': 'A facts digest in plan identity, so a changed host invalidates stale Ninja work', 'section': 'planning', 'task': ('30.2.3', R ~ '302-ship-the-platform-only-slice-end-to-end')},
+        {'text': 'Non-disclosing target discovery and a standalone <code>facts</code> inspection command', 'section': 'inspection', 'task': ('30.2.4–30.2.5', R ~ '302-ship-the-platform-only-slice-end-to-end')},
+        {'text': 'Separately authorized distribution and kernel observations', 'section': 'descriptor', 'task': ('30.3', R ~ '303-add-separately-authorized-distribution-and-kernel-observations')},
+        {'text': 'Typed host fixtures for manifest tests, and one snapshot shared across includes and bundles', 'section': 'confidence', 'task': ('30.4', R ~ '304-prove-host-facts-across-composition-fixtures-and-real-platforms')},
+        {'text': 'Query-gated filesystem probes: <code>exists</code>, <code>link_exists</code>, <code>same_file</code>, <code>mount</code>, and <code>expandvars</code>', 'section': 'today', 'task': ('6.7', R ~ '67-probe-host-state-through-injected-query-gated-seams')},
      ]},
     {'group': 'preview', 'preview': 'standard-library', 'title': 'Template standard-library expansion',
      'blurb': 'Absorb common manifest operations into the standard library without weakening determinism or the capability boundary.',
@@ -354,7 +359,7 @@
                         </div>
                         <div class="p-5 flex items-start">
                             <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:bare-metal-server" aria-hidden="true"></span>
-                            <p class="text-sm text-charcoal-mid">A manifest cannot yet ask which operating system or architecture it is on without reading environment variables; a stable host descriptor is <a href="{{ fc.href('system-facts') }}" class="hm-link">sketched for v0.1.1</a>.</p>
+                            <p class="text-sm text-charcoal-mid">A manifest cannot yet ask which operating system or architecture it is on without reading environment variables; an opt-in host descriptor is <a href="{{ fc.href('system-facts') }}" class="hm-link">proposed in RFC 0029</a>, intended for v0.1.1.</p>
                         </div>
                         <div class="p-5 flex items-start">
                             <span class="iconify text-warning mt-1 mr-3 shrink-0" data-icon="carbon:flow-connection" aria-hidden="true"></span>

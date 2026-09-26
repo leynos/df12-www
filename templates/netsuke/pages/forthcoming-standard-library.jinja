@@ -92,7 +92,7 @@
                         </tbody>
                     </table>
                 </div>
-                <p class="text-xs text-charcoal-mid max-w-3xl">Where host probing comes up &mdash; the filesystem predicates and <code>expandvars</code> of roadmap 6.7 &mdash; the separate <a href="{{ fc.href('system-facts') }}" class="hm-link">system facts sketch</a> covers what a manifest can learn about its host without probing at all.</p>
+                <p class="text-xs text-charcoal-mid max-w-3xl">Where host probing comes up &mdash; the filesystem predicates and <code>expandvars</code> of roadmap 6.7 &mdash; the separate <a href="{{ fc.href('system-facts') }}" class="hm-link">system facts preview</a> (RFC 0029) covers what a manifest can learn about its host without probing at all.</p>
             </section>
 
             <section id="families" class="mb-16 pt-10 border-t border-stone-light">
@@ -202,7 +202,7 @@ targets:
                     <li><strong>Today.</strong> The <a href="/netsuke/docs/standard-library/" class="hm-link">shipped standard library</a> &mdash; path filters, <code>glob</code>, <code>which</code>, <code>command_available</code>, and collection filters &mdash; covers most manifests.</li>
                     <li><strong>First step.</strong> Replace one <code>shell('jq ...')</code> with <code>from_json</code>, or one <code>--version</code> scrape with the <code>version</code> test. Both are pure, so <code>help targets</code> can evaluate them.</li>
                     <li><strong>Next.</strong> Layer configuration with <code>combine</code> and expand matrices with <code>product</code>, trusting the ordering to be stable.</li>
-                    <li><strong>Cross-platform.</strong> Compose paths with an explicit <code>dialect</code>, and read the host's own conventions from the <a href="{{ fc.href('system-facts') }}" class="hm-link">system facts sketch</a> once it lands.</li>
+                    <li><strong>Cross-platform.</strong> Compose paths with an explicit <code>dialect</code>, and read the host's own conventions from the <a href="{{ fc.href('system-facts') }}" class="hm-link">host facts of RFC 0029</a> once they land.</li>
                     <li><strong>Deep end.</strong> Probe the host through the 6.7 predicates, and gate expensive checks on a Git changeset.</li>
                 </ol>
             </section>

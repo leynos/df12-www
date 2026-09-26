@@ -1309,7 +1309,7 @@ sites:
       # date its release notes carry, and the nightly toolchain that
       # rust-toolchain.toml pins for source builds.
       netsuke_version: "0.1.0-beta4"
-      netsuke_release_date: "25 September 2026"
+      netsuke_release_date: "26 September 2026"
       netsuke_rust_nightly: "nightly-2026-08-23"
     theme:
       site_name: Netsuke

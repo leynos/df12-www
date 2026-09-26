@@ -157,7 +157,7 @@ env_block_var = ["AWS_SECRET_ACCESS_KEY"]
                     <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
                 </div>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
-                    A checkout's own <code>.netsuke.toml</code> is a request, not an order. For three kinds of setting, the primary project file can tighten what the operator allows but never loosen it. System and user configuration, <code>NETSUKE_</code> variables, and CLI flags are the operator layers. Files pulled in through <code>extends</code> keep ordinary file-layer precedence for fetch and <code>env()</code> policy.
+                    A checkout's own <code>.netsuke.toml</code> is a request, not an order. For three kinds of setting, the primary project file can tighten what the operator allows but never loosen it. System and user configuration, <code>NETSUKE_</code> variables, and CLI flags are the operator layers. For fetch and <code>env()</code> policy, only the primary project file is quarantined this way; files pulled in through <code>extends</code> keep ordinary file-layer precedence. For evaluation budgets, though, a value from the <code>extends</code> chain counts as a project value too, so it can likewise only narrow a ceiling, never raise one.
                 </p>
                 <div class="grid md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">

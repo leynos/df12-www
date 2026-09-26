@@ -1213,6 +1213,91 @@ fails by name, and each is checked for the markers its kind needs — a guide
 carries a code panel and a plate, an API group carries an entry article, and an
 example carries a facts list and a code panel.
 
+### 5.8. The forthcoming-capability previews: `forthcoming_data.jinja`
+
+`templates/netsuke/forthcoming_data.jinja` holds `previews`, the single ordered
+catalogue behind every forthcoming-capability page: the hub's card grid, each
+preview's sidebar, header chip, and previous/next footer, and the roadmap's
+links into a preview's sections all render from this one list, so adding a
+preview, renaming a section, or retargeting a release means editing one entry.
+Each entry carries:
+
+- `key` — the page's slug under `/netsuke/forthcoming/`.
+- `title` — the page's `<h1>` and card heading.
+- `short` — the sidebar and footer label.
+- `icon` — the Carbon icon on the hub card.
+- `tile` — the utility class that colours the card's icon tile.
+- `target` — the release the preview is aimed at, or `none` when no release
+  has been named upstream.
+- `stage` — how far the work has got: a sketch, a proposed RFC, or a branch
+  with code on it.
+- `summary` — the hub card's copy; trusted template data, rendered with
+  `| safe`, so it may carry `<code>` and other inline markup.
+- `sections` — the page's in-page anchors, in order.
+- `sources` — the upstream documents the page is written from.
+
+The list is ordered by how near each capability is: named releases first,
+earliest first, then proposals with no release.
+
+The macros:
+
+- `href(key, section=none)` — the URL of a preview, or of one of its
+  sections. An unknown preview, or a section not listed in that preview's
+  `sections`, calls an undefined function, which fails the build with a Jinja2
+  `UndefinedError` rather than publishing a link to nowhere — the same device
+  `api.ref` uses for Cuprum's API reference (section 5.5).
+- `target_label(entry)` — the chip text naming how near a preview is.
+- `chip(entry)` — the status chip built from `target_label`.
+- `sidebar(key)` — the preview sidebar: every preview, with the current one's
+  sections nested beneath it, then the current page's sources.
+- `header(key)` — a `{% call %}` block whose body is the lede: it renders the
+  breadcrumb, kicker, release and stage chips, and title, then the caller's
+  content as the standfirst paragraph.
+- `footer(key)` — the previous and next previews in list order; the ends
+  loop back to the hub.
+- `cards()` — the hub's card grid.
+- `index_list()` — a compact index of every preview, for the docs and guides
+  hubs.
+
+Every preview page imports the module as `fc`: `pages/forthcoming.jinja` calls
+`fc.cards()` for the hub, each `pages/forthcoming-<key>.jinja` calls
+`fc.sidebar`, `fc.header`, and `fc.footer` for its own key and `fc.href` for
+links to other previews, and `docs.jinja` and `guides.jinja` call
+`fc.index_list()` on their hubs. The roadmap's `tracks` data names an optional
+`preview` key per track, and links each item with `fc.href(key, item.section)`,
+so a roadmap link and the anchor it targets cannot drift apart.
+
+Adding a preview or renaming a section means:
+
+1. Add or edit the entry in the `previews` catalogue.
+2. Register the page in `config/pages.yaml`, under the Netsuke sub-site's
+   `content_pages`, with `nav_href: /netsuke/roadmap/`.
+3. Make the page's `<section id="…">` values match `sections` in the same
+   order.
+4. Add the slug and title to `PREVIEW_TITLES` in `tests/test_netsuke_site.py`
+   and to `PREVIEW_KEYS` in `tests/test_netsuke_chrome.py`.
+5. Rebuild and re-record the netsuke render baseline.
+
+Every preview page shares the same closing run of sections: `shallow-end`
+("From the shallow end"), `confidence` ("Confidence") where the stage warrants
+it, and `access` ("Accessibility & localization").
+
+| Modifier    | Effect                                                                                                                                                          |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _(none)_    | The default chip: a boxwood-pale pill with a stone border.                                                                                                      |
+| `--inverse` | Translucent chip for a dark surface.                                                                                                                            |
+| `--warning` | Amber-toned chip for a caution or stage marker.                                                                                                                 |
+| `--muted`   | Flat boxwood chip for a de-emphasized status.                                                                                                                   |
+| `--success` | Matcha-toned chip for a positive status.                                                                                                                        |
+| `--inline`  | A chip set inside running text, kept shorter than the line box so a marked line keeps its neighbours' leading; used for the roadmap's "new in release" markers. |
+| `--brand`   | Indigo-toned chip for a primary/brand status.                                                                                                                   |
+| `--accent`  | Vermilion-toned chip for an accent status.                                                                                                                      |
+| `--filter`  | An interactive filter chip, with its own hover state.                                                                                                           |
+| `--active`  | The selected state of a `--filter` chip.                                                                                                                        |
+
+_Table 7b: the `.hm-chip` component and its modifiers, in
+`src/styles/netsuke/himotoshi.css`._
+
 ## 6. Browser-side components
 
 Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files

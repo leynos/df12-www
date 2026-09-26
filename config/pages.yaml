@@ -1466,15 +1466,15 @@ sites:
         template: pages/forthcoming-testing-framework.jinja
         output_slug: forthcoming/testing-framework
         nav_href: /netsuke/roadmap/
-      - key: forthcoming-property-testing
-        label: Property Testing
-        template: pages/forthcoming-property-testing.jinja
-        output_slug: forthcoming/property-testing
-        nav_href: /netsuke/roadmap/
       - key: forthcoming-linter
         label: Netsukefile Linter
         template: pages/forthcoming-linter.jinja
         output_slug: forthcoming/linter
+        nav_href: /netsuke/roadmap/
+      - key: forthcoming-property-testing
+        label: Property Testing
+        template: pages/forthcoming-property-testing.jinja
+        output_slug: forthcoming/property-testing
         nav_href: /netsuke/roadmap/
       - key: forthcoming-states
         label: States and Probes

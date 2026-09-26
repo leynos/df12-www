@@ -1,52 +1,23 @@
 {% extends "doc_page.jinja" %}
 {% import "chrome.jinja" as chrome %}
 {% import "components.jinja" as ui %}
-{% import "docs_nav.jinja" as docsnav %}
+{% import "forthcoming_data.jinja" as fc %}
 {% block page_title %}Netsukefile Testing Framework (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
 
     <div class="site-container pt-16 grow flex">
 
-        {{ docsnav.sidebar(sections=[
-            {'title': 'Forthcoming', 'links': [
-                {'href': '/netsuke/forthcoming/', 'label': 'All previews'},
-                {'href': '/netsuke/forthcoming/linter/', 'label': 'Netsukefile Linter'},
-                {'href': '/netsuke/forthcoming/testing-framework/', 'label': 'Testing Framework', 'active': true},
-                {'href': '#status', 'label': 'Status', 'sub': true},
-                {'href': '#why', 'label': 'Why manifest tests', 'sub': true},
-                {'href': '#layout', 'label': 'Test tree and files', 'sub': true},
-                {'href': '#steps', 'label': 'Given, when, then', 'sub': true},
-                {'href': '#mocks', 'label': 'Doubles and fixtures', 'sub': true},
-                {'href': '#command', 'label': 'The command', 'sub': true},
-                {'href': '#example', 'label': 'Worked example', 'sub': true},
-                {'href': '#design', 'label': 'Under the bonnet', 'sub': true}
-            ]},
-            {'title': 'Sources', 'links': [
-                {'href': 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md', 'label': 'RFC 0007'},
-                {'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md', 'label': 'UX and semantic design'},
-                {'href': 'https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md', 'label': 'Technical design'}
-            ]},
-        ], search=false, nav_label='Preview pages') }}
+        {{ fc.sidebar('testing-framework') }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': 'Testing Framework'}]) }}
-
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center flex-wrap gap-3 mb-4">
-                    {{ ui.kicker('Forthcoming capability', dot='bg-primary') }}
-                    <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview targeted at v0.4.0</span>
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-base-content mb-6">Netsukefile Testing Framework</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+            {% call fc.header('testing-framework') %}
                     Netsukefiles contain real logic &mdash; <code>foreach</code>, <code>when</code>, macros, environment probes, globbing,
                     <code>command_available</code> &mdash; and today the only way to verify it is to run a build and eyeball the output.
                     <code>netsuke test</code> runs declarative tests through the same compiler pipeline as <code>netsuke build</code> and asserts on
                     the rendered manifest, the build graph, and the generated Ninja text, deterministically and without executing a single recipe.
-                </p>
-            </div>
+            {% endcall %}
 
             <section id="status" class="mb-16">
                 <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
@@ -54,10 +25,11 @@
                         <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
                     </h2>
                     <ul class="space-y-2 text-sm text-charcoal-mid">
-                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> Nothing described here is implemented: there is no <code>test</code> command, no <code>tests</code> manifest key, and no test dialect in the released binary.</span></li>
-                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md" class="hm-link">RFC 0007</a> (proposed, 17 August 2026) sets the scope; the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md" class="hm-link">UX and semantic design</a> and the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md" class="hm-link">technical design</a> are drafts. Roadmap phase 7 tracks the work, with every task still open.</span></li>
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> The released binary has no <code>test</code> command, no <code>tests</code> manifest key, and no test dialect. Only the first seam has landed on main: <code>now()</code> reads an injectable clock. Manifest authors see no change.</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md" class="hm-link">RFC 0007</a> (proposed, 17 August 2026) sets the scope; the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-ux-design.md" class="hm-link">UX and semantic design</a> and the <a href="https://github.com/leynos/netsuke/blob/main/docs/netsuke-test-framework-technical-design.md" class="hm-link">technical design</a> are drafts. <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#7-netsukefile-testing-framework" class="hm-link">Roadmap phase 7</a> tracks twenty-one tasks. The first, 7.1.1, the <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#71-seams-and-loader-options" class="hm-link">clock provider seam</a>, landed on 24 September 2026 in <a href="https://github.com/leynos/netsuke/pull/696" class="hm-link">#696</a> and makes <code>now()</code> read an injectable, UTC-normalized clock; the other twenty remain open. Issue <a href="https://github.com/leynos/netsuke/issues/591" class="hm-link">#591</a> tracks the feature.</span></li>
                         <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span><strong>Gated on evidence.</strong> Before the dialect and mock engine are built, the seams are dogfooded through a differential fidelity suite over the repository's example manifests; if the dialect's demand assumptions fail, the design's explicit exit is overrides only, with no dialect.</span></li>
-                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.4.0.</strong> The success criterion is concrete: an author can write the worked example below and run it to a green result on a machine with no compiler, no network, and a fixed clock. Key names, matchers, and output shapes may change before then.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.3.0.</strong> Issue #591 names v0.3.0 for the first usable release; the repository&rsquo;s own documents name no release. The success criterion is concrete: an author can write the worked example below and run it to a green result on a machine with no compiler, no network, and a fixed clock. Key names, matchers, and output shapes may change before then.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:chart-scatter" aria-hidden="true"></span> <span><strong>Extended by a follow-on.</strong> <a href="{{ fc.href('property-testing') }}" class="hm-link">Property testing</a> (RFC 0012, <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#10-property-based-testing-of-generated-build-scripts" class="hm-link">roadmap phase 10</a>) builds on this framework and its dialect.</span></li>
                     </ul>
                 </div>
             </section>
@@ -189,7 +161,7 @@ then:
       regex: "missing.*rule"
 {% endhighlight %}
                         </div>
-                        <p class="text-xs text-charcoal-mid mt-3">A false assertion is a <em>FAIL</em>; a case that could not run to a verdict is an <em>ERROR</em>. The two are distinct end to end, and expected failures can be asserted on by name.</p>
+                        <p class="text-xs text-charcoal-mid mt-3">A false assertion is a <em>FAIL</em>. An assertion whose evaluation raises &mdash; an undefined name, a type mismatch &mdash; is an <em>ERROR</em>, so a typo such as <code>result.grpah</code> cannot pass itself off as an ordinary red result. Negative tests name the diagnostic they expect with <code>expect_failure</code>, so a different bug cannot satisfy them: <code>message_contains</code> works from the start, while matching on <code>code</code> waits until the diagnostic code namespace is declared stable.</p>
                     </div>
                 </div>
             </section>
@@ -404,6 +376,92 @@ FAIL compile.yml::test_substituted_macro_receives_source
                 </div>
             </section>
 
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The worked example above is the design&rsquo;s finish line, not its starting point. The quick start in the UX design needs
+                    nothing beyond a Netsukefile and one test file in the default <code>netsuke-tests</code> directory: no <code>tests</code> block,
+                    no fixtures, no doubles, and no <code>given</code>. The test is the <code>hello.yml</code> case shown under
+                    <a href="{{ fc.href('testing-framework', 'steps') }}" class="hm-link">given, when, then</a>.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile (quick start, UX design §14.1)</div>
+                        {% highlight 'netsuke' %}
+netsuke_version: "1.2.0"
+
+targets:
+  - name: build/hello.txt
+    command: echo hello > build/hello.txt
+{% endhighlight %}
+                    </div>
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A passing run, as designed</div>
+                        {% highlight 'netsuke-console' %}
+$ netsuke test
+
+PASS hello.yml::test_hello_target_is_generated
+
+1 case: 1 passed
+{% endhighlight %}
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">
+                    That case needs no compiler, no network, and no real files, because <code>generate_ninja</code> runs against the in-memory
+                    pipeline. From there the path deeper is a ladder, and each rung is opt-in:
+                </p>
+                <ol class="space-y-3 mb-6 max-w-3xl text-sm text-charcoal-mid">
+                    <li class="flex items-start"><span class="font-mono text-primary mr-3">1</span><span><strong>Assertions only.</strong> Boolean expressions over <code>result</code>, with <code>then</code> after a pipeline action.</span></li>
+                    <li class="flex items-start"><span class="font-mono text-primary mr-3">2</span><span><strong>A loose stub.</strong> <code>stub(returns=&hellip;)</code> in <code>given.let</code> is the one-line default for a collaborator the test does not care about.</span></li>
+                    <li class="flex items-start"><span class="font-mono text-primary mr-3">3</span><span><strong>A spy or a verified mock.</strong> <code>spy()</code> records calls to the effective implementation; <code>mock(&hellip;)</code> adds expectations that must be met.</span></li>
+                    <li class="flex items-start"><span class="font-mono text-primary mr-3">4</span><span><strong>The structured <code>mocks</code> block.</strong> The full-fidelity form every shorthand desugars to, with matchers and call configurations.</span></li>
+                    <li class="flex items-start"><span class="font-mono text-primary mr-3">5</span><span><strong>Fixtures and macro substitution.</strong> Sandboxed files and stand-in macros, as in the worked example.</span></li>
+                </ol>
+                <p class="text-sm text-charcoal-mid mb-6 max-w-3xl">
+                    The design calls this strictness ladder deliberate: over-mocking is the documented failure mode of expressive mock frameworks,
+                    so the terse form stays the loosest. Test files declare macros exactly as a Netsukefile does, so authors carry one mental model
+                    between manifests and tests, and a mistyped key such as <code>fixture:</code> is rejected with the nearest known key.
+                </p>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:direction-fork" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Beyond the first version.</strong> The UX design lists its deferred features in likely delivery order: build
+                        execution behind explicit allow flags, filter and Jinja-test doubles, file- and session-scoped fixtures, data-driven case
+                        tables, snapshot assertions, and JUnit XML with an idempotence check. Separately,
+                        <a href="{{ fc.href('property-testing') }}" class="hm-link">property testing</a> (RFC 0012, roadmap phase 10) builds on this
+                        framework with quantified assertions, bounded generation, and metamorphic mutations, without reopening its closed dialect.
+                    </p>
+                </div>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    <code>netsuke test</code> is designed to follow the established display policy flags &mdash; <code>--color</code>,
+                    <code>--emoji</code>, <code>--progress</code>, and <code>--accessibility</code> &mdash; rather than invent its own, so the
+                    <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output</a> modes apply to test reports as they do to
+                    builds. Every human-facing string is to be <a href="/netsuke/docs/cli/#localization" class="hm-link">localized</a> through Fluent.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Keys early, not at the end</h3>
+                        <p class="text-xs text-charcoal-mid">The build-time completeness audit requires every key in all 34 catalogues beyond <code>en-US</code>. The technical design defines keys early in the phasing so translation lands in batches rather than as a release-blocking cliff. <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#76-command-localization-and-reporting" class="hm-link">Roadmap 7.6.2</a> adds the Fluent keys for report lines, diagnostics, and warnings.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Machine text stays invariant</h3>
+                        <p class="text-xs text-charcoal-mid">Two artefacts are deliberately not translated: the suggested YAML stanza for an unmatched call, and the expression-with-values rendering in a failure report. Both are meant to be pasted or matched, not read as prose. The <code>--json</code> report keeps the one-document stream contract.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">A documented accessible contract</h3>
+                        <p class="text-xs text-charcoal-mid">Roadmap 7.6.3 documents how case results, failure diagnostics, and the run summary render under <code>--accessibility on</code>, and records the findings against task 3.8.3, the still-open <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#38-accessibility-verification" class="hm-link">verification with assistive technology</a>. Until then the design names the contract but not its exact wording.</p>
+                    </div>
+                </div>
+            </section>
+
             <section id="design" class="mb-16 pt-10 border-t border-stone-light">
                 <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:layers" aria-hidden="true"></span> Under the bonnet
@@ -411,7 +469,7 @@ FAIL compile.yml::test_substituted_macro_receives_source
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
                         <h3 class="font-bold text-base-content mb-2 text-sm">One compiler, two new seams</h3>
-                        <p class="text-xs text-charcoal-mid">Implementation reuses the existing pipeline behind an options-carrying loader entry point that registers test overlays after the standard library and manifest macros and before <code>foreach</code> expansion. Only two seams are added: a clock provider and a macro-substitution overlay. Network mocking needs no transport seam, because the deny-all policy plus function-level doubles make the real network code unreachable under test.</p>
+                        <p class="text-xs text-charcoal-mid">Implementation reuses the existing pipeline behind an options-carrying loader entry point that registers test overlays after the standard library and manifest macros and before <code>foreach</code> expansion. Two seams are added. The clock provider is already on main (<a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#71-seams-and-loader-options" class="hm-link">7.1.1</a>, #696); the macro-substitution overlay is still to come (7.1.3). Sandbox-rooted <code>glob()</code> and file tests are adapters for the test registration rather than new seams (<a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#74-fixture-engine" class="hm-link">7.4.1</a>). Network mocking needs no transport seam, because the deny-all policy plus function-level doubles make the real network code unreachable under test.</p>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
                         <h3 class="font-bold text-base-content mb-2 text-sm">A killable child per case</h3>
@@ -426,9 +484,28 @@ FAIL compile.yml::test_substituted_macro_receives_source
                         <p class="text-xs text-charcoal-mid">Executing builds or fixture shell commands (designed, but deferred behind explicit allow flags); replacing Netsuke's own Rust test suites; a general-purpose scripting language for tests; file- and session-scoped fixtures; JUnit XML output. The <code>tests</code> key is admitted from the manifest version of the release that ships it, and older binaries reject it with their ordinary unknown-field diagnostic.</p>
                     </div>
                 </div>
+                <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">How the design earns trust</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">Ten named invariants</h4>
+                        <p class="text-xs text-charcoal-mid">The technical design states invariants I1 to I10, each with a verification method. Teardown-exactly-once is property-tested over generated fixture graphs of up to sixteen fixtures with failures injected at every lifecycle point; semantic fidelity is checked by differential tests against the build path over the example manifests; the hard timeout is tested with a deliberately non-cooperative template expression.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">No silent greens</h4>
+                        <p class="text-xs text-charcoal-mid">An empty run fails unless <code>--allow-empty</code> says otherwise. FAIL and ERROR stay distinct. An unmocked impure call is an error. And an older runner rejects a newer test file rather than misreading it.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">Evidence before the dialect</h4>
+                        <p class="text-xs text-charcoal-mid">Task <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#71-seams-and-loader-options" class="hm-link">7.1.4</a> dogfoods the seams through a differential fidelity suite before any dialect work begins, with overrides-only as the stated exit if demand fails to appear.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">Already practised on 7.1.1</h4>
+                        <p class="text-xs text-charcoal-mid">The clock seam shipped with six named obligations, each paired with a mutation it must reject, plus a <code>proptest</code> over the valid UTC offset range. The retrospective credits the mutation exercise with catching a near-miss in offset handling.</p>
+                    </div>
+                </div>
             </section>
 
-{{ docsnav.footer_nav({'kicker': 'Previous preview', 'label': 'Netsukefile Linter', 'href': '/netsuke/forthcoming/linter/'}, {'kicker': 'Follow', 'label': 'Roadmap', 'href': '/netsuke/roadmap/'}) }}
+{{ fc.footer('testing-framework') }}
 
         </main>
     </div>

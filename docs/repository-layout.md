@@ -175,10 +175,11 @@ sub-site's design system. Episodic, Netsuke, and Cuprum keep shared macros in
 `components.jinja`; Cuprum adds `_icons.jinja`, `_marks.jinja` for its
 fictional municipal marks, and `data/` for the lists its pages loop over;
 Netsuke adds `chrome.jinja` for page furniture, `docs_nav.jinja` for the docs
-navigation, and `examples_data.jinja` for the examples catalogue. Netsuke,
-Weaver, Stilyagi, and Cuprum each centralize their chrome in a `_layout.jinja`:
-every Netsuke content page reaches it through `doc_page.jinja` and the homepage
-extends it directly; the one standalone document is
+navigation, `examples_data.jinja` for the examples catalogue, and
+`forthcoming_data.jinja` for the forthcoming-capability preview catalogue.
+Netsuke, Weaver, Stilyagi, and Cuprum each centralize their chrome in a
+`_layout.jinja`: every Netsuke content page reaches it through `doc_page.jinja`
+and the homepage extends it directly; the one standalone document is
 `pages/icon-replacements.jinja`, which carries its own head and scripts. These
 are distinct from the main-site templates in `df12_pages/templates/`.
 

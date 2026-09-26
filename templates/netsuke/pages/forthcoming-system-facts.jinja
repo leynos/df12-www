@@ -1,0 +1,470 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}System Facts (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('system-facts') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('system-facts') %}
+                    A manifest can ask whether <code>cargo-nextest</code> is installed. It cannot ask which operating system it is running on.
+                    RFC 0029 proposes an opt-in, immutable <code>host</code> object &mdash; collected once per invocation, from the running
+                    Netsuke binary rather than the environment &mdash; so that a platform branch becomes a fact a manifest reads instead of
+                    a guess it makes from <code>uname</code> or <code>OS=Windows_NT</code>.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> No template variable, global, command, or configuration key exposes host facts today. Nothing on this page is implemented.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>A proposed RFC.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0029-first-class-host-facts.md" class="hm-link">RFC 0029, &ldquo;First-class host facts&rdquo;</a>, created on 25 September 2026, reached <code>main</code> in <a href="https://github.com/leynos/netsuke/pull/802" class="hm-link">PR #802</a> with status <em>Proposed</em>. Merging it did not accept it: accepting it, and recording an ADR, is itself roadmap task 30.1.1. It replaces the maintainer&rsquo;s sketch this page was first written from.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:task" aria-hidden="true"></span> <span><strong>Planned as roadmap phase 30.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#30-opt-in-host-facts-without-hidden-discovery" class="hm-link">&ldquo;Opt-in host facts without hidden discovery&rdquo;</a> has five steps and fifteen tasks, none ticked.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Intended near the front of v0.1.1.</strong> The RFC&rsquo;s release disposition is &ldquo;post-v0.1.0&rdquo; and leaves release assignment to review; phase 30 names no release and adds no v0.1.0 gate. The v0.1.1 aim is the maintainers&rsquo; stated intent, not a scheduled commitment.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why first-class host facts
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Replacing a Makefile currently leaves platform decisions in shell probes, environment conventions, or repeated Jinja
+                    branches with repository-specific names. Netsuke&rsquo;s own Makefile picks its Linux linker flag with
+                    <code>BUILD_HOST_OS := $(shell uname -s)</code>. The RFC&rsquo;s answer fits in one sentence:
+                </p>
+                <blockquote class="bg-white p-6 rounded-xl border border-base-300 border-l-4 border-l-primary shadow-xs text-sm text-charcoal-mid mb-8 max-w-3xl">
+                    <p>&ldquo;Collect once through explicit providers, normalize once, then render against an immutable snapshot. Facts describe observations; they neither grant capabilities nor select execution policy.&rdquo; &mdash; RFC 0029 &sect;1</p>
+                </blockquote>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Ansible, with dispositions</h3>
+                        <p class="text-xs text-charcoal-mid">Ansible&rsquo;s gathered facts are the prior art: one namespace, readable in templates and conditions. The RFC keeps that and the split between choosing what to collect and filtering what to show, and rejects the rest &mdash; see <a href="#alternatives" class="hm-link">roads not taken</a>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">No hidden I/O</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;No fact collector launches a shell, performs a network request, reads the process environment, or executes local fact files.&rdquo; The default group reads nothing at all: its values come from the running binary.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Small on purpose</h3>
+                        <p class="text-xs text-charcoal-mid">An unrestricted inventory would bring &ldquo;hidden I/O, identifying data, stale observations, graph changes caused by load, and incorrect cross-compilation decisions&rdquo;. Three groups, fifteen fields, and a closed vocabulary.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="opt-in" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:checkbox-checked" aria-hidden="true"></span> Opting in, and who may grant what
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A manifest opts in with a root <code>host_facts</code> mapping. Without it, nothing is collected and a variable a manifest
+                    already calls <code>host</code> stays an ordinary variable. With it, and no <code>gather</code> list, only the
+                    inexpensive <code>platform</code> group is requested.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed syntax, RFC 0029 &sect;1</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+host_facts:
+  schema: 1
+
+vars:
+  test_program: "fixture-test{{ host.exe_suffix }}"
+
+# Excerpt: the schema/version declaration and other manifest sections are omitted.
+actions:
+  - name: check-posix
+    when: "{{ host.family == 'unix' }}"
+    command: cargo test --all-targets
+  - name: check-windows
+    when: "{{ host.os == 'windows' }}"
+    command: cargo test --all-targets
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed syntax, RFC 0029 &sect;5.1</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+host_facts:
+  schema: 1
+  gather:
+    - platform
+    - distribution
+{% endraw %}{% endhighlight %}
+                        </div>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li><strong>Two keys only.</strong> <code>schema</code> is required; <code>gather</code> is a non-empty, duplicate-free list of literal group names that must include <code>platform</code>.</li>
+                            <li><strong>Closed vocabulary.</strong> No wildcard, negation, Jinja, or environment interpolation, and no <code>all</code>, so an upgrade cannot silently broaden collection. Unknown keys, versions, and groups fail before any provider runs.</li>
+                            <li><strong>A new format version.</strong> The opt-in needs an additive manifest-format version, allocated at implementation time; the examples deliberately omit a <code>netsuke_version</code>. Older Netsuke must reject the field, not ignore it.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">The authority ceiling (&sect;5.2)</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;The project requests groups; it cannot grant collection authority.&rdquo; Trusted operator configuration and explicit command-line choices set the allow-list, through the existing OrthoConfig provenance path under the proposed key <code>host_fact_policy.allowed_groups</code>. The default grant is <code>platform</code> alone. Asking for <code>distribution</code> or <code>kernel</code> without a grant fails before any I/O, naming the denied group and the fix. Operators may deny <code>platform</code> too, denials outrank requests, and no environment variable is assigned that could spoof a value.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">An immutable namespace (&sect;5.3)</h3>
+                        <p class="text-xs text-charcoal-mid">Once opted in, <code>host</code> is reserved throughout evaluation. Root and per-entry variables, loop bindings, macro parameters, imports, and local Jinja assignments may not shadow it &mdash; validation covers every binding site, not only <code>vars.host</code> &mdash; and item or attribute mutation is rejected. Without the opt-in there is no warning and no migration, and the unchanged quickstart is an acceptance fixture.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="descriptor" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:data-structured" aria-hidden="true"></span> The fact schema
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    &ldquo;Host&rdquo; means the Netsuke planner process: not the machine that built Netsuke, not a cross-compilation output,
+                    not a container a recipe enters, and not a remote executor. An x86-64 Netsuke running under translation on an ARM machine
+                    reports <code>x86_64</code>; a Linux Netsuke in WSL reports <code>linux</code>; a Windows Netsuke launched from Git Bash
+                    reports <code>windows</code>. Passing a Cargo <code>--target</code> never changes <code>host</code>.
+                </p>
+                <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Platform: the default group (&sect;6.1)</h3>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">No filesystem, registry, environment, subprocess, or network access: the values come from <code>std::env::consts</code> and target configuration. The spellings are Rust&rsquo;s, so <code>macos</code>, not <code>Darwin</code>, and <code>aarch64</code>, not <code>arm64</code>. A platform that cannot supply a field fails with <code>unsupported_host_platform</code> rather than being guessed as <code>linux</code> or <code>x86_64</code>.</p>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-8" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Field</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Type</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Contract (RFC 0029 Table 2)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.os</td><td class="px-6 py-4 text-sm text-charcoal-mid">string</td><td class="px-6 py-4 text-sm text-charcoal-mid">Rust-style planner OS identifier, for example <code>linux</code>, <code>windows</code>, <code>macos</code>, or <code>freebsd</code>.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.family</td><td class="px-6 py-4 text-sm text-charcoal-mid">string</td><td class="px-6 py-4 text-sm text-charcoal-mid"><code>windows</code>, <code>unix</code>, or <code>other</code>, with no distribution-family meaning.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.arch</td><td class="px-6 py-4 text-sm text-charcoal-mid">string</td><td class="px-6 py-4 text-sm text-charcoal-mid">Planner process ABI architecture, for example <code>x86</code>, <code>x86_64</code>, <code>arm</code>, or <code>aarch64</code>.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.pointer_width</td><td class="px-6 py-4 text-sm text-charcoal-mid">integer</td><td class="px-6 py-4 text-sm text-charcoal-mid">Pointer width in bits for the planner process ABI.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.endianness</td><td class="px-6 py-4 text-sm text-charcoal-mid">string</td><td class="px-6 py-4 text-sm text-charcoal-mid"><code>little</code> or <code>big</code>.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.exe_suffix</td><td class="px-6 py-4 text-sm text-charcoal-mid">string</td><td class="px-6 py-4 text-sm text-charcoal-mid">Executable suffix including its dot, or empty. Does not enumerate <code>PATHEXT</code> or pick a cross-target&rsquo;s suffix.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.path_separator</td><td class="px-6 py-4 text-sm text-charcoal-mid">string</td><td class="px-6 py-4 text-sm text-charcoal-mid">Native path-component separator, not a shell escape. Proves nothing about case sensitivity or symlinks.</td></tr>
+                            <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">host.path_list_separator</td><td class="px-6 py-4 text-sm text-charcoal-mid">string</td><td class="px-6 py-4 text-sm text-charcoal-mid">Path-list delimiter: <code>;</code> on Windows, <code>:</code> on Unix.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Distribution: opt-in, granted (&sect;6.2)</h3>
+                        <p class="text-xs text-charcoal-mid mb-2"><code>host.distribution.id</code>, <code>.id_like</code>, <code>.version_id</code>, and <code>.name</code>, each nullable, from Linux <code>os-release</code>: <code>/etc/os-release</code> first, <code>/usr/lib/os-release</code> only if that is missing, never merged, never sourced in a shell.</p>
+                        <p class="text-xs text-charcoal-mid">Bounded throughout: 64&nbsp;KiB read, 256-byte strings, 16 <code>id_like</code> entries, at most eight symlink hops. The file is opened non-blocking and type-checked on the open handle, so a FIFO fails as <code>host_fact_source_invalid</code> instead of stalling. Off Linux the group is <code>unsupported</code>: no registry crawl, no <code>lsb_release</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Kernel: opt-in, granted (&sect;6.3)</h3>
+                        <p class="text-xs text-charcoal-mid mb-2"><code>host.kernel.name</code>, <code>.release</code>, and <code>.native_arch</code>, each a string or null, read through OS-native APIs without executing <code>uname</code>, <code>ver</code>, or PowerShell.</p>
+                        <p class="text-xs text-charcoal-mid"><code>native_arch</code> is filled only when the adapter can establish it under translation, and is never a copy of <code>host.arch</code>. Release text is opaque: no SemVer ordering is implied. Platform, kernel, and distribution may legitimately disagree inside a container; they are never merged into one identity.</p>
+                    </div>
+                </div>
+                <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Missing, denied, and invalid are different (&sect;6.4)</h3>
+                <ul class="space-y-2 text-sm text-charcoal-mid max-w-3xl">
+                    <li><strong>Missing is a value.</strong> Once a group is selected every field exists; an observation without it is <code>null</code>, and an optional field is tested with <code>is not none</code>. A group&rsquo;s outcome is <code>collected</code>, <code>partial</code>, <code>absent</code>, or <code>unsupported</code>.</li>
+                    <li><strong>Denied and invalid are errors.</strong> A denied group, malformed data, an I/O failure, or an exceeded bound is never reported as <code>absent</code>, <code>false</code>, zero, or an empty mapping.</li>
+                    <li><strong>Typos are errors too.</strong> Reading an unselected group raises <code>host_fact_not_collected</code> without collecting; an unknown field raises <code>unknown_host_fact</code>, even inside a <code>default</code> expression, &ldquo;so a typo does not become a silent platform decision&rdquo;.</li>
+                </ul>
+            </section>
+
+            <section id="uses" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:compare" aria-hidden="true"></span> Using facts: what they replace, and one snapshot per run
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-accent-text mb-2">Today: ambient probing</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+actions:
+  - name: sign-installer
+    # Fails to load where OS is unset:
+    # env() has no default on main.
+    when: env('OS') == 'Windows_NT'
+    command: "Set-AuthenticodeSignature ..."
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono uppercase tracking-wide text-success-text mb-2">Proposed: the <code>when</code> form from RFC 0029 &sect;1</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+host_facts:
+  schema: 1
+
+actions:
+  - name: sign-installer
+    when: "{{ host.os == 'windows' }}"
+    command: "Set-AuthenticodeSignature ..."
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid mb-8 max-w-3xl">The right-hand panel applies the RFC&rsquo;s <code>when</code> pattern to the left-hand action; the action itself is this page&rsquo;s, not the RFC&rsquo;s. Where the question is a suffix rather than a branch, the RFC&rsquo;s own <code>"fixture-test{{ '{{' }} host.exe_suffix {{ '}}' }}"</code> folds two per-platform names into one.</p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Collect once (&sect;7.1)</h3>
+                        <ol class="space-y-1 text-xs text-charcoal-mid list-decimal pl-4">
+                            <li>Parse the literal opt-in and request.</li>
+                            <li>Validate names, schema, bindings, and the operator ceiling.</li>
+                            <li>Construct the selected providers.</li>
+                            <li>Collect in canonical order: platform, distribution, kernel.</li>
+                            <li>Validate and freeze one <code>HostFactsSnapshot</code>.</li>
+                            <li>Inject a read-only projection.</li>
+                            <li>Reuse it for expansion, validation, planning, and output.</li>
+                        </ol>
+                        <p class="text-xs text-charcoal-mid mt-2">Field access does no I/O. There is no mid-build refresh and no fact task in the Ninja graph.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Data, not trusted source (&sect;7.2)</h3>
+                        <p class="text-xs text-charcoal-mid">Facts may appear in value templates and <code>when</code> expressions, but not in an include path, bundle URL, Git ref, or any field whose own RFC requires a literal. A fact is &ldquo;never pre-quoted shell source or a filesystem capability&rdquo;: values from system files stay untrusted through rendering, and legacy shell recipes keep their quoting protections. Changing <code>cwd</code>, capturing output, or overlaying a child&rsquo;s environment cannot alter the frozen facts; there is no <code>set_fact</code> channel back.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Includes and bundles (&sect;7.3)</h3>
+                        <p class="text-xs text-charcoal-mid">Every local fragment shares the importing root&rsquo;s snapshot, and an included file may not request collection. A bundle may declare that it needs an already selected group, but cannot widen the request or the grant; missing required facts fail before the bundle renders. A bundle sees the importing planner, not its publisher. Both depend on the <a href="{{ fc.href('modules') }}" class="hm-link">modules</a> work.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="inspection" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:view" aria-hidden="true"></span> Discovery, inspection, and privacy
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Target discovery stays non-disclosing (&sect;8.1)</h3>
+                        <p class="text-sm text-charcoal-mid mb-4"><code>netsuke help targets</code> collects no facts by default. If discovery meets a <code>host</code> reference in metadata or a <code>when</code>, it returns <code>host_facts_disabled_in_query</code>: it must not guess a platform, hide targets, or present an incomplete list as complete. Consent is per invocation, and a project setting cannot give it:</p>
+                        <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed command, RFC 0029 &sect;8.1</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                    {% highlight 'netsuke-console' %}
+$ netsuke help targets --host-facts
+{% endhighlight %}
+                        </div>
+                        <p class="text-xs text-charcoal-mid mt-3">With consent it gathers exactly the requested groups within the ceiling, and still renders no recipes and permits no <code>env()</code>, <code>which()</code>, command, or network helper. This differs from <code>env()</code> today, whose guarded entries are kept and marked conditional; the RFC accepts an actionable error instead of symbolic evaluation.</p>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Standalone inspection (&sect;8.2)</h3>
+                        <p class="text-sm text-charcoal-mid mb-4">A read-only <code>facts</code> command needs no Netsukefile and reads only trusted operator configuration. <code>--gather</code> chooses what is collected; repeated <code>--filter</code> chooses only what is shown.</p>
+                        <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed commands, RFC 0029 &sect;8.2</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                    {% highlight 'netsuke-console' %}
+$ netsuke facts
+$ netsuke --json facts --gather platform --filter os --filter arch
+{% endhighlight %}
+                        </div>
+                        <p class="text-xs text-charcoal-mid mt-3">The JSON envelope carries <code>schema_version</code>, <code>scope: planner_process</code>, <code>collected_groups</code>, <code>facts</code>, group outcomes, and bounded provider identifiers. A schema-description option returns the field catalogue without collecting anything. The command and flag spellings are still open for review (&sect;14.6).</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:locked" aria-hidden="true"></span>
+                    <div class="text-xs text-charcoal-mid space-y-2">
+                        <p><strong>Data minimization (&sect;8.3).</strong> The catalogue excludes hostnames, addresses, network interfaces, usernames, home directories, machine IDs, serial numbers, environment dumps, SSH keys, package inventories, timestamps, uptime, and filesystem inventories. Raw provider documents never appear in diagnostics, and telemetry labels use only registered group, provider, and outcome categories.</p>
+                        <p>&ldquo;Observation provenance is not attestation.&rdquo; A container image or a compromised host can report misleading data, and a hash proves equality, not truth.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="planning" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:data-share" aria-hidden="true"></span> Reproducibility, planning, and caching
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Opted-in facts are environmental planning inputs. The same manifest, snapshot, and declared inputs must compile identically;
+                    different planners need not produce the same graph. Collecting without a shell does not make a build hermetic.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">A semantic digest (&sect;9.1)</h3>
+                        <p class="text-xs text-charcoal-mid">Versioned, over the schema, selected groups, normalized values, and group outcomes; keys sorted, sequence order kept, null distinct from empty. Timestamps, durations, source paths, localization, and diagnostic text are excluded. Every selected group is fingerprinted, used or not: conservative, and not dependent on a textual scan for <code>host</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">No stale Ninja work (&sect;9.2)</h3>
+                        <p class="text-xs text-charcoal-mid">The digest enters the generated plan&rsquo;s identity and each edge&rsquo;s command signature, not a Ninja comment, so a changed fact invalidates affected work even when the command text is unchanged. No persistent fact cache ships; serialized snapshots are provenance or test fixtures only.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Planning versus execution host (&sect;9.3)</h3>
+                        <p class="text-xs text-charcoal-mid">An exported or reused plan records its facts scope and digest, and Netsuke checks it before running; a mismatch is <code>host_plan_context_mismatch</code> and requires regeneration, never a silent re-plan midway. Running an exported file under Ninja directly bypasses that check, and the RFC says so rather than claiming a guarantee.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="today" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:search" aria-hidden="true"></span> What a manifest knows today
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Nothing in the shipped <a href="/netsuke/docs/standard-library/" class="hm-link">standard library</a> describes the host
+                    directly. A manifest asks specific questions through specific helpers, each with its own gate, and none runs under
+                    <code>netsuke help targets</code>. RFC 0029 is explicit that facts must not become a bypass for <code>env()</code> or
+                    <code>command_available()</code>.
+                </p>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-8" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Question</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Helper</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">How it is gated</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr><td class="px-6 py-4 text-sm text-charcoal-mid">Is a tool installed, and where?</td><td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">command_available(name)<br>which(name)</td><td class="px-6 py-4 text-sm text-charcoal-mid">Reads an injectable <code>PATH</code> and, on Windows, <code>PATHEXT</code>. The <code>workspace-recursive</code> search mode is opt-in, because it can resolve a checkout-controlled executable.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm text-charcoal-mid">An environment variable</td><td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">env(name)</td><td class="px-6 py-4 text-sm text-charcoal-mid">Required: an absent variable is an error. Read through an injectable <code>EnvReader</code> and checked against <code>env_allow_var</code> and <code>env_block_var</code>. A project file cannot grant itself access.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm text-charcoal-mid">What kind of file a path is</td><td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">is file, is dir, &hellip;</td><td class="px-6 py-4 text-sm text-charcoal-mid">Through a capability-scoped directory handle. A missing path is <code>false</code>.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm text-charcoal-mid">The home directory</td><td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">path | expanduser</td><td class="px-6 py-4 text-sm text-charcoal-mid">A platform-specific chain of variables; fails rather than passing <code>~</code> through.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm text-charcoal-mid">The time</td><td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-primary">now()</td><td class="px-6 py-4 text-sm text-charcoal-mid">An injected clock, which tests pin to a fixed instant.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Separately, <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#67-probe-host-state-through-injected-query-gated-seams" class="hm-link">roadmap step 6.7</a>
+                    plans query-gated probes &mdash; <code>exists</code>, <code>link_exists</code>, <code>same_file</code>, <code>mount</code>,
+                    and <code>expandvars</code> &mdash; covered on the <a href="{{ fc.href('standard-library') }}" class="hm-link">standard library preview</a>.
+                    Those ask about files and variables; host facts ask about the planner, and depend on none of them.
+                </p>
+            </section>
+
+            <section id="boundaries" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:border-full" aria-hidden="true"></span> Where facts stop
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Resource and capability facts, deferred (&sect;10)</h3>
+                        <p class="text-xs text-charcoal-mid">No <code>host.jobs</code>, free memory, or load. &ldquo;Neither a processor count nor a memory total establishes available build budget.&rdquo; Nothing changes <code>-j</code>, Ninja pools, or RFC 0024&rsquo;s contention classes. Filesystem features, libc compatibility, executable presence, virtualization, and network reachability need their own probes; none is inferred from <code>host.os</code>. Roadmap 30.5.1 decides later whether any earns an RFC.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not the recipe interpreter (&sect;4.2)</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;<code>host.family == 'unix'</code> does not prove that Bash exists; <code>host.os == 'windows'</code> does not prove that PowerShell or Git Bash is configured.&rdquo; Shell choice stays with RFC 0011 and the <a href="{{ fc.href('structured-commands') }}" class="hm-link">structured commands</a> work; tool presence stays with resolvers or the <a href="{{ fc.href('states') }}" class="hm-link">managed states and probes</a> proposal.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not the target (&sect;4.3)</h3>
+                        <p class="text-xs text-charcoal-mid">&ldquo;Observations never select a target triple automatically.&rdquo; Artefact names and compiler targets come from declared inputs &mdash; see <a href="{{ fc.href('typed-inputs') }}" class="hm-link">typed inputs</a> &mdash; unless an action deliberately builds for the planner&rsquo;s own platform.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not remote</h3>
+                        <p class="text-xs text-charcoal-mid">Scope is local planning. A command that invokes SSH, a container engine, an emulator, or a cross-compiler receives no implicit remote facts; a future remote executor needs its own platform contract, &ldquo;not a fake override of local <code>host</code>&rdquo;.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="alternatives" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:direction-fork" aria-hidden="true"></span> Roads not taken
+                </h2>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Alternative</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Why not (RFC 0029 &sect;3, &sect;14)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr><td class="px-6 py-4 text-sm font-medium text-base-content">Shell or environment probes everywhere</td><td class="px-6 py-4 text-sm text-charcoal-mid">Duplicates policy, complicates tests, and couples graph evaluation to ambient state. Kept as a legacy escape hatch.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm font-medium text-base-content">Copy Ansible&rsquo;s full inventory</td><td class="px-6 py-4 text-sm text-charcoal-mid">Brings identifiers, mutable observations, executable plugins, and dependencies unrelated to platform selection. Borrow the namespace and subset model, not an inventory service or <code>set_fact</code>.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm font-medium text-base-content">Inject facts into every template</td><td class="px-6 py-4 text-sm text-charcoal-mid">Collides with existing <code>host</code> variables and weakens metadata privacy.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm font-medium text-base-content">Treat process facts as physical-host or target facts</td><td class="px-6 py-4 text-sm text-charcoal-mid">Concise, and wrong under cross-compilation and translation. Review may rename <code>host.arch</code> to <code>process_arch</code>, but must keep the distinction.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm font-medium text-base-content">Gather lazily, or cache globally</td><td class="px-6 py-4 text-sm text-charcoal-mid">Lazy I/O makes cost and authority depend on control flow; global caches leak between embedders and go stale.</td></tr>
+                            <tr><td class="px-6 py-4 text-sm font-medium text-base-content">Prefixed top-level aliases, last-merged conflicts</td><td class="px-6 py-4 text-sm text-charcoal-mid">Two spellings per field invite shadowing; instead each field has exactly one owning collector, and a duplicate contribution is an internal error.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl"><strong>Still open (&sect;14.6).</strong> The final spelling of the inspection command and the consent flag, platform names for less common targets, and the safe native-adapter dependencies. The RFC holds that none of these alters the privacy default, the immutable snapshot, the scope definitions, or the operator ceiling.</p>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A manifest that never opts in is untouched: RFC 0025 keeps unannotated manifests a supported use, and the quickstart must
+                    stay byte-for-byte identical. The route deeper, in order:
+                </p>
+                <ol class="space-y-4 text-sm text-charcoal-mid max-w-3xl list-decimal pl-5 mb-8">
+                    <li><strong>Today: select tools, not platforms.</strong> <code>command_available()</code> in complementary <code>when</code> guards is shipped and tested. Where the real question is &ldquo;is this tool here?&rdquo;, it remains the right answer after facts land.</li>
+                    <li><strong>Planned: opt in with two lines.</strong> <code>host_facts: {schema: 1}</code> requests <code>platform</code> only, which the default grant already allows. No operator configuration is needed.</li>
+                    <li><strong>Planned: replace one probe.</strong> Swap an <code>OS</code> or <code>uname</code> check for <code>host.os</code> or <code>host.family</code>, or fold duplicated targets with <code>host.exe_suffix</code>.</li>
+                    <li><strong>Planned: look before branching.</strong> <code>netsuke facts</code> shows what the planner would see, without a manifest.</li>
+                    <li><strong>Planned: ask for more, with permission.</strong> Add <code>distribution</code> or <code>kernel</code> to <code>gather</code>, and have the operator grant it in <code>host_fact_policy.allowed_groups</code>.</li>
+                </ol>
+                <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Delivery slices (&sect;13.1)</h3>
+                <ol class="space-y-2 text-sm text-charcoal-mid max-w-3xl list-decimal pl-5">
+                    <li>Accept the field meanings, opt-in, privacy contract, and schema allocation; define the snapshot, grant, and diagnostic interfaces (roadmap 30.1).</li>
+                    <li>Ship the platform-only slice with the immutable projection, namespace checks, inspection, query consent, and fingerprinting together (30.2).</li>
+                    <li>Add separately authorized distribution and kernel providers (30.3).</li>
+                    <li>Integrate typed fixtures with the <a href="{{ fc.href('testing-framework') }}" class="hm-link">testing framework</a> and publish Linux, macOS, and Windows migration examples (30.4).</li>
+                </ol>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-success-text mb-3 text-sm">Existing</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li>The <code>command_available</code> example in the user&rsquo;s guide is an executed documentation test, run against stub commands and a controlled <code>PATH</code>.</li>
+                            <li><code>env()</code> and <code>now()</code> read injected seams, so tests control them without mutating the process environment or the clock &mdash; the pattern ADR-008 requires and the RFC&rsquo;s provider seam follows.</li>
+                            <li>Target discovery already refuses host-inspecting helpers; the RFC keeps that boundary rather than loosening it.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-warning-text mb-3 text-sm">Planned (&sect;11, &sect;13.2)</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li>A <code>FixedHostFactsProvider</code> with no fallback to real host APIs: fixed Linux, macOS, Windows, and other-platform snapshots render identically on every runner, with no <code>set_var</code> and no <code>uname</code>.</li>
+                            <li>Counting providers prove one collection per group; denied and unselected groups perform zero native or filesystem operations.</li>
+                            <li>A parser corpus for <code>os-release</code> &mdash; quotes, escapes, duplicates, invalid UTF-8, NUL, oversize, symlink cycles, a FIFO &mdash; plus bounded fuzzing from a finite seed corpus.</li>
+                            <li>Property tests for normalization, deterministic digests, request-and-grant intersection, and null versus empty; a bounded model check of the collect-once and consent state machine against production validation code.</li>
+                            <li>Real Ninja runs proving no-op reuse, rebuilds, removal of deselected edges, and rejection of mismatched reused plans.</li>
+                            <li>Native smoke jobs on Linux, macOS, and Windows, including Git Bash and WSL. &ldquo;A simulated Windows snapshot on Linux is not a Windows smoke test.&rdquo;</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    <strong>Stable diagnostics (&sect;12).</strong> <code>unsupported_host_fact_schema</code>, <code>unknown_host_fact_group</code>,
+                    <code>host_fact_collection_denied</code>, <code>host_namespace_shadowed</code>, <code>unknown_host_fact</code>,
+                    <code>host_fact_not_collected</code>, <code>host_facts_disabled_in_query</code>, <code>host_fact_source_invalid</code>,
+                    <code>host_fact_limit_exceeded</code>, and <code>host_plan_context_mismatch</code>. Each reports the group, field, request
+                    origin, and manifest span without printing system-file values. The downstream canaries are Repovec Appliance, MXD, and
+                    OrthoConfig.
+                </p>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Every human-readable message Netsuke emits is localized by default through Fluent, and host facts are no exception. The
+                    facts themselves are machine values &mdash; <code>linux</code>, <code>aarch64</code>, <code>unsupported</code> &mdash;
+                    and stay untranslated, as do the diagnostic category identifiers and JSON field names.
+                </p>
+                <ul class="space-y-3 text-sm text-charcoal-mid max-w-3xl mb-6">
+                    <li><strong>Localized diagnostics.</strong> Roadmap 30.1.2 defines the stable diagnostic categories &ldquo;with localized messages&rdquo;; the category is the part that survives translation.</li>
+                    <li><strong>Localized inspection.</strong> <code>netsuke facts</code> and its schema description use &ldquo;the existing CLI metadata, localization, and JSON conventions, not hand-built parallel output&rdquo;.</li>
+                    <li><strong>Locale cannot change a build.</strong> The facts digest excludes localization and diagnostic text, so running under another locale does not invalidate a plan.</li>
+                    <li><strong>Legible, unambiguous output.</strong> Human output puts one field per line and escapes control characters; empty values, nulls, and unsupported groups remain visibly distinct. <code>--json</code> gives tools a structured alternative.</li>
+                    <li><strong>Redaction by omission.</strong> Identifying data is never collected, raw system files never reach diagnostics, and telemetry labels are bounded categories.</li>
+                </ul>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:help" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid"><strong>Where the RFC is silent.</strong> It says nothing about screen readers, the ASCII or emoji output themes, or how &ldquo;visibly distinct&rdquo; null, empty, and unsupported values are spoken rather than seen. Nor does it describe how <code>host_facts_disabled_in_query</code> reads in <code>help targets</code> output beside today&rsquo;s <code>[? conditional]</code> markers. Those are gaps to settle during review, not promises.</p>
+                </div>
+            </section>
+
+{{ fc.footer('system-facts') }}
+
+        </main>
+    </div>
+
+{% endblock %}

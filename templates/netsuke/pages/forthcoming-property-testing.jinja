@@ -1,0 +1,380 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}Property Testing (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('property-testing') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('property-testing') %}
+                    A fixture proves that one manifest compiles to one build script. A property proves something about every build script a
+                    family of manifests can produce: that no action leaks the ambient environment, that declaration order never changes the
+                    output, that an unrelated target leaves existing actions alone. RFC 0012 proposes that step for the
+                    <a href="{{ fc.href('testing-framework') }}" class="hm-link">Netsukefile testing framework</a>, without adding a scripting language to do it.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}, and not implemented.</strong> The released CLI has no <code>test</code> command, and nothing on Netsuke's main branch implements <code>forall</code>, <code>mutations</code>, <code>for_all_actions</code>, or <code>result.actions</code>. One seam the design needs, a constructor that pins the recipe shell, already exists for other reasons.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Proposed.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0012-netsukefile-property-testing.md" class="hm-link">RFC 0012</a>, created 2 September 2026, is a proposed extension to <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0007-netsukefile-testing-framework.md" class="hm-link">RFC 0007</a>, which is itself still a proposal. Syntax on this page is the RFC's and may change.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:flow" aria-hidden="true"></span> <span><strong>Sequenced after the testing framework.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#10-property-based-testing-of-generated-build-scripts" class="hm-link">Roadmap phase 10</a> depends on the phase 7 result views and case supervisor, none of which has landed. Every phase 10 task is unticked.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>No release named.</strong> Neither the RFC nor the roadmap names a target release. This preview describes a design, not a date.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why properties
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A Netsukefile is a build-script generator. Its bugs rarely live in the one configuration a fixture pins; they live in the
+                    flag ordering nobody tried, the target name with an awkward character, the declaration someone moved. RFC 0012 lets authors
+                    state invariants over families of manifests, with the generated build script &mdash; principally its command invocations
+                    and environment constructions &mdash; as the subject under test.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">It extends the framework</h3>
+                        <p class="text-xs text-charcoal-mid">Everything here runs inside <code>netsuke test</code> as the <a href="{{ fc.href('testing-framework') }}" class="hm-link">testing framework preview</a> describes it: the same YAML dialect, the same <code>given</code>/<code>when</code>/<code>then</code> steps, the same sandboxed child per case, the same FAIL versus ERROR reporting. Property testing adds a view, a block, a vocabulary, and a lint. Without the framework it has nothing to extend.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Raw Ninja is the wrong subject</h3>
+                        <p class="text-xs text-charcoal-mid">Recipe text depends on the host shell, and per-action environment maps never appear in <code>build.ninja</code> at all. The RFC rejects properties over Ninja text because they end up either flaky across hosts or weakened to the point of vacuity.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Closed on purpose</h3>
+                        <p class="text-xs text-charcoal-mid">No user-defined predicate functions, strategies, shrinkers, or callbacks. Assertions are MiniJinja expressions the framework already evaluates; generators and mutations come from fixed vocabularies. The RFC rejects a general property-testing DSL because it would reopen the scripting surface RFC 0007 closed.</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Not the same as Netsuke's own property tests.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#43-determinism-and-manifest-property-testing" class="hm-link">Roadmap &sect;4.3</a>
+                        plans Proptest suites that check Netsuke's compiler &mdash; deterministic Ninja emission, expansion invariants, render stability &mdash;
+                        inside its Rust test tree. That is Netsuke testing itself. This preview is about authors testing <em>their</em> Netsukefiles.
+                        RFC 0012 leaves the internal suites exactly as they are.
+                    </p>
+                </div>
+            </section>
+
+            <section id="observation" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:view" aria-hidden="true"></span> <span class="min-w-0">Observing actions: <code>result.actions</code></span>
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The framework already proposes three result views: <code>result.manifest</code>, <code>result.graph</code>, and
+                    <code>result.ninja</code>. RFC 0012 adds a fourth, available after <code>build_graph</code>, built from the IR with the recipe
+                    shell pinned so identical manifests project identically on every host. The view is additive and exposes no internal IR types.
+                    Planned under <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#101-structured-observation-of-invocations-and-environments" class="hm-link">roadmap 10.1</a>.
+                </p>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Field</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Meaning (RFC 0012 Table 1)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows text-charcoal-mid">
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">target</td><td class="px-6 py-2 text-sm">The build edge's primary output target name.</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">rule</td><td class="px-6 py-2 text-sm">The owning rule name.</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">argv</td><td class="px-6 py-2 text-sm">The tokenized command, post-interpolation, pre-quoting.</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">env</td><td class="px-6 py-2 text-sm">The constructed environment map for the invocation.</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">cwd</td><td class="px-6 py-2 text-sm">The working directory, when the action declares one.</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">inputs</td><td class="px-6 py-2 text-sm">The resolved <code>$in</code> bindings.</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">outputs</td><td class="px-6 py-2 text-sm">The resolved <code>$out</code> bindings.</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">pool, depfile, dyndep</td><td class="px-6 py-2 text-sm">The assigned pool, depfile path template, and dyndep binding, when present.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Tokens, not quoting</h3>
+                        <p class="text-xs text-charcoal-mid"><code>argv</code> is deliberately the shell-independent token list. Whether a token is quoted correctly for <code>sh</code> or PowerShell is the escaping seam's problem, tested inside Netsuke, not the author's. Helpers mirror the graph view: <code>action(target)</code>, <code>actions_for_rule(name)</code>, and <code>has_action(target)</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">A canonical order</h3>
+                        <p class="text-xs text-charcoal-mid">Actions sort by <code>target</code>, then <code>rule</code>, then the RFC 8785 canonical JSON of the remaining fields &mdash; the canonical value contract of <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md#67-canonical-value-equality" class="hm-link">RFC 0006 &sect;6.7</a>. Declaration order and IR iteration order cannot change the view, so a quantified result reads the same on every run.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid mt-6 max-w-3xl">
+                    Two quantifiers join the <code>then</code> vocabulary: <code>for_all_actions</code> evaluates each listed expression once per
+                    action, binding <code>action</code>; <code>for_all_targets</code> does the same over the graph view, binding <code>target</code>.
+                    A failure reports the binding that falsified it with the substituted actual values. Assertions read <code>env</code> in full;
+                    every copy that leaves the runner &mdash; failure reports, diagnostics, rendered views, regression files &mdash; carries opaque
+                    key tokens and a fixed <code>&lt;redacted&gt;</code> marker instead. Redaction happens only on the way out, so it can never turn
+                    a FAIL into an ERROR.
+                </p>
+            </section>
+
+            <section id="generation" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:chart-scatter" aria-hidden="true"></span> Bounded generation: the <code class="mx-2">forall</code> block
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A case may declare <code>forall</code>, a mapping from binding names to domain constructors. The runner expands the domains into a
+                    finite family and runs the case's <code>steps</code> once per drawn tuple; drawn values are available wherever <code>let</code>
+                    bindings are. The case below draws a target name and a flag ordering, builds the graph, and asserts that no action's environment
+                    strays beyond the declared variables and no action lists a source twice.
+                    Planned under <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#102-declarative-bounded-generation" class="hm-link">roadmap 10.2</a>.
+                </p>
+                <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed syntax, verbatim from RFC 0012 &sect;3</div>
+                    {% highlight 'netsuke' %}{% raw %}
+netsuke_test_version: "1.1"
+
+test_command_env_is_closed_over_declared_vars:
+  description: Generated invocations never leak ambient environment.
+  forall:
+    target_name: { path_fragment: { max_len: 12 } }
+    flag_order: { permutations_of: ["-O2", "-g", "-Wall"] }
+  steps:
+    - given:
+        let:
+          declared_env: []
+          name: "{{ target_name }}"
+          flags: "{{ flag_order }}"
+    - when: build_graph
+    - then:
+        for_all_actions:
+          - "action.env | keys | reject('in', declared_env) | length == 0"
+          - "action.inputs | unique | length == action.inputs | length"
+{% endraw %}{% endhighlight %}
+                </div>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Constructor</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Draws</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Expansion</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows text-charcoal-mid">
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">one_of</td><td class="px-6 py-2 text-sm">One member of a finite set</td><td class="px-6 py-2 text-sm">Exhaustive</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">permutations_of</td><td class="px-6 py-2 text-sm">One ordering of the listed items</td><td class="px-6 py-2 text-sm">Exhaustive up to the ceiling</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">int</td><td class="px-6 py-2 text-sm">An integer from an inclusive range</td><td class="px-6 py-2 text-sm">Exhaustive up to the ceiling</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">path_fragment</td><td class="px-6 py-2 text-sm">A sandbox-safe relative path token</td><td class="px-6 py-2 text-sm">Sampled</td></tr>
+                            <tr><td class="px-6 py-2 font-mono text-sm text-primary whitespace-nowrap">list_of</td><td class="px-6 py-2 text-sm">A bounded list over a child domain</td><td class="px-6 py-2 text-sm">Sampled</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    When the Cartesian product of the declared domains fits under the expansion ceiling, every tuple is checked. Above it, the runner
+                    samples with a generator seeded with the fixed default seed <code>0</code>, so the default run is deterministic. The ceiling, the
+                    sample count, and a per-case deadline are enforced limits. Internally the runner reuses Proptest's generator and regression-file
+                    conventions; no Proptest type appears in the dialect.
+                </p>
+            </section>
+
+            <section id="mutations" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:compare" aria-hidden="true"></span> Metamorphic mutations
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The most valuable properties of a build-script generator compare two runs rather than inspecting one. These need no predicates
+                    from the author, so they ship as a closed <code>mutations</code> vocabulary: the runner derives a mutated manifest, runs the
+                    plan-mode pipeline on both, and asserts the named relation. The case below asserts that the generated script ignores
+                    declaration order and that adding an unrelated target leaves existing actions alone.
+                    Planned under <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#103-metamorphic-relations-coverage-and-adoption" class="hm-link">roadmap 10.3</a>.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed syntax, verbatim from RFC 0012 &sect;4</div>
+                        {% highlight 'netsuke' %}{% raw %}
+netsuke_test_version: "1.1"
+
+test_generation_is_order_invariant:
+  description: Declaration order never changes the generated script.
+  subject:
+    manifest: fixtures/webapp/Netsukefile
+  mutations:
+    - permute_declarations
+    - insert_irrelevant_target
+{% endraw %}{% endhighlight %}
+                    </div>
+                    <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] min-w-0" tabindex="0">
+                        <table class="min-w-full hm-rows prop-table">
+                            <thead class="bg-base-100">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Mutation</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Relation asserted</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white hm-rows text-charcoal-mid">
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">permute_declarations</td><td class="px-4 py-2 text-xs">Actions and Ninja output are identical.</td></tr>
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">insert_irrelevant_target</td><td class="px-4 py-2 text-xs">Pre-existing actions are unchanged.</td></tr>
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">rename_target</td><td class="px-4 py-2 text-xs">Actions are isomorphic under the renaming.</td></tr>
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">remove_declared_input</td><td class="px-4 py-2 text-xs">The declared <code>expect_failure</code> is raised.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Between them the four cover determinism, order invariance, locality, and rename isomorphism. Mutations compose with
+                    <code>forall</code>: each drawn tuple runs the base and the mutated pipeline. Both run inside the framework's killable child
+                    process, so a mutant that diverges or never terminates cannot wedge the runner.
+                </p>
+            </section>
+
+            <section id="coverage" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:replicate" aria-hidden="true"></span> Coverage and replay
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Shrink, persist, replay</h3>
+                        <p class="text-xs text-charcoal-mid">On failure the runner delta-reduces the drawn tuple towards domain minima, reports the smallest falsifying binding set it finds, and names both the seed and that tuple. It then persists seed and tuple in a regression file under the test tree, and later runs replay it before generating anything fresh. <code>--seed &lt;n&gt;</code> selects a reported seed, but a seed alone is not a replay: without the persisted tuple inputs the run samples afresh from that seed.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">The coverage completeness lint</h3>
+                        <p class="text-xs text-charcoal-mid">When a rule interpolates a command or constructs an environment and no test in the suite covers one of its actions with a quantified or metamorphic assertion, the run names the rule. The report is advisory by default; <code>--strict-coverage</code> makes it a failure. New invocation shapes opt into the property contract deliberately instead of drifting past it. The lint arrives last in the phase.</p>
+                    </div>
+                </div>
+                <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-6" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Adapted: two flags named in RFC 0012 prose, which shows no combined invocation</div>
+                    {% highlight 'netsuke-console' %}
+$ netsuke test --seed <n>
+$ netsuke test --strict-coverage
+{% endhighlight %}
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Everything else on the command line &mdash; filters, <code>--tag</code>, <code>--timeout</code>, <code>--json</code>, the exit
+                    codes &mdash; is the framework's, described under <a href="{{ fc.href('testing-framework', 'command') }}" class="hm-link">the command</a>
+                    in its preview. The RFC does not specify how the seed, tuple, or falsifying binding appear in JSON output, and does not show a
+                    rendered property failure, so neither is sketched here.
+                </p>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Property testing is opt-in by dialect version. Existing <code>netsuke_test_version: "1.0"</code> files parse and run unchanged;
+                    only a file that uses <code>forall</code>, <code>mutations</code>, or <code>result.actions</code> declares <code>"1.1"</code>.
+                    The shallow end is therefore the framework's own quick start: one file beside the manifest, one case, plain <code>netsuke test</code>.
+                </p>
+                <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/hello.yml &mdash; dialect 1.0, verbatim from the testing framework UX design &sect;14.1</div>
+                    {% highlight 'netsuke' %}
+netsuke_test_version: "1.0"
+
+test_hello_target_is_generated:
+  steps:
+    - when: generate_ninja
+      then:
+        - result.ok
+        - result.graph.has_target("build/hello.txt")
+{% endhighlight %}
+                </div>
+                <ol class="space-y-4 mb-6 max-w-3xl">
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">1. A 1.0 test file</h3>
+                        <p class="text-xs text-charcoal-mid">Fixed fixtures and assertions over the manifest, graph, and Ninja views. No properties, no version bump. See the <a href="{{ fc.href('testing-framework', 'shallow-end') }}" class="hm-link">testing framework's shallow end</a>.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">2. <code>mutations</code>, with no expressions</h3>
+                        <p class="text-xs text-charcoal-mid">Declare <code>"1.1"</code>, point a case at an existing manifest, and list <code>permute_declarations</code>. The relation is built in, so the first property needs no predicate at all &mdash; the RFC's example is five lines of intent.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">3. <code>forall</code> over small finite sets</h3>
+                        <p class="text-xs text-charcoal-mid"><code>one_of</code>, <code>permutations_of</code>, and small <code>int</code> ranges enumerate exhaustively under the ceiling, so every combination is checked rather than sampled, with <code>for_all_actions</code> assertions over each. Sampled domains such as <code>path_fragment</code> and <code>list_of</code> come after, with seeds and replay.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">4. Read the coverage lint</h3>
+                        <p class="text-xs text-charcoal-mid">The advisory report names each rule whose command or environment no property covers. It is the signpost to the deep end: a list of the next properties worth writing.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">5. Gate on <code>--strict-coverage</code></h3>
+                        <p class="text-xs text-charcoal-mid">Once the list is empty, make it stay empty: an uncovered rule fails the run, so a new invocation shape cannot land without a property.</p>
+                    </li>
+                </ol>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    No tutorial exists yet. Roadmap 10.3.4 plans the users' guide testing chapter for the property dialect, after the dialect has been
+                    dogfooded on Netsuke's own example manifests.
+                </p>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Every guarantee below is designed, not shipped. The phase's own success criterion is that the RFC's worked examples run green
+                    deterministically on a machine with no compiler and no network, and that a seeded failure replays identically from its reported
+                    seed and tuple inputs.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Plan mode only</h3>
+                        <p class="text-xs text-charcoal-mid">Properties observe plan-mode projections and never execute the build: no network, no ambient environment, no build execution. Fuzzing Ninja, the shell, or spawned processes is an explicit non-goal.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Deterministic by default</h3>
+                        <p class="text-xs text-charcoal-mid">No ambient clock, the fixed default seed <code>0</code>, and every report naming the seed in effect. Roadmap 10.2.2 requires repeated default runs to be byte-identical; the pinned shell makes <code>result.actions</code> identical across hosts.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Bounded and killable</h3>
+                        <p class="text-xs text-charcoal-mid">The ceiling, sample count, and per-case deadline are enforced limits, and each case runs in a child the runner can kill. Unbounded generation and coverage-guided exploration are non-goals.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Proven to catch something</h3>
+                        <p class="text-xs text-charcoal-mid">Roadmap 10.3.1 accepts each mutation only once a seeded suite shows it detecting a deliberately introduced generator defect. And a 1.0 runner fails closed on a 1.1 file with its unsupported-version diagnostic rather than misparsing it.</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-warning mt-1 mr-3" data-icon="carbon:help" aria-hidden="true"></span>
+                    <div class="text-xs text-charcoal-mid">
+                        <p class="mb-2"><strong>Open questions in <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0012-netsukefile-property-testing.md#open-questions" class="hm-link">the RFC</a>.</strong></p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>The default expansion ceiling and sample count. The RFC suggests something between 16 and 24, set by measuring realistic suites; roadmap 10.3.3 records the measurement.</li>
+                            <li>Whether <code>result.actions</code> should land early, inside the framework's phase 7 result-view work, so example-based tests can use it before properties arrive. The roadmap currently keeps it in phase 10.</li>
+                            <li>Whether delta reduction over the drawn tuple is enough, or whether sampled list domains need element-wise shrinking. Limited shrinking is a stated non-goal, not an oversight.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility &amp; localization
+                </h2>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Inherited output modes</h3>
+                        <p class="text-xs text-charcoal-mid">Property failures are <code>netsuke test</code> reports, so they follow its display policy flags &mdash; <code>--color</code>, <code>--emoji</code>, <code>--progress</code>, <code>--accessibility</code> &mdash; and its stream-purity contract: one JSON document per completed run under <code>--json</code>. See the <a href="{{ fc.href('testing-framework', 'access') }}" class="hm-link">framework's accessibility notes</a> and <a href="/netsuke/docs/cli/" class="hm-link">the CLI reference</a>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Localized like the rest</h3>
+                        <p class="text-xs text-charcoal-mid">The framework design localizes every human-facing string like the rest of the CLI, and roadmap 7.6.2 plans Fluent keys for report lines, diagnostics, and warnings. Property reports are no exception: every human-readable message Netsuke emits is localized by default, so a falsified property, a replay hint, or a coverage warning reads in the user&rsquo;s locale, while seeds, rule names, and drawn values stay exactly as generated.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Redacted by design</h3>
+                        <p class="text-xs text-charcoal-mid">Environment keys and values never leave the runner in clear: reports, diagnostics, and persisted regression files carry opaque key tokens and <code>&lt;redacted&gt;</code>, following ADR-009's redact-at-the-boundary rule.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    The RFC itself puts a plain-language summary before each YAML example for screen readers, which this page follows. It is silent on
+                    how a falsifying binding or a minimized tuple should read under <code>--accessibility on</code>; roadmap 7.6.3 plans to document
+                    how the framework's results and diagnostics render in that mode, and property reports would need the same treatment.
+                </p>
+            </section>
+
+{{ fc.footer('property-testing') }}
+
+        </main>
+    </div>
+
+{% endblock %}

@@ -105,7 +105,7 @@
 rules:
   - name: "compile"
     command: "gcc -c {{ ins }} -o {{ outs }}"
-    description: "Compiling {{ outs }}"
+    description: "Compiling C sources"
 
   - name: "link"
     command: "gcc {{ ins }} -o {{ outs }}"
@@ -180,7 +180,7 @@ targets:
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">description</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-xs font-mono text-charcoal-mid">"Package a release"</td>
-                                <td class="px-6 py-4 text-sm text-charcoal-mid">Discovery metadata shown by <code>netsuke help targets</code>. On a rule, <code>description</code> instead drives Ninja's progress display.</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Discovery metadata shown by <code>netsuke help targets</code>. On a rule, <code>description</code> instead drives Ninja's progress display. A description is rendered without the recipe markers: {% raw %}<code>{{ ins }}</code> and <code>{{ outs }}</code>{% endraw %} exist only inside <code>command</code> and <code>script</code>, so naming one in a description is an undefined-variable error, and a literal <code>$out</code> prints as written rather than expanding.</td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-mono font-medium text-primary">phony / always</td>
@@ -294,7 +294,7 @@ actions:
                         </div>
                         <h3 class="font-bold text-base-content mb-3">Validation boundaries</h3>
                         <p class="text-sm text-charcoal-mid leading-relaxed mb-4">
-{% raw %}                            Schema validation, deterministic plan generation, quoted <code>{{ ins }}</code> and <code>{{ outs }}</code> markers, and a documented recipe-shell contract are the safety story. Build and default-target paths reject <code>$</code>, spaces, colons, <code>|</code>, and control characters because Ninja cannot represent them unambiguously.
+{% raw %}                            Schema validation, deterministic plan generation, quoted <code>{{ ins }}</code> and <code>{{ outs }}</code> markers, and a documented recipe-shell contract are the safety story. Build and default-target paths escape a space for Ninja (<code>$&nbsp;</code>), so a filename with a space is fine. They reject <code>|</code> and control characters, which Ninja cannot represent, and <code>$</code> and colons, which Netsuke does not yet escape.
 {% endraw %}                        </p>
                         <a href="/netsuke/docs/security/" class="text-primary text-sm font-medium hover:underline">Read Security Model &rarr;</a>
                     </div>

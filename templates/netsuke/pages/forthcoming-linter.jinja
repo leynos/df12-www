@@ -1,51 +1,23 @@
 {% extends "doc_page.jinja" %}
 {% import "chrome.jinja" as chrome %}
 {% import "components.jinja" as ui %}
-{% import "docs_nav.jinja" as docsnav %}
+{% import "forthcoming_data.jinja" as fc %}
 {% block page_title %}Netsukefile Linter (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
 
     <div class="site-container pt-16 grow flex">
 
-        {{ docsnav.sidebar(sections=[
-            {'title': 'Forthcoming', 'links': [
-                {'href': '/netsuke/forthcoming/', 'label': 'All previews'},
-                {'href': '/netsuke/forthcoming/linter/', 'label': 'Netsukefile Linter', 'active': true},
-                {'href': '#status', 'label': 'Status', 'sub': true},
-                {'href': '#why', 'label': 'Why a linter', 'sub': true},
-                {'href': '#command', 'label': 'The command', 'sub': true},
-                {'href': '#rules', 'label': 'Rule catalogue', 'sub': true},
-                {'href': '#policy', 'label': 'Policy & suppression', 'sub': true},
-                {'href': '#output', 'label': 'Output', 'sub': true},
-                {'href': '#architecture', 'label': 'How it works', 'sub': true},
-                {'href': '/netsuke/forthcoming/testing-framework/', 'label': 'Testing Framework'}
-            ]},
-            {'title': 'Sources', 'links': [
-                {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md', 'label': 'Linter design'},
-                {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md', 'label': 'Rule reference'},
-                {'href': 'https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md', 'label': 'ADR-018'}
-            ]},
-        ], search=false, nav_label='Preview pages') }}
+        {{ fc.sidebar('linter') }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
 
-            {{ chrome.breadcrumb([{'href': '/netsuke/forthcoming/', 'label': 'Forthcoming'}, {'label': 'Netsukefile Linter'}]) }}
-
-            <!-- Page Header -->
-            <div class="mb-12 border-b border-stone-light pb-8">
-                <div class="flex items-center flex-wrap gap-3 mb-4">
-                    {{ ui.kicker('Forthcoming capability', dot='bg-primary') }}
-                    <span class="hm-chip"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> Preview targeted at v0.2.0</span>
-                </div>
-                <h1 class="font-serif text-4xl lg:text-5xl font-bold text-base-content mb-6">Netsukefile Linter</h1>
-                <p class="text-xl text-charcoal-mid font-light leading-relaxed max-w-3xl">
+            {% call fc.header('linter') %}
                     A manifest that parses, lowers, and produces a valid <code>build.ninja</code> can still be a bad manifest: it rebuilds
                     everything every time, breaks where <code>/bin/sh</code> is not <code>bash</code>, or races on an undeclared edge.
                     <code>netsuke check</code> polices the band between &ldquo;parses&rdquo; and &ldquo;provably wrong&rdquo; with a semantic
                     analysis over Netsuke's own compiler stages, inspired by mbake.
-                </p>
-            </div>
+            {% endcall %}
 
             <section id="status" class="mb-16">
                 <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
@@ -53,10 +25,10 @@
                         <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
                     </h2>
                     <ul class="space-y-2 text-sm text-charcoal-mid">
-                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> The released CLI has no <code>check</code> command; the roadmap lists it under the canonical CLI redesign.</span></li>
-                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-018-manifest-linting-under-netsuke-check.md" class="hm-link">ADR-018</a> (accepted 30 August 2026) places linting under <code>netsuke check</code>; the <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="hm-link">design document</a> and <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="hm-link">rule reference</a> are normative. They live on the <a href="https://github.com/leynos/netsuke/pull/592" class="hm-link">#592</a> branch until it merges, so the links here point at that branch.</span></li>
-                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Implemented on a branch.</strong> Issue <a href="https://github.com/leynos/netsuke/issues/592" class="hm-link">#592</a> carries the command, all twenty-four rules, the suppression scanner, and contract tests that check the rule reference against the registry in both directions.</span></li>
-                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.2.0.</strong> Rule names are intended to be permanent from the release that ships them; flags and output shapes may still change before then.</span></li>
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> The released CLI has no <code>check</code> command; the roadmap lists it under the <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#315-canonical-cli-redesign" class="hm-link">canonical CLI redesign</a> (task 3.15.1).</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Designed.</strong> <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/adr-021-manifest-linting-under-netsuke-check.md" class="hm-link">ADR-021</a> (accepted 30 August 2026) places linting under <code>netsuke check</code>. The <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md" class="hm-link">rule reference</a> is the source of truth for every rule; the <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-design.md" class="hm-link">design document</a> is a living document that changes as the prototype is used. Both live on the branch of pull request <a href="https://github.com/leynos/netsuke/pull/621" class="hm-link">#621</a> until it merges, so the links point there. The ADR&rsquo;s number may change on merge, because main has since taken ADR-021 for another decision.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Implemented on a branch.</strong> Pull request <a href="https://github.com/leynos/netsuke/pull/621" class="hm-link">#621</a>, for issue <a href="https://github.com/leynos/netsuke/issues/592" class="hm-link">#592</a>, carries the command, all twenty-four rules, the suppression scanner, and contract tests that check the rule reference against the registry in both directions. It currently conflicts with main and needs a rebase before it can merge.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.4.0, as a prototype.</strong> Rule names are permanent from v0.4.0. Everything else may still change: rule membership, default severities, flags, and output shapes. A later step of the branch&rsquo;s <a href="https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/roadmap.md#12-manifest-linting" class="hm-link">manifest-linting phase</a> freezes those contracts once the rules have been used on manifests their authors did not write.</span></li>
                     </ul>
                 </div>
             </section>
@@ -154,7 +126,7 @@ $ netsuke --json check
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
                     Twenty-four rules across nine categories. A rule is a stable, self-describing kebab-case name that is unique across every
                     stage and category; the name is what appears in policy selectors, suppression directives, <code>--explain</code>, and the
-                    <code>rule</code> field of JSON output, and it never changes. Category is metadata, so recategorizing a rule cannot
+                    <code>code</code> and span <code>label</code> of each JSON finding, and it never changes. Category is metadata, so recategorizing a rule cannot
                     invalidate a configuration file. Each finding also carries a diagnostic code of the form
                     <code>netsuke::lint::&lt;name_in_snake_case&gt;</code> and a <code>url</code> into the rule reference.
                 </p>
@@ -189,7 +161,7 @@ $ netsuke --json check
                             <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">literal-recipe-path</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe repeats a path the target already declares</td></tr>
                             <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">rule-without-description</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">off</td><td class="px-4 py-2 text-xs">rule declares no <code>description</code></td></tr>
                             <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">unreachable-target</td><td class="px-4 py-2 text-xs">clarity</td><td class="px-4 py-2 text-xs">graph</td><td class="px-4 py-2 text-xs">off</td><td class="px-4 py-2 text-xs">target reachable from no default and no other target</td></tr>
-                            <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">legacy-placeholder</td><td class="px-4 py-2 text-xs">migration</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe uses the undocumented <code>$in</code> or <code>$out</code> placeholder</td></tr>
+                            <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">legacy-placeholder</td><td class="px-4 py-2 text-xs">migration</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe uses the undocumented <code>$in</code> or <code>$out</code> placeholder (see the note below)</td></tr>
                             <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">manual-ninja-escape</td><td class="px-4 py-2 text-xs">migration</td><td class="px-4 py-2 text-xs">document</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">recipe doubles a dollar to escape it for Ninja</td></tr>
                             <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">suppression-without-reason</td><td class="px-4 py-2 text-xs">suppression</td><td class="px-4 py-2 text-xs">directive</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">lint directive states no reason</td></tr>
                             <tr><td class="px-4 py-2 font-mono text-xs text-primary whitespace-nowrap">unknown-suppression</td><td class="px-4 py-2 text-xs">suppression</td><td class="px-4 py-2 text-xs">directive</td><td class="px-4 py-2 text-xs">warning</td><td class="px-4 py-2 text-xs">lint directive names a rule that does not exist</td></tr>
@@ -197,7 +169,7 @@ $ netsuke --json check
                         </tbody>
                     </table>
                 </div>
-                <p class="text-xs text-charcoal-mid mb-8">Rules default to <code>off</code> only when they encode a project convention rather than a defect: building a target by name without declaring it a default is a legitimate workflow, and rule descriptions are a house style. The two migration rules exist because v0.1.0-beta3 made <code>$$</code> escaping and the <code>$in</code>/<code>$out</code> placeholders obsolete; see <a href="/netsuke/docs/security/#shell-dollars" class="hm-link">markers and shell dollars</a>.</p>
+                <p class="text-xs text-charcoal-mid mb-8">Rules default to <code>off</code> only when they encode a project convention rather than a defect: building a target by name without declaring it a default is a legitimate workflow, and rule descriptions are a house style. The two migration rules catch stale workarounds. Doubling a dollar (<code>$$PATH</code>) became a bug once Netsuke escaped dollars at the Ninja writer (ADR-014, shipped in v0.1.0-beta3); see <a href="/netsuke/docs/security/#shell-dollars" class="hm-link">markers and shell dollars</a>. On the branch, <code>legacy-placeholder</code> flags <code>$in</code>/<code>$out</code> because they were still substituted during lowering while the users&rsquo; guide documented only <code>{{ '{{' }} ins {{ '}}' }}</code> and <code>{{ '{{' }} outs {{ '}}' }}</code>. Main has since gone further: <a href="https://github.com/leynos/netsuke/blob/main/docs/adr-034-preserve-script-in-out-as-shell-variables.md" class="hm-link">ADR-034</a> makes <code>$in</code> and <code>$out</code> plain shell variables in every recipe, so this rule&rsquo;s rationale will need revising when #621 rebases.</p>
 
                 <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">One rule, worked</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-3xl"><code>undeclared-target-input</code>: Ninja schedules edges concurrently unless a dependency orders them. A recipe that reads a path another target produces, without declaring it, races &mdash; it succeeds whenever the producer happened to run first. Serial local builds hide this; a parallel or clean build does not.</p>
@@ -249,7 +221,7 @@ fail_on = "warning"
                     </div>
                     <div>
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Suppression directives</h3>
-                        <p class="text-sm text-charcoal-mid mb-4">Suppression is narrow by construction: a directive names one or more rules and must state a reason. There is no blanket disable comment and no <code>all</code> selector. Scoping follows YAML indentation: a directive alone on its line governs the next declaration and everything indented beneath it.</p>
+                        <p class="text-sm text-charcoal-mid mb-4">Suppression is narrow by construction: a directive names one or more rules and must state a reason. There is no blanket disable comment and no <code>all</code> selector. Scoping follows YAML indentation: a directive alone on its line governs the next declaration and everything indented beneath it, and a directive at the end of a line governs that line&rsquo;s declaration.</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
 {% highlight 'netsuke' %}
 targets:
@@ -283,11 +255,11 @@ targets:
                     objects under <code>diagnostics[0].related</code>, preserving the envelope invariant every other command follows.
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke --json check (passing, abridged from the design document)</div>
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke --json check (passing, abridged from the design document; the URL resolves once #621 merges)</div>
                     {% highlight 'json' %}{% raw %}
 {
   "schema_version": 1,
-  "generator": { "name": "netsuke", "version": "0.2.0" },
+  "generator": { "name": "netsuke", "version": "0.4.0" },
   "result": {
     "command": "check",
     "status": "pass",
@@ -301,7 +273,7 @@ targets:
         "code": "netsuke::lint::directory_dep_not_order_only",
         "severity": "warning",
         "help": "Move the directory to `order_only_deps`, which guarantees it exists first without tracking its timestamp.",
-        "url": "https://github.com/leynos/netsuke/blob/issue-592-v0-4-0-design-and-implement-a-netsukefile-linter-inspired-by-mbake/docs/netsuke-linter-rules.md#directory-dep-not-order-only",
+        "url": "https://github.com/leynos/netsuke/blob/main/docs/netsuke-linter-rules.md#directory-dep-not-order-only",
         "primary_span": { "line": 24, "column": 7, "snippet": "      - \"{{ build_dir }}\"" }
       }
     ]
@@ -309,6 +281,81 @@ targets:
 }
 {% endraw %}{% endhighlight %}
                 </div>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The first step is one bare command with nothing to configure. <code>netsuke check</code> loads, expands, renders, and lowers
+                    the manifest through the same stages as a build, with impure template helpers disabled; no recipe runs and no build output
+                    is created. The branch&rsquo;s migration note says it plainly: existing manifests need no changes, because checking is
+                    read-only. Everything past that first run is optional, and each step builds on the one before.
+                </p>
+                <ol class="space-y-4 mb-6 max-w-3xl">
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">1. Run it and read what it says</h3>
+                        <p class="text-xs text-charcoal-mid">No rule defaults to <code>error</code> and the default threshold is <code>error</code>, so on a manifest that compiles the first run reports findings without failing. Convention rules stay quiet: <code>unreachable-target</code> and <code>rule-without-description</code> are off until a selector enables them, because they encode a house style rather than a defect.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">2. Ask why</h3>
+                        <p class="text-xs text-charcoal-mid"><code>netsuke check --explain directory-dep-not-order-only</code> prints one rule&rsquo;s summary, rationale, and remediation; <code>--explain</code> alone lists the catalogue. The explanation ships in the binary, so it matches the rules that binary runs.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">3. Make it a gate</h3>
+                        <p class="text-xs text-charcoal-mid"><code>--fail-on warning</code> turns warnings into a failing exit code, which is the point at which the linter starts guarding a CI pipeline. <code>--fail-on never</code> goes the other way and makes findings purely informational.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">4. Fix the policy once</h3>
+                        <p class="text-xs text-charcoal-mid">Category and rule selectors narrow in order, and the <code>[cmds.check]</code> table in <code>netsuke.toml</code> records them for the project (see <a href="{{ fc.href('linter', 'policy') }}" class="hm-link">policy and suppression</a>). The table layers through the usual <a href="/netsuke/docs/configuration/" class="hm-link">configuration</a> precedence.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">5. Suppress with a reason</h3>
+                        <p class="text-xs text-charcoal-mid">Where a finding is deliberate, a <code># netsuke-lint: allow</code> directive names the rule and says why. The suppression rules keep those directives honest after the code around them changes.</p>
+                    </li>
+                </ol>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:direction-fork" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>The deep end.</strong> <code>netsuke --json check --explain</code> emits the whole registry as data, which the
+                        design calls the catalogue an editor or agent reads to build a rule picker without scraping prose. Together with the
+                        per-finding span data, the design judges it sufficient for a language server; no such server is planned in this work.
+                    </p>
+                </div>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The linter adds no output mode of its own. Human findings go through the existing diagnostics reporter, so they inherit the
+                    project&rsquo;s colour, emoji, and <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output</a> policies.
+                    The design document practises the same habit: its architecture diagram is preceded by a prose description for screen-reader users.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Framing text: localized now</h3>
+                        <p class="text-xs text-charcoal-mid">The command&rsquo;s subcommand and flag help, threshold message, summary line, and policy errors are localized as usual. The pull request adds <code>check</code> keys to all 35 <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Rule prose: English for now</h3>
+                        <p class="text-xs text-charcoal-mid">A rule&rsquo;s summary, rationale, and remediation are not localized in v0.4.0. ADR-021&rsquo;s reasoning: the prototype&rsquo;s wording is expected to change, and translating prose before it settles spends the effort twice.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Identifiers: never translated</h3>
+                        <p class="text-xs text-charcoal-mid">Rule, category, and severity names and diagnostic codes are values a user types into a configuration file or a suppression comment and a machine matches exactly. They stay untranslated permanently.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Step 12.2 of the branch&rsquo;s roadmap plans the migration: Fluent keys of the form <code>lint.rule.&lt;name&gt;.summary</code>,
+                    <code>.rationale</code>, and <code>.remediation</code>, with the English text kept as the fallback so a catalogue gap degrades to
+                    the source locale rather than to an empty diagnostic. Under <code>--locale</code>, a finding&rsquo;s <code>rule</code>,
+                    <code>category</code>, <code>severity</code>, and <code>code</code> are to stay byte-identical across locales, and
+                    <code>--explain --json</code> stays in the source locale so an editor&rsquo;s rule picker gets stable text. Translation follows the
+                    project&rsquo;s localization glossary and style guide, leaving manifest identifiers such as <code>order_only_deps</code> verbatim.
+                </p>
             </section>
 
             <section id="architecture" class="mb-16 pt-10 border-t border-stone-light">
@@ -341,12 +388,31 @@ targets:
                 <p class="text-sm text-charcoal-mid max-w-3xl">
                     A rule states what it found and where; the engine stamps the severity resolved from policy, so no rule can decide how loudly to
                     speak. Every rule carries a summary, a rationale, and a remediation in its registry entry, and a contract test checks the rule
-                    reference against that registry in both directions, so the documentation is provably complete rather than aspirationally so.
+                    reference against that registry in both directions, so it can neither omit a shipped rule nor document one that does not exist.
                     A future span-preserving YAML rewriter could add autofixes; that is a separate project and not part of this preview.
                 </p>
+                <h3 class="font-bold text-base-content mt-8 mb-4 text-sm uppercase tracking-wide">How the design earns trust</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">Three tests per rule, at minimum</h4>
+                        <p class="text-xs text-charcoal-mid">A positive case that must fire, a negative case that must not, and a suppression case proving the directive silences it &mdash; and that removing the reason produces <code>suppression-without-reason</code>. Snapshot tests pin the human rendering and both JSON branches; behavioural tests drive the binary end to end; and the repository&rsquo;s own example manifests are linted by a test.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">Properties over generated manifests</h4>
+                        <p class="text-xs text-charcoal-mid">Findings are ordered deterministically; a suppression never reaches outside its node; <code>--limit</code> never changes which findings would have been reported; and a finding&rsquo;s severity equals the policy for its rule. Two runs over the same manifest and configuration produce byte-identical findings.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">Honest spans, loud typos</h4>
+                        <p class="text-xs text-charcoal-mid">A wrong span is worse than no span, so the resolver returns nothing rather than guessing. An unknown rule name in a selector is an error, so a typo in CI configuration fails loudly instead of silently disabling nothing.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h4 class="font-bold text-base-content mb-2 text-sm">Evidence before the freeze</h4>
+                        <p class="text-xs text-charcoal-mid">The branch roadmap measures value by findings that changed a manifest, not by the number of rules registered. Its first step lints a corpus and records each rule&rsquo;s disposition before any contract is frozen. Two structural tasks are already done there: moving <code>miette</code> out of the lint core into an adapter, and runner telemetry for <code>netsuke check</code>.</p>
+                    </div>
+                </div>
             </section>
 
-{{ docsnav.footer_nav({'kicker': 'Back', 'label': 'Forthcoming capabilities', 'href': '/netsuke/forthcoming/'}, {'kicker': 'Next preview', 'label': 'Testing Framework', 'href': '/netsuke/forthcoming/testing-framework/'}) }}
+{{ fc.footer('linter') }}
 
         </main>
     </div>

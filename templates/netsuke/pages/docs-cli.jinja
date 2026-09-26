@@ -8,7 +8,7 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}, {'href': '#output-streams', 'label': 'Output streams'}, {'href': '#accessible-output', 'label': 'Accessible output'}, {'href': '#localization', 'label': 'Localization'}]) }}
+        {{ docsnav.sidebar('cli', sub_links=[{'href': '#cli', 'label': 'Commands'}, {'href': '#policy-flags', 'label': 'Policy and budget flags'}, {'href': '#output-streams', 'label': 'Output streams'}, {'href': '#accessible-output', 'label': 'Accessible output'}, {'href': '#localization', 'label': 'Localization'}]) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
@@ -34,7 +34,7 @@
                                     <h3 class="font-mono text-lg font-bold text-base-content">build</h3>
                                     <span class="px-2 py-0.5 rounded text-xs font-mono bg-success/10 text-success-text">Primary</span>
                                 </div>
-                                <p class="text-charcoal-mid text-sm mb-4">Builds the specified targets and their dependencies. This is the default subcommand when none is given. Global flags such as those below are written before the subcommand.</p>
+                                <p class="text-charcoal-mid text-sm mb-4">Builds the specified targets and their dependencies. This is the default subcommand when none is given. Global flags such as those below are written before the subcommand. Since v0.1.0-beta4 Netsuke passes Ninja a literal <code>--</code> before the selected targets, whether named on the command line or taken from <code>default_targets</code>, so a target called <code>-f</code> or <code>-C</code> stays a target rather than becoming a Ninja option.</p>
 
                                 <div class="space-y-2 mb-4">
                                     <div class="flex items-start text-xs font-mono">
@@ -80,6 +80,10 @@
                                     <div class="flex items-start text-xs font-mono">
                                         <span class="text-primary w-32 shrink-0">--color, --emoji</span>
                                         <span class="text-charcoal-light">Policy: <code>auto</code> | <code>always</code> | <code>never</code> (colour rendering is not yet implemented)</span>
+                                    </div>
+                                    <div class="flex items-start text-xs font-mono">
+                                        <span class="text-primary w-32 shrink-0">--fetch-*, --env-*, --manifest-*</span>
+                                        <span class="text-charcoal-light">Network, environment, and evaluation limits; see <a href="#policy-flags" class="hm-link">policy and budget flags</a></span>
                                     </div>
                                 </div>
                             </div>
@@ -192,6 +196,55 @@ digraph netsuke {
                 </div>
             </section>
 
+            <section id="policy-flags" class="mb-20 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:rule" aria-hidden="true"></span> Policy and budget flags
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    These global flags are operator policy: they sit above anything a project <code>.netsuke.toml</code> asks for. Each has a configuration key and a <code>NETSUKE_</code> variable; see <a href="/netsuke/docs/configuration/#policy-exceptions" class="hm-link">configuration</a> for how the layers combine and the <a href="/netsuke/docs/security/" class="hm-link">security model</a> for what each one protects.
+                </p>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Flag</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows text-xs text-charcoal-mid">
+{%- for flag, effect in [
+    ('--fetch-allow-scheme <SCHEME>', 'Allow another URL scheme for fetch(). Repeatable.'),
+    ('--fetch-allow-host <HOST>', 'Allow a host when default-deny is on. Wildcards such as *.example.com. Repeatable.'),
+    ('--fetch-block-host <HOST>', 'Always block a host, even when allowed elsewhere. Repeatable.'),
+    ('--fetch-default-deny', 'Deny every host not explicitly allowed.'),
+    ('--trust-project-fetch-policy', 'Since v0.1.0-beta4. Let project configuration widen fetch grants.'),
+    ('--env-allow-var <VAR>', 'Since v0.1.0-beta4. Permit env() to read this exact name; any entry makes the list restrictive. Repeatable.'),
+    ('--env-block-var <VAR>', 'Since v0.1.0-beta4. Always refuse env() this exact name. Repeatable.'),
+    ('--manifest-evaluation-fuel <FUEL>', 'Since v0.1.0-beta4. MiniJinja instructions per evaluation (default 1,000,000).'),
+    ('--manifest-fuel <FUEL>', 'Since v0.1.0-beta4. MiniJinja instructions per manifest (default 100,000,000).'),
+    ('--manifest-rendered-value-bytes <BYTES>', 'Since v0.1.0-beta4. Bytes per rendered value (default 1,048,576).'),
+    ('--manifest-rendered-manifest-bytes <BYTES>', 'Since v0.1.0-beta4. Bytes across all rendered values (default 16,777,216).'),
+    ('--manifest-source-bytes <BYTES>', 'Since v0.1.0-beta4. Template and macro-import source bytes (default 4,194,304).'),
+    ('--manifest-foreach-cardinality <COUNT>', 'Since v0.1.0-beta4. Values from one foreach iterator (default 10,000).'),
+    ('--manifest-expanded-entries <COUNT>', 'Since v0.1.0-beta4. Targets and actions after expansion (default 50,000).'),
+] %}
+                            <tr>
+                                <td class="px-4 py-3 font-mono whitespace-nowrap text-primary">{{ flag }}</td>
+                                <td class="px-4 py-3">{{ effect }}</td>
+                            </tr>
+{%- endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% call chrome.faux_window('Locking down a CI build', outer_class='mb-6') %}{% highlight 'netsuke-console' %}
+$ netsuke --fetch-default-deny \
+    --fetch-allow-host releases.example.com \
+    --env-allow-var CI \
+    --manifest-expanded-entries 5000 \
+    build
+{% endhighlight %}{% endcall %}
+            </section>
+
             <section id="output-streams" class="mb-20 pt-10 border-t border-stone-light">
                 <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:datastore" aria-hidden="true"></span> Output Streams
@@ -254,6 +307,14 @@ $ netsuke generate | grep 'rule '
                             to suppress progress entirely in environments where clean log output matters most.
                         </p>
                     </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs mt-6">
+                    <div class="flex flex-wrap items-center gap-3 mb-2">
+                        <h3 class="font-bold text-base-content text-sm">How task progress is read</h3>
+                        <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                    </div>
+                    <p class="text-xs text-charcoal-mid">Progress comes from Ninja status lines of the form <code>[current/total] description</code>. Netsuke holds at most 512 bytes of a candidate line; a longer line is still forwarded unchanged, but progress parsing skips it up to its newline and resumes on the next. A custom <code>NINJA_STATUS</code> that keeps the <code>[current/total]</code> shape still drives progress; other shapes simply produce no task update. <code>--progress never</code> skips parsing altogether.</p>
                 </div>
             </section>
 

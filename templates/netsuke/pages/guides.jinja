@@ -1,4 +1,5 @@
 {% extends "doc_page.jinja" %}
+{% import "forthcoming_data.jinja" as fc %}
 {% import "chrome.jinja" as chrome %}
 {% set active_nav = 'guides' %}
 {% block page_title %}Guides Hub - Netsuke Build System{% endblock %}
@@ -136,28 +137,7 @@
                         <h2 class="font-serif text-2xl font-bold text-base-content">Forthcoming Capabilities</h2>
                     </div>
 
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <a href="/netsuke/forthcoming/linter/" class="hm-guide-card hm-card p-6 block h-full">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-serif text-lg font-bold text-base-content">Netsukefile Linter</h3>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> v0.2.0</span>
-                            </div>
-                            <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
-                                What <code>netsuke check</code> will lint, how rule severities are configured, and what the preview deliberately leaves out.
-                            </p>
-                            <span class="text-xs font-mono text-primary font-medium">Read the preview &rarr;</span>
-                        </a>
-                        <a href="/netsuke/forthcoming/testing-framework/" class="hm-guide-card hm-card p-6 block h-full">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-serif text-lg font-bold text-base-content">Testing Framework</h3>
-                                <span class="hm-chip shrink-0"><span class="w-2 h-2 rounded-full bg-primary mr-1.5"></span> v0.4.0</span>
-                            </div>
-                            <p class="text-sm text-charcoal-mid mb-4 line-clamp-3">
-                                The <code>netsuke test</code> dialect: mocks, fixtures, and assertions over the expanded manifest, graph, and generated Ninja.
-                            </p>
-                            <span class="text-xs font-mono text-primary font-medium">Read the preview &rarr;</span>
-                        </a>
-                    </div>
+{{ fc.index_list() }}
                 </section>
 
                 <!-- Section: Contributing -->

@@ -1,0 +1,533 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}Structured Commands (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+{#- A section's closing line of upstream roadmap links: (anchor, label) pairs. -#}
+{% macro roadmap(items) -%}
+                <p class="text-xs text-charcoal-mid mt-6 pt-4 border-t border-base-300">
+                    <span class="font-bold text-base-content uppercase tracking-wide mr-1">Roadmap</span>
+                    {%- for anchor, label in items %}
+                    <a href="https://github.com/leynos/netsuke/blob/main/docs/roadmap.md#{{ anchor }}" class="hm-link">{{ label }}</a>{% if not loop.last %} &middot;{% endif %}
+                    {%- endfor %}
+                </p>
+{%- endmacro %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('structured-commands') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('structured-commands') %}
+                    A recipe today is shell text, and a rendered value that contains a semicolon, a quote, or a space can quietly become
+                    syntax. The proposed <code>invoke</code> block fixes the command's structure before any template value is evaluated,
+                    so an interpolation fills one argument and never changes how many there are. Environments, working directories,
+                    scratch space, and pipelines become fields rather than shell idioms; shells remain available, by name, when a
+                    recipe genuinely needs one.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> Recipes are shell strings in v0.1.x. No structured-command code is on Netsuke's main branch, and the README lists structured arguments and recipe environment mappings as not implemented yet.</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Designed, not ratified.</strong> <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0001-structured-command-blocks.md" class="hm-link">RFC 0001</a> and its three amendments &mdash; <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0009-structured-command-working-directories.md" class="hm-link">0009</a> (working directories), <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0010-runtime-bindings-and-secure-tempdirs.md" class="hm-link">0010</a> (runtime bindings and temporary directories), and <a href="https://github.com/leynos/netsuke/blob/main/docs/rfcs/0011-allow-listed-structured-command-shells.md" class="hm-link">0011</a> (named shells) &mdash; are all <em>Proposed</em>. <a href="https://github.com/leynos/netsuke/blob/main/docs/adr-019-structured-command-shell-selection.md" class="hm-link">ADR-019</a>, which selects the shell allow-list, was accepted on 2 September 2026.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:warning" aria-hidden="true"></span> <span><strong>Known conflicts.</strong> The RFCs disagree in places &mdash; on the base for relative stream paths, and on two overlapping temporary-directory spellings. Roadmap task 12.1.1 must reconcile them before implementation starts, and issue <a href="https://github.com/leynos/netsuke/issues/803" class="hm-link">#803</a> tracks the specifics, so details on this page may change.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>One task ticked of 42.</strong> Roadmap phases 11 to 15 carry the work; only 11.1.1, the paper contract for named shells, is done. Draft <a href="https://github.com/leynos/netsuke/pull/778" class="hm-link">PR #778</a> plans the shell-selection vocabulary (11.2.1) and changes no production code.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Planned for v0.2.0.</strong> The user's guide and the v0.1.0 migration guide name v0.2.0, and say structured commands will not be backported by quietly changing legacy recipes.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why structure a command
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A <code>command</code> is one shell string or a list of them. Environment setup, argument quoting, and process invocation
+                    all travel in the same text, which is hard to inspect, less portable than the manifest schema, and easy to make unsafe when
+                    a rendered value carries whitespace or shell metacharacters. Jinja values are not shell-quoted for you today; the
+                    <a href="/netsuke/docs/security/#recipe-shells" class="hm-link">security page</a> documents the shipped contract. RFC 0001's
+                    motivating example is an ordinary coverage recipe:
+                </p>
+                <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
+                    <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Legacy recipe, valid today (RFC 0001 &sect;2)</div>
+                    {% highlight 'netsuke' %}
+actions:
+  - name: coverage
+    command:
+      - 'echo "coverage linker flags: -fuse-ld=lld"'
+      - >-
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=clang
+        RUSTFLAGS="-D warnings -C link-arg=-fuse-ld=lld"
+        CFLAGS="-fuse-ld=lld"
+        LDFLAGS="-fuse-ld=lld"
+        cargo llvm-cov --lcov --output-path lcov.info
+        --all-targets --all-features
+{% endhighlight %}
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not render, then tokenize</h3>
+                        <p class="text-xs text-charcoal-mid">Splitting the text after rendering is too late: an interpolated semicolon, redirection, quote, or run of whitespace has already become syntax or moved an argument boundary. The rule is to parse structure first, evaluate interpolation second, and never parse an interpolated value again.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Not a YAML argv list</h3>
+                        <p class="text-xs text-charcoal-mid">An explicit list is safe and hostile to write: a six-word command becomes a tall stack of list items. The RFC rejects it in favour of an ergonomic string that Netsuke parses under its own small grammar, not POSIX shell or PowerShell rules.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">One contract on every host</h3>
+                        <p class="text-xs text-charcoal-mid">On Windows every legacy recipe runs under Windows PowerShell (<code>powershell.exe</code>), not <code>pwsh</code>, whatever launched Netsuke. Direct invocation needs no interpreter at all, so the same <code>invoke</code> line means the same argv on Linux, macOS, and Windows.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="invoke" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Argv-safe commands with <code class="ml-2">invoke</code>
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    <code>command</code> gains two new forms beside the existing ones: a mapping with an <code>invoke</code> key, and a list that
+                    mixes strings, <code>invoke</code> blocks, <code>rule:</code> items, and <code>script:</code> items. With <code>shell</code>
+                    absent or <code>false</code>, <code>invoke</code> is an argv template. Quotes group words and are removed; a backslash outside
+                    quotes is literal, so <code>C:\tools\bin</code> survives; unquoted <code>|</code>, <code>&amp;</code>, <code>;</code>,
+                    <code>&lt;</code>, and <code>&gt;</code> are errors that catch accidental pipelines and redirections; and nothing expands
+                    &mdash; no <code>$HOME</code>, <code>%TEMP%</code>, globs, or <code>$(…)</code>.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed field forms (RFC 0001 &sect;4)</div>
+                        {% highlight 'netsuke' %}
+# Existing scalar shell command.
+command: cargo test
+
+# New structured command block.
+command:
+  invoke: cargo test
+  env:
+    RUST_BACKTRACE: "1"
+
+# New heterogeneous command list.
+command:
+  - invoke: cargo build
+  - rule: package
+  - script: |
+      printf '%s\n' 'package complete'
+{% endhighlight %}
+                    </div>
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed interpolation (RFC 0001; comments added)</div>
+                        {% highlight 'netsuke' %}{% raw %}
+command:
+  invoke: frobnicate --output={{ destination }}
+# destination = "release files; delete nothing"
+# argv: ["frobnicate", "--output=release files; delete nothing"]
+
+vars:
+  coverage_args: [--all-targets, --all-features]
+command:
+  invoke: cargo llvm-cov {{ coverage_args }}
+# argv: ["cargo", "llvm-cov", "--all-targets", "--all-features"]
+
+command:
+  invoke: clang {{ ins }} -o {{ outs }}
+# one argv element per path, spaces and all
+{% endraw %}{% endhighlight %}
+                    </div>
+                </div>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A scalar fills exactly one word. A list splices its elements only when it stands as a whole unquoted word. A stray
+                    <code>$in</code> or <code>$out</code> earns a targeted diagnostic pointing at <code>{{ '{{ ins }}' }}</code> and
+                    <code>{{ '{{ outs }}' }}</code>. On Windows, direct mode refuses a resolved <code>cmd.exe</code>, <code>.bat</code>, or
+                    <code>.cmd</code> target, because <code>cmd.exe</code> can reread separate arguments as shell source. Ninja still schedules the
+                    build: a structured edge calls a hidden Netsuke action runner by opaque ID, and the generated Ninja line carries no rendered
+                    user arguments or environment values.
+                </p>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3 shrink-0" data-icon="carbon:security" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Argv-safe is not a sandbox.</strong> Direct mode keeps each value inside its argument. It cannot stop a value
+                        beginning with <code>-</code> being read as an option, a program treating an argument as code, or the executable itself
+                        misbehaving. In the RFC's words, Netsuke preserves the argv boundary; it cannot validate every callee's application grammar.
+                        Program-specific guards such as <code>--</code> remain the author's job.
+                    </p>
+                </div>
+{{ roadmap([
+    ('121-fix-command-structure-before-evaluating-template-values', '12.1 Command structure before values'),
+    ('122-execute-isolated-commands-without-losing-legacy-sequence-semantics', '12.2 Isolated execution'),
+    ('123-carry-structured-commands-through-build-and-generate-workflows', '12.3 Build and generate workflows'),
+]) }}
+            </section>
+
+            <section id="environment" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:folder-details" aria-hidden="true"></span> Environments and working directories
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A block's <code>env</code> is an exact overlay for that one child process. It needs no shell quoting and does not persist to
+                    later blocks. Duplicate keys are invalid, compared case-insensitively on Windows. RFC 0009 adds <code>cwd</code>, so a
+                    structured command no longer has to fall back to <code>shell: true</code> and <code>cd dir &amp;&amp; …</code>.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">The coverage recipe, proposed (RFC 0001 &sect;4)</div>
+                        {% highlight 'netsuke' %}
+actions:
+  - name: coverage
+    command:
+      - invoke: 'echo "coverage linker flags: -fuse-ld=lld"'
+      - invoke: >-
+          cargo llvm-cov --lcov --output-path lcov.info
+          --all-targets --all-features
+        env:
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER: clang
+          RUSTFLAGS: -D warnings -C link-arg=-fuse-ld=lld
+          CFLAGS: -fuse-ld=lld
+          LDFLAGS: -fuse-ld=lld
+{% endhighlight %}
+                    </div>
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Per-block and per-stage cwd, proposed (RFC 0009)</div>
+                        {% highlight 'netsuke' %}
+command:
+  invoke: cargo test --all-targets
+  cwd: rust_extension
+
+command:
+  - invoke: generator --format json
+    cwd: producer
+    pipe: true
+  - invoke: validator --schema schema.json
+    cwd: consumer
+    stdout: validated.json
+{% endhighlight %}
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Directories stay inside the workspace</h3>
+                        <p class="text-xs text-charcoal-mid">A relative <code>cwd</code> resolves against the effective workspace after <code>-C</code>. Absolute paths and lexical or symlink escapes are rejected, and nothing is created on the author's behalf. In shell mode Netsuke applies the directory at spawn rather than lowering it to <code>cd backend &amp;&amp; …</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Deliberately small, for now</h3>
+                        <p class="text-xs text-charcoal-mid">Richer operations &mdash; <code>default</code>, <code>prepend</code>, <code>append</code>, <code>unset</code> &mdash; and <code>env</code> at rule, target, or action level are deferred to decision 15.1.1. Whether stream paths resolve against <code>cwd</code> or the workspace is one of the conflicts 12.1.1 must settle; RFC 0001 and RFC 0009 currently disagree.</p>
+                    </div>
+                </div>
+{{ roadmap([
+    ('122-execute-isolated-commands-without-losing-legacy-sequence-semantics', '12.2 Exact overlays and literal cwd'),
+    ('151-evaluate-additional-argument-and-environment-surfaces', '15.1 Additional environment surfaces'),
+]) }}
+            </section>
+
+            <section id="bindings" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:data-share" aria-hidden="true"></span> Runtime bindings and private scratch space
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    RFC 0010 lets one execution unit pass a discovered value to the next without a shell. A block's standard output can be
+                    captured into a named binding, and a later block can use it as its working directory. A block can also ask the runner for a
+                    private temporary directory and name it for its successors.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Capture, then use as cwd; proposed (RFC 0010)</div>
+                        {% highlight 'netsuke' %}
+command:
+  - invoke: workspace-locator --relative
+    stdout:
+      env: WORKSPACE_DIR
+  - invoke: cargo test --all-targets
+    cwd:
+      env: WORKSPACE_DIR
+{% endhighlight %}
+                    </div>
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A runner-owned temporary directory; proposed (RFC 0010)</div>
+                        {% highlight 'netsuke' %}
+command:
+  - invoke: prepare-fixture
+    cwd:
+      tempdir:
+        env: FIXTURE_DIR
+  - invoke: verify-fixture
+    cwd:
+      env: FIXTURE_DIR
+{% endhighlight %}
+                    </div>
+                </div>
+                <blockquote class="border-l-4 border-primary/40 pl-4 mb-6 max-w-3xl text-sm text-charcoal-mid italic">
+                    Runtime bindings are scoped data owned by the action runner, not mutations of the parent process environment. Text captured
+                    from a child cannot grant filesystem authority merely by containing an absolute path. <span class="not-italic">&mdash; RFC 0010</span>
+                </blockquote>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Capture</h3>
+                        <p class="text-xs text-charcoal-mid">A capture takes <code>env</code>, <code>chomp</code> (default <code>true</code>), and <code>max_bytes</code> (default 65,536, at most 16&nbsp;MiB). Decoding is strict UTF-8; invalid bytes or a NUL stop the commit. A binding becomes visible only after its producer succeeds, and its value is kept out of diagnostics by default. If the captured text is <code>/tmp/outside</code>, the next block fails before spawn: text carries no directory capability.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Temporary directories</h3>
+                        <p class="text-xs text-charcoal-mid">Names are unpredictable, and the directory is owner-only (<code>0700</code> on Unix, a restricted ACL on Windows) before the child sees it &mdash; never created open and tightened afterwards. Cleanup runs after success, failure, cancellation, timeout, signal, spawn error, and pipeline setup failure, and does not follow symlinks. Failed directories are not kept for debugging.</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start mt-6">
+                    <span class="iconify text-primary mt-1 mr-3 shrink-0" data-icon="carbon:warning-alt" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Two designs, not one.</strong> RFC 0001 also proposes a per-stage <code>temp_dir: true</code> that binds
+                        <code>TMPDIR</code>, <code>TMP</code>, and <code>TEMP</code>; RFC 0010's <code>cwd: { tempdir }</code> does not rewrite those
+                        variables. Likewise RFC 0001's ephemeral <code>capture_stdout</code> is distinct from <code>stdout: { env: NAME }</code>.
+                        Task 12.1.1 will record whether both spellings remain.
+                    </p>
+                </div>
+{{ roadmap([
+    ('141-pass-validated-discovery-results-to-later-execution-units', '14.1 Discovery results'),
+    ('142-own-temporary-directory-authority-and-lifetime-explicitly', '14.2 Temporary-directory authority'),
+    ('143-prove-the-amended-contract-in-downstream-style-builds', '14.3 Downstream-style proof'),
+]) }}
+            </section>
+
+            <section id="streams" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow-stream" aria-hidden="true"></span> Streams and pipelines without a shell
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Redirection and piping become fields: <code>stdin</code>, <code>stdout</code>, <code>stderr</code>, <code>tee</code>,
+                    <code>pipe</code>, and <code>capture_stdout</code>. Output files are create-or-truncate, with append mode reserved. Pipes and
+                    tees carry arbitrary bytes. Before anything is truncated, every destination in a unit is opened provisionally and compared,
+                    so relative aliases, symlinks, and hard links that name the same file are caught first.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A three-stage pipeline; proposed (RFC 0001)</div>
+                        {% highlight 'netsuke' %}
+command:
+  - invoke: producer --format=json
+    pipe: true
+  - invoke: jq ".items[]"
+    pipe: true
+  - invoke: consumer
+    stdout: result.txt
+{% endhighlight %}
+                    </div>
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Piping standard error; proposed (RFC 0010)</div>
+                        {% highlight 'netsuke' %}
+command:
+  - invoke: compiler invalid-source.rs
+    pipe: stderr
+  - invoke: normalize-diagnostics
+    stdout: normalized-errors.txt
+{% endhighlight %}
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Strict pipefail, without the shell</h3>
+                        <p class="text-xs text-charcoal-mid">A pipeline succeeds only when every stage exits successfully, every stream opens, and every relay or tee completes &mdash; the effect of <code>pipefail</code>, derived from child statuses rather than shell configuration. On failure, started stages are terminated and reaped and every relay is joined. Units run in declaration order and the first failure stops the sequence. <code>pipe: stderr</code> is not <code>2&gt;&amp;1</code>: merged streams are out of scope and still need explicit shell mode.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Where legacy state stops</h3>
+                        <p class="text-xs text-charcoal-mid mb-3">Pipelines never cross a rule, script, or legacy-string boundary, and a structured item ends the current legacy shell group:</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                            {% highlight 'netsuke' %}
+command:
+  - export MODE=fast
+  - echo "$MODE"   # Same legacy shell group: prints fast.
+  - invoke: tool
+  - echo "$MODE"   # New legacy shell group: MODE is not retained.
+{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+{{ roadmap([
+    ('131-bind-streams-without-corrupting-aliased-or-replaced-files', '13.1 Stream binding'),
+    ('132-run-pipelines-with-explicit-byte-flow-and-complete-ownership', '13.2 Pipelines'),
+    ('133-validate-stream-composition-through-real-manifests', '13.3 Stream validation'),
+    ('152-gate-broader-stream-and-process-authority-behind-separate-designs', '15.2 Append, merged streams, and more'),
+]) }}
+            </section>
+
+            <section id="shells" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:list-checked" aria-hidden="true"></span> Named, allow-listed shells
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Some recipes need a shell. RFC 0011 widens <code>shell</code> from a Boolean to a Boolean or a name. <code>true</code>
+                    resolves to <code>sh</code> on Unix-like hosts and <code>powershell</code> on Windows; a name picks one of four built-ins.
+                    <strong>Any shell &mdash; <code>shell: true</code> or a named one &mdash; gives up direct mode's argv-safety.</strong> The
+                    selector changes the interpreter, not the safety boundary.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed selectors (RFC 0011 &sect;4)</div>
+                        {% highlight 'netsuke' %}
+command:
+  - invoke: cargo test --workspace
+    shell: false          # direct: argv-safe
+  - invoke: Write-Output $env:TARGET
+    shell: true           # platform default: shell text
+  - invoke: set -o pipefail; build-project
+    shell: bash           # named: shell text
+  - invoke: Get-ChildItem Env:
+    shell: pwsh           # named: shell text
+{% endhighlight %}
+                    </div>
+                    <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] min-w-0" tabindex="0">
+                        <table class="min-w-full hm-rows prop-table">
+                            <thead class="bg-base-100">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Name</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Hosts</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Fixed arguments</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white hm-rows text-charcoal-mid">
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary">sh</td><td class="px-4 py-2 text-xs">Unix-like, <code>/bin/sh</code></td><td class="px-4 py-2 font-mono text-xs whitespace-nowrap">-c</td></tr>
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary">bash</td><td class="px-4 py-2 text-xs">Unix-like and Windows</td><td class="px-4 py-2 font-mono text-xs whitespace-nowrap">--noprofile --norc -c</td></tr>
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary">pwsh</td><td class="px-4 py-2 text-xs">Unix-like and Windows</td><td class="px-4 py-2 font-mono text-xs whitespace-nowrap">-NoLogo -NoProfile -NonInteractive -Command</td></tr>
+                                <tr><td class="px-4 py-2 font-mono text-xs text-primary">powershell</td><td class="px-4 py-2 text-xs">Windows</td><td class="px-4 py-2 font-mono text-xs whitespace-nowrap">-NoLogo -NoProfile -NonInteractive -Command</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">The manifest cannot add a shell</h3>
+                        <p class="text-xs text-charcoal-mid">Further shells, such as <code>dash</code>, come only from trusted operator configuration as <code>[[shells]]</code> entries; a project's <code>.netsuke.toml</code> is never trusted for shell definitions. Names resolve against the host <code>PATH</code> captured before the block's <code>env</code> overlay, so a manifest-supplied <code>PATH</code> or a repository-local executable cannot stand in for an allow-listed shell.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Today versus planned</h3>
+                        <p class="text-xs text-charcoal-mid">Today's Windows route for every legacy recipe is Windows PowerShell 5.1 (<code>powershell.exe</code>); the <a href="/netsuke/docs/security/#recipe-shells" class="hm-link">security page</a> documents it. The planned <code>pwsh</code> and <code>powershell</code> names are separate, per-block choices and change nothing for legacy recipes. Draft PR #778 also proposes reserving the YAML 1.1 Boolean words (<code>yes</code>, <code>on</code>, and the rest) so a quoted <code>"on"</code> cannot name a shell; that addendum is not on main.</p>
+                    </div>
+                </div>
+{{ roadmap([
+    ('111-settle-the-contract-before-implementation', '11.1 Contract (done)'),
+    ('112-resolve-trusted-shells-without-expanding-manifest-authority', '11.2 Trusted resolution'),
+    ('113-carry-named-shells-through-structured-execution-boundaries', '11.3 Execution boundaries'),
+]) }}
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Nothing existing has to move. Scalar command strings keep their shell semantics, an all-string list behaves exactly as it
+                    does now, and no manifest is converted to direct invocation automatically. Structured mappings will sit behind an additive
+                    manifest minor version, provisionally <code>1.1.0</code>, so older Netsuke releases reject the new syntax cleanly rather than
+                    misreading it.
+                </p>
+                <ol class="grid md:grid-cols-3 gap-6 mb-8">
+                    <li class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="font-mono text-xs text-primary mb-2">1 &middot; Leave it</div>
+                        <p class="text-xs text-charcoal-mid"><code>command: "…"</code> strings keep working unchanged. Recipes that depend on shell state should stay legacy, or use <code>shell: true</code> or a named shell.</p>
+                    </li>
+                    <li class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="font-mono text-xs text-primary mb-2">2 &middot; Convert one item</div>
+                        <p class="text-xs text-charcoal-mid">Lists may mix strings, <code>invoke</code> blocks, <code>rule:</code>, and <code>script:</code> items, so one line can move at a time. Migrate a legacy list only when no shell state must persist between its entries.</p>
+                    </li>
+                    <li class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="font-mono text-xs text-primary mb-2">3 &middot; Replace the idioms</div>
+                        <p class="text-xs text-charcoal-mid">Swap <code>cd</code> for <code>cwd</code>, command substitution for capture, and <code>2&gt;&amp;1 |</code> for <code>pipe: stderr</code> where merged output is not required. A migration guide with executed examples is task 14.3.2.</p>
+                    </li>
+                </ol>
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">cd to cwd; proposed migration (RFC 0009)</div>
+                        {% highlight 'netsuke' %}
+# Before
+command: cd rust_extension && cargo clippy --all-targets
+
+# After
+command:
+  invoke: cargo clippy --all-targets
+  cwd: rust_extension
+{% endhighlight %}
+                    </div>
+                    <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                        <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Substitution to capture; proposed migration (RFC 0010)</div>
+                        {% highlight 'netsuke' %}
+# Before
+command: WORKSPACE_DIR=$(tool locate) && cd "$WORKSPACE_DIR" && cargo test
+
+# After
+command:
+  - invoke: tool locate --relative
+    stdout:
+      env: WORKSPACE_DIR
+  - invoke: cargo test
+    cwd:
+      env: WORKSPACE_DIR
+{% endhighlight %}
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid mt-6 max-w-3xl">
+                    The deeper end is separate work. Recipes that must be ready before they run &mdash; a virtual environment, a live service
+                    &mdash; are the subject of <a href="{{ fc.href('states') }}" class="hm-link">States and Probes</a>, which proposes states
+                    as further execution units on this same structured runner rather than a template-time subprocess facility.
+                </p>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The central claim is small enough to test: a scalar interpolation cannot change process structure or argv boundaries. The
+                    RFCs plan evidence for it at several strengths. None of that is written yet; what ships is the equivalent work for today's
+                    legacy placeholders.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm flex items-center"><span class="iconify text-warning mr-2" data-icon="carbon:pending" aria-hidden="true"></span> Planned</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid list-disc pl-4">
+                            <li>Property tests that arbitrary scalars stay inside their original argv word and sequences splice exactly their elements; 12.1.4 makes &ldquo;hostile scalars never change the argument count&rdquo; its success criterion.</li>
+                            <li>Property tests over bounded relative paths (RFC 0009), binding sequences where no text binding acquires directory capability (RFC 0010), and shell names against <code>PATH</code>/<code>PATHEXT</code> states (11.2.4).</li>
+                            <li>Bounded Kani checks for command-block mutual exclusions and pipeline topology; 13.2.1 requires them over the normalization kernel, proving one selected stream per edge and at most one predecessor per input. RFC 0010 allows a harness for binding reservation, commit, failure, and cleanup.</li>
+                            <li>Fuzzing with quotes, newlines, shell operators, Unicode, and substitution text as scalar payloads, asserting the process structure is unchanged.</li>
+                            <li>A recorder helper executable that captures argv, environment, stdin, stdout, stderr, and exit status for cross-platform integration tests, plus a deterministic <code>EEXIST</code> race test and compatibility snapshots for legacy lowering.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm flex items-center"><span class="iconify text-success mr-2" data-icon="carbon:checkmark-outline" aria-hidden="true"></span> Shipping today, for legacy recipes</h3>
+                        <p class="text-xs text-charcoal-mid mb-3"><a href="https://github.com/leynos/netsuke/blob/main/docs/adr-027-command-placeholder-contract.md" class="hm-link">ADR-027</a> fixes the contract for <code>$in</code> and <code>$out</code> placeholders in shell-string recipes, and is careful about what it proves.</p>
+                        <ul class="space-y-2 text-xs text-charcoal-mid list-disc pl-4">
+                            <li>The placeholder marker recognizer is covered by Kani proofs.</li>
+                            <li>The backtick and <code>shlex</code> behaviour is covered by proptest, not by proof.</li>
+                            <li>The <code>shlex</code> guard is documented as not an injection check. Argv-safety is exactly what legacy recipes do not have, and why this design exists.</li>
+                        </ul>
+                        <p class="text-xs text-charcoal-mid mt-3">The publication gate, 14.3.3, requires formatting, lint, documentation, unit, behavioural, property, and bounded-proof gates on the supported target matrix, plus at least two downstream canaries.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility and localization
+                </h2>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Localized diagnostics</h3>
+                        <p class="text-xs text-charcoal-mid">Shell-resolution failures keep a typed classification that is converted into a localized, user-facing diagnostic at one application boundary, so behaviour never depends on message text. Diagnostics name the action, the one-based item, the pipeline stage, and the exit status.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Redaction</h3>
+                        <p class="text-xs text-charcoal-mid">Diagnostics never print whole environment mappings, since argv and environments may hold credentials. Captured values stay hidden by default, complete <code>PATH</code> values are not printed, and absolute host paths are omitted or redacted where a relative path will do.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Where the design is silent</h3>
+                        <p class="text-xs text-charcoal-mid">The RFCs and ADR-019 set no accessibility-specific requirements beyond Netsuke's shared output modes, such as the existing <a href="/netsuke/docs/cli/#accessible-output" class="hm-link">accessible output</a>. Nothing more is promised here, and this page does not invent it.</p>
+                    </div>
+                </div>
+            </section>
+
+{{ fc.footer('structured-commands') }}
+
+        </main>
+    </div>
+
+{% endblock %}

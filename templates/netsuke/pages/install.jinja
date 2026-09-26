@@ -80,20 +80,24 @@ $ cargo binstall netsuke-build@{{ netsuke_version }}
                     </div>
                     <div class="bg-base-content rounded-lg p-6 code-block-wrapper">
                         {% highlight 'netsuke-console' %}
-$ rustup toolchain install nightly-2026-08-23
-$ cargo +nightly-2026-08-23 install netsuke-build@{{ netsuke_version }}
+$ rustup toolchain install {{ netsuke_rust_nightly }}
+$ cargo +{{ netsuke_rust_nightly }} install netsuke-build@{{ netsuke_version }}
                         {% endhighlight %}
                     </div>
                     <div class="mt-8 grid md:grid-cols-2 gap-6">
-                        <div class="bg-base-100 p-4 rounded-lg border border-base-300">
+                        <div class="bg-base-100 p-4 rounded-lg border border-base-300 min-w-0">
                             <h4 class="font-bold text-sm text-base-content mb-2 flex items-center">
                                 <span  class="iconify mr-2 text-warning" data-icon="carbon:chemistry" aria-hidden="true"></span> Build from a source checkout
                             </h4>
-                            <div class="bg-white p-3 rounded border border-base-300 font-mono text-xs text-charcoal-mid">
+                            <div class="bg-white p-3 rounded border border-base-300 font-mono text-xs text-charcoal-mid whitespace-nowrap overflow-x-auto [contain:inline-size]" tabindex="0">
                                 git clone https://github.com/leynos/netsuke.git<br>
-                                cd netsuke &amp;&amp; cargo install --path .
+                                cd netsuke<br>
+                                make install-build-tools &nbsp;# Linux only<br>
+                                export PATH="$HOME/.local/bin:$PATH"<br>
+                                cargo install --path .
                             </div>
                             <p class="mt-2 text-xs text-charcoal-mid">The checkout's <code>rust-toolchain.toml</code> selects the pinned nightly automatically, so no toolchain argument is passed here.</p>
+                            <p class="mt-2 text-xs text-charcoal-mid"><span class="font-mono text-warning-text">Since v0.1.0-beta4:</span> a checkout build also inherits the repository's build standard, which on Linux links with <code>mold</code>. Run <code>make install-build-tools</code> first; it unpacks the pinned <code>mold</code> (2.41.0) into <code>~/.local/bin</code> without touching a shell profile, so add that directory to <code>PATH</code> before <code>cargo install</code>. A distribution <code>mold</code> on <code>PATH</code> also works. Without one the link fails rather than falling back. macOS, Windows, and registry installs do not need <code>mold</code>.</p>
                         </div>
                         <div class="bg-base-100 p-4 rounded-lg border border-base-300">
                             <h4 class="font-bold text-sm text-base-content mb-2 flex items-center">
@@ -146,7 +150,7 @@ $ brew install ninja
                 <div class="p-8 lg:p-10 hidden" id="install-panel-windows" data-install-panel="windows" role="tabpanel" aria-labelledby="install-tab-windows">
                     <div class="mb-8">
                         <h3 class="font-serif text-2xl font-bold text-base-content mb-2">Windows installer</h3>
-                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{{ netsuke_version }}" class="hm-link">v{{ netsuke_version }} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts. On Windows, recipes run in Windows PowerShell by default; set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2 (see the <a href="/netsuke/docs/security/#recipe-shells" class="hm-link">recipe shell contract</a>). An MSI product version cannot carry a pre-release suffix, so every beta in the 0.1.0 series shares the numeric version <code>0.1.0</code>: installing a later pre-release MSI replaces the existing installation rather than sitting alongside it.</p>
+                        <p class="text-charcoal-mid text-sm">The <a href="https://github.com/leynos/netsuke/releases/tag/v{{ netsuke_version }}" class="hm-link">v{{ netsuke_version }} release</a> ships Windows Installer (<code>.msi</code>) packages for x64 and Arm64. The MSI installs to <code>C:\Program Files\netsuke</code> and does <strong>not</strong> update <code>PATH</code>. Ninja must be installed separately. PowerShell help files are published beside each MSI as sidecar artefacts. On Windows, recipes run in Windows PowerShell by default; set <code>NETSUKE_WINDOWS_SHELL=bash</code> to keep POSIX recipes running through Git Bash or MSYS2 (see the <a href="/netsuke/docs/security/#recipe-shells" class="hm-link">recipe shell contract</a>). An MSI product version cannot carry a pre-release suffix, so every beta in the 0.1.0 series, and the final 0.1.0, shares the numeric version <code>0.1.0</code>. Since v0.1.0-beta4, installing a later beta or the final release MSI replaces the existing installation rather than sitting alongside it.</p>
                     </div>
                     <div class="bg-base-content rounded-lg p-6 code-block-wrapper font-mono text-sm text-stone-light overflow-x-auto">
 {% highlight 'powershell' %}
@@ -295,14 +299,14 @@ $ netsuke build
                 <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                     <h3 class="font-bold text-base-content text-lg mb-2">Can I install a specific version?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +nightly-2026-08-23 install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{{ netsuke_version }}</code>, not <code>v{{ netsuke_version }}</code>). Pre-release versions such as <code>{{ netsuke_version }}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="hm-link">crates.io</a> for available versions.
+                        Yes. Use Cargo with the pinned nightly and a semantic version number: <code>cargo +{{ netsuke_rust_nightly }} install netsuke-build --version &lt;VERSION&gt;</code>. The version must be a number without a leading <code>v</code> (for example <code>{{ netsuke_version }}</code>, not <code>v{{ netsuke_version }}</code>). Pre-release versions such as <code>{{ netsuke_version }}</code> must be requested explicitly; Cargo does not select them by default. Check <a href="https://crates.io/crates/netsuke-build" class="hm-link">crates.io</a> for available versions.
                     </p>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                     <h3 class="font-bold text-base-content text-lg mb-2">How do I update Netsuke?</h3>
                     <p class="text-charcoal-mid leading-relaxed">
-                        Re-run <code>cargo binstall netsuke-build@&lt;VERSION&gt;</code> with the new version to fetch its prebuilt release, or run <code>cargo +nightly-2026-08-23 install netsuke-build --force</code> to rebuild from crates.io with the pinned nightly shown above. Either way the existing <code>netsuke</code> binary is replaced.
+                        Re-run <code>cargo binstall netsuke-build@&lt;VERSION&gt;</code> with the new version to fetch its prebuilt release, or run <code>cargo +{{ netsuke_rust_nightly }} install netsuke-build --force</code> to rebuild from crates.io with the pinned nightly shown above. Either way the existing <code>netsuke</code> binary is replaced.
                     </p>
                 </div>
 

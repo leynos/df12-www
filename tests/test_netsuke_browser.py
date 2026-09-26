@@ -23,6 +23,7 @@ from pathlib import Path
 
 import pytest
 
+from df12_pages.config import load_site_config
 from tests.support.netsuke_browser import (
     BASE_PATH,
     CASES,
@@ -53,6 +54,7 @@ if typ.TYPE_CHECKING:
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_NETSUKE = REPO_ROOT / "public" / SITE
+PAGES_YAML = REPO_ROOT / "config" / "pages.yaml"
 
 tools = load("weaver_snapshot_tools")
 document = load("weaver_snapshot_document")
@@ -192,6 +194,29 @@ MEASURE_RING = (
     "})())"
 )
 
+# The roadmap's "shipped" list carries the release marker: `.hm-chip
+# hm-chip--inline hm-chip--success`, both in the section's intro paragraph
+# and inside individual list items. `--inline` is the modifier that keeps a
+# chip from growing the line box it sits in.
+ROADMAP_PAGE = "roadmap/"
+
+#: Measure every inline chip under `#shipped`, together with its parent's
+#: computed line-height and font-size — the two properties `.hm-chip--inline`
+#: promises not to disturb.
+MEASURE_INLINE_CHIPS = """JSON.stringify(
+  Array.from(document.querySelectorAll('#shipped .hm-chip--inline')).map((chip) => {
+    const chipStyle = getComputedStyle(chip);
+    const parentStyle = getComputedStyle(chip.parentElement);
+    return {
+      chipHeight: chip.getBoundingClientRect().height,
+      parentLineHeight: parseFloat(parentStyle.lineHeight),
+      whiteSpace: chipStyle.whiteSpace,
+      chipFontSize: parseFloat(chipStyle.fontSize),
+      parentFontSize: parseFloat(parentStyle.fontSize),
+    };
+  })
+)"""
+
 
 @pytest.mark.timeout(300)
 @pytest.mark.parametrize("selector", SCROLLER_SHAPES)
@@ -272,6 +297,51 @@ def test_a_scrolling_code_region_shows_a_keyboard_focus_ring(
         f"{ring['ground']} it is drawn on, under the "
         f"{MINIMUM_RING_CONTRAST}:1 a focus indicator needs"
     )
+
+
+@pytest.mark.timeout(300)
+@pytest.mark.parametrize(
+    ("width", "height"),
+    [(MOBILE_WIDTH, MOBILE_HEIGHT), (DESKTOP_WIDTH, DESKTOP_HEIGHT)],
+)
+def test_an_inline_chip_does_not_grow_its_line(
+    drive: cabc.Callable[..., str], served: str, width: int, height: int
+) -> None:
+    """A "beta4" marker keeps the same leading as the text it sits beside.
+
+    `.hm-chip--inline` exists so that a chip dropped into running text —
+    the roadmap's "new in this release" marker, in the intro paragraph and
+    inside individual `#shipped` list items — does not push its line apart
+    from its neighbours. The default chip's padding and dot would otherwise
+    grow the line box; the inline modifier shrinks the type, drops the gap,
+    and sets its own tight leading so the chip stays shorter than the line
+    it sits in. Checked at both a phone width and a desktop one, since the
+    list reflows between them but the marker should not.
+    """
+    _open(drive, served, ROADMAP_PAGE, width, height)
+    chips = _evaluate(drive, MEASURE_INLINE_CHIPS)
+    assert chips, (
+        f"{BASE_PATH}{ROADMAP_PAGE} should carry at least one "
+        f"#shipped .hm-chip--inline for this check to mean anything"
+    )
+    for index, chip in enumerate(chips):
+        assert chip["chipHeight"] <= chip["parentLineHeight"], (
+            f"chip {index} on {BASE_PATH}{ROADMAP_PAGE} is "
+            f"{chip['chipHeight']}px tall, taller than its parent's "
+            f"{chip['parentLineHeight']}px line-height, so it would grow "
+            f"the line box"
+        )
+        assert chip["whiteSpace"] == "nowrap", (
+            f"chip {index} on {BASE_PATH}{ROADMAP_PAGE} has white-space "
+            f"{chip['whiteSpace']!r}, not nowrap, so it could wrap onto its "
+            f"own line"
+        )
+        assert chip["chipFontSize"] < chip["parentFontSize"], (
+            f"chip {index} on {BASE_PATH}{ROADMAP_PAGE} is "
+            f"{chip['chipFontSize']}px, not smaller than its parent's "
+            f"{chip['parentFontSize']}px, so it would not read as a small "
+            f"inline marker"
+        )
 
 
 @pytest.mark.timeout(900)
@@ -506,10 +576,41 @@ BASELINE = REPO_ROOT / "tests" / "support" / "netsuke_baseline.json"
 UPDATE_BASELINE = "NETSUKE_BASELINE_UPDATE"
 
 # What changes from build to build without the page changing: the forthcoming
-# pages stamp the build date into a heading, and every footer carries the
-# build year beside the copyright sign.
+# pages stamp the build date into a heading, every footer carries the build
+# year beside the copyright sign, and every page carries the release
+# version, release date, and Rust nightly configured in `pages.yaml`. The
+# first two have a fixed shape and are matched by pattern here; the release
+# values do not, so they are read from the real configuration below and
+# redacted by exact string match instead. Either way the redaction is
+# narrow on purpose: authored content that merely resembles one of these --
+# a PR number, an RFC number, a commit hash, another version mentioned on a
+# preview page -- is left alone, and its change still moves the digest, as
+# it should.
 BUILD_DATE = re.compile(r"Status on \d{1,2} [A-Z][a-z]+ \d{4}")
 COPYRIGHT_YEAR = re.compile(r"© \d{4} df12")
+
+
+def _release_redactions() -> tuple[tuple[str, str], ...]:
+    """Pair each per-release value from ``pages.yaml`` with its placeholder.
+
+    Read once from the real ``sites.netsuke.template_vars``, the same source
+    the rendered pages draw from, so a redaction never drifts from what is
+    actually stamped into the output. ``netsuke_version`` is redacted as its
+    bare value; a template that writes it with a literal ``v`` prefix (for
+    example ``v0.1.0-beta4``) still loses the version, because the bare
+    value is a substring of the prefixed one.
+
+    Returns
+    -------
+    tuple[tuple[str, str], ...]
+        Pairs of ``(value, placeholder)``, applied in order.
+    """
+    template_vars = load_site_config(PAGES_YAML).sites[SITE].template_vars
+    return (
+        (str(template_vars["netsuke_version"]), "<netsuke version>"),
+        (str(template_vars["netsuke_release_date"]), "<release date>"),
+        (str(template_vars["netsuke_rust_nightly"]), "<rust nightly>"),
+    )
 
 
 @pytest.fixture(scope="module", params=sorted(BASELINE_VIEWPORTS))
@@ -588,11 +689,30 @@ def test_the_capture_command_snapshots_every_netsuke_page(
 
 
 def _digest(snapshot: Path) -> str:
-    """Hash a snapshot's normalized tree, with the build date and year redacted."""
+    """Hash a snapshot's normalized tree, with the per-release values redacted.
+
+    The build date, the copyright year, and the release version, release
+    date, and Rust nightly configured in ``pages.yaml`` all change every
+    release without the page itself changing, so each is replaced with a
+    stable placeholder before hashing. Authored content that merely
+    resembles one of them -- a PR number, an RFC number, a commit hash,
+    another version mentioned on a preview page -- is deliberately left
+    hashed as-is: its change is a real change to the page.
+
+    This has a known limit. The normalized tree also carries each node's
+    bounding box, so a redacted value whose rendered length changes -- a
+    release date that grows a digit, say -- still moves the digest even
+    though the placeholder text does not. That is the case
+    ``NETSUKE_BASELINE_UPDATE=1`` exists for: a release bump re-records the
+    baseline, as described in
+    :func:`test_every_page_renders_as_the_committed_baseline`.
+    """
     rendered = BUILD_DATE.sub(
         "Status on <build date>", document._normalized_tree(snapshot)
     )
     rendered = COPYRIGHT_YEAR.sub("© <build year> df12", rendered)
+    for value, placeholder in _release_redactions():
+        rendered = rendered.replace(value, placeholder)
     return hashlib.sha256(rendered.encode("utf-8")).hexdigest()
 
 
@@ -610,9 +730,10 @@ def test_every_page_renders_as_the_committed_baseline(
     fails here by name; ``scripts/weaver_snapshot.py capture`` and ``diff``
     then show what moved, and once the change is meant, running this test
     with ``NETSUKE_BASELINE_UPDATE=1`` rewrites the record for the commit
-    that makes it. The build date the forthcoming pages stamp into a heading
-    and the build year in every footer are the accepted differences, and
-    both are redacted before hashing.
+    that makes it. The build date the forthcoming pages stamp into a heading,
+    the build year in every footer, and the release version, release date,
+    and Rust nightly configured in ``pages.yaml`` are the accepted
+    differences, and all are redacted before hashing.
     """
     name, out_dir = captured
     digests = {path.stem: _digest(path) for path in sorted(out_dir.glob("*.json"))}

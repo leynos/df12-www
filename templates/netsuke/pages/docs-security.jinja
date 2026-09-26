@@ -11,7 +11,7 @@
     <!-- Main Content Area with Sidebar -->
     <div class="site-container pt-16 grow flex">
 
-        {{ docsnav.sidebar('security', sub_links=[{'href': '#network-policy', 'label': 'Network policy'}, {'href': '#recipe-shells', 'label': 'Recipe shells'}, {'href': '#shell-dollars', 'label': 'Markers and shell dollars'}, {'href': '#security', 'label': 'Security model'}]) }}
+        {{ docsnav.sidebar('security', sub_links=[{'href': '#network-policy', 'label': 'Network policy'}, {'href': '#env-access', 'label': 'Environment access'}, {'href': '#resource-budgets', 'label': 'Resource budgets'}, {'href': '#file-reads', 'label': 'File reads'}, {'href': '#recipe-shells', 'label': 'Recipe shells'}, {'href': '#shell-dollars', 'label': 'Markers and shell dollars'}, {'href': '#security', 'label': 'Security model'}]) }}
 
         <!-- Main Content -->
         <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
@@ -20,7 +20,7 @@
             {{ chrome.breadcrumb([{'href': '/netsuke/docs/', 'label': 'Docs'}, {'label': 'Security Model'}]) }}
 
             {% call chrome.page_header('Reference', 'Security Model') %}
-                Validated structure, quoted path substitutions, a documented recipe-shell contract, and an auditable network policy for the <code>fetch()</code> helper. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>: Netsuke reduces common quoting mistakes, but it is not a sandbox.
+                Validated structure, quoted path substitutions, a documented recipe-shell contract, an auditable network policy for <code>fetch()</code>, an access policy for <code>env()</code>, and hard budgets on manifest evaluation and file reads. A <code>Netsukefile</code> deserves the same care as a <code>Makefile</code>: Netsuke reduces common quoting and exhaustion mistakes, but it is not a sandbox.
             {% endcall %}
 
             <section id="network-policy" class="mb-20">
@@ -56,6 +56,43 @@
                     </div>
                 </div>
 
+                <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs mb-8">
+                    <div class="flex flex-wrap items-center gap-3 mb-2">
+                        <code class="text-accent-text font-bold font-mono text-sm">--trust-project-fetch-policy</code>
+                        <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                    </div>
+                    <p class="text-xs text-charcoal-mid">Allow project configuration to widen fetch-policy grants. The same opt-in is <code>trust_project_fetch_policy = true</code> in system or user configuration, or <code>NETSUKE_TRUST_PROJECT_FETCH_POLICY=true</code>. It is read only from operator-controlled layers, so no project file can authorize itself.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="flex flex-wrap items-center gap-3 mb-3">
+                            <h3 class="font-bold text-base-content text-sm">Project configuration only narrows</h3>
+                            <span class="text-xs font-mono text-warning-text bg-warning/10 px-2 py-1 rounded">Breaking in v0.1.0-beta4</span>
+                        </div>
+                        <p class="text-xs text-charcoal-mid mb-2">Fetch policy does not follow ordinary configuration precedence. System and user configuration, <code>NETSUKE_</code> variables, and CLI flags are <em>operator</em> policy; the primary project <code>.netsuke.toml</code> is an untrusted project request.</p>
+                        <ul class="space-y-1.5 text-xs text-charcoal-mid list-disc pl-4">
+                            <li>A project <code>fetch_default_deny = true</code> turns default-deny on; <code>false</code> cannot turn an operator's default-deny off.</li>
+                            <li>Project <code>fetch_block_host</code> entries accumulate with every other layer, and a block always beats an allow.</li>
+                            <li>Project <code>fetch_allow_scheme</code> and <code>fetch_allow_host</code> entries are ignored unless the operator has opted in. With the opt-in they are appended to the operator's own.</li>
+                            <li>Files loaded through <code>extends</code> are not quarantined and keep ordinary file-layer precedence.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <div class="flex flex-wrap items-center gap-3 mb-3">
+                            <h3 class="font-bold text-base-content text-sm">Every redirect is rechecked</h3>
+                            <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                        </div>
+                        <p class="text-xs text-charcoal-mid mb-2"><code>fetch()</code> applies the policy to the URL it was given and to every redirect destination before opening a connection. An HTTPS-to-HTTP redirect succeeds only when <code>http</code> is explicitly allowed and the destination host passes too.</p>
+                        <ul class="space-y-1.5 text-xs text-charcoal-mid list-disc pl-4">
+                            <li><code>301</code>, <code>302</code>, <code>303</code>, <code>307</code>, and <code>308</code> are followed with GET semantics; relative <code>Location</code> values resolve against the current URL.</li>
+                            <li>Chains stop after five redirects. A repeated destination, a missing or invalid <code>Location</code>, and a refused destination each fail with their own localized diagnostic.</li>
+                            <li>URL credentials are dropped when a redirect changes origin, and redirect diagnostics never print userinfo.</li>
+                            <li>With <code>cache=true</code> the entry is keyed on the original URL; a miss rechecks every hop before storing the body, and a hit makes no request.</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div class="bg-base-content rounded-xl overflow-hidden">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Restricting fetch to a single host</div>
                     {% highlight 'netsuke-console' %}
@@ -65,6 +102,151 @@ $ netsuke \
   --fetch-block-host internal.example.com \
   build
 {% endhighlight %}
+                </div>
+            </section>
+
+            <section id="env-access" class="mb-20 pt-10 border-t border-stone-light">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
+                        <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:locked" aria-hidden="true"></span> Manifest environment access
+                    </h2>
+                    <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                </div>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    <code>env()</code> reads process environment variables while a manifest renders. Two lists of exact variable names decide which it may read. With neither list configured, <code>env()</code> stays default-allow, so existing manifests behave as before.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content text-sm mb-2">Configuration file</h3>
+                        <div class="bg-base-content rounded-lg p-3 overflow-x-auto [contain:inline-size]" tabindex="0">
+{% highlight 'toml' %}
+env_allow_var = ["CI", "PACKAGE_REGISTRY_TOKEN"]
+env_block_var = ["AWS_SECRET_ACCESS_KEY"]
+{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content text-sm mb-2">Environment (JSON arrays)</h3>
+                        <div class="bg-base-content rounded-lg p-3 overflow-x-auto [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke-console' %}
+NETSUKE_ENV_ALLOW_VAR='["CI"]'
+NETSUKE_ENV_BLOCK_VAR='["GITHUB_TOKEN"]'
+{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content text-sm mb-2">CLI (one name, repeatable)</h3>
+                        <div class="bg-base-content rounded-lg p-3 overflow-x-auto [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke-console' %}
+$ netsuke --env-allow-var CI \
+    --env-block-var GITHUB_TOKEN build
+{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs mb-6">
+                    <h3 class="font-bold text-base-content mb-3 text-sm">How the lists combine</h3>
+                    <ul class="space-y-2 text-xs text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-primary mt-0.5 mr-2 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>One effective <code>env_allow_var</code> entry makes the allowlist restrictive: only listed names resolve.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-0.5 mr-2 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>An <code>env_block_var</code> list on its own blocks only its listed names. A block always overrides an allow.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-0.5 mr-2 text-xs shrink-0" data-icon="carbon:checkmark" aria-hidden="true"></span> <span>Every entry is one exact name. There are no globs or patterns.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs shrink-0" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span><code>env_allow_var</code> entries in the primary project <code>.netsuke.toml</code> are removed before the policy is composed, so a checkout cannot grant itself access or switch on default-deny. Project <code>env_block_var</code> entries still count, because they can only restrict. Files loaded through <code>extends</code> keep ordinary precedence.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs shrink-0" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>A refused lookup fails with &ldquo;Access to an environment variable is blocked.&rdquo; The <code>netsuke_manifest_env_lookups_total</code> counter records each lookup by <code>outcome</code> (<code>success</code>, <code>blocked</code>, <code>not_present</code>, <code>not_unicode</code>) and never the name.</span></li>
+                    </ul>
+                </div>
+                <p class="text-xs text-charcoal-mid max-w-3xl">
+                    The policy reduces how many secrets reach rendered manifest fields. It does not make rendered manifests safe to log; an allowed value still needs the usual output discipline. Full detail is in the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#control-manifest-environment-access" class="hm-link">users' guide</a>.
+                </p>
+            </section>
+
+            <section id="resource-budgets" class="mb-20 pt-10 border-t border-stone-light">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
+                        <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:meter" aria-hidden="true"></span> Resource budgets
+                    </h2>
+                    <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                </div>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    Netsuke bounds every manifest evaluation before it runs a build command or answers <code>help targets</code>. Each limit is a configuration key with a matching <code>NETSUKE_</code> variable (the key in upper case) and a <code>--manifest-*</code> flag.
+                </p>
+
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Key and flag</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Default</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Bounds</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows text-xs text-charcoal-mid">
+{%- for key, default, meaning in [
+    ('manifest_evaluation_fuel', '1,000,000', 'MiniJinja instructions for one evaluation'),
+    ('manifest_fuel', '100,000,000', 'MiniJinja instructions for the whole manifest'),
+    ('manifest_rendered_value_bytes', '1 MiB', 'Bytes emitted by one rendered value'),
+    ('manifest_rendered_manifest_bytes', '16 MiB', 'Bytes emitted across all rendered values'),
+    ('manifest_source_bytes', '4 MiB', 'Template and macro-import source consumed'),
+    ('manifest_foreach_cardinality', '10,000', 'Values consumed from one foreach iterator'),
+    ('manifest_expanded_entries', '50,000', 'Targets and actions emitted by expansion'),
+] %}
+                            <tr>
+                                <td class="px-4 py-3 font-mono"><code class="text-primary">{{ key }}</code><br><code>--{{ key | replace('_', '-') }}</code><br><code>NETSUKE_{{ key | upper }}</code></td>
+                                <td class="px-4 py-3 font-mono whitespace-nowrap">{{ default }}</td>
+                                <td class="px-4 py-3">{{ meaning }}</td>
+                            </tr>
+{%- endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">Who may change a limit</h3>
+                        <p class="text-xs text-charcoal-mid">Set budgets in trusted configuration, the environment, or on the command line. A project <code>.netsuke.toml</code>, including its <code>extends</code> chain, may lower a ceiling but never raise one set by the defaults, user configuration, the environment, or the CLI. Zero, negative, or unparsable values are configuration errors, not silently ignored.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-3 text-sm">What a breach looks like</h3>
+                        <p class="text-xs text-charcoal-mid">The failure reads <code>Manifest resource budget exhausted</code> with the stage and the numeric limit &mdash; never template text, context values, or rendered secrets. In JSON output its code is <code>netsuke::runner::manifest_budget_exceeded</code>.</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
+                    <span class="iconify text-primary mt-1 mr-3 shrink-0" data-icon="carbon:information" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">Budgets reduce exhaustion exposure; they do not remove it. MiniJinja materializes a macro result before its size can be checked, so a macro can allocate past the per-value ceiling before the limit is reported. <a href="https://github.com/leynos/netsuke/blob/main/docs/adr-018-bound-manifest-template-evaluation.md" class="hm-link">ADR-018</a> records the gap. Separately, MiniJinja 2.24.0 refuses a single repeated string above 100 MB with <code>repeated string is too large</code>.</p>
+                </div>
+            </section>
+
+            <section id="file-reads" class="mb-20 pt-10 border-t border-stone-light">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <h2 class="font-serif text-2xl font-bold text-base-content flex items-center">
+                        <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:document-protected" aria-hidden="true"></span> Bounded file reads
+                    </h2>
+                    <span class="text-xs font-mono text-warning-text bg-warning/10 px-2 py-1 rounded">Breaking in v0.1.0-beta4</span>
+                </div>
+                <p class="text-charcoal-mid mb-8 max-w-3xl">
+                    The <code>contents</code>, <code>linecount</code>, <code>hash</code>, and <code>digest</code> filters share one read policy, so a checkout entry cannot exhaust Netsuke's memory or wedge a render.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">8 MiB per read</h3>
+                        <p class="text-xs text-charcoal-mid">The default budget matches the <code>fetch()</code> response limit. A call may pass <code>max_bytes</code> to lower it; a larger value is clamped to the ceiling. An oversized file fails with a diagnostic naming the path and the limit, never the contents. There is no configuration key or flag for the ceiling in v0.1.0-beta4; programs embedding Netsuke set it with <code>StdlibConfig::with_file_max_read_bytes</code>.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">No final symlink</h3>
+                        <p class="text-xs text-charcoal-mid">A symbolic link as the last path component is refused; a symlinked directory earlier in the path is fine. On Windows every reparse point is refused: junctions, mount points, and placeholder tags too. <code>follow_symlinks=true</code> waives only that check. A link whose target is written as an absolute path is still refused, because the workspace capability tests the link target, not where it resolves.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Regular files only</h3>
+                        <p class="text-xs text-charcoal-mid">A FIFO or device node is refused once opened; on Unix the open is non-blocking, so a FIFO cannot stall the render first. <code>contents</code> and <code>linecount</code> also require UTF-8; <code>hash</code> and <code>digest</code> accept any bytes.</p>
+                    </div>
+                </div>
+                <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+{% highlight 'netsuke' %}{% raw %}
+vars:
+  version: "{{ 'generated/version.txt' | contents(follow_symlinks=true) }}"
+  header_sum: "{{ 'fixtures/header.bin' | hash(max_bytes=1024) }}"
+{% endraw %}{% endhighlight %}
                 </div>
             </section>
 
@@ -115,7 +297,7 @@ netsuke build
                     <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:currency-dollar" aria-hidden="true"></span> Markers and shell dollars
                 </h2>
                 <p class="text-charcoal-mid mb-8 max-w-3xl">
-{% raw %}                    <code>{{ ins }}</code> and <code>{{ outs }}</code> are the only Netsuke markers for input and output paths, and the only values that are automatically shell-quoted. Everything else a template renders is ordinary command text. Since v0.1.0-beta3, shell dollar expressions are written normally: Netsuke lowers the markers first and only then escapes literal dollars as <code>$$</code> in the generated Ninja file, so the shell receives them unchanged.
+{% raw %}                    <code>{{ ins }}</code> and <code>{{ outs }}</code> are the only Netsuke markers for input and output paths, and the only values that are automatically shell-quoted. Everything else a template renders is ordinary command text. Since v0.1.0-beta3, shell dollar expressions are written normally: Netsuke lowers the markers first and only then escapes literal dollars as <code>$$</code> in the generated Ninja file, so the shell receives them unchanged. Since v0.1.0-beta4 that holds in <code>script:</code> recipes too: <code>$in</code>, <code>$out</code>, <code>$ins</code>, and <code>$outs</code> are ordinary shell variables in both <code>command:</code> and <code>script:</code>.
 {% endraw %}                </p>
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
@@ -133,12 +315,13 @@ targets:
                         <p class="text-xs text-charcoal-mid mt-3"><code>$CC</code>, <code>$CFLAGS</code>, and <code>$HOSTNAME</code> reach <code>/bin/sh</code> as literal shell variables. On the PowerShell route, write <code>$env:CC</code> instead; PowerShell does not perform POSIX <code>${VAR:-default}</code> expansion.</p>
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
-                        <h3 class="font-bold text-base-content mb-3 text-sm">Migrating a beta2 manifest</h3>
+                        <h3 class="font-bold text-base-content mb-3 text-sm">Migrating a beta2 or beta3 manifest</h3>
                         <ul class="space-y-2 text-xs text-charcoal-mid">
                             <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace the historical spelling <code>$$PATH</code> with <code>$PATH</code>. On POSIX and Bash routes <code>$$</code> is the shell's process identifier; in PowerShell it is the last token of the previous command, so the extra dollar now changes the result.</span></li>
-{% raw %}                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace any <code>$in</code> or <code>$out</code> placeholder with <code>{{ ins }}</code> or <code>{{ outs }}</code>. Literal <code>$ins</code> and <code>$outs</code> remain ordinary shell variables.</span></li>
+{% raw %}                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Replace any <code>$in</code> or <code>$out</code> path placeholder with <code>{{ ins }}</code> or <code>{{ outs }}</code>. Beta3 still rewrote them in <code>script:</code> recipes; since v0.1.0-beta4 they reach the shell as ordinary variables there too, as <code>$ins</code> and <code>$outs</code> always have.</span></li>
 {% endraw %}                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>On POSIX and Bash routes a marker may appear unquoted, single-quoted, or double-quoted, but not inside a command substitution or backticks. In PowerShell, use markers unquoted; quoted and command-substitution sites are rejected.</span></li>
-                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Build and default-target paths reject <code>$</code>, spaces, colons, <code>|</code>, and control characters; emitted metadata such as descriptions rejects newlines and NUL.</span></li>
+                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>Build and default-target paths escape a space as <code>$&nbsp;</code>, Ninja's own path escape. They reject <code>|</code> and control characters, which Ninja cannot represent, and also <code>$</code> and colons, which Ninja could escape but Netsuke does not yet accept.</span></li>
+                            <li class="flex items-start"><span class="iconify text-warning mt-0.5 mr-2 text-xs" data-icon="carbon:warning-alt" aria-hidden="true"></span> <span>A literal <code>$</code> in a <code>description</code>, <code>depfile</code>, <code>deps</code>, or <code>pool</code> is doubled, so it prints as written: a description of <code>CC $out</code> shows <code>CC $out</code>, not the output path. Newline, carriage return, and NUL are rejected in those fields.</span></li>
                         </ul>
                     </div>
                 </div>
@@ -194,6 +377,23 @@ targets:
                             <div class="mt-2 text-sm text-charcoal-mid space-y-2">
                                 <p>Since v0.1.0-beta2, the filesystem capability used for <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">glob()</code> metadata checks is opened at the pattern's longest literal directory prefix &mdash; not at the filesystem root or the working directory &mdash; so glob expansion holds only the authority its pattern can reach. Since v0.1.0-beta3, the Jinja helper also rejects any matched path that is not a portable unquoted shell word, so an untrusted checkout filename cannot become shell syntax when <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">item</code> is interpolated into a recipe.</p>
                                 <p>A pattern whose literal prefix is missing, or names something other than a directory, expands to no matches. A match reached through a symbolic link that resolves outside the prefix, or dangles, is skipped rather than failing the expansion; a cyclic symbolic link still fails it, and a literal prefix that is itself a symbolic link cannot establish the capability, so the expansion fails. Glob tracing redacts caller-controlled path fields as <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">&lt;redacted&gt;</code>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-base-100 border-l-4 border-primary p-6 rounded-r-lg mb-12">
+                    <div class="flex">
+                        <div class="shrink-0">
+                            <span class="iconify text-primary mt-1" data-icon="carbon:view-off" aria-hidden="true"></span>
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <h3 class="text-sm font-bold text-base-content">Manifest content stays out of logs</h3>
+                                <span class="text-xs font-mono text-success-text bg-success/10 px-2 py-1 rounded">Since v0.1.0-beta4</span>
+                            </div>
+                            <div class="mt-2 text-sm text-charcoal-mid space-y-2">
+                                <p>At <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">DEBUG</code> and <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">TRACE</code>, graph-generation tracing no longer emits the manifest AST, target or dependency names, recipe commands, variable values, macro bodies, or paths. What remains is bounded: a span, fixed <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">recipe_shell</code>, <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">outcome</code>, and <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">error_category</code> fields, and count-only metrics. There is no replacement log, because rendered values can carry secrets that <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">env()</code> interpolated. Anyone who scraped <code class="font-mono bg-white px-1 py-0.5 rounded border border-base-300">--verbose</code> output for manifest detail needs another route.</p>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,401 @@
+{% extends "doc_page.jinja" %}
+{% import "chrome.jinja" as chrome %}
+{% import "components.jinja" as ui %}
+{% import "forthcoming_data.jinja" as fc %}
+{% block page_title %}Reusable Modules (Forthcoming) - Netsuke Build System{% endblock %}
+{% block content %}
+{% set rfc = 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/' %}
+{% set rc = 'https://github.com/leynos/netsuke/blob/main/docs/roadmap-composition.md' %}
+
+    <div class="site-container pt-16 grow flex">
+
+        {{ fc.sidebar('modules') }}
+
+        <!-- Main Content -->
+        <main id="main-content" class="hm-docs-content flex-1 min-w-0 py-12 px-4 sm:px-6 lg:px-12">
+
+            {% call fc.header('modules') %}
+                    Reusing a Netsukefile has two routes today: copy it into the next repository and watch the
+                    copies drift, or push the work into shell scripts and lose the graph. &ldquo;Reusable modules&rdquo; is this site&rsquo;s
+                    umbrella for what Netsuke&rsquo;s design calls <em>manifest composition</em>: repository-relative <em>includes</em>,
+                    versioned local <em>bundles</em>, and digest-pinned external bundles. One rule runs through all three &mdash; composition
+                    order is explicit, stable, and incapable of silently replacing a declaration.
+            {% endcall %}
+
+            <section id="status" class="mb-16">
+                <div class="bg-warning/5 border border-warning/30 rounded-xl p-6">
+                    <h2 class="font-bold text-base-content text-sm uppercase tracking-wide mb-3 flex items-center">
+                        <span class="iconify text-warning mr-2" data-icon="carbon:information-filled" aria-hidden="true"></span> Status on {{ generated_at.day }} {{ generated_at.strftime('%B %Y') }}
+                    </h2>
+                    <ul class="space-y-2 text-sm text-charcoal-mid">
+                        <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> Nothing is implemented. The released manifest rejects unknown top-level keys, so an <code>includes:</code> or <code>bundles:</code> key is an error today. Every task in phases 16 to 19 of the <a href="{{ rc }}" class="hm-link">composition roadmap</a> is unticked.</span></li>
+                        <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:document" aria-hidden="true"></span> <span><strong>Proposed.</strong> <a href="{{ rfc }}0002-repository-relative-includes.md" class="hm-link">RFC 0002</a>, <a href="{{ rfc }}0003-versioned-local-bundles.md" class="hm-link">RFC 0003</a>, and <a href="{{ rfc }}0004-digest-pinned-external-bundles.md" class="hm-link">RFC 0004</a> were written on 26 August 2026 and merged as documents in pull request <a href="https://github.com/leynos/netsuke/pull/600" class="hm-link">#600</a>. They stay proposed until the roadmap&rsquo;s explicit acceptance tasks complete, and some details below are still open.</span></li>
+                        <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs" data-icon="carbon:tag" aria-hidden="true"></span> <span><strong>Preview targeted at v0.2.0 &mdash; the local layers.</strong> Issue <a href="https://github.com/leynos/netsuke/issues/593" class="hm-link">#593</a> says v0.2.0 should at minimum accept the whole RFC sequence and implement the local composition foundation. External Git acquisition may be staged later if its transport, cache, and verification work would delay the local spine. The roadmap promises no dates.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:help" aria-hidden="true"></span> <span><strong>Undecided.</strong> Who writes and maintains the bundles people will actually use is open in issue <a href="https://github.com/leynos/netsuke/issues/784" class="hm-link">#784</a>: nobody has committed to shipping official bundles. The lock file&rsquo;s name and schema are also undecided.</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="why" class="mb-16">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:idea" aria-hidden="true"></span> Why composition, and why three layers
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    The only reuse a manifest has today is the <code>macros</code> key: named <a href="/netsuke/docs/templating/" class="hm-link">Jinja macros</a>
+                    registered before other fields render, visible within that one file. Macros cut repetition inside a manifest; they draw no
+                    source-file boundaries. Meanwhile the same groups recur across repositories &mdash; Rust formatting, Clippy, rustdoc, and tests;
+                    Python formatting, linting, type checks, and tests; release, audit, spelling, and documentation gates; feature-lane matrices.
+                    Jinja&rsquo;s own <code>include</code> and <code>import</code> were considered and rejected: they evaluate too late, mix source
+                    composition with value rendering, and could make a metadata query execute build-time helpers.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Includes &middot; RFC 0002</h3>
+                        <p class="text-xs text-charcoal-mid">Split one large Netsukefile into reviewable local files, with optional namespaces, without changing the graph and without letting file order decide which declaration wins.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Local bundles &middot; RFC 0003</h3>
+                        <p class="text-xs text-charcoal-mid">Package a quality gate with a version, typed parameters, and a public surface. Copying fragments between repositories loses version identity; a bundle keeps it.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">External bundles &middot; RFC 0004</h3>
+                        <p class="text-xs text-charcoal-mid">Consume a reviewed upstream release from Git instead of vendoring each update, without trusting a movable tag or touching the network during a build.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Each layer is useful alone, and the order is normative: local includes first, local bundles second, networked acquisition
+                    only later. None of the three is required; a manifest with no <code>includes</code> behaves exactly as it does now.
+                </p>
+            </section>
+
+            <section id="includes" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:document-multiple-01" aria-hidden="true"></span> Repository-relative includes
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    An include names a fragment by a literal path relative to the including file. An optional <code>as</code> puts the
+                    fragment&rsquo;s named rules, targets, and actions in a namespace, so <code>lint</code> in the fragment below becomes
+                    <code>rust_quality::lint</code>; references inside the fragment are rewritten before cross-fragment resolution. An unnamespaced
+                    include contributes its declarations directly and is correspondingly more likely to collide.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono text-charcoal-mid mb-2">Proposed syntax, RFC 0002 §§5&ndash;5.1</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                            {% highlight 'netsuke' %}{% raw %}
+includes:
+  - path: build/netsuke/release.yaml
+  - path: build/netsuke/rust-quality.yaml
+    as: rust_quality
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono text-charcoal-mid mb-2">Illustrative metadata fields, RFC 0002 §11</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                            {% highlight 'json' %}{% raw %}
+{
+  "name": "rust_quality::lint",
+  "source": "build/netsuke/rust-quality.yaml",
+  "namespace": "rust_quality"
+}
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-8" tabindex="0">
+                    <table class="min-w-full hm-rows prop-table">
+                        <thead class="bg-base-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Question</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-base-content uppercase tracking-wider">Proposed answer</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white hm-rows">
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-base-content">In what order?</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Depth-first post-order. For a root <code>R</code> including <code>A</code> then <code>B</code>, where <code>A</code> includes <code>C</code>, the order is <code>C, A, B, R</code> &mdash; never directory iteration, hash-map, or filesystem metadata order.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-base-content">Does a later file win?</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">No. Order does not imply replacement. A duplicate name is an error naming both sources, their spans, and their include chains, with a remedy: add <code>as</code>, rename one, or extract a bundle. Variables are never deep-merged.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-base-content">Cycles and repeats?</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">A cycle is an error that prints the chain; the same file included twice, even through another spelling or a symlink, is an error.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-base-content">Which paths?</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Literal strings opened through the workspace capability. Absolute paths, workspace escapes, globs, Jinja, <code>env()</code>, <code>glob()</code>, and network sources are rejected.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-base-content">What does discovery run?</td>
+                                <td class="px-6 py-4 text-sm text-charcoal-mid">Nothing. <code>netsuke help targets</code> and JSON metadata resolve and parse includes, and show each declaration&rsquo;s origin, but never render or execute recipe fields.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Roadmap: phase 16 &mdash; <a href="{{ rc }}#161-load-each-local-composition-unit-once-through-a-capability" class="hm-link">16.1 loading each unit once</a>,
+                    <a href="{{ rc }}#162-preserve-declaration-meaning-through-composition-and-rendering" class="hm-link">16.2 preserving declaration meaning</a>, and
+                    <a href="{{ rc }}#163-make-local-extraction-usable-in-builds-and-metadata-queries" class="hm-link">16.3 builds and metadata queries</a>.
+                    Task 16.1.1 still has to settle how a namespaced fragment&rsquo;s variables are projected; the RFC requires only that it stay a typed namespace.
+                </p>
+            </section>
+
+            <section id="bundles" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:package" aria-hidden="true"></span> Versioned local bundles
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A bundle is a directory with a strictly parsed descriptor, <code>NetsukeBundle.yaml</code>, beside its own manifest and
+                    fragments. The descriptor is not a build manifest: it names the bundle, versions it, lists every runtime resource its recipes
+                    use, declares typed parameters, and lists exports. Everything not exported is private. Consumers cannot reach past an exported
+                    entry point to the declarations behind it, and a bundle cannot read the importer&rsquo;s unrelated variables.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono text-charcoal-mid mb-2">Bundle descriptor, trimmed from RFC 0003 §4</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                            {% highlight 'yaml' %}{% raw %}
+bundle:
+  name: df12.rust-quality
+  version: 1.4.2
+  manifest: Netsukefile.bundle.yaml
+  runtime_resources: []
+
+parameters:
+  features:
+    type: sequence<string>
+    default: []
+
+exports:
+  actions:
+    - lint
+    - test
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono text-charcoal-mid mb-2">Proposed import, RFC 0003 §5.1</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                            {% highlight 'netsuke' %}{% raw %}
+bundles:
+  - name: df12.rust-quality
+    source:
+      path: build/bundles/rust-quality
+    version: "=1.4.2"
+    as: rust
+    with:
+      cargo: cargo
+      features:
+        - serde
+        - tracing
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid mb-8 max-w-3xl">
+                    The <code>df12.rust-quality</code> name is the RFC&rsquo;s worked example, not a published bundle. Exported <code>lint</code>
+                    under <code>as: rust</code> becomes <code>rust::lint</code>, and the same bundle may be instantiated twice under distinct namespaces.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Typed parameters</h3>
+                        <p class="text-xs text-charcoal-mid"><code>string</code>, <code>bool</code>, <code>integer</code>, <code>path</code>, <code>sequence&lt;string&gt;</code>, <code>sequence&lt;path&gt;</code>, and <code>mapping&lt;string, string&gt;</code>. No default means required; an unknown parameter is an error; values are validated before any Jinja evaluates, then read inside the bundle as <code>bundle.params</code>. The same contract is meant to serve root manifest inputs &mdash; see <a href="{{ fc.href('typed-inputs') }}" class="hm-link">Typed Inputs</a>, which forbids a rival parameter system.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Catalogue selection</h3>
+                        <p class="text-xs text-charcoal-mid">Instead of <code>source.path</code>, a <code>source.catalogue</code> directory holds candidate versions, and a requirement such as <code>"^1.4"</code> selects the highest satisfying version. Directory names are hints only; malformed candidates fail closed; a tie is an ambiguity error. Pre-release ordering is not settled: the RFC&rsquo;s prose and its own example disagree, and task 17.1.1 must reconcile them.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Content digests and locks</h3>
+                        <p class="text-xs text-charcoal-mid">A SHA-256 digest covers every graph-reachable file and declared resource, by bundle-relative path, mode, and exact bytes &mdash; not timestamps, owners, or <code>.git</code> &mdash; so relocating a bundle keeps its digest. A lock record binds the selection; CI and release builds require it to match, and editing files without bumping the version shows up as a digest mismatch.</p>
+                    </div>
+                </div>
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start mb-6">
+                    <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
+                    <p class="text-xs text-charcoal-mid">
+                        <strong>Still open.</strong> The lock file&rsquo;s name and schema, the canonical tree and parameter encodings, and the
+                        command spellings. RFC 0003 sketches conceptual <code>bundle</code> subcommands for listing, inspecting, updating, and
+                        verifying, but its <code>inspect</code> must first be reconciled with the CLI&rsquo;s canonical <code>get</code>, so none is
+                        shown here as final. Local resolution never consults Git: the same files resolve the same way whether or not <code>.git</code> is present.
+                    </p>
+                </div>
+                <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">
+                    A bundle&rsquo;s recipes keep exactly the execution capabilities of ordinary recipes; provenance does not make an unsafe
+                    command safe. Task 17.4.4 joins bundles to the <a href="{{ fc.href('structured-commands', 'shells') }}" class="hm-link">structured-command track</a>:
+                    process directories stay anchored to the importing workspace rather than the fragment or cache, and bundle content may not add
+                    shell definitions or replace a resolved shell through <code>PATH</code>, bindings, or placement.
+                </p>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Roadmap: phase 17 &mdash; <a href="{{ rc }}#171-fix-bundle-identity-and-parameter-meaning-before-instantiation" class="hm-link">17.1 identity and parameters</a>,
+                    <a href="{{ rc }}#172-instantiate-local-bundles-without-exposing-private-declarations" class="hm-link">17.2 private instantiation</a>,
+                    <a href="{{ rc }}#173-bind-local-selections-to-exact-content-and-explicit-lock-changes" class="hm-link">17.3 content and locks</a>, and
+                    <a href="{{ rc }}#174-validate-reusable-bundles-and-their-execution-context-boundary" class="hm-link">17.4 validation and the execution boundary</a>.
+                </p>
+            </section>
+
+            <section id="external" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:locked" aria-hidden="true"></span> Digest-pinned external bundles
+                </h2>
+                <div class="bg-warning/5 border border-warning/30 rounded-lg p-5 flex items-start mb-6">
+                    <span class="iconify text-warning mt-1 mr-3" data-icon="carbon:time" aria-hidden="true"></span>
+                    <p class="text-sm text-charcoal-mid">
+                        <strong>May land after v0.2.0.</strong> RFC 0004 may be accepted during v0.2.0 design work, but external acquisition
+                        itself may ship later than the local layers. Phase 18 starts only once includes and local bundles are stable.
+                    </p>
+                </div>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    An external source names a Git URL, exactly one of a <code>tag</code> or a full <code>commit</code>, an optional
+                    <code>subdir</code>, and a mandatory <code>digest</code>. A tag is a discovery handle, not the trust anchor: the lock record and
+                    the canonical content digest bind the bytes. Branches, <code>HEAD</code>, default branches, abbreviated commit IDs, and
+                    version-only references are rejected, and a tag that later resolves to a different object fails verification even when the
+                    bundle digest is unchanged &mdash; retagging is treated as a provenance event, not shrugged off.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-6 mb-4">
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono text-charcoal-mid mb-2">Proposed syntax, RFC 0004 §5 (<code>with</code> omitted)</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                            {% highlight 'netsuke' %}{% raw %}
+bundles:
+  - source:
+      git:
+        url: https://github.com/df12/netsuke-bundles.git
+        tag: rust-quality/v1.4.2
+        subdir: bundles/rust-quality
+        digest: sha256:4e9f2d...
+    name: df12.rust-quality
+    version: "=1.4.2"
+    as: rust
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-mono text-charcoal-mid mb-2">Provenance output, RFC 0004 §15</p>
+                        <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
+                            {% highlight 'text' %}{% raw %}
+rust: df12.rust-quality 1.4.2
+  git tag rust-quality/v1.4.2
+  commit 8c5e4e6d76d75de67f66f09cb2c63d69d2e14f84
+  digest sha256:4e9f2d...
+  lock verified, cache hit
+{% endraw %}{% endhighlight %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-charcoal-mid mb-8 max-w-3xl">
+                    The <code>df12/netsuke-bundles</code> repository is illustrative, taken from the RFC&rsquo;s examples. It does not exist as a
+                    published source, and whether any official bundles will is the open question in issue #784.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">One command touches the network</h3>
+                        <p class="text-xs text-charcoal-mid">Builds and metadata queries, <code>netsuke help targets</code> included, are cache-only in every mode: they never fetch, never publish a cache entry, and never update a lock. <code>netsuke bundle fetch</code> is the sole command allowed to acquire, and it changes a lock only when given <code>--update-lock</code>. A cache miss is a typed diagnostic naming the namespace and expected digest.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Hardened acquisition</h3>
+                        <p class="text-xs text-charcoal-mid">No shell pipelines; Git hooks, filters, submodules, and LFS smudging disabled; credentials in URLs rejected and redacted everywhere; bounded transfers. Cache entries are content-addressed, written atomically, and re-verified on every use. Signed tags would be additive, never a substitute for the digest, and their policy is deferred to phase 19.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Roadmap: phase 18 &mdash; <a href="{{ rc }}#181-establish-one-explicit-and-bounded-acquisition-boundary" class="hm-link">18.1 the acquisition boundary</a>,
+                    <a href="{{ rc }}#182-verify-exact-git-objects-as-ordinary-bundle-content" class="hm-link">18.2 exact Git objects</a>,
+                    <a href="{{ rc }}#183-make-cached-provenance-trustworthy-without-granting-write-authority" class="hm-link">18.3 cached provenance</a>, and
+                    <a href="{{ rc }}#184-deliver-explicit-acquisition-and-reproduce-builds-offline" class="hm-link">18.4 offline reproduction</a>; then
+                    <a href="{{ rc }}#191-evaluate-extensions-only-against-recorded-consumer-needs" class="hm-link">19.1</a>, which decides extensions
+                    such as signed-tag policy only against recorded consumer needs.
+                </p>
+            </section>
+
+            <section id="shallow-end" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:flow" aria-hidden="true"></span> From the shallow end
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    A single Netsukefile stays a complete, supported manifest. Manifests without <code>includes</code> keep their current
+                    behaviour, and the new keys arrive behind an additive manifest-format minor version, so an older Netsuke rejects them cleanly
+                    rather than misreading them. Each step below is optional.
+                </p>
+                <ol class="space-y-4 mb-6 max-w-3xl">
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">1. Split the monolith into includes</h3>
+                        <p class="text-xs text-charcoal-mid">Move one group into a fragment, add a literal include, add <code>as</code> if names collide, update references, and compare graph and help snapshots before deleting the originals. Because duplicates are errors, the copied and extracted versions cannot both stay active by accident.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">2. Turn a fragment into a local bundle</h3>
+                        <p class="text-xs text-charcoal-mid">Add a descriptor, give it a name and version, replace reads of importer variables with declared parameters, list the exports, import it under a namespace, and generate the lock record.</p>
+                    </li>
+                    <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-1 text-sm">3. Swap a vendored bundle for an external one</h3>
+                        <p class="text-xs text-charcoal-mid">Publish it unchanged under a reviewed tag, compute its digest, switch the source to <code>git</code> while keeping namespace, parameters, identity, and version, review the external lock, and prove graph equivalence before removing the vendored copy.</p>
+                    </li>
+                </ol>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    Includes never gain version semantics, and neither includes nor local bundles gain network behaviour. The roadmap is explicit that
+                    phase numbers identify work, not a requirement to finish every earlier phase, so a project may stop after any step.
+                </p>
+            </section>
+
+            <section id="confidence" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:certificate-check" aria-hidden="true"></span> Confidence
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    None of what follows exists yet; these are the guarantees the RFCs promise and the evidence the roadmap demands before any
+                    task is ticked.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Designed guarantees</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li><strong>Deterministic order.</strong> Traversal and catalogue selection are independent of enumeration order.</li>
+                            <li><strong>No silent override.</strong> Duplicates, cycles, and repeated files are errors with full include chains.</li>
+                            <li><strong>Exact bytes.</strong> The build fingerprint covers every included byte; touching metadata alone changes nothing. Bundle and external digests bind content; tag and commit drift are detected.</li>
+                            <li><strong>Discovery runs nothing.</strong> Instrumented metadata queries must record zero command, recipe-only helper, and network invocations.</li>
+                            <li><strong>Honest diagnostics.</strong> Errors point at the original fragment spans, not a synthetic merged file.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
+                        <h3 class="font-bold text-base-content mb-2 text-sm">Planned tests and proofs</h3>
+                        <ul class="space-y-2 text-xs text-charcoal-mid">
+                            <li><strong>Property tests</strong> generating bounded acyclic and cyclic include graphs, version catalogues, and parameter maps.</li>
+                            <li><strong>Kani</strong> harnesses may check the bounded traversal and that every composition unit is emitted exactly once; the roadmap requires them to cover the production state machine, not a disconnected model.</li>
+                            <li><strong>Git tests</strong> for annotated and lightweight tags, retagging, and limits, run against a local protocol server rather than the public internet.</li>
+                            <li><strong>Canaries:</strong> split a real monolithic Netsukefile and prove graph equivalence; consume one quality-gate bundle from at least two downstream repositories; build a tagged bundle from a verified cache with the network disabled. Unix-like and Windows runs.</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    The downstream migrations behind those canaries are tracked in issue <a href="https://github.com/leynos/netsuke/issues/598" class="hm-link">#598</a>.
+                </p>
+            </section>
+
+            <section id="access" class="mb-16 pt-10 border-t border-stone-light">
+                <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center">
+                    <span class="iconify text-primary mr-3 text-lg" data-icon="carbon:accessibility" aria-hidden="true"></span> Accessibility &amp; localization
+                </h2>
+                <p class="text-charcoal-mid mb-6 max-w-3xl">
+                    Every human-readable message Netsuke emits is localized by default through its <a href="/netsuke/docs/cli/#localization" class="hm-link">Fluent catalogues</a>, so include cycles,
+                    bundle resolution failures, lock mismatches, and provenance summaries arrive in the reader's locale like any other
+                    diagnostic; bundle names, versions, digests, and error codes stay untranslated so they can be matched. The composition
+                    documents add no composition-specific output modes, and this preview does not invent any. What else follows from them:
+                </p>
+                <ul class="space-y-3 text-sm text-charcoal-mid max-w-3xl mb-6">
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs shrink-0" data-icon="carbon:terminal" aria-hidden="true"></span> <span><strong>Bundle commands join the existing CLI vocabulary.</strong> The roadmap requires that vocabulary to be extended before any bundle command is built, so bundle commands inherit the global flags v{{ netsuke_version }} already has &mdash; <code>--json</code>, <code>--locale</code>, <code>--color</code>, <code>--emoji</code>, <code>--progress</code>, and <code>--accessibility</code> &mdash; rather than inventing their own. See the <a href="/netsuke/docs/cli/" class="hm-link">CLI reference</a>.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs shrink-0" data-icon="carbon:json" aria-hidden="true"></span> <span><strong>Human and JSON output.</strong> Provenance and failures are specified for both, with human output kept concise and failures distinguishable by type rather than by parsing prose.</span></li>
+                    <li class="flex items-start"><span class="iconify text-primary mt-1 mr-2 text-xs shrink-0" data-icon="carbon:view-off" aria-hidden="true"></span> <span><strong>Redaction by default.</strong> Bundle parameter values are redacted in diagnostics and metadata unless declared <code>expose: non-secret</code>; credentials in Git URLs are rejected and redacted; absolute host and cache paths never appear in metadata.</span></li>
+                </ul>
+                <p class="text-sm text-charcoal-mid max-w-3xl">
+                    The <a href="/netsuke/guides/translating/" class="hm-link">translation guide</a> covers how those messages are
+                    translated, and the glossary keeps terms such as <em>bundle</em> and <em>include</em> consistent across locales.
+                </p>
+            </section>
+
+{{ fc.footer('modules') }}
+
+        </main>
+    </div>
+
+{% endblock %}

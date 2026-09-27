@@ -85,7 +85,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 #[given("the forecast is \"{forecast}\"")]
 fn forecast(evening: &mut Evening, forecast: String) {
     if forecast == "thunder" {
-        bdd::skip!("no picnics in a thunderstorm");
+        rstest_bdd::skip!("no picnics in a thunderstorm");
     }
     evening.forecast = forecast;
 }

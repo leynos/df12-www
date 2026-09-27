@@ -1,3 +1,6 @@
+//! One scenario bound to three steps, which share a fixture and change it
+//! through `&mut`.
+
 use rstest::fixture;
 use rstest_bdd_macros::{given, scenario, then, when};
 

@@ -1,3 +1,6 @@
+//! A scenario written in French, exercising the `# language: fr` Gherkin
+//! header and its Soit/Quand/Alors keywords.
+
 use rstest::fixture;
 use rstest_bdd_macros::{given, scenario, then, when};
 

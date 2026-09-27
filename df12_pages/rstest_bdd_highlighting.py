@@ -46,6 +46,19 @@ class LanternStyle(Style):
 
     Every declared colour clears 4.5:1 against ``background_color``. Edit this
     class and rerun the generator rather than hand-editing the CSS it emits.
+
+    Attributes
+    ----------
+    name : str
+        The style's Pygments name, ``"lantern"``.
+    background_color : str
+        The night-blue code ground, ``#16283a``, that every token colour
+        is checked against.
+    highlight_color : str
+        The raised night used for highlighted lines, ``#1f3850``.
+    styles : dict
+        Mapping of Pygments token types to style strings, the palette
+        roles described in the module docstring.
     """
 
     name = "lantern"

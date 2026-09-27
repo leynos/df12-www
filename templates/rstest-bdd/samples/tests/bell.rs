@@ -1,3 +1,6 @@
+//! A step pattern inferred from its function name, and a cucumber-rs-style
+//! `expr =` pattern with a typed placeholder.
+
 use rstest::fixture;
 use rstest_bdd_macros::{given, scenario, then, when};
 

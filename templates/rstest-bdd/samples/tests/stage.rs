@@ -1,3 +1,6 @@
+//! The Tokio harness, with `#[harness_context]` exposing the runtime handle
+//! to a step.
+
 use rstest::fixture;
 use rstest_bdd_harness_tokio::TokioTestContext;
 use rstest_bdd_macros::{given, scenario, then, when};

@@ -1,3 +1,6 @@
+//! A custom `HarnessAdapter` that announces the stage before running the
+//! scenario on the test thread.
+
 use rstest::fixture;
 use rstest_bdd_harness::{HarnessAdapter, HarnessResult, StdScenarioRunRequest};
 use rstest_bdd_macros::{given, scenario, then, when};

@@ -54,7 +54,16 @@ BOLD_WEIGHT = "600"
 
 
 def build_css() -> str:
-    """Build the generated CSS block from the lantern style."""
+    """Build the generated CSS block from the lantern style.
+
+    Returns
+    -------
+    str
+        The full generated block: the ``BEGIN`` marker, the
+        stylelint-disable marker, the ``:root`` custom properties, the
+        token rules, the stylelint-enable marker, and the ``END`` marker,
+        joined with newlines.
+    """
     formatter = HtmlFormatter(style=LanternStyle, cssclass=CSS_CLASS)
     variables, rules = token_rules(
         formatter,
@@ -114,6 +123,13 @@ def main(stylesheet: Path = STYLESHEET) -> int:
         The stylesheet to rewrite. Defaults to the tracked
         ``src/static/rstest-bdd/assets/styles/syntax.css``; a test may pass a
         temporary path instead.
+
+    Returns
+    -------
+    int
+        The process exit status, always ``0``. The stylesheet is written
+        only when the generated block has changed; either way, ``main``
+        reports "updated" or "unchanged" on stdout.
     """
     css = stylesheet.read_text(encoding="utf-8") if stylesheet.exists() else ""
     updated = rewrite(css)

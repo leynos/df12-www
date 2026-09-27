@@ -1,3 +1,6 @@
+//! An async `#[when]` step under `#[tokio::test]`, awaiting a channel until
+//! the kettle boils.
+
 use std::time::Duration;
 
 use rstest::fixture;

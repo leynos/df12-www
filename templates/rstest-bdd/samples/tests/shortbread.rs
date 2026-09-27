@@ -1,3 +1,6 @@
+//! Steps that return an updated fixture value, including a fallible `when`
+//! step that returns `Result<Tin, String>`.
+
 use rstest::fixture;
 use rstest_bdd_macros::{given, scenario, then, when};
 

@@ -1,3 +1,6 @@
+//! A `#[once]` fixture shared across scenarios, and `ScenarioState`-derived
+//! per-scenario state held in `Slot`s.
+
 use std::sync::OnceLock;
 
 use rstest::fixture;

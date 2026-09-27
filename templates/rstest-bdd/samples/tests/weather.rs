@@ -1,5 +1,7 @@
+//! The `scenarios!` macro auto-discovering feature files, tag filtering, and
+//! a step that skips a scenario at runtime.
+
 use rstest::fixture;
-use rstest_bdd as bdd;
 use rstest_bdd_macros::{given, scenarios, then};
 
 #[derive(Default)]
@@ -15,7 +17,7 @@ fn evening() -> Evening {
 #[given("the forecast is \"{forecast}\"")]
 fn forecast(evening: &mut Evening, forecast: String) {
     if forecast == "thunder" {
-        bdd::skip!("no picnics in a thunderstorm");
+        rstest_bdd::skip!("no picnics in a thunderstorm");
     }
     evening.forecast = forecast;
 }

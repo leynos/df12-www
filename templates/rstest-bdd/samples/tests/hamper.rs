@@ -1,3 +1,6 @@
+//! A `DataTableRow` struct binding a Gherkin data table, and a step that
+//! captures a doc string as a plain `String` argument.
+
 use rstest::fixture;
 use rstest_bdd::datatable::Rows;
 use rstest_bdd_macros::{DataTableRow, given, scenario, then, when};

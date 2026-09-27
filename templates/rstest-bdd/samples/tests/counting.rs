@@ -1,3 +1,6 @@
+//! A Scenario Outline: one test generated per Examples row, with the
+//! placeholder value threaded into the test function as a parameter.
+
 use rstest::fixture;
 use rstest_bdd_macros::{given, scenario, then, when};
 

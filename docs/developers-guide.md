@@ -1384,7 +1384,9 @@ and next buttons, which stay `hidden` in the markup because they do nothing
 without it. `nearestIndex` and `counterText` are its pure queries;
 `createStorybook(deps)` takes a document, an animation-frame `requestFrame`,
 and a `prefersReducedMotion` query. `copy-code.ts` is Cuprum's copy button with
-`data-rb-copy` attributes.
+`data-rb-copy` attributes. Both scripts report their outcomes through the
+optional `telemetry.ts` hook; see section 6.5 for the seam, its vocabularies,
+and the `data-rb-*` contract in full.
 
 The cast never appears on a legal notice: `shared_content_page.jinja` empties
 the footer's `footer_art` block, which credits the illustrations, and
@@ -1398,16 +1400,17 @@ pixels, and drives the storybook.
 Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files
 that follow one shared convention: a plain immediately invoked function
 expression (IIFE) module, guarded by the same `module.exports` hook described
-below. Loading and bootstrap otherwise differ by site. Sixteen of the eighteen
-scripts (Netsuke, Stilyagi, Episodic, and Cuprum) are loaded with
-`<script defer>` and guard their own initialization on `document.readyState`
-(running immediately if the document has already finished loading, or waiting
-for `DOMContentLoaded` otherwise). Weaver's two scripts, `telemetry.ts` and
-`mobile-nav.ts`, are the exception: they are loaded with a plain `<script>` at
-the end of `<body>` and run immediately and unconditionally, with no
-`readyState`/`DOMContentLoaded` gate. Where a component's behaviour has a pure
-decision worth testing in isolation — no DOM, no timers — that function is
-exported via `module.exports` at the end of the IIFE, guarded by
+below. Loading and bootstrap otherwise differ by site. Eighteen of the
+twenty-one scripts (Netsuke, Stilyagi, Episodic, Cuprum, and rstest-bdd's
+`copy-code.ts` and `storybook.ts`) are loaded with `<script defer>` and guard
+their own initialization on `document.readyState` (running immediately if the
+document has already finished loading, or waiting for `DOMContentLoaded`
+otherwise). Three scripts are the exception: Weaver's `telemetry.ts` and
+`mobile-nav.ts`, and rstest-bdd's `telemetry.ts`. Each is loaded with a plain
+`<script>` at the end of `<body>` and runs immediately and unconditionally,
+with no `readyState`/`DOMContentLoaded` gate. Where a component's behaviour has
+a pure decision worth testing in isolation — no DOM, no timers — that function
+is exported via `module.exports` at the end of the IIFE, guarded by
 `typeof module !== "undefined"` so the same file still runs unmodified as a
 plain browser script. `docs-scrollspy.ts` exports `pickActiveIndex` (which
 heading is currently being read); `config-keys.ts` exports `nextTabIndex`
@@ -1799,6 +1802,69 @@ branching logic worth testing directly, `module.exports` guarded for Bun, and a
 `matchMedia` listener — with the pre-`addEventListener` fallback — for any
 behaviour that genuinely differs by viewport width rather than merely being
 restyled by it.
+
+### 6.5. rstest-bdd telemetry and storybook contract
+
+rstest-bdd's copy buttons and storybook report through the same optional hook
+model as Episodic search and Weaver chrome. A production host may set
+`window.df12RstestBddTelemetrySink` to a function before
+`src/static/rstest-bdd/assets/js/telemetry.ts` runs, which happens immediately,
+at the end of `<body>`, with no `defer` and no `DOMContentLoaded` gate, so the
+deferred `copy-code.ts` and `storybook.ts` find the API already in place when
+they run. Without a sink, `telemetry.ts` is a no-op and nothing is collected. A
+sink that throws is caught and ignored, because observability must not be able
+to break the copy button or the storybook it was watching.
+
+The API it installs at `globalThis.df12RstestBddTelemetry` is
+`emit(operation, outcome, reason?)` plus the four frozen vocabularies `emit`
+checks its arguments against. Every event has the fixed shape
+`{component, operation, outcome, reason?}`; `component` is derived from
+`operation` rather than passed, so it cannot disagree with it. The whole of
+what may leave the page is declared at the top of `telemetry.ts`:
+
+| Field       | Values                                                         |
+| ----------- | -------------------------------------------------------------- |
+| `component` | `rstest-bdd-copy-button`, `rstest-bdd-storybook`               |
+| `operation` | `clipboard`, `storybook`                                       |
+| `outcome`   | `copied`, `failed`, `initialized`, `navigated`                 |
+| `reason`    | `unavailable`, `rejected`, `tab`, `previous`, `next`, `scroll` |
+
+_Table 9: every field an rstest-bdd telemetry event may carry._
+
+An `operation`, `outcome`, or `reason` outside those lists is dropped rather
+than emitted. `copy-code.ts` emits a `clipboard` `copied` on a successful
+write, and a `clipboard` `failed` with `unavailable` when no clipboard API is
+present or `rejected` when a write is refused — never the copied text.
+`storybook.ts` emits a `storybook` `initialized` once, when it wires the page,
+and a `storybook` `navigated` each time the chapter in view changes, with the
+reason `tab`, `previous`, or `next` when the reader chose it and `scroll` when
+a scroll frame changed it — only on an actual change, and never which chapter.
+See section 5.9 for what each script does; this section covers only the
+telemetry seam.
+
+`templates/rstest-bdd/_layout.jinja` loads `telemetry.js` with a plain
+`<script>` and no `defer`, before the deferred `copy-code.js`, so the API is
+already installed when that script's click handlers run; `storybook.js` is
+deferred on the home page in the same order.
+
+**The `data-rb-*` contract.** `copy-code.ts` reads `data-rb-copy` (the value
+`console` strips leading `$` prompts before the text is copied),
+`data-rb-copy-slot` (where the button is appended), and `data-rb-copy-label`
+(an optional accessible-name suffix). `storybook.ts` reads `data-rb-storybook`
+(the scrolling strip), `data-rb-chapter` (one per chapter),
+`data-rb-chapter-tab` (the fragment-link tabs), `data-rb-story-paging` (the
+previous/next container, hidden in the markup until the script wires it),
+`data-rb-story-prev`, `data-rb-story-next`, and `data-rb-story-count` (the
+"Chapter NN of NN" counter).
+
+`tests/js/rstest-bdd-telemetry.test.mjs` is the enforcement for the seam
+itself: it tries to get page data, copied text, and identifiers into an event
+rather than only checking the happy path.
+`tests/js/rstest-bdd-copy-code.test.mjs` and
+`tests/js/rstest-bdd-storybook.test.mjs` cover what each script does with it,
+the latter including a model-based property test that runs every generated
+trace over `tab`, `previous`, `next`, and `scroll` transitions and checks the
+reported navigations against the model's own chapter-in-view state.
 
 ## 7. Styling and the cascade
 

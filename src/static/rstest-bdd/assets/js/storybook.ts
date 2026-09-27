@@ -1,4 +1,5 @@
-/* The lantern picnic storybook on the rstest-bdd home page.
+/**
+ * @file The lantern picnic storybook on the rstest-bdd home page.
  *
  * The markup is complete without this script: all eight chapters sit in a
  * horizontally scrolling, keyboard-reachable strip (`[data-rb-storybook]`),
@@ -15,19 +16,26 @@
  *
  * Smooth scrolling is dropped when the reader prefers reduced motion.
  *
+ * The storybook reports through the optional telemetry hook in
+ * `telemetry.ts` that it was wired, and each time the chapter in view
+ * changes, with the cause: a tab, a paging button, or scrolling. It never
+ * says which chapter.
+ *
  * `nearestIndex` and `counterText` are pure queries. The controller takes
- * its dependencies (document, animation frame, motion preference) as
- * arguments so tests can drive it with fakes; `init` at the bottom supplies
- * the real ones. All of them are exported for the Bun tests.
+ * its dependencies (document, animation frame, motion preference,
+ * telemetry) as arguments so tests can drive it with fakes; `init` at the
+ * bottom supplies the real ones. All of them are exported for the Bun tests.
  */
 (() => {
   "use strict";
 
-  /* What `createStorybook` needs from its host. */
+  /* What `createStorybook` needs from its host. `telemetry` is absent on a
+     page that did not load `telemetry.js`. */
   interface StorybookDeps {
     document: Document;
     requestFrame(callback: () => void): void;
     prefersReducedMotion(): boolean;
+    telemetry?: RstestBddTelemetryApi | undefined;
   }
 
   /* The index of the chapter whose left edge is nearest the strip's scroll
@@ -70,6 +78,7 @@
     var prev = paging?.querySelector<HTMLButtonElement>("[data-rb-story-prev]");
     var next = paging?.querySelector<HTMLButtonElement>("[data-rb-story-next]");
     var counter = paging?.querySelector<HTMLElement>("[data-rb-story-count]");
+    var telemetry = deps.telemetry;
     var current = -1;
     var pending = false;
 
@@ -80,10 +89,11 @@
       return chapters.map((chapter) => chapter.offsetLeft - origin);
     }
 
-    /* Mark chapter `index` as the one in view. */
-    function mark(index: number): void {
+    /* Mark chapter `index` as the one in view. Returns whether that changed
+       anything, so the scroll handler reports only a real change. */
+    function mark(index: number): boolean {
       if (index === current || index < 0) {
-        return;
+        return false;
       }
       current = index;
       tabs.forEach((tab, i) => {
@@ -102,6 +112,18 @@
       if (next) {
         next.disabled = index === chapters.length - 1;
       }
+      return true;
+    }
+
+    /* Report a navigation and its cause, one of telemetry's `REASONS`. */
+    function reportNavigation(reason: string | undefined): void {
+      telemetry?.emit(telemetry.OPERATIONS.storybook, telemetry.OUTCOMES.navigated, reason);
+    }
+
+    /* Show chapter `index` because the reader chose it, reporting why. */
+    function choose(index: number, reason: string | undefined): void {
+      show(index);
+      reportNavigation(reason);
     }
 
     /* Scroll the strip to chapter `index` and hand it focus. */
@@ -126,7 +148,9 @@
       pending = true;
       deps.requestFrame(() => {
         pending = false;
-        mark(nearestIndex(offsets(), strip.scrollLeft));
+        if (mark(nearestIndex(offsets(), strip.scrollLeft))) {
+          reportNavigation(telemetry?.REASONS.scroll);
+        }
       });
     }
 
@@ -136,16 +160,21 @@
     tabs.forEach((tab, index) => {
       tab.addEventListener("click", (event) => {
         event.preventDefault();
-        show(index);
+        choose(index, telemetry?.REASONS.tab);
       });
     });
     strip.addEventListener("scroll", onScroll, { passive: true });
     if (paging) {
       paging.hidden = false;
-      prev?.addEventListener("click", () => show(Math.max(current - 1, 0)));
-      next?.addEventListener("click", () => show(Math.min(current + 1, chapters.length - 1)));
+      prev?.addEventListener("click", () =>
+        choose(Math.max(current - 1, 0), telemetry?.REASONS.previous),
+      );
+      next?.addEventListener("click", () =>
+        choose(Math.min(current + 1, chapters.length - 1), telemetry?.REASONS.next),
+      );
     }
     mark(nearestIndex(offsets(), strip.scrollLeft));
+    telemetry?.emit(telemetry.OPERATIONS.storybook, telemetry.OUTCOMES.initialized);
 
     return {
       show: show,
@@ -154,7 +183,7 @@
   }
 
   /* Wire the page's storybook, supplying the real document, animation
-     frame, and motion preference. */
+     frame, motion preference, and telemetry, if the page loaded it. */
   function init(): void {
     createStorybook({
       document: document,
@@ -162,6 +191,7 @@
         window.requestAnimationFrame(callback);
       },
       prefersReducedMotion: () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      telemetry: globalThis.df12RstestBddTelemetry,
     });
   }
 

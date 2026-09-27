@@ -12,6 +12,9 @@
  * — a manually advanced clock and a clipboard whose write resolves, rejects,
  * or is missing — so every outcome, the delayed announcement, and the reset
  * are observed at the moment they are due rather than waited out. The
+ * telemetry suite hands the controller the compiled hook from `telemetry.js`
+ * and a recording sink, and checks each outcome is reported by name while
+ * the copied text never reaches an event. The
  * `DOMContentLoaded` path runs in an isolated happy-dom `Window`, because
  * dispatching that event on the shared document would wake every other
  * suite's waiting listener as well.
@@ -26,6 +29,7 @@ import { evaluateScript } from "./helpers/dom.mjs";
 
 const require = createRequire(import.meta.url);
 const SCRIPT = join("public", "rstest-bdd", "assets", "js", "copy-code.js");
+const telemetry = require("../../public/rstest-bdd/assets/js/telemetry.js");
 const {
   stripPrompts,
   copyLabel,
@@ -122,16 +126,25 @@ function fakeClipboard(outcome) {
 
 /* Mount `markup` into the global document and build the controller over a
    fake clock and `clipboard`, which may be undefined to model an insecure
-   context. Returns the controller with the clock that drives it. */
-function harness(markup, clipboard) {
+   context, and the telemetry hook, if given. Returns the controller with the
+   clock that drives it. */
+function harness(markup, clipboard, hook = undefined) {
   document.body.innerHTML = markup;
   const clock = fakeClock();
   const controller = createCopyController({
     document,
     clock,
     getClipboard: () => clipboard,
+    telemetry: hook,
   });
   return { clock, controller };
+}
+
+/* Install a sink that records every telemetry event, and return the list. */
+function recordTelemetry() {
+  const events = [];
+  globalThis.df12RstestBddTelemetrySink = (event) => events.push(event);
+  return events;
 }
 
 /* A reference for one line: drop a single leading `$ ` prompt, if any. */
@@ -311,6 +324,81 @@ describe("the copy controller", () => {
     expect(wired.button.textContent).toBe("Copied");
     clock.advance(RESET_MS - 500);
     expect(wired.button.textContent).toBe("Copy");
+  });
+});
+
+describe("the copy telemetry", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+    globalThis.df12RstestBddTelemetrySink = undefined;
+  });
+
+  test("a copy reports success, never the text it copied", async () => {
+    const events = recordTelemetry();
+    const clipboard = fakeClipboard("resolve");
+    const { controller } = harness(FIXTURE, clipboard, telemetry);
+    await controller.buttons[0].copy();
+    await controller.buttons[1].copy();
+    expect(events).toEqual([
+      { component: "rstest-bdd-copy-button", operation: "clipboard", outcome: "copied" },
+      { component: "rstest-bdd-copy-button", operation: "clipboard", outcome: "copied" },
+    ]);
+    const reported = JSON.stringify(events);
+    for (const text of clipboard.written) {
+      expect(reported).not.toContain(text);
+    }
+    expect(reported).not.toContain("cargo");
+    expect(reported).not.toContain("lantern");
+  });
+
+  test("a rejected write reports a bounded reason", async () => {
+    const events = recordTelemetry();
+    const { controller } = harness(FIXTURE, fakeClipboard("reject"), telemetry);
+    await controller.buttons[1].copy();
+    expect(events).toEqual([
+      {
+        component: "rstest-bdd-copy-button",
+        operation: "clipboard",
+        outcome: "failed",
+        reason: "rejected",
+      },
+    ]);
+  });
+
+  test("an absent clipboard reports that the API was unavailable", async () => {
+    const events = recordTelemetry();
+    const { controller } = harness(FIXTURE, undefined, telemetry);
+    await controller.buttons[0].copy();
+    expect(events).toEqual([
+      {
+        component: "rstest-bdd-copy-button",
+        operation: "clipboard",
+        outcome: "failed",
+        reason: "unavailable",
+      },
+    ]);
+  });
+
+  test("the buttons still copy when the page did not load the hook", async () => {
+    const events = recordTelemetry();
+    const clipboard = fakeClipboard("resolve");
+    const { controller } = harness(FIXTURE, clipboard);
+    await controller.buttons[0].copy();
+    expect(clipboard.written.length).toBe(1);
+    expect(controller.buttons[0].button.textContent).toBe("Copied");
+    expect(events).toEqual([]);
+  });
+
+  test("the page wiring reports through the global hook", async () => {
+    const events = recordTelemetry();
+    const written = mountWithClipboard();
+    document.querySelectorAll("button.rb-copy")[0].click();
+    await settle();
+    expect(written.length).toBe(1);
+    expect(events).toEqual([
+      { component: "rstest-bdd-copy-button", operation: "clipboard", outcome: "copied" },
+    ]);
+    expect(JSON.stringify(events)).not.toContain(written[0]);
   });
 });
 

@@ -1,4 +1,5 @@
-/* Copy buttons for rstest-bdd's code panels.
+/**
+ * @file Copy buttons for rstest-bdd's code panels.
  *
  * The markup is complete without this script: every command and code block
  * is selectable text in a keyboard-reachable scroll region. The script only
@@ -13,9 +14,13 @@
  * announced through one polite live region per page. The button returns to
  * "Copy" after a short pause; a second click restarts the pause.
  *
+ * Each outcome is also reported through the optional telemetry hook in
+ * `telemetry.ts`, as an outcome and a cause only: the copied text is never
+ * handed to it.
+ *
  * `stripPrompts`, `copyLabel`, and `panelText` are pure queries. The
- * controller takes its dependencies (document, clock, clipboard) as
- * arguments so tests can drive it with fakes; `init` at the bottom supplies
+ * controller takes its dependencies (document, clock, clipboard, telemetry)
+ * as arguments so tests can drive it with fakes; `init` at the bottom supplies
  * the real ones. All of them are exported for the Bun tests.
  */
 (() => {
@@ -36,11 +41,13 @@
 
   /* What `createCopyController` needs from its host. `getClipboard` is a
      getter rather than a value because `navigator.clipboard` is absent in an
-     insecure context, and the outcome has to be checked on each click. */
+     insecure context, and the outcome has to be checked on each click.
+     `telemetry` is absent on a page that did not load `telemetry.js`. */
   interface CopyDeps {
     document: Document;
     clock: Clock;
     getClipboard(): Clipboard | undefined;
+    telemetry?: RstestBddTelemetryApi | undefined;
   }
 
   /* One wired panel: the button it gained, and the copy its click runs. */
@@ -132,14 +139,30 @@
     /* Copy the panel's text and report the outcome. Returns a promise so
        tests can await settlement; the click listener ignores it. */
     function copy(): Promise<void> {
+      var telemetry = deps.telemetry;
       var clipboard = deps.getClipboard();
       if (!clipboard) {
         report("unavailable");
+        telemetry?.emit(
+          telemetry.OPERATIONS.clipboard,
+          telemetry.OUTCOMES.failed,
+          telemetry.REASONS.unavailable,
+        );
         return Promise.resolve();
       }
       return clipboard.writeText(panelText(panel)).then(
-        () => report("copied"),
-        () => report("failed"),
+        () => {
+          report("copied");
+          telemetry?.emit(telemetry.OPERATIONS.clipboard, telemetry.OUTCOMES.copied);
+        },
+        () => {
+          report("failed");
+          telemetry?.emit(
+            telemetry.OPERATIONS.clipboard,
+            telemetry.OUTCOMES.failed,
+            telemetry.REASONS.rejected,
+          );
+        },
       );
     }
 
@@ -170,8 +193,8 @@
     return { announcer: announcer, buttons: buttons };
   }
 
-  /* Wire the page's panels, supplying the real document, timers, and
-     clipboard. */
+  /* Wire the page's panels, supplying the real document, timers, clipboard,
+     and telemetry, if the page loaded it. */
   function init(): void {
     createCopyController({
       document: document,
@@ -180,6 +203,7 @@
         clearTimeout: window.clearTimeout.bind(window),
       },
       getClipboard: () => navigator.clipboard,
+      telemetry: globalThis.df12RstestBddTelemetry,
     });
   }
 

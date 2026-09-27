@@ -94,7 +94,9 @@ describe("the typecheck-js target", () => {
 
     rmSync(written.pop());
     expect(typecheck().status).toBe(0);
-  });
+    // Two full typecheck runs over every browser script and build script;
+    // on a busy machine they no longer fit the default five seconds.
+  }, 30000);
 
   test("fails on a type error in a build script too", () => {
     written.push(SCRIPTS_FIXTURE);

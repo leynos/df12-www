@@ -121,7 +121,9 @@ describe("the stylelint target", () => {
 
     rmSync(FIXTURE);
     expect(make("stylelint").status).toBe(0);
-  });
+    // Two full stylelint runs over every stylesheet under src/; on a busy
+    // machine they no longer fit the default five seconds.
+  }, 30000);
 
   test("passes on a conforming file, so the verdict tracks content not presence", () => {
     writeFileSync(FIXTURE, CLEAN);
@@ -166,7 +168,8 @@ describe("the fmt integration", () => {
        reporting. */
     expect(readFileSync(FMT_FIXTURE, "utf8")).toContain("rgb(0 0 0 / 50%)");
     expect(make("stylelint").status).toBe(0);
-  });
+    // A fixing run and a checking run over every stylesheet under src/.
+  }, 30000);
 
   test("the fixer leaves a disabled range byte-identical", () => {
     writeFileSync(FMT_FIXTURE, FENCED);

@@ -1,0 +1,179 @@
+/* rstest-bdd inner pages: getting started, the guides, harnesses, compare,
+ * and the roadmap. Each block is scoped under its page's <main> class. */
+
+/* ---------- Shared: the drop-down chevron in the guide rail ----------- */
+
+.rb-toc__chevron {
+  width: 0.8rem;
+  height: 0.8rem;
+  transition: transform 160ms var(--rb-ease);
+}
+
+.rb-toc__menu[open] .rb-toc__chevron {
+  transform: rotate(180deg);
+}
+
+/* ---------- Guide head ------------------------------------------------- */
+
+/* A guide's head: its felt badge sewn beside the title. */
+.rb-guide-page .rb-guide-head__grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.5rem 2rem;
+  align-items: center;
+}
+
+.rb-guide-page .rb-guide-head__badge {
+  width: clamp(5rem, 11vw, 8.5rem);
+  height: auto;
+  filter: drop-shadow(0 4px 4px color-mix(in oklab, var(--color-thread) 30%, transparent));
+}
+
+@media (width < 30rem) {
+  .rb-guide-page .rb-guide-head__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Getting started -------------------------------------------- */
+
+.rb-start .rb-start__next {
+  margin-top: 1.25rem;
+}
+
+/* ---------- Guides index ----------------------------------------------- */
+
+.rb-guides .rb-guides__index {
+  padding-top: 1rem;
+}
+
+/* ---------- Compare ---------------------------------------------------- */
+
+.rb-compare .rb-compare__map .rb-card__title code {
+  background: none;
+  font-size: 1.05rem;
+}
+
+.rb-compare .rb-compare__list {
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+.rb-compare .rb-compare__list li + li {
+  margin-top: 0.5rem;
+}
+
+.rb-compare .rb-compare__list li::marker {
+  color: var(--color-stitch-cream);
+}
+
+/* ---------- Roadmap ---------------------------------------------------- */
+
+/* Released patches: a quilt that fills a row at a time, newest first. */
+.rb-roadmap .rb-roadmap__releases {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-roadmap .rb-roadmap__releases .rb-card__title a {
+  color: inherit;
+}
+
+.rb-roadmap .rb-roadmap__name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+/* On the frame: a patch pinned in place, with two brass pins at its top
+   corners. */
+.rb-roadmap .rb-roadmap__pinned {
+  --rb-local-pin: radial-gradient(
+    circle at 50% 40%,
+    var(--color-lantern) 0 4px,
+    var(--color-thread-muted) 4.5px 5.5px,
+    transparent 6px
+  );
+
+  background-image: var(--rb-local-pin), var(--rb-local-pin);
+  background-position:
+    0.9rem 0.7rem,
+    calc(100% - 0.9rem) 0.7rem;
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+}
+
+/* Chalked out: no fabric yet, only a dashed tailor's-chalk outline on the
+   page. The chalk is a boundary a reader has to see, so it is thread-muted
+   (7.40:1 on wool) rather than white. */
+.rb-roadmap .rb-roadmap__chalk {
+  border: 2px dashed var(--color-thread-muted);
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ---------- Legal pages ------------------------------------------------ */
+
+/* A legal notice sits in one wool patch in a reading column, under a
+   breadcrumb, as the Netsuke legal pages do. */
+.rb-legal-page .rb-legal-page__shell {
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 3.5rem) var(--rb-gutter) 4.5rem;
+}
+
+.rb-legal-page .rb-legal-page__crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  color: var(--rb-muted-text);
+  font-size: 0.9rem;
+  list-style: none;
+}
+
+.rb-legal-page .rb-legal-page__crumbs li + li::before {
+  margin-right: 0.5rem;
+  content: "/";
+}
+
+.rb-legal-page .rb-legal-page__panel {
+  --rb-radius: 1.4rem;
+  --rb-stitch-inset: 9px;
+
+  padding: clamp(1.5rem, 5vw, 3rem);
+  box-shadow: var(--shadow-patch-lift);
+}
+
+.rb-legal-page .rb-legal-page__eyebrow {
+  --rb-radius: 999px;
+  --rb-stitch-inset: 3px;
+
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: var(--color-burlap);
+  color: var(--color-rust);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rb-legal-page .rb-legal-page__title {
+  margin-top: 1.25rem;
+  font-size: clamp(2.2rem, 5vw, 3rem);
+}
+
+.rb-legal-page .rb-legal-page__summary {
+  max-width: 40rem;
+  margin-top: 1rem;
+  color: var(--rb-muted-text);
+  font-size: 1.15rem;
+}

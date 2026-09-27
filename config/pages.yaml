@@ -116,9 +116,9 @@ homepage:
           external: false
         - label: rstest-bdd
           description: Behaviour-driven testing macros layered on rstest. Narrative clarity without the ceremony.
-          href: "https://github.com/leynos/rstest-bdd"
-          meta_label: View on GitHub
-          external: true
+          href: "rstest-bdd/"
+          meta_label: Learn more
+          external: false
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.
@@ -1718,4 +1718,64 @@ sites:
       - { key: docs-api-errors, label: "Errors", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors }
       - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
       - { key: setwork, label: Setwork, template: pages/setwork.jinja, output_slug: setwork }
+    pages: {}
+
+  rstest-bdd:
+    output_dir: public/rstest-bdd
+    templates_dir: templates/rstest-bdd
+    stylesheet: /rstest-bdd/assets/styles/rstest-bdd.css
+    base_path: /rstest-bdd/
+    theme:
+      site_name: rstest-bdd
+      hero_eyebrow: rstest-bdd Documentation
+      hero_tagline: Small stories. Real Rust tests.
+    parent_link:
+      label: "← Back to df12 Productions"
+      href: /
+    template_vars:
+      # The release every sample on the sub-site is compiled and run
+      # against. The sample crate under templates/rstest-bdd/samples/ pins
+      # the same versions; `make rstest-bdd-samples` runs it. Move these
+      # together with that crate's Cargo.toml, after the samples pass, and
+      # update the verification date.
+      rstest_bdd_version: "0.6.0"
+      rstest_bdd_tag: "v0.6.0"
+      rstest_bdd_released: "14 September 2026"
+      rstest_version: "0.26.1"
+      rust_floor: "1.88"
+      samples_verified_on: "2026-09-27"
+      repository_url: "https://github.com/leynos/rstest-bdd"
+      users_guide_url: "/docs-rstest-bdd-introduction.html"
+    nav_links:
+      - label: Home
+        href: /rstest-bdd/
+      - label: Get started
+        href: /rstest-bdd/getting-started/
+      - label: Guides
+        href: /rstest-bdd/guides/
+      - label: Harnesses
+        href: /rstest-bdd/harnesses/
+      - label: Compare
+        href: /rstest-bdd/compare/
+      - label: Roadmap
+        href: /rstest-bdd/roadmap/
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    homepage:
+      title: "rstest-bdd — Small stories. Real Rust tests."
+    content_pages:
+      - { key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: getting-started }
+      - { key: guides, label: Guides, template: pages/guides.jinja, output_slug: guides }
+      - { key: guide-feature-files, label: Write feature files, template: pages/guide-feature-files.jinja, output_slug: guides/feature-files }
+      - { key: guide-steps, label: Define steps, template: pages/guide-steps.jinja, output_slug: guides/steps }
+      - { key: guide-fixtures-and-state, label: Fixtures and state, template: pages/guide-fixtures-and-state.jinja, output_slug: guides/fixtures-and-state }
+      - { key: guide-binding-and-filtering, label: Bind and filter scenarios, template: pages/guide-binding-and-filtering.jinja, output_slug: guides/binding-and-filtering }
+      - { key: guide-async, label: Async scenarios, template: pages/guide-async.jinja, output_slug: guides/async }
+      - { key: guide-tooling, label: Tooling, template: pages/guide-tooling.jinja, output_slug: guides/tooling }
+      - { key: guide-migrate-to-0-6, label: Migrate to 0.6, template: pages/guide-migrate-to-0-6.jinja, output_slug: guides/migrate-to-0-6 }
+      - { key: harnesses, label: Harnesses, template: pages/harnesses.jinja, output_slug: harnesses }
+      - { key: compare, label: Compare, template: pages/compare.jinja, output_slug: compare }
+      - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
     pages: {}

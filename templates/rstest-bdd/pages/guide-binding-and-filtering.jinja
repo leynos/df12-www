@@ -1,0 +1,121 @@
+{% extends "pages/_guide.jinja" %}
+{% set guide_slug = 'binding-and-filtering' %}
+{% set thesis = 'A scenario becomes a test when something binds it: #[scenario] for one, scenarios! for a directory. Tags decide which, and skip! says why one did not run.' %}
+{% set sections = [
+  {'id': 'scenario', 'label': 'One scenario'},
+  {'id': 'directory', 'label': 'A whole directory'},
+  {'id': 'tags', 'label': 'Tag expressions'},
+  {'id': 'skipping', 'label': 'Skipping'},
+  {'id': 'fine-print', 'label': 'Fine print'},
+] %}
+{% block guide %}
+          <section id="scenario" aria-labelledby="scenario-title">
+            <h2 id="scenario-title">One scenario</h2>
+            <p>
+              <code>#[scenario]</code> turns a function into the test for one
+              scenario. <code>path</code> names the feature file, relative to
+              the crate root; <code>name</code> picks a scenario by title, or
+              <code>index</code> by position, and without either the first
+              scenario is used.
+            </p>
+            {% call ui.code_panel('tests/hamper.rs', sample='tests/hamper.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[scenario(path = "tests/features/hamper.feature", name = "Pack the picnic")]
+fn pack_the_picnic(hamper: Hamper) {
+    let _ = hamper;
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              The function’s parameters are the scenario’s fixtures, and its
+              body runs after the last step. A name that matches no scenario,
+              or more than one, is a compile error.
+            </p>
+          </section>
+
+          <section id="directory" aria-labelledby="directory-title">
+            <h2 id="directory-title">A whole directory</h2>
+            <p>
+              <code>scenarios!</code> walks a directory and generates a test for
+              every scenario it finds, named from the file and the scenario
+              title. Fixtures the steps need are listed with their types, since
+              there is no function signature to declare them.
+            </p>
+            {{ ui.sample('tests/weather.rs') }}
+            {% call ui.output('cargo test --test weather', 'rstest-bdd ' ~ rstest_bdd_version) %}
+running 2 tests
+test auto_scenarios::weather_thunder_in_the_hills ... ok
+test auto_scenarios::weather_a_dry_evening ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+            {% endcall %}
+          </section>
+
+          <section id="tags" aria-labelledby="tags-title">
+            <h2 id="tags-title">Tag expressions</h2>
+            <p>
+              <code>tags = "…"</code> filters by the tags on the feature, the
+              scenario, and an Outline’s Examples table. Expressions use
+              <code>and</code>, <code>or</code>, <code>not</code>, and
+              parentheses, with <code>not</code> binding tightest and
+              <code>or</code> loosest.
+            </p>
+            {{ ui.sample('tests/features/auto/weather.feature') }}
+            <p>
+              <code>"@smoke and not @wip"</code> keeps the dry evening and the
+              thunder, and leaves the fog out; there are two tests above, not
+              three. The filter runs when the test compiles, so a left-out
+              scenario is absent from the test list rather than ignored.
+              <code>#[scenario]</code> takes the same <code>tags</code>
+              argument, and fails to compile when the scenario it names does
+              not satisfy it.
+            </p>
+          </section>
+
+          <section id="skipping" aria-labelledby="skipping-title">
+            <h2 id="skipping-title">Skipping</h2>
+            <p>
+              A step that cannot sensibly go on calls
+              <code>rstest_bdd::skip!</code> with a reason. The remaining steps
+              and the scenario body do not run. The thunder scenario above does
+              exactly that:
+            </p>
+            {% call ui.code_panel('tests/weather.rs', sample='tests/weather.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[given("the forecast is \"{forecast}\"")]
+fn forecast(evening: &mut Evening, forecast: String) {
+    if forecast == "thunder" {
+        bdd::skip!("no picnics in a thunderstorm");
+    }
+    evening.forecast = forecast;
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              A skipped scenario still reports <code>ok</code>, which is easy to
+              miss. Set <code>RSTEST_BDD_FAIL_ON_SKIPPED=1</code> and every skip
+              fails the test, unless its feature or scenario carries
+              <code>@allow_skipped</code>, as the thunder does.
+            </p>
+            {% call ui.code_panel('Terminal', copy='console') %}
+            {% highlight 'console', 'lantern-syntax' %}
+$ RSTEST_BDD_FAIL_ON_SKIPPED=1 cargo test --test weather
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              <code>cargo bdd skipped --reasons</code> lists every skip and its
+              reason; see <a href="/rstest-bdd/guides/tooling/#cargo-bdd">tooling</a>.
+            </p>
+          </section>
+
+          <section id="fine-print" aria-labelledby="fine-print-title">
+            <h2 id="fine-print-title">Fine print</h2>
+            {% call ui.note('Where skip! may be called', 'caveat') %}
+            <p>
+              <code>skip!</code> works inside a step or a helper a step calls,
+              on the thread running the step. Called anywhere else, it panics
+              and says so.
+            </p>
+            {% endcall %}
+          </section>
+{% endblock %}

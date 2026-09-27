@@ -1,0 +1,39 @@
+{#
+  The roadmap quilt. `releases` are the patches already sewn, newest first,
+  with dates from the GitHub releases (v0.4.0 is a tag without published
+  notes). `frame` and `chalk` summarize the unchecked items of the
+  repository's docs/roadmap.md at the documented release, each with the
+  roadmap number a reader can look up; the page states no dates the project
+  has not published. Update these from the roadmap when the release moves.
+  `notes` and `body` are trusted template data, rendered with | safe, so
+  they may carry inline markup.
+#}
+{% set releases = [
+  {'tag': 'v0.6.0', 'name': 'Harnesses for all!', 'date': '14 Sep 2026', 'patch': 'night',
+   'notes': 'Harness adapters, with Std, Tokio, and GPUI; <code>#[harness_context]</code>; fallible fixtures; guard-based <code>StepContext</code> borrowing; a rebuild when a feature file changes; Rust 1.88.'},
+  {'tag': 'v0.5.0', 'name': 'Fully async', 'date': '9 Feb 2026', 'patch': 'rust',
+   'notes': 'Async steps executed for real on Tokio’s current-thread runtime, fallible scenario bodies, and structured <code>ExecutionError</code> outcomes.'},
+  {'tag': 'v0.4.0', 'name': 'Tag only', 'date': '25 Jan 2026', 'patch': 'burlap',
+   'notes': 'A tag without published release notes.'},
+  {'tag': 'v0.3.1', 'name': 'Volkswagens', 'date': '27 Dec 2025', 'patch': 'moss',
+   'notes': 'Language-server navigation from step to feature, specificity-ranked step matching, and quote-stripping string placeholders.'},
+  {'tag': 'v0.3.0', 'name': 'When I grow up', 'date': '25 Dec 2025', 'patch': 'lantern',
+   'notes': 'The language server’s scaffolding and on-save indexing, and the move to the stable toolchain.'},
+  {'tag': 'v0.2.0', 'name': 'Skipping and mutable fixtures', 'date': '8 Dec 2025', 'patch': 'cranberry',
+   'notes': '<code>skip!</code> and the skipped-outcome assertions, <code>&amp;mut</code> fixtures in steps, cached data tables, and row-level Examples validation.'},
+  {'tag': 'v0.1.0', 'name': 'First point release', 'date': '8 Nov 2025', 'patch': 'robot',
+   'notes': 'Compile-time step validation, the <code>cargo-bdd</code> diagnostics tool, and implicit fixture injection.'},
+] %}
+{% set frame = [
+  {'number': '11.2.2', 'title': 'One prelude', 'body': 'A public prelude exporting <code>StepResult</code>, <code>Slot</code>, <code>ScenarioState</code>, and the harness-context helpers, so a test imports one module.'},
+  {'number': '11.2.3', 'title': 'Clearer harness diagnostics', 'body': 'Compile errors that spot a non-canonical harness path or a missing attribute policy, and say how to fix it.'},
+  {'number': '11.2.4', 'title': 'A compatibility suite', 'body': 'Tests proving the 0.6 patterns — mutable worlds, fallible fixtures, both harnesses, Outlines, skips — keep working.'},
+] %}
+{% set chalk = [
+  {'number': '12.2', 'title': 'Simpler harness APIs', 'body': 'Typed harness extractors for steps, configurable harness factories, one extension model for third-party harnesses, and settled async-harness semantics.'},
+  {'number': '12.2.5', 'title': 'A readable test per row', 'body': 'Every scenario and Outline row as its own named test with its own lifecycle and failure report.'},
+  {'number': '13', 'title': 'Parser-neutral execution', 'body': 'A runtime plan that Gherkin and other front ends share, so each keeps its own source locations and the same skip and failure rules.'},
+  {'number': '6.3', 'title': 'Teardown hooks', 'body': 'Hooks guaranteed to run after a scenario, whether it passed, failed, or skipped.'},
+  {'number': '6.4.1', 'title': 'Cached feature parsing', 'body': 'Parsed Gherkin cached in <code>OUT_DIR</code>, so large suites do not parse the same files on every build.'},
+  {'number': '6.2', 'title': 'Editor integration', 'body': 'A rust-analyzer procedural-macro server or a VS Code extension, and skipped scenarios surfaced in the editor.'},
+] %}

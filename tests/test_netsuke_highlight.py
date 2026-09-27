@@ -18,6 +18,7 @@ from pygments.lexers import get_lexer_by_name
 from df12_pages.highlighting import HimotoshiStyle
 from scripts import generate_cuprum_pygments_css as cuprum_generator
 from scripts import generate_himotoshi_pygments_css as himotoshi_generator
+from scripts import generate_rstest_bdd_pygments_css as rstest_bdd_generator
 from scripts import generate_stilyagi_pygments_css as stilyagi_generator
 from scripts.generate_himotoshi_pygments_css import (
     BEGIN,
@@ -288,6 +289,7 @@ class TestHimotoshiPygmentsCss:
         pytest.param(himotoshi_generator, id="himotoshi"),
         pytest.param(stilyagi_generator, id="stilyagi"),
         pytest.param(cuprum_generator, id="cuprum"),
+        pytest.param(rstest_bdd_generator, id="rstest-bdd"),
     ],
 )
 def test_generated_block_is_fenced_from_stylelint(generator: ModuleType) -> None:

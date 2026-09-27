@@ -1,0 +1,179 @@
+/* rstest-bdd sub-site stylesheet — the Tailwind 4 + daisyUI 5 entry.
+ *
+ * Compiled by the shared df12 build into
+ * public/rstest-bdd/assets/styles/rstest-bdd.css, alongside the main, mxd,
+ * Episodic, Weaver, Stilyagi, Netsuke, and Cuprum entrypoints.
+ *
+ * The site is the lantern picnic, sewn by hand: wool-cream felt for the page,
+ * night-blue felt for the chrome and the code, lantern yellow for action,
+ * and pumpkin, rust, moss, cranberry, and Bobbin's blue-grey for the patches
+ * between. The palette is declared once — as the daisyUI "rstest-bdd" theme
+ * plus the tokens under @theme — and the partials consume those variables
+ * rather than restating a colour literal. The generated Pygments block stays
+ * in src/static/rstest-bdd/assets/styles/syntax.css, which
+ * scripts/generate_rstest_bdd_pygments_css.py owns.
+ *
+ * Every class the partials define carries an `rb-` prefix. daisyUI emits
+ * every component it knows into the utilities layer, so an unprefixed
+ * `.card`, `.btn`, or `.badge` in the markup would be restyled the moment
+ * this sheet is linked, and would outrank the components layer below.
+ */
+
+@import "tailwindcss";
+
+/* @font-face rules belong to no layer: an unlayered at-rule that declares a
+ * font rather than styling an element cannot lose a cascade argument. */
+@import "./rstest-bdd/fonts.css";
+
+/* The layering is load-bearing: compiled Tailwind puts utilities in
+ * @layer utilities, and per CSS Cascade Level 5 an unlayered declaration
+ * beats every layered one regardless of specificity. In the components
+ * layer a utility in the markup still wins, which is what anyone writing
+ * `class="mt-8"` expects. Element defaults go a layer lower, beside the
+ * preflight — they describe an element before any class touches it. */
+@import "./rstest-bdd/site-base.css" layer(base);
+@import "./rstest-bdd/needlework.css" layer(components);
+@import "./rstest-bdd/chrome.css" layer(components);
+@import "./rstest-bdd/components.css" layer(components);
+
+/* The Pygments stylesheet stays at its src/static path, where its generator
+ * and test point, but compiles in here rather than loading as a link. */
+@import "../static/rstest-bdd/assets/styles/syntax.css" layer(components);
+
+/* Page partials import last, so where a page tunes a shared component its
+ * rule wins the source-order tie. Each is scoped under the page's <main>
+ * class, because every page's rules share this one sheet. */
+@import "./rstest-bdd/home.css" layer(components);
+@import "./rstest-bdd/pages.css" layer(components);
+
+/* The phone-width full bleed imports after everything it overrides. */
+@import "./rstest-bdd/bleed.css" layer(components);
+
+@source "../../templates/rstest-bdd/**/*.jinja";
+@source "../static/rstest-bdd/assets/js/*.ts";
+
+@plugin "daisyui" {
+  themes: rstest-bdd --default;
+  logs: false;
+}
+
+/* The lantern-picnic palette as a daisyUI theme.
+ *
+ * The base ramp is felt: wool cream for the page, linen for a recessed
+ * patch, burlap for a deep one; base-content is the dark-brown thread.
+ * Lantern yellow is primary because it is the colour of action — the
+ * primary button, the glow, the focus ring on night — and it carries thread
+ * type. Rust is secondary: the accent that can carry type on wool.
+ *
+ * Every content pairing but one meets WCAG 2.2 AA for body text on its
+ * fill: primary 8.39:1, secondary 6.13:1, neutral 12.15:1, info 6.62:1,
+ * success 4.90:1, warning 8.39:1, error 7.13:1. The exception is the accent:
+ * thread on pumpkin manages 4.26:1, so pumpkin is a fill, a seam, and
+ * Marrow's colour, and never carries body type.
+ */
+@plugin "daisyui/theme" {
+  name: "rstest-bdd";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #f7efdd; /* wool: the page */
+  --color-base-200: #efe3c8; /* linen: a recessed patch */
+  --color-base-300: #e2d0a8; /* burlap: a deep patch, a tag */
+  --color-base-content: #2b2019; /* thread: dark-brown type */
+  --color-primary: #e9b44c; /* lantern: action and glow */
+  --color-primary-content: #2b2019;
+  --color-secondary: #9a3a17; /* rust: accent type on wool */
+  --color-secondary-content: #f7efdd;
+  --color-accent: #d2652b; /* pumpkin: Marrow; fills and seams only */
+  --color-accent-content: #2b2019;
+  --color-neutral: #16283a; /* night: chrome, code, dark bands */
+  --color-neutral-content: #f5e6c4;
+  --color-info: #3e5957; /* Bobbin's blue-grey, cut to carry type */
+  --color-info-content: #f7efdd;
+  --color-success: #5d6e33; /* moss */
+  --color-success-content: #f7efdd;
+  --color-warning: #e9b44c;
+  --color-warning-content: #2b2019;
+  --color-error: #8f2b39; /* cranberry */
+  --color-error-content: #f7efdd;
+
+  /* Felt, not plastic: soft corners, 2px edges, and depth drawn as a
+     pressed shadow rather than a blur. */
+  --radius-selector: 0.75rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.9rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 2px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  /* Typography. Fraunces, set soft, is the display face: headlines only; its
+     rounded serifs read as stuffed felt letters. Nunito is the body and
+     interface face. JetBrains Mono is for code and file names. Every family
+     name is quoted and every generic keyword is not. */
+  --font-display: "Fraunces", "Georgia", "Times New Roman", serif;
+  --font-sans: "Nunito", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Consolas", monospace;
+
+  /* The design-language names for the daisyUI slots above, so partials and
+     templates speak needlework while the values live in exactly one place. */
+  --color-wool: var(--color-base-100);
+  --color-linen: var(--color-base-200);
+  --color-burlap: var(--color-base-300);
+  --color-thread: var(--color-base-content);
+  --color-lantern: var(--color-primary);
+  --color-rust: var(--color-secondary);
+  --color-pumpkin: var(--color-accent);
+  --color-night: var(--color-neutral);
+  --color-moss: var(--color-success);
+  --color-cranberry: var(--color-error);
+
+  /* Secondary type on wool: 7.40:1 on wool, 5.57:1 on burlap. */
+  --color-thread-muted: #5a4a3c;
+
+  /* Starlight: type on night, 12.15:1. */
+  --color-starlight: #f5e6c4;
+
+  /* Secondary type on night: 8.86:1. */
+  --color-night-muted: #c2c8c9;
+
+  /* A raised night patch, for a panel inside a night band. Starlight holds
+     9.77:1 on it and lantern 6.38:1. */
+  --color-night-raised: #1f3850;
+
+  /* Pumpkin type on night, where pumpkin itself manages only 4.03:1:
+     6.82:1. */
+  --color-pumpkin-lift: #f09a6a;
+
+  /* Moss type on wool: 6.58:1 (4.95:1 on burlap). */
+  --color-moss-text: #4b5a26;
+
+  /* Bobbin's felt, a fill: thread on it falls to 4.16:1, so it carries no
+     body type. Its type cut is --color-info, 6.62:1 on wool. */
+  --color-robot: #6c8886;
+
+  /* The cream thread of a running stitch on a dark or coloured patch. */
+  --color-stitch-cream: #f3e3c0;
+
+  /* A darker, tonal cream for thread that crosses onto a cream ground, such
+     as a blanket stitch hemming a night band to the wool above it: the
+     cream above would vanish there. Ornament, so no contrast floor applies,
+     but it holds 1.7:1 on wool and 7.9:1 on night, visible on both. */
+  --color-stitch-tonal: #d2b98a;
+
+  /* Stamped small sizes below Tailwind's text-xs. */
+  --text-2xs: 0.6875rem; /* 11px */
+  --tracking-label: 0.12em;
+
+  /* Elevation is felt pressed onto felt: a short, soft, warm shadow. */
+  --shadow-patch:
+    0 2px 0 color-mix(in oklab, var(--color-thread) 18%, transparent),
+    0 6px 14px -6px color-mix(in oklab, var(--color-thread) 35%, transparent);
+  --shadow-patch-lift:
+    0 3px 0 color-mix(in oklab, var(--color-thread) 22%, transparent),
+    0 12px 22px -8px color-mix(in oklab, var(--color-thread) 40%, transparent);
+}

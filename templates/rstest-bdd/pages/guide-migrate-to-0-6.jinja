@@ -1,0 +1,113 @@
+{% extends "pages/_guide.jinja" %}
+{% set guide_slug = 'migrate-to-0-6' %}
+{% set thesis = 'Most suites move from 0.5 to 0.6 by bumping three versions. What follows is the list of what can still break, ordered by how many suites it touches.' %}
+{% set sections = [
+  {'id': 'versions', 'label': 'Bump the versions'},
+  {'id': 'every-suite', 'label': 'What any suite may hit'},
+  {'id': 'harnesses', 'label': 'Custom harnesses'},
+  {'id': 'direct-callers', 'label': 'Direct API callers'},
+] %}
+{% block guide %}
+          <section id="versions" aria-labelledby="versions-title">
+            <h2 id="versions-title">Bump the versions</h2>
+            <p>
+              rstest-bdd {{ rstest_bdd_version }} needs Rust {{ rust_floor }}
+              or newer, because its Gherkin parser does. Move the runtime and
+              the macros together.
+            </p>
+            {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
+            {% highlight 'toml', 'lantern-syntax' %}
+[dev-dependencies]
+rstest = "{{ rstest_version }}"
+rstest-bdd = "{{ rstest_bdd_version }}"
+rstest-bdd-macros = "{{ rstest_bdd_version }}"
+            {% endhighlight %}
+            {% endcall %}
+          </section>
+
+          <section id="every-suite" aria-labelledby="every-suite-title">
+            <h2 id="every-suite-title">What any suite may hit</h2>
+            <h3>An underscore no longer names a different fixture</h3>
+            <p>
+              Exactly one leading underscore is dropped from an implicit
+              fixture name, so <code>_world</code> and <code>world</code> both
+              ask for the <code>world</code> fixture. A parameter underscored
+              only to quiet the unused-variable lint needs no change. One that
+              meant a fixture literally named <code>_world</code> now says so:
+            </p>
+            {% call ui.code_panel('From the v0.6.0 migration guide', copy=false, foot='Quoted from the migration guide.') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[scenario(path = "tests/features/search.feature")]
+fn search_works(#[from(_world)] world: SearchWorld) {}
+            {% endhighlight %}
+            {% endcall %}
+            <h3>A <code>Result</code> alias can now fail a scenario</h3>
+            <p>
+              A step returning a local alias of <code>Result&lt;T, E&gt;</code>
+              used to have its <code>Err</code> boxed up as a value and ignored,
+              so the scenario passed. It now fails at that step, and
+              <code>Ok(T)</code> injects the <code>T</code>. A scenario that
+              turns red here was wrong before; the error type must implement
+              <code>Display</code>.
+            </p>
+            <h3>The Tokio runtime alias is deprecated</h3>
+            <p>
+              <code>scenarios!(…, runtime = "tokio-current-thread")</code> still
+              compiles, with a warning, as an alias for
+              <code>harness = rstest_bdd_harness_tokio::TokioHarness</code>.
+              Name the harness instead, and add
+              <code>rstest-bdd-harness-tokio</code> as a dev-dependency; the
+              <a href="/rstest-bdd/harnesses/#tokio">harnesses</a> page shows
+              the form.
+            </p>
+          </section>
+
+          <section id="harnesses" aria-labelledby="harnesses-title">
+            <h2 id="harnesses-title">Custom harnesses</h2>
+            <p>
+              <code>HarnessAdapter::run</code> now returns
+              <code>HarnessResult&lt;T&gt;</code>, so a harness that fails to
+              build its runtime reports an infrastructure error rather than
+              panicking inside the scenario. Wrap the result in
+              <code>Ok</code>, and map construction errors to
+              <code>HarnessError</code>:
+            </p>
+            {% call ui.code_panel('tests/own_stage.rs', sample='tests/own_stage.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+impl HarnessAdapter for LanternStage {
+    type Context = ();
+
+    fn run<T>(&self, request: StdScenarioRunRequest<'_, T>) -> HarnessResult<T> {
+        eprintln!("lighting the lantern stage");
+        Ok(request.run_without_context())
+    }
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              A harness named in <code>harness = …</code> is built with
+              <code>Default</code>, so it must implement both traits. Only
+              projects that adopted the harness API from the 0.6.0
+              development branch have one to change.
+            </p>
+          </section>
+
+          <section id="direct-callers" aria-labelledby="direct-callers-title">
+            <h2 id="direct-callers-title">Direct API callers</h2>
+            <p>
+              These affect only code that calls the runtime or the language
+              server’s library directly; generated scenario code is updated by
+              the macros.
+            </p>
+            <ul>
+              <li><code>StepContext::insert_value</code> returns <code>InsertOutcome</code> instead of <code>Option&lt;Box&lt;dyn Any&gt;&gt;</code>.</li>
+              <li><code>record_bypassed_steps</code> takes a <code>BypassedScenario</code> descriptor and the bypassed steps.</li>
+              <li>Feature paths in diagnostics, the JSON report, and JUnit’s <code>classname</code> are relative to the crate’s manifest directory.</li>
+              <li>The language server’s indexing functions return <code>RustStepIndexResult</code>, and <code>find_feature_files</code> returns a <code>Result</code>.</li>
+            </ul>
+            <p>
+              The <a href="{{ repository_url }}/blob/{{ rstest_bdd_tag }}/docs/v0-6-0-migration-guide.md">migration guide</a>
+              has before-and-after code for each, and a list of common errors.
+            </p>
+          </section>
+{% endblock %}

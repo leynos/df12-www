@@ -1,0 +1,131 @@
+{#
+  The lantern picnic: the home page's eight chapters, in order. One list
+  drives the chapter tabs, the chapters themselves, and their numbering.
+
+  Each chapter carries:
+    tab       the one-word tab label
+    label     the concept the chapter teaches, after "Chapter nn ·"
+    title     the chapter heading
+    story     what happens in the picture
+    concept   the rstest-bdd idea, named in the note's label
+    technical the note's body
+    code      the snippet's kind: a sample `file` it is excerpted from, with
+              its `lexer`, or `output` for a real transcript
+    alt       what the illustration shows
+    caption   who is in it and what they are doing
+
+  The snippets are captured blocks below, keyed by chapter number. Every
+  sample excerpt is a contiguous run of lines from the named file under
+  samples/, which tests/test_rstest_bdd_build.py checks; the transcripts are
+  what the samples print, with the Fluent isolation marks the terminal does
+  not show removed.
+#}
+{% set chapters = [
+  {'tab': 'Agree', 'label': 'Shared understanding',
+   'title': 'First, agree what good looks like.',
+   'story': 'A lantern on the trolley. A ring of the bell. An upright lantern at the picnic table. Three pictures make the promise concrete enough to argue about.',
+   'concept': 'Gherkin scenarios',
+   'technical': 'Given sets the starting state, When names the action, and Then states the result. The team now has one sentence to point at.',
+   'code': {'file': 'tests/features/lantern.feature', 'lexer': 'gherkin'},
+   'alt': 'Marrow the felt crab, a cream rabbit, and a cloth robot lean over a workshop table to agree a three-picture storyboard: a trolley with a lantern, a bell, and an upright lantern.',
+   'caption': 'Marrow aligns the storyboard. Clover points to the promise; Bobbin brings the trolley.'},
+  {'tab': 'Connect', 'label': 'Executable steps',
+   'title': 'A story with something attached.',
+   'story': 'Marrow clips the pictures above the route. Bobbin has already built the mechanism. Clover holds the promised result beside the destination.',
+   'concept': 'Step functions',
+   'technical': 'A feature file does not make software work. #[given], #[when], and #[then] bind each line to a Rust function; #[scenario] binds the story to a test.',
+   'code': {'file': 'tests/lantern.rs', 'lexer': 'rust'},
+   'alt': 'Marrow clips a storyboard above a toy trolley route, with a bell and a release mechanism along the track.',
+   'caption': 'Marrow attaches the storyboard; Bobbin connects the mechanism and Clover checks the destination.'},
+  {'tab': 'Run', 'label': 'The existing test runner',
+   'title': 'A new story. The same workshop.',
+   'story': 'A wheel check, a bell check, and a full rehearsal share the familiar bench. Clover brings another stool. Nobody builds an extension.',
+   'concept': 'Ordinary tests',
+   'technical': 'Each scenario expands to an rstest test and runs under cargo test, with the filters, parallelism, and CI already in place.',
+   'code': {'file': none, 'lexer': 'console'},
+   'alt': 'A workshop bench holds a wheel jig, a bell check, and the full trolley rehearsal side by side.',
+   'caption': 'Marrow adds the rehearsal to the bench while Bobbin checks the bell and Clover brings a stool.'},
+  {'tab': 'Prepare', 'label': 'Composable fixtures',
+   'title': 'Good beginnings bear repeating.',
+   'story': 'Marrow opens the props cupboard. Every rehearsal gets its own freshly reset trolley. The bells have their own muffler.',
+   'concept': 'Fixtures',
+   'technical': 'rstest fixtures supply the setup. Each scenario gets its own, and steps may take &mut to it: no compulsory World struct, no shared mutable trolley.',
+   'code': {'file': 'tests/lantern.rs', 'lexer': 'rust'},
+   'alt': 'A compartmented props cupboard supplies separate trolley rehearsal boards for Marrow and the robot.',
+   'caption': 'Marrow and Bobbin prepare separate rehearsals; Clover brings a lantern from the props cupboard.'},
+  {'tab': 'Repeat', 'label': 'Explicit example cases',
+   'title': 'Nothing was a delivery too.',
+   'story': 'Once with one lantern. Once with two. Once with none. Marrow gives the empty trolley their full attention. It must not acquire a lantern on the way.',
+   'concept': 'Scenario Outlines',
+   'technical': 'An Examples table repeats a scenario once per row, and each row runs as its own test case. Three chosen rows are three cases, not a proof.',
+   'code': {'file': 'tests/features/counting.feature', 'lexer': 'gherkin'},
+   'alt': 'Three miniature lanes carry exactly one lantern, two lanterns, and no lanterns.',
+   'caption': 'Marrow inspects the empty trolley while Bobbin and Clover rehearse one-, two-, and zero-lantern deliveries.'},
+  {'tab': 'Discover', 'label': 'Useful failures',
+   'title': 'The trolley arrived. The promise didn’t.',
+   'story': 'The lantern still glows. It also lies on its side. Marrow holds up the original picture. Nearly right is useful information.',
+   'concept': 'Failures that point somewhere',
+   'technical': 'The failure names the step, the function, the feature file, and the scenario. The test finds the broken promise; the repair is still Bobbin’s job.',
+   'code': {'file': none, 'lexer': 'output'},
+   'alt': 'Marrow holds a picture of an upright lantern beside the real lantern, which glows while lying on its side in the trolley.',
+   'caption': 'Marrow compares the promise with the fallen lantern; Clover and Bobbin investigate the strap.'},
+  {'tab': 'Adapt', 'label': 'Harness adapters',
+   'title': 'Keep the story. Choose its stage.',
+   'story': 'The strap is fixed. The three carry the trolley towards another stage, ready for a fresh rehearsal.',
+   'concept': 'Where a scenario runs',
+   'technical': 'harness = chooses the stage: the standard harness, Tokio, or GPUI, or one written for the job. The feature file and the steps stay as they are.',
+   'code': {'file': 'tests/stage.rs', 'lexer': 'rust'},
+   'alt': 'Marrow, the rabbit, and the robot carry the repaired trolley towards timber, clockwork, and window-shaped stage supports.',
+   'caption': 'Marrow, Clover, and Bobbin choose a stage for the repaired trolley.'},
+  {'tab': 'Tea', 'label': 'A promise kept',
+   'title': 'And then there was time for tea.',
+   'story': 'The lanterns stand upright. Clover pours, Bobbin unfolds a napkin, and Marrow puts the clipboard down. One piece of shortbread remains unaccounted for.',
+   'concept': 'Evidence, not a guarantee',
+   'technical': 'A passing scenario is evidence for the behaviour it exercises. That is worth a picnic. It is not a promise that nothing will ever tip over again.',
+   'code': {'file': none, 'lexer': 'output'},
+   'alt': 'At dusk, Marrow, the rabbit, and the cloth robot share tea and shortbread on a checked blanket beside the trolley of glowing lanterns.',
+   'caption': 'Marrow settles down with shortbread while Clover pours tea and Bobbin lays out a napkin.'},
+] %}
+
+{% set snippet_1 %}
+Given a lantern on the trolley
+When the departure bell rings
+Then the lantern arrives upright
+{% endset %}
+{% set snippet_2 %}
+#[given("a lantern on the trolley")]
+fn load(trolley: &mut Trolley) {
+    trolley.loaded = true;
+    trolley.upright = true;
+}
+{% endset %}
+{% set snippet_3 %}
+$ cargo test lantern_delivery
+{% endset %}
+{% set snippet_4 %}
+#[fixture]
+fn trolley() -> Trolley {
+    Trolley::default()
+}
+{% endset %}
+{% set snippet_5 %}
+Examples:
+  | count |
+  | 1     |
+  | 2     |
+  | 0     |
+{% endset %}
+{% set snippet_6 %}
+assertion failed: trolley.upright
+Step failed at index 2: Then the lantern arrives upright - Panic in step 'the lantern arrives upright', function 'check': assertion failed: trolley.upright (feature: tests/features/lantern.feature, scenario: Deliver a lantern)
+{% endset %}
+{% set snippet_7 %}
+harness = rstest_bdd_harness_tokio::TokioHarness,
+{% endset %}
+{% set snippet_8 %}
+running 1 test
+test lantern_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+{% endset %}
+{% set snippets = [snippet_1, snippet_2, snippet_3, snippet_4, snippet_5, snippet_6, snippet_7, snippet_8] %}

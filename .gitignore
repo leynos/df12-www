@@ -247,3 +247,7 @@ target/
 terraform.tfvars.*
 .vtcode/
 *.swo
+
+# Cargo build output for the rstest-bdd sample crate, which the sub-site
+# includes verbatim and `make rstest-bdd-samples` compiles and runs.
+templates/rstest-bdd/samples/target/

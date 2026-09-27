@@ -1,0 +1,112 @@
+{% extends "pages/_guide.jinja" %}
+{% set guide_slug = 'steps' %}
+{% set thesis = 'A step definition is an ordinary Rust function with a pattern on it. The pattern decides which lines it runs for and what it pulls out of them.' %}
+{% set sections = [
+  {'id': 'patterns', 'label': 'Patterns'},
+  {'id': 'placeholders', 'label': 'Typed placeholders'},
+  {'id': 'inferred', 'label': 'Inferred patterns and expr'},
+  {'id': 'returns', 'label': 'Steps that return'},
+  {'id': 'fine-print', 'label': 'Fine print'},
+] %}
+{% block guide %}
+          <section id="patterns" aria-labelledby="patterns-title">
+            <h2 id="patterns-title">Patterns</h2>
+            <p>
+              <code>#[given]</code>, <code>#[when]</code>, and
+              <code>#[then]</code> each take the text of the step they
+              implement, without its keyword. A pattern matches the whole
+              line, not a prefix of it, and a <code>And</code> or
+              <code>But</code> step is matched against the keyword it
+              continues.
+            </p>
+            {% call ui.code_panel('tests/lantern.rs', sample='tests/lantern.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[given("a lantern on the trolley")]
+fn load(trolley: &mut Trolley) {
+    trolley.loaded = true;
+    trolley.upright = true;
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              Parameters that are not placeholders are fixtures, found by
+              name: <code>trolley</code> here is the <code>trolley</code>
+              fixture. <a href="/rstest-bdd/guides/fixtures-and-state/">Fixtures and state</a>
+              covers them.
+            </p>
+          </section>
+
+          <section id="placeholders" aria-labelledby="placeholders-title">
+            <h2 id="placeholders-title">Typed placeholders</h2>
+            <p>
+              <code>{name}</code> in a pattern captures text into the parameter
+              of the same name. <code>{name:Type}</code> also constrains what
+              matches and parses it through <code>FromStr</code> before the
+              step runs, so the function receives a number rather than a
+              string.
+            </p>
+            {% call ui.code_panel('tests/counting.rs', sample='tests/counting.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[given("a trolley carrying {count:u32} lanterns")]
+fn load(trolley: &mut Trolley, count: u32) {
+    trolley.lanterns = count;
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              Quotes in the step are part of the text, so a pattern that
+              expects them says so, and the placeholder captures what is
+              between them:
+            </p>
+            {% call ui.code_panel('tests/weather.rs', sample='tests/weather.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[given("the forecast is \"{forecast}\"")]
+            {% endhighlight %}
+            {% endcall %}
+          </section>
+
+          <section id="inferred" aria-labelledby="inferred-title">
+            <h2 id="inferred-title">Inferred patterns and <code>expr</code></h2>
+            <p>
+              A step attribute with no pattern takes it from the function’s
+              name, with underscores read as spaces. A pattern may also be
+              given as <code>expr = "…"</code>, the form cucumber-rs uses, which
+              eases moving a suite across.
+            </p>
+            {{ ui.sample('tests/features/bell.feature') }}
+            {{ ui.sample('tests/bell.rs') }}
+          </section>
+
+          <section id="returns" aria-labelledby="returns-title">
+            <h2 id="returns-title">Steps that return</h2>
+            <p>
+              A step may return a value instead of mutating a fixture. The
+              value replaces the one fixture of the same type for the steps
+              that follow. A <code>Result</code> is unwrapped: <code>Ok</code>
+              is stored, and <code>Err</code> fails the scenario at that step.
+            </p>
+            {{ ui.sample('tests/features/shortbread.feature') }}
+            {{ ui.sample('tests/shortbread.rs') }}
+            <p>
+              Here the <code>Given</code> step fills the tin, the
+              <code>When</code> step hands back a new one, and the
+              <code>Then</code> step reads the latest. Were four friends to
+              arrive at a tin of three, the <code>When</code> step would fail
+              with “only 3 biscuits for 4 friends”.
+            </p>
+          </section>
+
+          <section id="fine-print" aria-labelledby="fine-print-title">
+            <h2 id="fine-print-title">Fine print</h2>
+            {% call ui.note('Matching rules', 'caveat') %}
+            <p>
+              A returned value replaces a fixture only when exactly one fixture
+              has its type; with none, or more than one, the value is dropped
+              and the fixtures stay as they were. A returned
+              <code>()</code> or <code>Ok(())</code> stores nothing. To match a
+              literal brace in a pattern, double it: <code>{{ '{{' }}</code> and
+              <code>{{ '}}' }}</code>.
+            </p>
+            {% endcall %}
+          </section>
+{% endblock %}

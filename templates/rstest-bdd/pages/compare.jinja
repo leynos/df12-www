@@ -1,0 +1,86 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% block title %}rstest-bdd and cucumber-rs · rstest-bdd{% endblock %}
+{% block description %}How rstest-bdd and cucumber-rs differ: the test runner, where state lives, how steps are found, and async support. A different trade-off, not a replacement.{% endblock %}
+{% block main_class %} class="rb-compare"{% endblock %}
+{% block content %}
+      {% call ui.page_head(
+        'Compare',
+        'A different trade-off, not a replacement.',
+        'cucumber-rs ports classic Cucumber to Rust and does it well. rstest-bdd treats BDD as an extension of rstest, for teams already invested in cargo test.',
+        image={
+          'name': 'neighbouring-picnics',
+          'alt': 'Two neighbouring felt picnics on a patchwork meadow: on the left the rabbit, the robot, and Marrow the crab on a gingham blanket; on the right a cheerful felt cucumber at a small table with a cake stand, waving a leaf across the hedge as Marrow waves back.',
+          'label': 'Next door',
+          'caption': 'Marrow waves to the neighbours. Both picnics are going well.',
+          'eager': true,
+        }) %}
+        {{ ui.button('Coming from cucumber-rs', '#coming-from-cucumber', icon='arrow-down') }}
+      {% endcall %}
+
+      <section class="rb-section" aria-labelledby="side-by-side-title">
+        <div class="rb-shell">
+          {{ ui.section_head('1', 'Side by side', 'Where the two differ.', 'side-by-side-title',
+             lede='Both read Gherkin and run Rust steps. They part ways over who runs the tests and where state lives.') }}
+          {{ ui.matrix('rstest-bdd and cucumber-rs compared',
+            ['', 'rstest-bdd', 'cucumber-rs'],
+            [
+              ['Test runner', '<code>cargo test</code>, with <code>rstest</code> underneath', 'Its own, started by <code>World::run(…)</code>'],
+              ['State', '<code>rstest</code> fixtures, fresh per scenario', 'A <code>World</code> struct per scenario'],
+              ['Finding steps', 'Registered at compile time, matched at run time', 'Collected by the runner'],
+              ['Scenario Outlines', 'One <code>rstest</code> case per Examples row', 'Expanded by the runner'],
+              ['Async', 'Tokio current-thread, as an async scenario or through <code>TokioHarness</code>', 'Built in, on the runtime the runner is given'],
+              ['Missing steps', 'Fail at run time; a compile error under strict validation', 'Reported by the runner'],
+              ['Philosophy', 'BDD as an extension of <code>rstest</code>', 'A Rust port of classic Cucumber'],
+            ]) }}
+        </div>
+      </section>
+
+      <section id="coming-from-cucumber" class="rb-section rb-surface-linen rb-blanket-top" aria-labelledby="coming-title">
+        <div class="rb-shell">
+          {{ ui.section_head('2', 'Coming from cucumber-rs', 'The same ideas, different homes.', 'coming-title',
+             lede='A cucumber-rs suite moves across concept by concept. The feature files do not change.') }}
+          <div class="rb-quilt rb-compare__map">
+            {% set mapping = [
+              ('World', 'A fixture, or several', 'Each scenario gets fresh fixtures; a step asks for the ones it needs by name.', '/rstest-bdd/guides/fixtures-and-state/#fixtures'),
+              ('&mut World in a step', '&mut Fixture', 'Steps take &mut to a fixture the scenario owns. No RefCell.', '/rstest-bdd/guides/fixtures-and-state/#mutable'),
+              ('Option fields on the World', 'Slot<T>', 'Empty until a step fills it, reset in one call.', '/rstest-bdd/guides/fixtures-and-state/#slots'),
+              ('Expensive setup shared by all', '#[once] fixture', 'Built once and kept read-only; per-scenario data is built from it.', '/rstest-bdd/guides/fixtures-and-state/#shared'),
+              ('#[given(expr = "…")]', 'The same, accepted', 'The step macros take expr = for a gentler move.', '/rstest-bdd/guides/steps/#inferred'),
+              ('The runner’s filters', 'cargo test filters and tags', 'Tag expressions choose scenarios at compile time; test names filter at run time.', '/rstest-bdd/guides/binding-and-filtering/#tags'),
+            ] %}
+            {% for from, to, body, href in mapping %}
+            <a class="rb-card rb-patch rb-stitched" href="{{ href }}">
+              <span class="rb-kicker">{{ from }}</span>
+              <h3 class="rb-card__title"><code>{{ to }}</code></h3>
+              <p class="rb-card__body">{{ body }}</p>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="rb-section" aria-labelledby="choose-title">
+        <div class="rb-shell rb-compare__choose">
+          {{ ui.section_head('3', 'Choosing', 'Pick the one that suits the suite.', 'choose-title') }}
+          <div class="rb-quilt">
+            <article class="rb-card rb-patch rb-patch--moss rb-stitched">
+              <h3 class="rb-card__title">rstest-bdd, when…</h3>
+              <ul class="rb-compare__list">
+                <li>the crate already tests with <code>rstest</code>, and scenarios should share its fixtures;</li>
+                <li>scenarios should run under <code>cargo test</code>, with its filters, parallelism, and IDE support;</li>
+                <li>each scenario’s state should be isolated by default.</li>
+              </ul>
+            </article>
+            <article class="rb-card rb-patch rb-patch--robot rb-stitched">
+              <h3 class="rb-card__title">cucumber-rs, when…</h3>
+              <ul class="rb-compare__list">
+                <li>a dedicated runner, with its own output and hooks, is the point;</li>
+                <li>one <code>World</code> per scenario is the model the team wants;</li>
+                <li>async steps must run on a multi-threaded runtime.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+{% endblock %}

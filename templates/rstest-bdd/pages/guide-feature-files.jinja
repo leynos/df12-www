@@ -1,0 +1,121 @@
+{% extends "pages/_guide.jinja" %}
+{% set guide_slug = 'feature-files' %}
+{% set thesis = 'A feature file is the part of the suite everyone reads. Scenarios, Background, Outlines, tables, docstrings, tags, and other languages, with the Rust each one needs.' %}
+{% set sections = [
+  {'id': 'scenario', 'label': 'One scenario'},
+  {'id': 'background', 'label': 'Background, tables, docstrings'},
+  {'id': 'outline', 'label': 'Scenario Outlines'},
+  {'id': 'tags', 'label': 'Tags'},
+  {'id': 'languages', 'label': 'Other languages'},
+  {'id': 'fine-print', 'label': 'Fine print'},
+] %}
+{% block guide %}
+          <section id="scenario" aria-labelledby="scenario-title">
+            <h2 id="scenario-title">One scenario</h2>
+            <p>
+              A file starts with <code>Feature:</code> and holds one or more
+              scenarios. Each scenario is a list of steps, and each step starts
+              with a keyword: <code>Given</code> for the starting state,
+              <code>When</code> for the action, <code>Then</code> for the
+              result. <code>And</code> and <code>But</code> continue whichever
+              keyword came before.
+            </p>
+            {{ ui.sample('tests/features/lantern.feature') }}
+            <p>
+              Write steps about what someone could observe, not about the code
+              that makes it happen. “The lantern arrives upright” survives a
+              rewrite of the trolley; “<code>upright</code> is true” does not.
+            </p>
+          </section>
+
+          <section id="background" aria-labelledby="background-title">
+            <h2 id="background-title">Background, tables, and docstrings</h2>
+            <p>
+              A <code>Background</code> runs before every scenario in the file.
+              A data table follows a step as rows between pipes; a docstring
+              follows a step between triple quotes. Both belong to the step
+              above them.
+            </p>
+            {{ ui.sample('tests/features/hamper.feature') }}
+            <p>
+              A step receives its table through a <code>#[datatable]</code>
+              parameter and its docstring through a parameter named
+              <code>docstring</code>. <code>Rows&lt;Item&gt;</code> parses each
+              row into a struct that derives <code>DataTableRow</code>, matching
+              columns to fields by the header; <code>#[datatable(truthy)]</code>
+              reads “yes” and “no” as booleans.
+            </p>
+            {{ ui.sample('tests/hamper.rs') }}
+            {% call ui.note('A table can stay untyped') %}
+            <p>
+              <code>Vec&lt;Vec&lt;String&gt;&gt;</code> takes the table as it
+              is written, header row and all. Reach for <code>Rows&lt;T&gt;</code>
+              once the steps start parsing cells by hand.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="outline" aria-labelledby="outline-title">
+            <h2 id="outline-title">Scenario Outlines</h2>
+            <p>
+              An Outline is a scenario with placeholders in angle brackets and
+              an <code>Examples</code> table. Each row becomes a test case, and
+              each <code>&lt;placeholder&gt;</code> is replaced by that row’s
+              value before any step is matched, so the steps see
+              <code>a trolley carrying 2 lanterns</code>.
+            </p>
+            {{ ui.sample('tests/features/counting.feature') }}
+            <p>
+              The rows run as <code>counting_lanterns::case_1</code>,
+              <code>case_2</code>, and <code>case_3</code>. The Rust is on the
+              <a href="/rstest-bdd/getting-started/#repeat">getting started</a>
+              page.
+            </p>
+          </section>
+
+          <section id="tags" aria-labelledby="tags-title">
+            <h2 id="tags-title">Tags</h2>
+            <p>
+              A tag is a word starting with <code>@</code>, on the line above a
+              feature, a scenario, or an Examples table. Tags select which
+              scenarios become tests, and <code>@allow_skipped</code> marks a
+              skip as expected.
+            </p>
+            {{ ui.sample('tests/features/auto/weather.feature') }}
+            <p>
+              Selection happens when the test compiles, so a scenario a tag
+              expression leaves out is not a test at all rather than an
+              ignored one. The expressions are in
+              <a href="/rstest-bdd/guides/binding-and-filtering/#tags">bind and filter scenarios</a>.
+            </p>
+          </section>
+
+          <section id="languages" aria-labelledby="languages-title">
+            <h2 id="languages-title">Other languages</h2>
+            <p>
+              A <code># language:</code> line at the top of the file switches
+              the keywords to any language Gherkin knows. Nothing else needs
+              configuring; the step patterns are written in the same language
+              as the steps.
+            </p>
+            {{ ui.sample('tests/features/pique_nique.feature') }}
+            {{ ui.sample('tests/pique_nique.rs') }}
+            <p>
+              The repository’s <code>japanese-ledger</code> example does the
+              same in Japanese, with a <code>背景</code> (Background) and
+              typed placeholders.
+            </p>
+          </section>
+
+          <section id="fine-print" aria-labelledby="fine-print-title">
+            <h2 id="fine-print-title">Fine print</h2>
+            {% call ui.note('What the parser does not do', 'caveat') %}
+            <p>
+              The <code>*</code> step keyword is parsed but never matched to a
+              step definition. Tags on an Examples table select rows for
+              compilation, but <code>@allow_skipped</code> is read from the
+              feature and the scenario only.
+            </p>
+            {% endcall %}
+          </section>
+{% endblock %}

@@ -1,0 +1,29 @@
+/* Below 480px, content panels run full bleed, as Netsuke's code windows and
+ * Cuprum's panels do: code panels, output slips, and illustration frames
+ * shed the page gutter, their rounded corners, and their side stitches, so a
+ * line of code gets the whole phone width. A panel nested inside another
+ * stays inside it. This file imports last, so no !important is needed. */
+
+@media (width < 30rem) {
+  .rb-shell > .rb-code,
+  .rb-shell .rb-code:not(.rb-code .rb-code),
+  .rb-shell .rb-output,
+  .rb-shell .rb-figure {
+    margin-inline: calc(var(--rb-gutter) * -1);
+    border-radius: 0;
+  }
+
+  .rb-shell .rb-code,
+  .rb-shell .rb-figure {
+    --rb-radius: 0;
+    --rb-stitch-inset: 5px 0;
+  }
+
+  .rb-shell .rb-output {
+    border-inline: 0;
+  }
+
+  .rb-shell .rb-figure img {
+    border-radius: 0;
+  }
+}

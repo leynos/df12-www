@@ -1,0 +1,150 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% block title %}Harnesses · rstest-bdd{% endblock %}
+{% block description %}rstest-bdd {{ rstest_bdd_version }} harness adapters: run the same scenario on the test thread, in a Tokio runtime, in GPUI, or on a stage of your own.{% endblock %}
+{% block main_class %} class="rb-harnesses"{% endblock %}
+{% block content %}
+{% set sections = [
+  {'id': 'stages', 'label': 'The stages'},
+  {'id': 'tokio', 'label': 'The Tokio stage'},
+  {'id': 'gpui', 'label': 'The GPUI stage'},
+  {'id': 'own', 'label': 'A stage of your own'},
+] %}
+      {% call ui.page_head(
+        'New in ' ~ rstest_bdd_version,
+        'Keep the story. Choose its stage.',
+        'A harness adapter owns the environment a scenario runs in. The feature file and the steps stay the same; harness = picks the stage.',
+        image={
+          'name': 'three-stages',
+          'alt': 'The rabbit, Marrow, and the robot push a toy trolley with an upright glowing lantern across a patchwork quilt towards three felt puppet-theatre stages: oatmeal wool, mustard with brass cogs, and night blue with embroidered stars.',
+          'label': 'Three stages',
+          'caption': 'Clover, Marrow, and Bobbin take the same rehearsal to a new stage.',
+          'eager': true,
+        }) %}
+        {{ ui.button('Compare the stages', '#stages', icon='arrow-down') }}
+      {% endcall %}
+
+      <div class="rb-shell rb-guide">
+        <nav class="rb-toc rb-stitched" aria-label="On this page">
+          <div class="rb-toc__rail">
+            <p class="rb-toc__heading">On this page</p>
+            <ol class="rb-toc__list">
+              {% for section in sections %}<li><a href="#{{ section.id }}">{{ section.label }}</a></li>{% endfor %}
+            </ol>
+          </div>
+          <details class="rb-toc__menu">
+            <summary>On this page {{ icons.icon('chevron-solid', 'rb-toc__chevron') }}</summary>
+            <ol class="rb-toc__list">
+              {% for section in sections %}<li><a href="#{{ section.id }}">{{ section.label }}</a></li>{% endfor %}
+            </ol>
+          </details>
+          <p class="rb-toc__source">Full reference: <a href="/docs-rstest-bdd-binding-tests-to-scenarios.html">binding tests to scenarios</a></p>
+        </nav>
+
+        <div class="rb-guide__body">
+          <section id="stages" aria-labelledby="stages-title">
+            <h2 id="stages-title">The stages</h2>
+            <p>
+              Without <code>harness</code>, a scenario runs on the test thread.
+              With it, the generated test hands the whole run — steps, skip
+              handling, and the scenario body — to the adapter, which may set
+              up a runtime or an application first. Three adapters ship with
+              {{ rstest_bdd_version }}.
+            </p>
+            {{ ui.matrix('Harness adapters in rstest-bdd ' ~ rstest_bdd_version,
+              ['Harness', 'Crate', 'Runs the scenario', 'Step context', 'Use it when'],
+              [
+                ['<code>StdHarness</code>', '<code>rstest-bdd-harness</code>', 'On the test thread', 'None', 'Always, by default; nothing to add.'],
+                ['<code>TokioHarness</code>', '<code>rstest-bdd-harness-tokio</code>', 'In a Tokio current-thread runtime', '<code>TokioTestContext</code>', 'Steps need the runtime handle or spawn tasks.'],
+                ['<code>GpuiHarness</code>', '<code>rstest-bdd-harness-gpui</code>', 'Under <code>#[gpui::test]</code>', '<code>gpui::TestAppContext</code>', 'The application is built on GPUI.'],
+                ['Your own', 'Implements <code>HarnessAdapter</code>', 'Wherever the adapter says', 'Its <code>Context</code> type', 'Anything else: a simulator, an ECS world.'],
+              ]) }}
+            <p>
+              For the first-party adapters the macro infers the matching test
+              attributes from the harness path, so <code>harness = …</code> is
+              the only argument needed. <code>attributes = …</code> exists to
+              override that choice.
+            </p>
+          </section>
+
+          <section id="tokio" aria-labelledby="tokio-title">
+            <h2 id="tokio-title">The Tokio stage</h2>
+            <p>
+              Add <code>rstest-bdd-harness-tokio = "{{ rstest_bdd_version }}"</code>
+              as a dev-dependency. A step reaches the runtime through a
+              parameter marked <code>#[harness_context]</code>.
+            </p>
+            {{ ui.sample('tests/features/stage.feature') }}
+            {{ ui.sample('tests/stage.rs') }}
+            {% call ui.note('Steps under the harness must not wait', 'caveat') %}
+            <p>
+              The <code>async fn</code> step above completes without suspending,
+              so it runs. A step that awaits a timer or a channel fails with
+              “async step yielded Pending inside a harness-provided runtime”, and
+              an <code>async fn</code> scenario cannot take a harness at all.
+              For steps that wait on real work, use an async scenario under
+              <code>#[tokio::test]</code>; the
+              <a href="/rstest-bdd/guides/async/">async guide</a> shows both.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="gpui" aria-labelledby="gpui-title">
+            <h2 id="gpui-title">The GPUI stage</h2>
+            <p>
+              <code>rstest-bdd-harness-gpui</code> runs the scenario under
+              GPUI’s test attribute and hands steps the
+              <code>gpui::TestAppContext</code> through
+              <code>#[harness_context]</code>. A fallible scenario body that
+              returns <code>Err</code> fails with “scenario returned an error”.
+            </p>
+            {% call ui.code_panel('From the user’s guide', copy=false, foot='Quoted from the user’s guide; the sample crate does not build GPUI.') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[scenario(
+    path = "tests/features/counter.feature",
+    name = "Increment a counter and observe GPUI context",
+    harness = rstest_bdd_harness_gpui::GpuiHarness,
+)]
+fn increment_and_observe_gpui_context() -> Result<(), std::io::Error> {
+    increment_counter()?;
+    Ok(())
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              Scenarios that keep windows and entities alive between steps have
+              their own playbook in the
+              <a href="/docs-rstest-bdd-binding-tests-to-scenarios.html">user’s guide</a>,
+              and the repository’s <code>gpui-counter</code> example runs one.
+            </p>
+          </section>
+
+          <section id="own" aria-labelledby="own-title">
+            <h2 id="own-title">A stage of your own</h2>
+            <p>
+              An adapter implements <code>HarnessAdapter</code> from
+              <code>rstest-bdd-harness</code> and <code>Default</code>, because
+              the macro builds it. <code>run</code> receives the scenario as a
+              request, sets the stage, and runs it. It returns
+              <code>HarnessResult&lt;T&gt;</code>, so a stage that fails to
+              build is an infrastructure error with its own message, not a
+              failed assertion.
+            </p>
+            {{ ui.sample('tests/own_stage.rs') }}
+            {% call ui.output('cargo test --test own_stage -- --nocapture', 'excerpt') %}
+running 1 test
+lighting the lantern stage
+test lantern_stage ... ok
+            {% endcall %}
+            <p>
+              An adapter with a context of its own sets <code>Context</code>
+              and hands it to the steps that ask with
+              <code>#[harness_context]</code>. The user’s guide has a cookbook
+              for third-party adapters, with a conformance check for attribute
+              policies.
+            </p>
+          </section>
+        </div>
+      </div>
+{% endblock %}

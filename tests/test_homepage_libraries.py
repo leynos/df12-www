@@ -170,7 +170,8 @@ def test_shipped_config_lists_cuprum_and_rstest_bdd() -> None:
     assert set(by_label) == {"Cuprum", "rstest-bdd"}
     assert by_label["Cuprum"].href == "cuprum/"
     assert not by_label["Cuprum"].external, "Cuprum is a local sub-site"
-    assert by_label["rstest-bdd"].external
+    assert by_label["rstest-bdd"].href == "rstest-bdd/"
+    assert not by_label["rstest-bdd"].external, "rstest-bdd is a local sub-site"
 
 
 def test_rendered_homepage_lists_libraries_in_the_tools_section(tmp_path: Path) -> None:
@@ -194,8 +195,8 @@ def test_rendered_homepage_lists_libraries_in_the_tools_section(tmp_path: Path) 
         links[title.get_text(strip=True)] = anchor
     assert links["Cuprum"]["href"] == "cuprum/"
     assert "target" not in links["Cuprum"].attrs
-    assert links["rstest-bdd"]["target"] == "_blank"
-    assert "noopener" in links["rstest-bdd"]["rel"]
+    assert links["rstest-bdd"]["href"] == "rstest-bdd/"
+    assert "target" not in links["rstest-bdd"].attrs
 
     for label, anchor in links.items():
         link = expected[label]

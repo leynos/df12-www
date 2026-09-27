@@ -1,0 +1,70 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% from "data/roadmap.jinja" import releases, frame, chalk %}
+{% block title %}Roadmap · rstest-bdd{% endblock %}
+{% block description %}What rstest-bdd has shipped, what is next on the frame, and what is chalked out, from the project's releases and roadmap.{% endblock %}
+{% block main_class %} class="rb-roadmap"{% endblock %}
+{% block content %}
+      {% call ui.page_head(
+        'Roadmap',
+        'The quilt so far.',
+        'Sewn, on the frame, and chalked out. Status comes from the repository’s releases and its roadmap; there are no dates here that the project has not published.',
+        image={
+          'name': 'quilt-frame',
+          'alt': 'A patchwork quilt on a wooden quilting frame: a finished row of seven felt patches at the top, two patches pinned in place below, and chalk outlines of future squares, while Marrow sews, the robot holds the next square, and the rabbit chalks a new outline.',
+          'label': 'On the frame',
+          'caption': 'Marrow sews the pinned patch, Bobbin holds the next, and Clover chalks where one will go.',
+          'eager': true,
+        }) %}
+        {{ ui.button('Track the roadmap', repository_url ~ '/blob/main/docs/roadmap.md', icon='arrow-right') }}
+      {% endcall %}
+
+      <section class="rb-section" aria-labelledby="sewn-title">
+        <div class="rb-shell">
+          {{ ui.section_head('1', 'Sewn', 'Released.', 'sewn-title',
+             lede='Seven tagged releases, newest first. Each links to its notes.') }}
+          <ol class="rb-roadmap__releases">
+            {% for release in releases %}
+            <li class="rb-card rb-patch rb-patch--{{ release.patch }} rb-stitched">
+              <span class="rb-kicker"><time>{{ release.date }}</time></span>
+              <h3 class="rb-card__title"><a href="{{ repository_url }}/{% if release.tag == 'v0.4.0' %}tree{% else %}releases/tag{% endif %}/{{ release.tag }}">{{ release.tag }}</a></h3>
+              <p class="rb-roadmap__name">{{ release.name }}</p>
+              <p class="rb-card__body">{{ release.notes | safe }}</p>
+            </li>
+            {% endfor %}
+          </ol>
+        </div>
+      </section>
+
+      <section class="rb-section rb-surface-linen rb-blanket-top" aria-labelledby="frame-title">
+        <div class="rb-shell">
+          {{ ui.section_head('2', 'On the frame', 'Next, and compatible.', 'frame-title',
+             lede='The 0.6.1 line adds helpers, diagnostics, and tests without breaking a 0.6 suite.') }}
+          <div class="rb-quilt">
+            {% for item in frame %}
+            <article class="rb-card rb-patch rb-stitched rb-roadmap__pinned">
+              <span class="rb-kicker">Roadmap {{ item.number }}</span>
+              <h3 class="rb-card__title">{{ item.title }}</h3>
+              <p class="rb-card__body">{{ item.body | safe }}</p>
+            </article>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <section class="rb-section" aria-labelledby="chalk-title">
+        <div class="rb-shell">
+          {{ ui.section_head('3', 'Chalked out', 'Proposed, not promised.', 'chalk-title',
+             lede='Larger changes the roadmap records before a 1.0 release. Some may change shape before they are sewn.') }}
+          <div class="rb-quilt">
+            {% for item in chalk %}
+            <article class="rb-card rb-roadmap__chalk">
+              <span class="rb-kicker">Roadmap {{ item.number }}</span>
+              <h3 class="rb-card__title">{{ item.title }}</h3>
+              <p class="rb-card__body">{{ item.body | safe }}</p>
+            </article>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+{% endblock %}

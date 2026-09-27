@@ -1,0 +1,91 @@
+{% extends "pages/_guide.jinja" %}
+{% set guide_slug = 'async' %}
+{% set thesis = 'Steps can be async fn. Where they run, and whether they may wait on anything, depends on which of two forms binds the scenario.' %}
+{% set sections = [
+  {'id': 'async-scenario', 'label': 'An async scenario'},
+  {'id': 'harness', 'label': 'The Tokio harness'},
+  {'id': 'choosing', 'label': 'Choosing a form'},
+  {'id': 'fine-print', 'label': 'Fine print'},
+] %}
+{% block guide %}
+          <section id="async-scenario" aria-labelledby="async-scenario-title">
+            <h2 id="async-scenario-title">An async scenario</h2>
+            <p>
+              Declare the scenario function <code>async fn</code> and put
+              <code>#[tokio::test(flavor = "current_thread")]</code> under
+              <code>#[scenario]</code>. Its steps may then be
+              <code>async fn</code> and await real work: timers, channels,
+              spawned tasks. They run in order on one thread, so a borrowed
+              fixture stays valid across an <code>.await</code>.
+            </p>
+            {{ ui.sample('tests/features/kettle.feature') }}
+            {{ ui.sample('tests/kettle.rs') }}
+            <p>
+              The <code>When</code> step spawns the stove, waits on a channel
+              until it reports the boil, and only then lets the
+              <code>Then</code> step pour. The crate needs its own
+              <code>tokio</code> dev-dependency for the test attribute.
+            </p>
+            {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
+            {% highlight 'toml', 'lantern-syntax' %}
+tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }
+            {% endhighlight %}
+            {% endcall %}
+          </section>
+
+          <section id="harness" aria-labelledby="harness-title">
+            <h2 id="harness-title">The Tokio harness</h2>
+            <p>
+              <code>harness = rstest_bdd_harness_tokio::TokioHarness</code>
+              keeps the scenario function synchronous and runs the steps inside
+              a Tokio runtime the harness owns. A step can reach the runtime
+              through <code>#[harness_context]</code>, and an
+              <code>async fn</code> step that finishes without waiting runs as
+              written.
+            </p>
+            {% call ui.code_panel('tests/stage.rs', sample='tests/stage.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[scenario(
+    path = "tests/features/stage.feature",
+    harness = rstest_bdd_harness_tokio::TokioHarness,
+)]
+fn tokio_stage(trolley: Trolley) {
+    let _ = trolley;
+}
+            {% endhighlight %}
+            {% endcall %}
+            {% call ui.note('The harness does not wait', 'caveat') %}
+            <p>
+              Under <code>TokioHarness</code>, an async step that has to wait —
+              on the kettle’s channel, say — fails the scenario with “async step
+              yielded Pending inside a harness-provided runtime”. And
+              <code>harness</code> cannot be combined with an
+              <code>async fn</code> scenario; the macro refuses it at compile
+              time. The full sample is on the
+              <a href="/rstest-bdd/harnesses/#tokio">harnesses</a> page.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="choosing" aria-labelledby="choosing-title">
+            <h2 id="choosing-title">Choosing a form</h2>
+            {{ ui.matrix('Choosing between the two async forms',
+              ['Need', 'Async scenario', 'Tokio harness'],
+              [
+                ['Steps await timers, channels, or I/O', 'Yes', 'No: a waiting step fails'],
+                ['Steps reach the runtime handle', 'Through Tokio itself', 'Through <code>#[harness_context]</code>'],
+                ['Scenario function', '<code>async fn</code>', '<code>fn</code>'],
+                ['Works with <code>scenarios!</code>', 'No', 'Yes: <code>harness = …</code>'],
+              ]) }}
+          </section>
+
+          <section id="fine-print" aria-labelledby="fine-print-title">
+            <h2 id="fine-print-title">Fine print</h2>
+            {% call ui.note('Current-thread only', 'caveat') %}
+            <p>
+              Both forms run on Tokio’s current-thread runtime. There is no
+              async-std support, and multi-thread runtimes are future work.
+            </p>
+            {% endcall %}
+          </section>
+{% endblock %}

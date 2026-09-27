@@ -1,0 +1,47 @@
+{#
+  The pattern book: every guide, in reading order. This one list drives the
+  guide index's cards, each guide's kicker ("Guide n of 7"), its previous and
+  next links, and the home page's links into the guides, so adding or
+  reordering a guide means editing one entry.
+
+  Each entry carries:
+    slug     the page's path under /rstest-bdd/guides/, and its badge's name
+    title    the card heading and the guide's <h1>
+    summary  the card copy; trusted template data, rendered with | safe
+    covers   the concepts and crate items, named on the card
+    patch    the card's patch colour (a .rb-patch-- modifier)
+    source   the matching section of the full user's guide
+    source_label  how the link to it reads
+#}
+{% set reference = '/docs-rstest-bdd-' %}
+{% set guides = [
+  {'slug': 'feature-files', 'title': 'Write feature files',
+   'summary': 'Scenarios, Background, Scenario Outlines, data tables, docstrings, tags, and feature files in other languages.',
+   'covers': 'Gherkin, Examples, tables, docstrings', 'patch': 'night',
+   'source': reference ~ 'gherkin-feature-files.html', 'source_label': 'Gherkin feature files'},
+  {'slug': 'steps', 'title': 'Define steps',
+   'summary': 'Step patterns, typed placeholders, and steps that return a value for the next step to use.',
+   'covers': '#[given], #[when], #[then], placeholders', 'patch': 'lantern',
+   'source': reference ~ 'step-definitions.html', 'source_label': 'Step definitions'},
+  {'slug': 'fixtures-and-state', 'title': 'Fixtures and state',
+   'summary': 'Fixtures as the world: <code>&amp;mut</code> access in steps, a fresh fixture per scenario, and what should really be shared.',
+   'covers': '#[fixture], &mut, Slot, #[once]', 'patch': 'moss',
+   'source': reference ~ 'state-management-across-scenarios.html', 'source_label': 'State management across scenarios'},
+  {'slug': 'binding-and-filtering', 'title': 'Bind and filter scenarios',
+   'summary': '<code>#[scenario]</code> for one scenario, <code>scenarios!</code> for a directory, tag expressions, and skipping with a reason.',
+   'covers': '#[scenario], scenarios!, tags, skip!', 'patch': 'cranberry',
+   'source': reference ~ 'binding-tests-to-scenarios.html', 'source_label': 'Binding tests to scenarios'},
+  {'slug': 'async', 'title': 'Async scenarios',
+   'summary': 'Async steps on Tokio\'s current-thread runtime, and which of the two async forms to reach for.',
+   'covers': 'async fn steps, #[tokio::test]', 'patch': 'rust',
+   'source': reference ~ 'async-scenario-execution.html', 'source_label': 'Async scenario execution'},
+  {'slug': 'tooling', 'title': 'Tooling',
+   'summary': 'Strict compile-time validation, <code>cargo bdd</code>, the language server, and JSON and JUnit reports.',
+   'covers': 'validation, cargo bdd, rstest-bdd-lsp', 'patch': 'robot',
+   'source': reference ~ 'running-and-maintaining-tests.html', 'source_label': 'Running and maintaining tests'},
+  {'slug': 'migrate-to-0-6', 'title': 'Migrate to 0.6',
+   'summary': 'What changed from 0.5: fixture-name normalization, <code>Result</code> aliases that now fail, the Tokio runtime alias, <code>HarnessResult</code>, and Rust 1.88.',
+   'covers': 'the 0.5 to 0.6 upgrade', 'patch': 'burlap',
+   'source': 'https://github.com/leynos/rstest-bdd/blob/v0.6.0/docs/v0-6-0-migration-guide.md', 'source_label': 'The v0.6.0 migration guide'},
+] %}
+

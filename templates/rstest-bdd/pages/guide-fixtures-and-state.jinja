@@ -1,0 +1,115 @@
+{% extends "pages/_guide.jinja" %}
+{% set guide_slug = 'fixtures-and-state' %}
+{% set thesis = 'There is no World struct to define. Fixtures are the world: each scenario gets fresh ones, steps borrow them, and anything shared across scenarios is shared on purpose.' %}
+{% set sections = [
+  {'id': 'fixtures', 'label': 'Fixtures are the world'},
+  {'id': 'mutable', 'label': 'Changing a fixture'},
+  {'id': 'slots', 'label': 'Optional state in slots'},
+  {'id': 'shared', 'label': 'Sharing across scenarios'},
+  {'id': 'fine-print', 'label': 'Fine print'},
+] %}
+{% block guide %}
+          <section id="fixtures" aria-labelledby="fixtures-title">
+            <h2 id="fixtures-title">Fixtures are the world</h2>
+            <p>
+              A step parameter that is not a placeholder is a fixture, found by
+              its name. The fixtures are ordinary <code>rstest</code> fixtures,
+              so a unit test and a scenario can share one definition.
+            </p>
+            {% call ui.code_panel('tests/lantern.rs', sample='tests/lantern.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[fixture]
+fn trolley() -> Trolley {
+    Trolley::default()
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              The scenario function names the fixtures the scenario owns, and
+              every scenario builds its own. Two scenarios never see each
+              other’s trolley, so they can run in parallel and in any order.
+            </p>
+          </section>
+
+          <section id="mutable" aria-labelledby="mutable-title">
+            <h2 id="mutable-title">Changing a fixture</h2>
+            <p>
+              A step that takes <code>&amp;mut Trolley</code> gets exclusive
+              access to the scenario’s trolley for the length of the step; one
+              that takes <code>&amp;Trolley</code> reads it. No
+              <code>RefCell</code> is needed for either.
+            </p>
+            {% call ui.code_panel('tests/lantern.rs', sample='tests/lantern.rs') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[when("the departure bell rings")]
+fn depart(trolley: &mut Trolley) {
+    trolley.arrived = true;
+}
+
+#[then("the lantern arrives upright")]
+fn check(trolley: &Trolley) {
+    assert!(trolley.loaded);
+    assert!(trolley.arrived);
+    assert!(trolley.upright);
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>
+              A step can also return a new value instead, which replaces the
+              fixture of that type; <a href="/rstest-bdd/guides/steps/#returns">steps that return</a>
+              shows how.
+            </p>
+          </section>
+
+          <section id="slots" aria-labelledby="slots-title">
+            <h2 id="slots-title">Optional state in slots</h2>
+            <p>
+              Some state only exists once a step has run: what was borrowed,
+              what a command printed. <code>Slot&lt;T&gt;</code> starts empty
+              and is filled by <code>set</code>, read by <code>get</code>, and
+              checked by <code>is_empty</code>, all through a shared reference.
+              A struct of slots derives <code>ScenarioState</code>, which adds
+              <code>reset</code> to empty them all.
+            </p>
+            {{ ui.sample('tests/features/props.feature') }}
+            {{ ui.sample('tests/props.rs') }}
+            {% call ui.note('Derive Default as well', 'caveat') %}
+            <p>
+              In rstest-bdd {{ rstest_bdd_version }},
+              <code>#[derive(ScenarioState)]</code> requires
+              <code>Default</code> but does not provide it, so derive both, as
+              above. The user’s guide says the derive supplies
+              <code>Default</code>; the published release does not.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="shared" aria-labelledby="shared-title">
+            <h2 id="shared-title">Sharing across scenarios</h2>
+            <p>
+              Share infrastructure, not scenario data. The cupboard above is
+              built once, by a <code>#[once]</code> fixture, and never changed;
+              each scenario builds its own <code>Stage</code> and
+              <code>Rehearsal</code> from it. The second scenario states its
+              own starting point rather than relying on whatever the first
+              left behind.
+            </p>
+            <p>
+              A <code>#[once]</code> fixture is a <code>&amp;'static</code>
+              reference, so steps take it through a per-scenario fixture, as
+              <code>Stage</code> does here, rather than by name.
+            </p>
+          </section>
+
+          <section id="fine-print" aria-labelledby="fine-print-title">
+            <h2 id="fine-print-title">Fine print</h2>
+            {% call ui.note('Mutable shared state is a hazard', 'caveat') %}
+            <p>
+              A <code>#[once]</code> fixture with interior mutability couples
+              every scenario that touches it to the order the test runner
+              picks. Keep shared fixtures read-only, or give each scenario its
+              own transaction or directory.
+            </p>
+            {% endcall %}
+          </section>
+{% endblock %}

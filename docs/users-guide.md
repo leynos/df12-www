@@ -233,9 +233,25 @@ described above for the equivalent Netsuke and Weaver surfaces.
 
 The df12 Productions home page carries a short Libraries list beneath its
 product grid. It currently lists two entries: Cuprum, linking to
-[/cuprum/](/cuprum/), and rstest-bdd, linking to
-[https://github.com/leynos/rstest-bdd](https://github.com/leynos/rstest-bdd)
-and opening in a new tab.
+[/cuprum/](/cuprum/), and rstest-bdd, linking to [/rstest-bdd/](/rstest-bdd/).
+
+## 7. rstest-bdd
+
+rstest-bdd's site begins at [/rstest-bdd/](/rstest-bdd/), where the lantern
+picnic's eight chapters introduce each idea beside the code for it. Its guided
+entry point is [Getting started](/rstest-bdd/getting-started/), which takes a
+reader from three dev-dependencies to a passing scenario and a deliberate
+failure. The [pattern book](/rstest-bdd/guides/) holds seven short guides, from
+writing feature files to migrating to 0.6, each ending at the matching section
+of the full user's guide in the df12 reference library. The sub-site also
+carries a [harnesses](/rstest-bdd/harnesses/) page, a
+[comparison with cucumber-rs](/rstest-bdd/compare/), and a
+[roadmap](/rstest-bdd/roadmap/).
+
+The sub-site documents rstest-bdd 0.6.0. Every code panel that names a file was
+cut from a package that compiles and runs against that release from crates.io,
+and every transcript was copied from a run of it. Where the release and its
+documentation disagree, the pages say what the release does.
 
 For implementation detail rather than usage guidance, switch to the
 [developers' guide](developers-guide.md) or the

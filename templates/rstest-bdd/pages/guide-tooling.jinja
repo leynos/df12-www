@@ -1,0 +1,150 @@
+{% extends "pages/_guide.jinja" %}
+{% set guide_slug = 'tooling' %}
+{% set thesis = 'Four tools around the suite: strict validation to catch a missing step at compile time, cargo-bdd to list what is registered, a language server for the editor, and report writers for CI.' %}
+{% set sections = [
+  {'id': 'strict', 'label': 'Strict validation'},
+  {'id': 'cargo-bdd', 'label': 'cargo-bdd'},
+  {'id': 'language-server', 'label': 'The language server'},
+  {'id': 'reports', 'label': 'Reports'},
+] %}
+{% block guide %}
+          <section id="strict" aria-labelledby="strict-title">
+            <h2 id="strict-title">Strict validation</h2>
+            <p>
+              By default a missing step is found when its scenario runs. The
+              test fails and names the step, the feature, and the scenario:
+            </p>
+            {% call ui.code_panel('tests/features/missing.feature', foot='Not part of the sample crate: it exists to fail.', copy=false) %}
+            {% highlight 'gherkin', 'lantern-syntax' %}
+Feature: A forgotten step
+  Scenario: Nobody wrote the bell
+    Given a lantern on the trolley
+    When the bell is rung twice
+    Then the lantern arrives upright
+            {% endhighlight %}
+            {% endcall %}
+            {% call ui.output('cargo test --test missing', 'excerpt') %}
+thread 'nobody_wrote_the_bell' (605609) panicked at tests/missing.rs:9:1:
+Step not found at index 1: When the bell is rung twice (feature: tests/features/missing.feature, scenario: Nobody wrote the bell)
+            {% endcall %}
+            <p>
+              Turn on the <code>strict-compile-time-validation</code> feature
+              of <code>rstest-bdd-macros</code> and the same mistake stops the
+              build, pointing at the <code>#[scenario]</code> that needs the
+              step:
+            </p>
+            {% call ui.code_panel('Terminal', copy='console') %}
+            {% highlight 'console', 'lantern-syntax' %}
+$ cargo test --features "rstest-bdd-macros/strict-compile-time-validation"
+            {% endhighlight %}
+            {% endcall %}
+            {% call ui.output('Output', 'excerpt') %}
+error: No matching step definition found for 'When the bell is rung twice'
+ --> tests/missing.rs:9:1
+  |
+9 | #[scenario(path = "tests/features/missing.feature")]
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            {% endcall %}
+            {% call ui.note('Strict means local', 'caveat') %}
+            <p>
+              Strict validation checks against the step definitions the
+              compiler can see in the crate being built. A suite that shares
+              step definitions from another crate cannot use it; the gentler
+              <code>compile-time-validation</code> feature exists for that
+              case, and leaves the final check to the run.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="cargo-bdd" aria-labelledby="cargo-bdd-title">
+            <h2 id="cargo-bdd-title">cargo-bdd</h2>
+            <p>
+              <code>cargo-bdd</code> builds the test binaries and asks each for
+              the steps it registered. <code>steps</code> lists them with the
+              file and line that define them:
+            </p>
+            {% call ui.code_panel('Terminal', copy='console') %}
+            {% highlight 'console', 'lantern-syntax' %}
+$ cargo install cargo-bdd --version {{ rstest_bdd_version }} --locked
+$ cargo-bdd steps
+            {% endhighlight %}
+            {% endcall %}
+            {% call ui.output('cargo-bdd steps, the first six lines', 'cargo-bdd ' ~ rstest_bdd_version) %}
+Given 'a bell on the trolley' (tests/bell.rs:15)
+Then 'the rabbit hears {count:u32} rings' (tests/bell.rs:26)
+When 'the bell rings {times:u32} times' (tests/bell.rs:21)
+Given 'a trolley carrying {count:u32} lanterns' (tests/counting.rs:15)
+Then '{count:u32} lanterns arrive at the picnic' (tests/counting.rs:25)
+When 'the departure bell rings' (tests/counting.rs:20)
+            {% endcall %}
+            <p>
+              <code>duplicates</code> lists definitions that share a keyword
+              and pattern. Across separate integration-test files, as in the
+              sample crate, that is harmless: each file is its own test binary.
+            </p>
+            {% call ui.note('Run it as cargo-bdd in 0.6.0', 'caveat') %}
+            <p>
+              Invoked through Cargo as <code>cargo bdd steps</code>, the 0.6.0
+              binary receives the word <code>bdd</code> as its first argument
+              and stops with “unrecognized subcommand 'bdd'”. Call the binary
+              directly, as above. Its <code>unused</code> and
+              <code>skipped</code> commands read the registry rather than a
+              test run, and on the sample crate report every step unused and
+              no scenario skipped; treat them as unreliable in this release.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="language-server" aria-labelledby="language-server-title">
+            <h2 id="language-server-title">The language server</h2>
+            <p>
+              <code>rstest-bdd-lsp</code> speaks the Language Server Protocol
+              over standard input and output. It jumps from a step definition
+              to the feature lines it matches and back, and reports
+              unimplemented steps, unused definitions, and mismatched
+              placeholders, tables, and docstrings when a file is saved.
+            </p>
+            {% call ui.code_panel('Terminal', copy='console') %}
+            {% highlight 'console', 'lantern-syntax' %}
+$ cargo install --git https://github.com/leynos/rstest-bdd --tag {{ rstest_bdd_tag }} rstest-bdd-server --locked
+$ rstest-bdd-lsp --help
+            {% endhighlight %}
+            {% endcall %}
+            {% call ui.output('rstest-bdd-lsp --help', 'excerpt') %}
+Language server for rstest-bdd BDD testing framework
+
+Usage: rstest-bdd-lsp [OPTIONS]
+
+Options:
+      --log-level <LOG_LEVEL>
+          Log level (trace, debug, info, warn, error)
+
+      --debounce-ms <DEBOUNCE_MS>
+          Debounce interval in milliseconds for file change events
+
+      --workspace-root <WORKSPACE_ROOT>
+          Override workspace root path for discovery.
+            {% endcall %}
+            {% call ui.note('Install from the tag', 'caveat') %}
+            <p>
+              The <code>rstest-bdd-server</code> crate on crates.io is still
+              0.4.0, so <code>cargo install rstest-bdd-server</code> installs
+              a language server two releases behind. Install from the
+              {{ rstest_bdd_tag }} tag, as above.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="reports" aria-labelledby="reports-title">
+            <h2 id="reports-title">Reports</h2>
+            <p>
+              Every scenario that runs records its outcome in the test
+              process. <code>rstest_bdd::reporting::json::write_snapshot</code>
+              writes those records as JSON to any <code>io::Write</code>, and
+              <code>reporting::junit::write_snapshot</code> writes JUnit XML to
+              any <code>fmt::Write</code>, with a <code>&lt;skipped&gt;</code>
+              element and its reason for each skip. Feature paths in both are
+              relative to the crate root.
+            </p>
+          </section>
+{% endblock %}

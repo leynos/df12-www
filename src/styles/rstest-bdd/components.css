@@ -1,0 +1,976 @@
+/* rstest-bdd components, each paired with a macro in
+ * templates/rstest-bdd/components.jinja. The macro says what a thing is at
+ * the call site; this sheet says how it is sewn. */
+
+/* ---------- Shell and kicker ------------------------------------------ */
+
+.rb-shell {
+  width: 100%;
+  max-width: var(--rb-shell);
+  margin-inline: auto;
+  padding-inline: var(--rb-gutter);
+}
+
+.rb-kicker {
+  color: var(--rb-accent-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.rb-lede {
+  max-width: var(--rb-measure);
+  color: var(--rb-muted-text);
+  font-size: 1.15rem;
+}
+
+/* ---------- Buttons ---------------------------------------------------- */
+
+/* A button is a felt patch pressed onto the page: a firm offset shadow in
+   thread that shortens when pressed. Lantern is the one primary action. */
+.rb-btn {
+  --rb-btn-fill: var(--color-lantern);
+  --rb-btn-ink: var(--color-thread);
+  --rb-btn-edge: var(--color-thread);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 3rem;
+  padding: 0.7rem 1.35rem;
+  border: 2px solid var(--rb-btn-edge);
+  border-radius: 0.75rem;
+  background: var(--rb-btn-fill);
+  box-shadow: 3px 3px 0 var(--rb-btn-edge);
+  color: var(--rb-btn-ink);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    transform 120ms var(--rb-ease),
+    box-shadow 120ms var(--rb-ease);
+}
+
+.rb-btn:hover {
+  color: var(--rb-btn-ink);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--rb-btn-edge);
+}
+
+.rb-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--rb-btn-edge);
+}
+
+.rb-btn svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.rb-btn--outline {
+  --rb-btn-fill: transparent;
+}
+
+/* On night, the outline button's edge and type become starlight. */
+.rb-surface-night .rb-btn--outline,
+.rb-patch--night .rb-btn--outline {
+  --rb-btn-ink: var(--color-starlight);
+  --rb-btn-edge: var(--color-starlight);
+}
+
+.rb-btn--night {
+  --rb-btn-fill: var(--color-night);
+  --rb-btn-ink: var(--color-starlight);
+}
+
+.rb-btn--compact {
+  min-height: 2.6rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.95rem;
+}
+
+.rb-surface-night .rb-btn:not(.rb-btn--outline) {
+  --rb-btn-edge: var(--color-lantern);
+
+  box-shadow: 3px 3px 0 color-mix(in oklab, var(--color-lantern) 45%, transparent);
+}
+
+/* ---------- Page head -------------------------------------------------- */
+
+.rb-page-head {
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2rem, 5vw, 3.5rem);
+}
+
+.rb-page-head__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (width >= 64rem) {
+  .rb-page-head--art .rb-page-head__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  }
+}
+
+.rb-page-head__title {
+  margin-top: 0.8rem;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+}
+
+.rb-page-head__thesis {
+  max-width: 38rem;
+  margin-top: 1.1rem;
+  font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+}
+
+.rb-page-head__meta {
+  margin-top: 1rem;
+  color: var(--rb-muted-text);
+  font-size: 0.95rem;
+}
+
+.rb-page-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.25rem;
+  align-items: center;
+  margin-top: 1.75rem;
+}
+
+/* ---------- Illustration frame ---------------------------------------- */
+
+/* An illustration is sewn into a wool patch: a stitched border around a
+   softly rounded picture, the caption on a linen strip beneath it. */
+.rb-figure {
+  --rb-radius: 1.1rem;
+  --rb-stitch-inset: 6px;
+
+  padding: 0.85rem;
+  border-radius: var(--rb-radius);
+  background: var(--color-wool);
+  box-shadow: var(--shadow-patch-lift);
+}
+
+.rb-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.6rem;
+}
+
+.rb-figure__caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  align-items: baseline;
+  padding: 0.75rem 0.4rem 0.2rem;
+  color: var(--color-thread-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.rb-figure__label {
+  color: var(--color-rust);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* ---------- Sections --------------------------------------------------- */
+
+.rb-section {
+  padding-block: clamp(3rem, 7vw, 5.5rem);
+}
+
+.rb-section-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.3rem 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.rb-section-head .rb-kicker {
+  grid-column: 2;
+}
+
+.rb-section-head .rb-bead {
+  grid-row: 1 / span 2;
+}
+
+.rb-section-head__title {
+  grid-column: 2;
+  font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+}
+
+.rb-section-head__lede {
+  grid-column: 1 / -1;
+  max-width: var(--rb-measure);
+  margin-top: 0.6rem;
+  color: var(--rb-muted-text);
+  font-size: 1.1rem;
+}
+
+/* Running prose inside a section. */
+.rb-prose {
+  max-width: var(--rb-measure);
+}
+
+.rb-prose > * + * {
+  margin-top: 1rem;
+}
+
+.rb-prose h3 {
+  margin-top: 2.25rem;
+  font-size: 1.5rem;
+}
+
+.rb-prose ul,
+.rb-prose ol {
+  padding-left: 1.4rem;
+}
+
+.rb-prose ul {
+  list-style: disc;
+}
+
+.rb-prose ol {
+  list-style: decimal;
+}
+
+.rb-prose li + li {
+  margin-top: 0.4rem;
+}
+
+.rb-prose li::marker {
+  color: var(--color-rust);
+}
+
+/* ---------- Code panel ------------------------------------------------- */
+
+/* Code is the picnic blanket at night: a flat night patch with a cream
+   running stitch inside its edge. The bar carries a burlap tab with the file
+   name, and the copy button when the script adds it. */
+.rb-code {
+  --rb-radius: 0.9rem;
+  --rb-stitch: color-mix(in oklab, var(--color-stitch-cream) 55%, transparent);
+  --rb-stitch-inset: 6px;
+  --rb-focus: var(--color-lantern);
+
+  min-width: 0;
+  margin-block: 1.5rem;
+  padding: 0.6rem;
+  border-radius: var(--rb-radius);
+  background: var(--color-night);
+  box-shadow: var(--shadow-patch);
+  color: var(--color-starlight);
+}
+
+.rb-code__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.8rem 0.35rem;
+}
+
+.rb-code__file {
+  --rb-stitch: var(--color-rust);
+  --rb-radius: 0.35rem;
+
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.35rem;
+  background: var(--color-burlap);
+  color: var(--color-thread);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.rb-code__slot {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  color: var(--color-night-muted);
+  font-size: 0.85rem;
+}
+
+.rb-code__foot {
+  padding: 0.35rem 0.8rem 0.55rem;
+  color: var(--color-night-muted);
+  font-size: 0.8rem;
+}
+
+.rb-copy {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+  border: 2px dashed color-mix(in oklab, var(--color-stitch-cream) 70%, transparent);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-lantern);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rb-copy:hover {
+  border-style: solid;
+}
+
+/* ---------- Output transcript ----------------------------------------- */
+
+/* Output is a linen slip with a dashed thread border, so input and output
+   never look alike. */
+.rb-output {
+  min-width: 0;
+  margin-block: 1.5rem;
+  border: 2px dashed var(--color-rust);
+  border-radius: 0.9rem;
+  background: var(--color-linen);
+}
+
+.rb-output__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.6rem 1rem 0;
+  color: var(--color-rust);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rb-output__body pre {
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.65;
+
+  /* A transcript is read, not copied and run, so its long lines wrap
+     rather than scroll. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Notes and callouts ---------------------------------------- */
+
+/* A note is a small patch sewn to the page: a label, then the words. The
+   technical note in the storybook and the guides' fine print share it. */
+.rb-note {
+  --rb-radius: 0.8rem;
+
+  margin-block: 1.5rem;
+  padding: 1.1rem 1.35rem 1.2rem;
+  border-radius: var(--rb-radius);
+  background: var(--color-linen);
+}
+
+.rb-note__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--rb-accent-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.rb-note > p + p {
+  margin-top: 0.6rem;
+}
+
+.rb-note--caveat {
+  --rb-stitch: var(--color-cranberry);
+  --rb-accent-text: var(--color-cranberry);
+}
+
+.rb-note--new {
+  --rb-stitch: var(--color-moss);
+  --rb-accent-text: var(--color-moss-text);
+}
+
+/* ---------- Facts ------------------------------------------------------ */
+
+.rb-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+  margin-block: 1.5rem;
+}
+
+.rb-facts > div {
+  --rb-radius: 0.7rem;
+  --rb-stitch-inset: 5px;
+
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--rb-radius);
+  background: var(--color-linen);
+}
+
+.rb-facts dt {
+  color: var(--color-rust);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.rb-facts dd {
+  margin-top: 0.15rem;
+  font-weight: 700;
+}
+
+/* ---------- Quilt grid and cards -------------------------------------- */
+
+/* A quilt lays several patches out as a grid joined by seams: the gap is
+   the seam allowance, and each patch carries its own stitch. */
+.rb-quilt {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: 0.9rem;
+}
+
+.rb-card {
+  --rb-radius: 0.9rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 1.6rem 1.5rem 1.5rem;
+  border-radius: var(--rb-radius);
+  box-shadow: var(--shadow-patch);
+  text-decoration: none;
+  transition:
+    transform 160ms var(--rb-ease),
+    box-shadow 160ms var(--rb-ease);
+}
+
+a.rb-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-patch-lift);
+}
+
+.rb-card__badge {
+  width: 4.25rem;
+  height: 4.25rem;
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(0 3px 3px color-mix(in oklab, var(--color-thread) 30%, transparent));
+}
+
+.rb-card__title {
+  font-size: 1.45rem;
+}
+
+a.rb-card .rb-card__title {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.rb-card__body {
+  color: var(--rb-muted-text);
+}
+
+.rb-card__meta {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  color: var(--rb-accent-text);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+/* ---------- Details (fine print) -------------------------------------- */
+
+.rb-details {
+  border-bottom: 2px dashed color-mix(in oklab, var(--rb-stitch) 55%, transparent);
+}
+
+.rb-details summary {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3rem;
+  padding: 0.9rem 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+
+.rb-details summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The disclosure mark is a sewn-on button that turns a quarter when open. */
+.rb-details summary::after {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--color-wool), var(--color-wool)) center / 55% 2px no-repeat,
+    linear-gradient(var(--color-wool), var(--color-wool)) center / 2px 55% no-repeat,
+    var(--color-rust);
+  content: "";
+  transition: transform 160ms var(--rb-ease);
+}
+
+.rb-details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.rb-details__body {
+  max-width: var(--rb-measure);
+  padding-bottom: 1.2rem;
+  color: var(--rb-muted-text);
+}
+
+.rb-details__body > * + * {
+  margin-top: 0.6rem;
+}
+
+/* ---------- Matrix ---------------------------------------------------- */
+
+/* A comparison table. Below 48rem, where it would scroll sideways, each row
+   becomes a patch titled by its row header, and each cell is labelled by
+   its column; the macro states the table's ARIA roles, which the block
+   display would otherwise cost it. */
+.rb-matrix {
+  width: 100%;
+  margin-block: 1.5rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 0.9rem;
+  background: var(--color-wool);
+  box-shadow: var(--shadow-patch);
+  font-size: 0.97rem;
+}
+
+.rb-matrix th,
+.rb-matrix td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.rb-matrix thead th {
+  background: var(--color-night);
+  color: var(--color-starlight);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.rb-matrix tbody tr + tr > * {
+  border-top: 2px dashed color-mix(in oklab, var(--color-rust) 45%, transparent);
+}
+
+.rb-matrix tbody th {
+  font-weight: 800;
+}
+
+.rb-matrix__label {
+  display: none;
+}
+
+@media (width < 48rem) {
+  .rb-matrix,
+  .rb-matrix tbody,
+  .rb-matrix tr,
+  .rb-matrix th,
+  .rb-matrix td {
+    display: block;
+  }
+
+  .rb-matrix {
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .rb-matrix thead {
+    display: none;
+  }
+
+  .rb-matrix tbody tr {
+    margin-bottom: 0.9rem;
+    padding: 0.4rem 0;
+    border-radius: 0.9rem;
+    background: var(--color-wool);
+    box-shadow: var(--shadow-patch);
+  }
+
+  .rb-matrix tbody tr + tr > * {
+    border-top: 0;
+  }
+
+  .rb-matrix tbody th {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+  }
+
+  .rb-matrix td {
+    padding-block: 0.35rem;
+  }
+
+  .rb-matrix__label {
+    display: block;
+    color: var(--color-rust);
+    font-size: var(--text-2xs);
+    font-weight: 800;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+}
+
+/* ---------- Guide layout ---------------------------------------------- */
+
+/* A guide is prose with a sticky list of its sections beside it from 64rem,
+   and above it, in a <details> drop-down, below that. One list in the
+   template renders both, so they cannot drift. */
+.rb-guide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  padding-block: 1rem 4rem;
+}
+
+@media (width >= 64rem) {
+  .rb-guide {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 3.5rem;
+  }
+}
+
+.rb-guide__body {
+  min-width: 0;
+}
+
+.rb-guide__body > section + section {
+  margin-top: 3.25rem;
+}
+
+.rb-guide__body h2 {
+  margin-bottom: 1rem;
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+}
+
+.rb-guide__body h3 {
+  margin-block: 1.75rem 0.75rem;
+  font-size: 1.35rem;
+}
+
+.rb-guide__body p,
+.rb-guide__body ul,
+.rb-guide__body ol {
+  max-width: var(--rb-measure);
+}
+
+.rb-guide__body p + p,
+.rb-guide__body p + ul,
+.rb-guide__body ul + p {
+  margin-top: 0.9rem;
+}
+
+.rb-guide__body ul {
+  padding-left: 1.4rem;
+  list-style: disc;
+}
+
+.rb-guide__body li + li {
+  margin-top: 0.35rem;
+}
+
+.rb-guide__body li::marker {
+  color: var(--color-rust);
+}
+
+.rb-toc {
+  --rb-radius: 0.9rem;
+
+  align-self: start;
+  padding: 1.2rem 1.3rem;
+  border-radius: var(--rb-radius);
+  background: var(--color-linen);
+  font-size: 0.95rem;
+}
+
+@media (width >= 64rem) {
+  .rb-toc {
+    position: sticky;
+    top: 6rem;
+  }
+
+  .rb-toc__menu {
+    display: none;
+  }
+}
+
+@media (width < 64rem) {
+  .rb-toc__rail {
+    display: none;
+  }
+}
+
+.rb-toc__heading {
+  margin-bottom: 0.6rem;
+  color: var(--color-rust);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.rb-toc__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-toc__list li + li {
+  margin-top: 0.15rem;
+}
+
+.rb-toc__list a {
+  display: block;
+  padding: 0.35rem 0;
+  color: var(--color-thread);
+  text-decoration-color: color-mix(in oklab, var(--color-rust) 45%, transparent);
+}
+
+.rb-toc__menu summary {
+  display: flex;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  align-items: center;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rb-toc__source {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 2px dashed color-mix(in oklab, var(--color-rust) 45%, transparent);
+  font-size: 0.9rem;
+}
+
+/* ---------- Pager ----------------------------------------------------- */
+
+.rb-pager {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.9rem;
+  margin-top: 3.5rem;
+}
+
+.rb-pager a {
+  --rb-radius: 0.9rem;
+
+  display: block;
+  padding: 1.1rem 1.35rem;
+  border-radius: var(--rb-radius);
+  background: var(--color-linen);
+  color: var(--color-thread);
+  text-decoration: none;
+}
+
+.rb-pager a:hover .rb-pager__title {
+  text-decoration-thickness: 2px;
+}
+
+.rb-pager__dir {
+  display: block;
+  color: var(--color-rust);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.rb-pager__title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.rb-pager__next {
+  text-align: right;
+}
+
+/* ---------- Legal ---------------------------------------------------- */
+
+/* The body of a legal page: Markdown rendered by the shared-content
+   generator, so element selectors style it, plus the table of contents,
+   sections, and badge cards the generator wraps it in. The layout follows
+   the Netsuke legal pages; the materials are this site's. */
+.rb-legal {
+  margin-top: 2.5rem;
+  line-height: 1.85;
+}
+
+.rb-legal > * + *,
+.rb-legal .content-section > * + * {
+  margin-top: 1rem;
+}
+
+.rb-legal > :first-child {
+  margin-top: 0;
+}
+
+.rb-legal h2 {
+  font-size: 1.6rem;
+}
+
+.rb-legal h3 {
+  margin-top: 1.75rem;
+  font-size: 1.25rem;
+}
+
+.rb-legal h4 {
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+}
+
+.rb-legal ul,
+.rb-legal ol {
+  padding-left: 1.5rem;
+}
+
+.rb-legal ul {
+  list-style: disc;
+}
+
+.rb-legal ol {
+  list-style: decimal;
+}
+
+.rb-legal li + li,
+.rb-legal li > ul,
+.rb-legal li > ol {
+  margin-top: 0.5rem;
+}
+
+.rb-legal li::marker {
+  color: var(--color-rust);
+}
+
+.rb-legal strong {
+  font-weight: 800;
+}
+
+.rb-legal blockquote {
+  padding-left: 1.25rem;
+  border-left: 3px dashed var(--color-rust);
+  color: var(--rb-muted-text);
+}
+
+.rb-legal hr {
+  margin-block: 2.5rem;
+  border: 0;
+  border-top: 2px dashed color-mix(in oklab, var(--color-rust) 45%, transparent);
+}
+
+.rb-legal table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.rb-legal th,
+.rb-legal td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--color-burlap);
+  text-align: left;
+}
+
+/* The table of contents: a linen patch of links, one per section. */
+.rb-legal .content-toc {
+  padding: 1.35rem 1.5rem;
+  border: 2px dashed color-mix(in oklab, var(--color-rust) 55%, transparent);
+  border-radius: 0.9rem;
+  background: var(--color-linen);
+}
+
+.rb-legal .content-toc ul {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  list-style: none;
+}
+
+.rb-legal .content-toc li + li {
+  margin-top: 0;
+}
+
+.rb-legal .content-section {
+  margin-top: 2.75rem;
+}
+
+.rb-legal .content-section--divider {
+  padding-top: 2rem;
+  border-top: 2px dashed color-mix(in oklab, var(--color-rust) 45%, transparent);
+}
+
+/* A card: a linen patch with a round felt badge beside its body. */
+.rb-legal .content-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.35rem 1.5rem;
+  border-radius: 0.9rem;
+  background: var(--color-linen);
+  box-shadow: var(--shadow-patch);
+}
+
+.rb-legal .content-card__badge {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-top: 0.15rem;
+  border: 2px dashed var(--color-stitch-cream);
+  border-radius: 50%;
+  background: var(--color-rust);
+  color: var(--color-wool);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rb-legal .content-card--accent .content-card__badge {
+  background: var(--color-cranberry);
+}
+
+.rb-legal .content-card__body {
+  min-width: 0;
+}
+
+.rb-legal .content-card__body > * + * {
+  margin-top: 0.5rem;
+}
+
+.rb-legal .content-card__body h3 {
+  margin-top: 0;
+}

@@ -17,7 +17,7 @@
  *   optional throughout because every reader tolerates their absence: the
  *   telemetry sinks are no-ops when nothing installed them.
  *
- * `module` is the CommonJS hook the Bun tests use. Eleven scripts end with
+ * `module` is the CommonJS hook the Bun tests use. Fourteen scripts end with
  * `if (typeof module !== "undefined" && module.exports) { module.exports =
  * {...}; }`, which the browser skips and `require` honours. It is declared as
  * a plain global rather than through `@types/node` so the browser project
@@ -56,6 +56,27 @@ interface WeaverTelemetryApi {
   REASONS: Readonly<Record<string, string>>;
 }
 
+/** An rstest-bdd telemetry event, as handed to the host's sink by `telemetry.ts`. */
+interface RstestBddTelemetryEvent {
+  component: string;
+  operation: string;
+  outcome: string;
+  reason?: string;
+}
+
+/**
+ * The API `rstest-bdd/assets/js/telemetry.ts` installs for the copy buttons
+ * and the storybook. Each vocabulary is a closed map from a camelCase name to
+ * the string that leaves the page; `emit` drops anything outside them.
+ */
+interface RstestBddTelemetryApi {
+  emit(operation: string, outcome: string, reason?: string): void;
+  COMPONENTS: Readonly<Record<string, string>>;
+  OPERATIONS: Readonly<Record<string, string>>;
+  OUTCOMES: Readonly<Record<string, string>>;
+  REASONS: Readonly<Record<string, string>>;
+}
+
 /**
  * An Episodic search-index lifecycle event, as `site-search.ts` hands it to
  * the host's sink. The schema is fixed and has nowhere to put a query, a
@@ -77,6 +98,8 @@ interface TailwindPlayCdn {
 declare var df12WeaverTelemetry: WeaverTelemetryApi | undefined;
 declare var df12WeaverNavTelemetry: ((event: WeaverTelemetryEvent) => void) | undefined;
 declare var df12WeaverCopy: ((text: string) => Promise<boolean>) | undefined;
+declare var df12RstestBddTelemetry: RstestBddTelemetryApi | undefined;
+declare var df12RstestBddTelemetrySink: ((event: RstestBddTelemetryEvent) => void) | undefined;
 declare var df12EpisodicSearchTelemetry:
   | ((event: EpisodicSearchTelemetryEvent) => void)
   | undefined;

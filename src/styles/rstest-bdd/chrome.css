@@ -1,0 +1,376 @@
+/* rstest-bdd chrome: the masthead, the primary navigation, and the footer.
+ *
+ * The masthead is a strip of night felt hung from the top of the page, with
+ * a blanket-stitched lower edge in cream. It carries the wordmark, the six
+ * destinations, GitHub as a utility link, and Get started as the one
+ * persistent action. Below 68.75rem the destinations collapse into a native
+ * popover opened by a labelled Menu button — no script, and never a bare
+ * hamburger. */
+
+.rb-mast {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 6px 16px -10px color-mix(in oklab, var(--color-night) 70%, transparent);
+}
+
+/* The stitched hem along the masthead's bottom edge. */
+.rb-mast::after {
+  position: absolute;
+  inset: auto 0 5px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--color-stitch-cream) 0 9px, transparent 0 16px);
+  content: "";
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.rb-mast__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: var(--rb-shell);
+  min-height: 4.5rem;
+  margin: 0 auto;
+  padding: 0.5rem var(--rb-gutter) 0.85rem;
+}
+
+/* The wordmark: Marrow's pumpkin button, then the name, with "-bdd" in
+   lantern yellow as the mockups set it. */
+.rb-wordmark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--color-starlight);
+  text-decoration: none;
+}
+
+.rb-wordmark:hover {
+  color: var(--color-starlight);
+}
+
+.rb-wordmark .rb-bead {
+  --rb-bead-size: 2.1rem;
+}
+
+.rb-wordmark__name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-variation-settings:
+    "SOFT" 100,
+    "WONK" 1;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.rb-wordmark__name span {
+  color: var(--color-lantern);
+}
+
+.rb-wordmark__imprint {
+  display: none;
+  color: var(--color-night-muted);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+@media (width >= 80rem) {
+  .rb-wordmark__imprint {
+    display: block;
+    max-width: 7rem;
+    line-height: 1.35;
+  }
+}
+
+/* ---------- Primary navigation ---------------------------------------- */
+
+.rb-nav {
+  flex: 1;
+  min-width: 0;
+}
+
+.rb-nav__toggle {
+  display: none;
+}
+
+/* The list is a popover element, and the UA styles a popover as a fixed,
+   bordered, inset box even while it is closed. At desktop widths it is an
+   ordinary row, so every one of those UA declarations is reset here. */
+.rb-nav__list {
+  position: static;
+  inset: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 1.4rem;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  list-style: none;
+}
+
+.rb-nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  border-bottom: 3px solid transparent;
+  color: var(--color-starlight);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.rb-nav__link:hover {
+  border-bottom-color: var(--color-starlight);
+  color: var(--color-starlight);
+}
+
+/* The current page is marked by a stitched underline in lantern, and by
+   aria-current for assistive technology. */
+.rb-nav__link[aria-current="page"] {
+  border-bottom: 3px dashed var(--color-lantern);
+  color: var(--color-lantern);
+}
+
+.rb-nav__up .rb-nav__link {
+  color: var(--color-night-muted);
+}
+
+.rb-nav__menu-only {
+  display: none;
+}
+
+.rb-mast__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rb-mast__github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  color: var(--color-starlight);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.rb-mast__github:hover {
+  color: var(--color-starlight);
+  text-decoration: underline;
+}
+
+.rb-mast__github svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+@media (width < 68.75rem) {
+  .rb-nav {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .rb-nav__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 2px dashed var(--color-stitch-cream);
+    border-radius: 0.6rem;
+    background: transparent;
+    color: var(--color-starlight);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .rb-nav__toggle svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .rb-nav__list {
+    display: none;
+  }
+
+  /* The open panel drops from the masthead as a strip of night felt. */
+  .rb-nav__list:popover-open {
+    position: fixed;
+    inset: 4.5rem 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: calc(100dvh - 4.5rem);
+    padding: 0.5rem var(--rb-gutter) 1.5rem;
+    overflow-y: auto;
+    border-bottom: 3px dashed var(--color-lantern);
+    background: var(--color-night);
+    color: var(--color-starlight);
+  }
+
+  .rb-nav__list:popover-open .rb-nav__link {
+    width: 100%;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-stitch-cream) 45%, transparent);
+    font-size: 1.05rem;
+  }
+
+  .rb-nav__list:popover-open .rb-nav__link[aria-current="page"] {
+    border-bottom: 2px dashed var(--color-lantern);
+  }
+
+  .rb-nav__menu-only {
+    display: block;
+  }
+
+  .rb-mast__github {
+    display: none;
+  }
+}
+
+@media (width < 30rem) {
+  .rb-mast__inner {
+    gap: 0.75rem;
+  }
+
+  .rb-wordmark__name {
+    font-size: 1.35rem;
+  }
+
+  .rb-mast__actions .rb-btn {
+    display: none;
+  }
+}
+
+/* ---------- Footer ----------------------------------------------------- */
+
+.rb-footer {
+  margin-top: 0;
+  padding-top: 1rem;
+  font-size: 0.975rem;
+}
+
+.rb-footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 2.5rem;
+  max-width: var(--rb-shell);
+  margin: 0 auto;
+  padding: 3.5rem var(--rb-gutter) 2.5rem;
+}
+
+.rb-footer__blurb {
+  max-width: 26rem;
+  color: var(--rb-muted-text);
+}
+
+.rb-footer__motto {
+  margin-top: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-variation-settings: "SOFT" 100;
+  line-height: 1.15;
+}
+
+.rb-footer__motto em {
+  color: var(--color-lantern);
+}
+
+.rb-footer__heading {
+  margin-bottom: 0.9rem;
+  color: var(--color-lantern);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.rb-footer__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-footer__list li + li {
+  margin-top: 0.45rem;
+}
+
+.rb-footer__list a {
+  color: var(--color-starlight);
+  text-decoration-color: color-mix(in oklab, var(--color-starlight) 45%, transparent);
+}
+
+.rb-footer__list a:hover {
+  text-decoration-color: var(--color-starlight);
+}
+
+.rb-footer__strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  max-width: var(--rb-shell);
+  margin: 0 auto;
+  padding: 1.25rem var(--rb-gutter) 2rem;
+  color: var(--rb-muted-text);
+  font-size: 0.85rem;
+}
+
+.rb-footer__strip .rb-seam {
+  flex-basis: 100%;
+  margin-bottom: 0.75rem;
+}
+
+@media (width < 56rem) {
+  .rb-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rb-footer__about {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (width < 30rem) {
+  .rb-footer__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Skip link ------------------------------------------------- */
+
+.rb-skip {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--color-lantern);
+  color: var(--color-thread);
+  font-weight: 800;
+  transform: translateY(-200%);
+}
+
+.rb-skip:focus {
+  transform: translateY(0);
+}

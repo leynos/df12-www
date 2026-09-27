@@ -4,12 +4,12 @@ This guide is for maintainers and contributors working on the df12 Productions
 website generator, its sub-site templates, stylesheets, and browser-side
 scripts. It covers how to build and serve the site locally, how generated and
 hand-crafted files are separated, how the Pygments syntax highlighting for the
-Episodic, Netsuke, Stilyagi, and Cuprum sub-sites are generated, the shared
-Jinja macros and the component classes they pair with, the convention used for
-browser-side components, the cascade quirks introduced by the Netsuke
-sub-site's use of the Tailwind Play content delivery network (CDN), and how
-accessibility is checked. It does not restate deployment or OpenTofu guidance,
-which lives in [`AGENTS.md`](../AGENTS.md).
+Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd sub-sites are generated,
+the shared Jinja macros and the component classes they pair with, the
+convention used for browser-side components, the cascade quirks introduced by
+the Netsuke sub-site's use of the Tailwind Play content delivery network (CDN),
+and how accessibility is checked. It does not restate deployment or OpenTofu
+guidance, which lives in [`AGENTS.md`](../AGENTS.md).
 
 For the shape of the repository, see [Repository layout](repository-layout.md).
 For the generator's architecture and extension points, see
@@ -40,13 +40,15 @@ depends on the last:
 bun run build              # build:static, build:js, build:css, build:images, build:pages, build:search, build:static
 bun run build:static       # copy src/static/ verbatim, except .ts (scripts/copy-static.ts)
 bun run build:js           # compile the browser scripts to public/ (scripts/compile-browser-scripts.ts)
-bun run build:css          # compile the main, mxd, Episodic, Weaver, Stilyagi, Netsuke and Cuprum Tailwind entrypoints
+bun run build:css          # compile every Tailwind entrypoint: main, mxd, Episodic, Weaver, Stilyagi, Netsuke,
+                           # Cuprum, and rstest-bdd
 bun run build:css:mxd      # just the mxd entrypoint, for iterating on one sub-site
 bun run build:css:episodic # just the Episodic entrypoint
 bun run build:css:weaver   # just the Weaver entrypoint
 bun run build:css:stilyagi # just the Stilyagi entrypoint
 bun run build:css:netsuke  # just the Netsuke entrypoint
 bun run build:css:cuprum   # just the Cuprum entrypoint
+bun run build:css:rstest-bdd # just the rstest-bdd entrypoint
 bun run build:images       # generate responsive image variants (scripts/generate-image-variants.ts)
 bun run build:pages        # uv run pages generate --all-sites
 bun run build:search       # build the Netsuke and Episodic search indices
@@ -285,6 +287,7 @@ carries its reasoning in the file:
 | `src/styles/netsuke/himotoshi.css`                       | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/stilyagi/assets/styles/syntax.css`           | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/cuprum/assets/styles/syntax.css`             | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
+| `src/static/rstest-bdd/assets/styles/syntax.css`         | The Pygments blocks are generated one rule per line. Formatting them would put the formatter and the generator in a loop, each undoing the other — see section 4.4. Only the formatter is disabled; the rest of each file is still checked. |
 | `src/static/episodic/assets/search/episodic-search.json` | Episodic's MiniSearch builder owns the serialized index. Reformatting it would make the committed projection differ from its generator.                                                                                                     |
 | `**/*.svg`                                               | The a11y rules that fire on standalone SVGs are written for inline JSX, where the `<svg>` is part of a document's accessibility tree.                                                                                                       |
 | `**/*.css` (linter only)                                 | Formatting is enforced; the CSS lint rules belong to stylelint, see section 2.5.                                                                                                                                                            |
@@ -328,12 +331,12 @@ grouped by component, which the rule would scatter.
 Where a rule genuinely should not apply, disable it at the line with a stated
 reason, `/* stylelint-disable-next-line <rule> -- why */`, rather than
 loosening it in the config. The generated Pygments blocks are the one standing
-exception: the Himotoshi, Stilyagi, and Cuprum generators each fence their
-block with a `/* stylelint-disable */` and a matching `/* stylelint-enable */`
-marker, while the Episodic generator writes the whole file and so emits only a
-file-level `/* stylelint-disable */` in its header. Either way, a finding
-inside a generated range is a change to the generator rather than to the
-stylesheet. Section 4.4 has the detail.
+exception: the Himotoshi, Stilyagi, Cuprum, and rstest-bdd generators each
+fence their block with a `/* stylelint-disable */` and a matching
+`/* stylelint-enable */` marker, while the Episodic generator writes the whole
+file and so emits only a file-level `/* stylelint-disable */` in its header.
+Either way, a finding inside a generated range is a change to the generator
+rather than to the stylesheet. Section 4.4 has the detail.
 
 `make fmt` runs `stylelint --fix` as well as Biome. That is safe over the
 generated blocks because stylelint does not apply fixes inside a disabled
@@ -348,21 +351,22 @@ anyone rebuilds from a clean tree.
 
 Every published file has a source elsewhere in the repository:
 
-| Published under `public/`             | Comes from                                                                    |
-| ------------------------------------- | ----------------------------------------------------------------------------- |
-| `**/*.html`                           | `df12_pages` rendering `templates/` against `config/`                         |
-| `assets/site.css`                     | Tailwind compiling `src/styles/`                                              |
-| `mxd/assets/tailwind.css`             | Tailwind compiling `src/styles/`                                              |
-| `episodic/assets/styles/tailwind.css` | Tailwind compiling `src/styles/`                                              |
-| `weaver/assets/styles/weaver.css`     | Tailwind compiling `src/styles/`                                              |
-| `stilyagi/assets/styles/stilyagi.css` | Tailwind compiling `src/styles/`                                              |
-| `netsuke/assets/css/himotoshi.css`    | Tailwind compiling `src/styles/`                                              |
-| `cuprum/assets/styles/cuprum.css`     | Tailwind compiling `src/styles/`                                              |
-| `images/*.webp`, `images/*.avif`      | `scripts/generate-image-variants.ts`                                          |
-| `*/assets/js/*.js`                    | `scripts/compile-browser-scripts.ts` compiling `src/static/**/assets/js/*.ts` |
-| `netsuke/assets/search/*.json`        | `scripts/build-netsuke-search-index.mjs`                                      |
-| `episodic/assets/search/*.json`       | `scripts/build-episodic-search-index.mjs`                                     |
-| everything else                       | `src/static/`, copied by `scripts/copy-static.ts`                             |
+| Published under `public/`                 | Comes from                                                                    |
+| ----------------------------------------- | ----------------------------------------------------------------------------- |
+| `**/*.html`                               | `df12_pages` rendering `templates/` against `config/`                         |
+| `assets/site.css`                         | Tailwind compiling `src/styles/`                                              |
+| `mxd/assets/tailwind.css`                 | Tailwind compiling `src/styles/`                                              |
+| `episodic/assets/styles/tailwind.css`     | Tailwind compiling `src/styles/`                                              |
+| `weaver/assets/styles/weaver.css`         | Tailwind compiling `src/styles/`                                              |
+| `stilyagi/assets/styles/stilyagi.css`     | Tailwind compiling `src/styles/`                                              |
+| `netsuke/assets/css/himotoshi.css`        | Tailwind compiling `src/styles/`                                              |
+| `cuprum/assets/styles/cuprum.css`         | Tailwind compiling `src/styles/`                                              |
+| `rstest-bdd/assets/styles/rstest-bdd.css` | Tailwind compiling `src/styles/`                                              |
+| `images/*.webp`, `images/*.avif`          | `scripts/generate-image-variants.ts`                                          |
+| `*/assets/js/*.js`                        | `scripts/compile-browser-scripts.ts` compiling `src/static/**/assets/js/*.ts` |
+| `netsuke/assets/search/*.json`            | `scripts/build-netsuke-search-index.mjs`                                      |
+| `episodic/assets/search/*.json`           | `scripts/build-episodic-search-index.mjs`                                     |
+| everything else                           | `src/static/`, copied by `scripts/copy-static.ts`                             |
 
 _Table 3: Published paths under `public/` and the source that generates them._
 
@@ -382,13 +386,14 @@ local or in CI — discards it silently.
 ## 4. The Pygments CSS generators
 
 This is the source of truth for how build-time syntax highlighting is wired
-together on the Episodic, Netsuke, Stilyagi, and Cuprum sub-sites, referenced
-from the [Netsuke update execution plan](execplans/netsuke-update.md).
+together on the Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd sub-sites,
+referenced from the
+[Netsuke update execution plan](execplans/netsuke-update.md).
 
 ### 4.1. Styles, lexers, and the highlight tag
 
-Code blocks on the Episodic, Netsuke, Stilyagi, and Cuprum sub-sites are
-highlighted at build time by the Jinja tag
+Code blocks on the Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd
+sub-sites are highlighted at build time by the Jinja tag
 `{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
 `df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
 `pygments.highlight` with the named lexer, and wraps the result in a
@@ -397,7 +402,7 @@ using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
 syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
 must be wrapped in `{% raw %}` inside the tag.
 
-Four Pygments styles supply the colours:
+Five Pygments styles supply the colours:
 
 - `EpisodicStyle` in `df12_pages/episodic_highlighting.py`, for the Episodic
   sub-site.
@@ -410,13 +415,15 @@ Four Pygments styles supply the colours:
   sub-site.
 - `CuprumStyle` in `df12_pages/cuprum_highlighting.py`, for the Cuprum
   sub-site.
+- `LanternStyle` in `df12_pages/rstest_bdd_highlighting.py`, for the
+  rstest-bdd sub-site.
 
-`EpisodicStyle` and `CuprumStyle` are imported directly by their generators;
-nothing resolves them by name, because the highlight tag emits token classes
-and the colours arrive from the generated stylesheet. The Netsuke custom lexers
-and the `HimotoshiStyle` and `StilyagiStyle` classes are registered with
-Pygments through the `pygments.lexers` and `pygments.styles` entry points in
-`pyproject.toml`, so `get_lexer_by_name("netsuke")` and
+`EpisodicStyle`, `CuprumStyle`, and `LanternStyle` are imported directly by
+their generators; nothing resolves them by name, because the highlight tag
+emits token classes and the colours arrive from the generated stylesheet. The
+Netsuke custom lexers and the `HimotoshiStyle` and `StilyagiStyle` classes are
+registered with Pygments through the `pygments.lexers` and `pygments.styles`
+entry points in `pyproject.toml`, so `get_lexer_by_name("netsuke")` and
 `get_style_by_name("stilyagi")` resolve anywhere in the pipeline without an
 explicit import.
 
@@ -427,14 +434,16 @@ explicit import.
 translation from a Pygments `Style` to CSS rules, shared by
 `scripts/generate_episodic_pygments_css.py`,
 `scripts/generate_himotoshi_pygments_css.py`,
-`scripts/generate_stilyagi_pygments_css.py`, and
-`scripts/generate_cuprum_pygments_css.py`. The generated `:root` variables and
-token rules are shared output. Site-specific chrome stays at each site's
+`scripts/generate_stilyagi_pygments_css.py`,
+`scripts/generate_cuprum_pygments_css.py`, and
+`scripts/generate_rstest_bdd_pygments_css.py`. The generated `:root` variables
+and token rules are shared output. Site-specific chrome stays at each site's
 established boundary: Himotoshi's remains in its generator, while the layout
 rules for Stilyagi's `.code-scroll`, `.stilyagi-syntax`, and
-`.stilyagi-syntax pre`, and for Cuprum's `.code-scroll`, `.cuprum-syntax`, and
-`.cuprum-syntax pre`, are handwritten above the `BEGIN` marker in each
-`syntax.css`.
+`.stilyagi-syntax pre`, for Cuprum's `.code-scroll`, `.cuprum-syntax`, and
+`.cuprum-syntax pre`, and for rstest-bdd's `.rb-code-scroll`,
+`.lantern-syntax`, and `.lantern-syntax pre`, are handwritten above the `BEGIN`
+marker in each `syntax.css`.
 
 The module exports two functions. Everything else in it is private and may be
 reshaped freely.
@@ -450,9 +459,9 @@ shared helper resolves token classes without a private Pygments method: it
 walks each token's parent chain and uses the public `STANDARD_TYPES` mapping,
 preserving Pygments' class strings.
 
-The Stilyagi and Cuprum generators emit only the `:root` variables and token
-rules. Their layout rules stay outside the marked block so padding, scrolling,
-and chrome can be edited directly as CSS.
+The Stilyagi, Cuprum, and rstest-bdd generators emit only the `:root` variables
+and token rules. Their layout rules stay outside the marked block so padding,
+scrolling, and chrome can be edited directly as CSS.
 
 `variable_name(token, prefix)` derives one custom-property name from a Pygments
 token type: `Literal.String.Escape` with the prefix `--netsuke-syntax-` gives
@@ -509,21 +518,23 @@ long as the style declares parents before children.
   `generate_himotoshi_pygments_css.py` itself, alongside the generated token
   rules.
 - Rerun the relevant generator after any change to `EpisodicStyle`,
-  `HimotoshiStyle`, `StilyagiStyle`, or `CuprumStyle`.
+  `HimotoshiStyle`, `StilyagiStyle`, `CuprumStyle`, or `LanternStyle`.
 - The generators write to the tracked source —
   `src/static/episodic/assets/styles/syntax.css`,
   `src/styles/netsuke/himotoshi.css`,
-  `src/static/stilyagi/assets/styles/syntax.css`, and
-  `src/static/cuprum/assets/styles/syntax.css` — never to `public/`. Writing to
-  `public/` would lose the change on the next clean build.
+  `src/static/stilyagi/assets/styles/syntax.css`,
+  `src/static/cuprum/assets/styles/syntax.css`, and
+  `src/static/rstest-bdd/assets/styles/syntax.css` — never to `public/`.
+  Writing to `public/` would lose the change on the next clean build.
 - A test asserts the committed marked block matches what the generator would
   produce (`test_committed_stylesheet_matches_the_generator` in each test
   module below). A stale stylesheet fails the commit gates.
-- All four generated stylesheets are excluded from the Biome formatter, in the
+- All five generated stylesheets are excluded from the Biome formatter, in the
   `src/static/stilyagi/assets/styles/syntax.css`,
   `src/styles/netsuke/himotoshi.css`,
-  `src/static/episodic/assets/styles/syntax.css`, and
-  `src/static/cuprum/assets/styles/syntax.css` override in `biome.jsonc`.
+  `src/static/episodic/assets/styles/syntax.css`,
+  `src/static/cuprum/assets/styles/syntax.css`, and
+  `src/static/rstest-bdd/assets/styles/syntax.css` override in `biome.jsonc`.
   `token_rules` emits one rule per line, which the formatter would expand; the
   next generator run would collapse it again, and the tools would undo each
   other on alternate runs — with the test above failing on whichever ran last.
@@ -531,15 +542,15 @@ long as the style declares parents before children.
   `scripts/pygments_css.py` and regenerate. Do not remove the exclusion to tidy
   a diff.
 - Stylelint is handled by the generators themselves rather than by the config.
-  `generate_himotoshi_pygments_css.py`, `generate_stilyagi_pygments_css.py`, and
-  `generate_cuprum_pygments_css.py` emit a `/* stylelint-disable */` marker
-  after `BEGIN` and a `/* stylelint-enable */` marker before `END`; the
-  Episodic generator, which writes the whole file, emits a
-  `/* stylelint-disable */` in its header. The rest of each file is still
-  linted. `stylelint --fix` leaves a disabled range alone, so `make fmt` and
-  the generators do not fight; a lint finding inside the markers means the
-  generator's output has changed shape and the generator, not the stylesheet,
-  is what to change.
+  `generate_himotoshi_pygments_css.py`, `generate_stilyagi_pygments_css.py`,
+  `generate_cuprum_pygments_css.py`, and `generate_rstest_bdd_pygments_css.py`
+  emit a `/* stylelint-disable */` marker after `BEGIN` and a
+  `/* stylelint-enable */` marker before `END`; the Episodic generator, which
+  writes the whole file, emits a `/* stylelint-disable */` in its header. The
+  rest of each file is still linted. `stylelint --fix` leaves a disabled range
+  alone, so `make fmt` and the generators do not fight; a lint finding inside
+  the markers means the generator's output has changed shape and the generator,
+  not the stylesheet, is what to change.
 
 ### 4.5. Regenerating and verifying
 
@@ -548,8 +559,11 @@ uv run python scripts/generate_episodic_pygments_css.py
 uv run python scripts/generate_himotoshi_pygments_css.py
 uv run python scripts/generate_stilyagi_pygments_css.py
 uv run python scripts/generate_cuprum_pygments_css.py
-uv run pytest tests/test_episodic_highlight.py tests/test_netsuke_highlight.py tests/test_stilyagi_highlight.py tests/test_cuprum_highlight.py
-bunx biome check src/static/episodic/assets/styles src/styles/netsuke src/static/stilyagi/assets/styles src/static/cuprum/assets/styles
+uv run python scripts/generate_rstest_bdd_pygments_css.py
+uv run pytest tests/test_episodic_highlight.py tests/test_netsuke_highlight.py \
+  tests/test_stilyagi_highlight.py tests/test_cuprum_highlight.py tests/test_rstest_bdd_highlight.py
+bunx biome check src/static/episodic/assets/styles src/styles/netsuke src/static/stilyagi/assets/styles \
+  src/static/cuprum/assets/styles src/static/rstest-bdd/assets/styles
 ```
 
 Each script is idempotent: rerunning it without changing the corresponding
@@ -564,23 +578,25 @@ block outright, so a run restores it without needing the previous content.
 
 ### 4.6. Per-site mapping
 
-| Site     | Style            | Lexers                                             | Wrapper class     | Variable prefix      | Bold weight | Stylesheet                                     |
-| -------- | ---------------- | -------------------------------------------------- | ----------------- | -------------------- | ----------- | ---------------------------------------------- |
-| Episodic | `EpisodicStyle`  | `bash`, `console`, `json`, `make`, `xml`           | `episodic-syntax` | `--episodic-syntax-` | `600`       | `src/static/episodic/assets/styles/syntax.css` |
-| Netsuke  | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/styles/netsuke/himotoshi.css`             |
-| Stilyagi | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css` |
-| Cuprum   | `CuprumStyle`    | `python`, `console`                                | `cuprum-syntax`   | `--cuprum-syntax-`   | `600`       | `src/static/cuprum/assets/styles/syntax.css`   |
+| Site       | Style            | Lexers                                             | Wrapper class     | Variable prefix      | Bold weight | Stylesheet                                       |
+| ---------- | ---------------- | -------------------------------------------------- | ----------------- | -------------------- | ----------- | ------------------------------------------------ |
+| Episodic   | `EpisodicStyle`  | `bash`, `console`, `json`, `make`, `xml`           | `episodic-syntax` | `--episodic-syntax-` | `600`       | `src/static/episodic/assets/styles/syntax.css`   |
+| Netsuke    | `HimotoshiStyle` | `netsuke`, `netsuke-console`, `toml`, `powershell` | `hm-syntax`       | `--netsuke-syntax-`  | `600`       | `src/styles/netsuke/himotoshi.css`               |
+| Stilyagi   | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css`   |
+| Cuprum     | `CuprumStyle`    | `python`, `console`                                | `cuprum-syntax`   | `--cuprum-syntax-`   | `600`       | `src/static/cuprum/assets/styles/syntax.css`     |
+| rstest-bdd | `LanternStyle`   | `rust`, `gherkin`, `toml`, `console`               | `lantern-syntax`  | `--lantern-syntax-`  | `600`       | `src/static/rstest-bdd/assets/styles/syntax.css` |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each
 stylesheet._
 
 The lexer list reflects what the templates currently use, not the full set
-Pygments supports; `bash`, `console`, `json`, `make`, `toml`, `powershell`, and
-`xml` are stock Pygments lexers used unmodified. The bold weight differs
-because the sub-sites' monospace faces read differently at the same weight:
-Episodic, Netsuke, and Cuprum stop at semibold — Cuprum ships IBM Plex Mono
-only up to 600 — while Stilyagi's lighter face goes to full bold.
+Pygments supports; `bash`, `console`, `gherkin`, `json`, `make`, `rust`, `toml`,
+`powershell`, and `xml` are stock Pygments lexers used unmodified. The bold
+weight differs because the sub-sites' monospace faces read differently at the
+same weight: Episodic, Netsuke, Cuprum, and rstest-bdd stop at semibold —
+Cuprum ships IBM Plex Mono only up to 600, and rstest-bdd JetBrains Mono at 400
+and 600 — while Stilyagi's lighter face goes to full bold.
 
 ### 4.7. The Weaver icon generator
 
@@ -1157,9 +1173,9 @@ homepage:
           external: false
         - label: rstest-bdd
           description: Behaviour-driven testing macros layered on rstest. Narrative clarity without the ceremony.
-          href: "https://github.com/leynos/rstest-bdd"
-          meta_label: View on GitHub
-          external: true
+          href: "rstest-bdd/"
+          meta_label: Learn more
+          external: false
 ```
 
 `_build_libraries_config` in `df12_pages/config/homepage.py` builds
@@ -1298,21 +1314,103 @@ it, and `access` ("Accessibility & localization").
 _Table 7b: the `.hm-chip` component and its modifiers, in
 `src/styles/netsuke/himotoshi.css`._
 
+### 5.9. rstest-bdd's needlework, samples, and storybook
+
+The rstest-bdd sub-site at `/rstest-bdd/` is the lantern picnic sewn by hand:
+felt patches, running stitches, blanket-stitched hems, a patchwork strip, and
+Marrow the crab with Clover the rabbit and Bobbin the felt robot, who stand for
+the three amigos. `templates/rstest-bdd/components.jinja` holds its macros;
+import it as `ui`.
+
+| Macro                           | Draws                                                                   | Classes                       |
+| ------------------------------- | ----------------------------------------------------------------------- | ----------------------------- |
+| `button`, `bead`                | A felt button pressed onto the page; a round felt button with a numeral | `.rb-btn`, `.rb-bead`         |
+| `page_head`, `figure`           | An inner page's first viewport; an illustration sewn into a wool patch  | `.rb-page-head`, `.rb-figure` |
+| `section_head`                  | A numbered section head: bead, kicker, heading, lede                    | `.rb-section-head`            |
+| `code_panel`, `sample`          | A night-blue code panel; the same, holding a whole file from `samples/` | `.rb-code`, `.rb-code-scroll` |
+| `output`, `note`, `facts`       | A run's real output; a stitched note or caveat; a row of facts          | `.rb-output`, `.rb-note`, …   |
+| `guide_card`, `matrix`, `pager` | A pattern-book card; a table that becomes patches below 48rem; a pager  | `.rb-card`, `.rb-matrix`, …   |
+
+_Table 7c: the rstest-bdd macros and the component classes they pair with._
+
+Every class carries an `rb-` prefix, and `tests/test_rstest_bdd_build.py` fails
+if a page uses a daisyUI component name, for the reason section 5.5 gives. The
+materials are in `src/styles/rstest-bdd/needlework.css`: `.rb-stitched` sews a
+running stitch inside an element's edge, `.rb-seam` is a dashed divider,
+`.rb-blanket-top` hems a band to whatever sits above it, `.rb-quilted` lays a
+quilting lattice over a padded ground, `.rb-patchwork` is the strip above the
+footer, and `.rb-patch--<colour>` sets a patch's fill. A stitch draws with
+gradients rather than a dashed border, so its length is the same in every
+browser, and takes its thread from `--rb-stitch`, which each patch colour and
+dark band re-points; `--rb-blanket` overrides it for a blanket stitch whose
+loops cross onto a cream ground. Pumpkin is Marrow's colour and a fill only:
+thread on it measures 4.26:1, so it carries no type.
+
+The code on the sub-site is the code of a real Cargo package,
+`templates/rstest-bdd/samples/`, which depends on the crates.io release named by
+`rstest_bdd_version` in `config/pages.yaml`. `ui.sample('tests/lantern.rs')`
+includes a whole file with `{% include %}`, and an excerpt in a
+`ui.code_panel(…, sample='tests/lantern.rs')` names the file it was cut from.
+`test_every_sample_panel_is_a_run_of_its_sample` holds each panel to
+consecutive lines of its file, and
+`test_the_sample_crate_pins_the_documented_release` holds the package's
+versions to the config. Because the templates include the samples, no sample
+may contain a Jinja delimiter, which a test also checks. Run the samples with:
+
+```bash
+make rstest-bdd-samples
+```
+
+It needs a Rust toolchain and the network, so it is not one of the commit
+gates. When the release moves, bump the package's dependencies and the
+`template_vars` together, rerun the samples, and update every transcript shown
+with `ui.output`, which are copied from real runs. The package's `target/`
+directory is git-ignored.
+
+The data lists under `templates/rstest-bdd/data/` drive the repeated structure:
+`guides.jinja` the pattern book's cards, each guide's position, and its pager;
+`story.jinja` the home page's eight chapters and their tabs; and
+`roadmap.jinja` the released, pinned, and chalked-out patches. Every guide
+extends `pages/_guide.jinja` and sets `guide_slug`, `thesis`, and `sections`;
+the one `sections` list renders the sticky rail from 64rem and the `<details>`
+drop-down below it, and a test holds both to the page's `<section>` ids.
+
+The home page's storybook is rung 5 of the ladder in `AGENTS.md`. Without
+script, all eight chapters sit in a horizontally scrolling, keyboard-reachable
+strip, and the tabs are fragment links. `storybook.ts` marks the tab for the
+chapter in view with `aria-current="true"`, scrolls the strip rather than the
+page when a tab is chosen, moves focus to the chapter, and reveals the previous
+and next buttons, which stay `hidden` in the markup because they do nothing
+without it. `nearestIndex` and `counterText` are its pure queries;
+`createStorybook(deps)` takes a document, an animation-frame `requestFrame`,
+and a `prefersReducedMotion` query. `copy-code.ts` is Cuprum's copy button with
+`data-rb-copy` attributes. Both scripts report their outcomes through the
+optional `telemetry.ts` hook; see section 6.5 for the seam, its vocabularies,
+and the `data-rb-*` contract in full.
+
+The cast never appears on a legal notice: `shared_content_page.jinja` empties
+the footer's `footer_art` block, which credits the illustrations, and
+`test_legal_pages_carry_no_illustration` checks it.
+`tests/test_rstest_bdd_browser.py`, marked `playwright`, runs axe over every
+page at 390 and 1440 pixels, checks that no page scrolls sideways at 320
+pixels, and drives the storybook.
+
 ## 6. Browser-side components
 
 Browser-side scripts under `src/static/<site>/assets/js/` are TypeScript files
 that follow one shared convention: a plain immediately invoked function
 expression (IIFE) module, guarded by the same `module.exports` hook described
-below. Loading and bootstrap otherwise differ by site. Sixteen of the eighteen
-scripts (Netsuke, Stilyagi, Episodic, and Cuprum) are loaded with
-`<script defer>` and guard their own initialization on `document.readyState`
-(running immediately if the document has already finished loading, or waiting
-for `DOMContentLoaded` otherwise). Weaver's two scripts, `telemetry.ts` and
-`mobile-nav.ts`, are the exception: they are loaded with a plain `<script>` at
-the end of `<body>` and run immediately and unconditionally, with no
-`readyState`/`DOMContentLoaded` gate. Where a component's behaviour has a pure
-decision worth testing in isolation — no DOM, no timers — that function is
-exported via `module.exports` at the end of the IIFE, guarded by
+below. Loading and bootstrap otherwise differ by site. Eighteen of the
+twenty-one scripts (Netsuke, Stilyagi, Episodic, Cuprum, and rstest-bdd's
+`copy-code.ts` and `storybook.ts`) are loaded with `<script defer>` and guard
+their own initialization on `document.readyState` (running immediately if the
+document has already finished loading, or waiting for `DOMContentLoaded`
+otherwise). Three scripts are the exception: Weaver's `telemetry.ts` and
+`mobile-nav.ts`, and rstest-bdd's `telemetry.ts`. Each is loaded with a plain
+`<script>` at the end of `<body>` and runs immediately and unconditionally,
+with no `readyState`/`DOMContentLoaded` gate. Where a component's behaviour has
+a pure decision worth testing in isolation — no DOM, no timers — that function
+is exported via `module.exports` at the end of the IIFE, guarded by
 `typeof module !== "undefined"` so the same file still runs unmodified as a
 plain browser script. `docs-scrollspy.ts` exports `pickActiveIndex` (which
 heading is currently being read); `config-keys.ts` exports `nextTabIndex`
@@ -1704,6 +1802,69 @@ branching logic worth testing directly, `module.exports` guarded for Bun, and a
 `matchMedia` listener — with the pre-`addEventListener` fallback — for any
 behaviour that genuinely differs by viewport width rather than merely being
 restyled by it.
+
+### 6.5. rstest-bdd telemetry and storybook contract
+
+rstest-bdd's copy buttons and storybook report through the same optional hook
+model as Episodic search and Weaver chrome. A production host may set
+`window.df12RstestBddTelemetrySink` to a function before
+`src/static/rstest-bdd/assets/js/telemetry.ts` runs, which happens immediately,
+at the end of `<body>`, with no `defer` and no `DOMContentLoaded` gate, so the
+deferred `copy-code.ts` and `storybook.ts` find the API already in place when
+they run. Without a sink, `telemetry.ts` is a no-op and nothing is collected. A
+sink that throws is caught and ignored, because observability must not be able
+to break the copy button or the storybook it was watching.
+
+The API it installs at `globalThis.df12RstestBddTelemetry` is
+`emit(operation, outcome, reason?)` plus the four frozen vocabularies `emit`
+checks its arguments against. Every event has the fixed shape
+`{component, operation, outcome, reason?}`; `component` is derived from
+`operation` rather than passed, so it cannot disagree with it. The whole of
+what may leave the page is declared at the top of `telemetry.ts`:
+
+| Field       | Values                                                         |
+| ----------- | -------------------------------------------------------------- |
+| `component` | `rstest-bdd-copy-button`, `rstest-bdd-storybook`               |
+| `operation` | `clipboard`, `storybook`                                       |
+| `outcome`   | `copied`, `failed`, `initialized`, `navigated`                 |
+| `reason`    | `unavailable`, `rejected`, `tab`, `previous`, `next`, `scroll` |
+
+_Table 9: every field an rstest-bdd telemetry event may carry._
+
+An `operation`, `outcome`, or `reason` outside those lists is dropped rather
+than emitted. `copy-code.ts` emits a `clipboard` `copied` on a successful
+write, and a `clipboard` `failed` with `unavailable` when no clipboard API is
+present or `rejected` when a write is refused — never the copied text.
+`storybook.ts` emits a `storybook` `initialized` once, when it wires the page,
+and a `storybook` `navigated` each time the chapter in view changes, with the
+reason `tab`, `previous`, or `next` when the reader chose it and `scroll` when
+a scroll frame changed it — only on an actual change, and never which chapter.
+See section 5.9 for what each script does; this section covers only the
+telemetry seam.
+
+`templates/rstest-bdd/_layout.jinja` loads `telemetry.js` with a plain
+`<script>` and no `defer`, before the deferred `copy-code.js`, so the API is
+already installed when that script's click handlers run; `storybook.js` is
+deferred on the home page in the same order.
+
+**The `data-rb-*` contract.** `copy-code.ts` reads `data-rb-copy` (the value
+`console` strips leading `$` prompts before the text is copied),
+`data-rb-copy-slot` (where the button is appended), and `data-rb-copy-label`
+(an optional accessible-name suffix). `storybook.ts` reads `data-rb-storybook`
+(the scrolling strip), `data-rb-chapter` (one per chapter),
+`data-rb-chapter-tab` (the fragment-link tabs), `data-rb-story-paging` (the
+previous/next container, hidden in the markup until the script wires it),
+`data-rb-story-prev`, `data-rb-story-next`, and `data-rb-story-count` (the
+"Chapter NN of NN" counter).
+
+`tests/js/rstest-bdd-telemetry.test.mjs` is the enforcement for the seam
+itself: it tries to get page data, copied text, and identifiers into an event
+rather than only checking the happy path.
+`tests/js/rstest-bdd-copy-code.test.mjs` and
+`tests/js/rstest-bdd-storybook.test.mjs` cover what each script does with it,
+the latter including a model-based property test that runs every generated
+trace over `tab`, `previous`, `next`, and `scroll` transitions and checks the
+reported navigations against the model's own chapter-in-view state.
 
 ## 7. Styling and the cascade
 

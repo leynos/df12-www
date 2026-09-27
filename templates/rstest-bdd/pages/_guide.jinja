@@ -1,0 +1,57 @@
+{#
+  The layout every guide extends. A guide sets `guide_slug` (its entry in
+  data/guides.jinja), `thesis`, and `sections` — the list of {id, label}
+  that drives both the sticky rail and the drop-down above the body — and
+  fills the `guide` block with one <section id="…"> per entry, in order.
+  tests/test_rstest_bdd_build.py holds the rail and the sections to each
+  other.
+#}
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% from "data/guides.jinja" import guides %}
+{% set slugs = guides | map(attribute='slug') | list %}
+{% set position = slugs.index(guide_slug) %}
+{% set guide = guides[position] %}
+{% block title %}{{ guide.title }} · rstest-bdd guides{% endblock %}
+{% block description %}{{ thesis }}{% endblock %}
+{% block main_class %} class="rb-guide-page"{% endblock %}
+{% macro _toc_links() -%}
+<ol class="rb-toc__list">
+  {% for section in sections %}
+  <li><a href="#{{ section.id }}">{{ section.label }}</a></li>
+  {% endfor %}
+</ol>
+{%- endmacro %}
+{% block content %}
+      <header class="rb-page-head rb-guide-head">
+        <div class="rb-shell rb-guide-head__grid">
+          <img class="rb-guide-head__badge" src="/rstest-bdd/assets/images/badges/{{ guide.slug }}.webp" width="256" height="256" alt="" decoding="async" />
+          <div>
+            <p class="rb-kicker"><a href="/rstest-bdd/guides/">Guides</a> · {{ position + 1 }} of {{ guides | length }}</p>
+            <h1 class="rb-page-head__title">{{ guide.title }}</h1>
+            <p class="rb-page-head__thesis">{{ thesis }}</p>
+          </div>
+        </div>
+      </header>
+      <div class="rb-shell rb-guide">
+        <nav class="rb-toc rb-stitched" aria-label="In this guide">
+          <div class="rb-toc__rail">
+            <p class="rb-toc__heading">In this guide</p>
+            {{ _toc_links() }}
+          </div>
+          <details class="rb-toc__menu">
+            <summary>In this guide {{ icons.icon('chevron-solid', 'rb-toc__chevron') }}</summary>
+            {{ _toc_links() }}
+          </details>
+          <p class="rb-toc__source">Full reference: <a href="{{ guide.source }}">{{ guide.source_label }}</a></p>
+        </nav>
+        <div class="rb-guide__body">
+          {% block guide %}{% endblock %}
+          {{ ui.pager(
+            {'href': '/rstest-bdd/guides/' ~ guides[position - 1].slug ~ '/', 'title': guides[position - 1].title} if position > 0 else {'href': '/rstest-bdd/getting-started/', 'title': 'Getting started'},
+            {'href': '/rstest-bdd/guides/' ~ guides[position + 1].slug ~ '/', 'title': guides[position + 1].title} if position + 1 < guides | length else {'href': '/rstest-bdd/harnesses/', 'title': 'Harnesses'},
+          ) }}
+        </div>
+      </div>
+{% endblock %}

@@ -1,0 +1,499 @@
+/* The rstest-bdd home page: the hero, the ribbon, the storybook, the
+ * workbench, the notes, the stage, the fine print, and the closing patch.
+ * Every rule is scoped under `.rb-home`, the page's <main>. */
+
+/* ---------- Hero ------------------------------------------------------- */
+
+.rb-home .rb-hero {
+  padding-block: clamp(2.5rem, 6vw, 5rem) clamp(2.5rem, 5vw, 4rem);
+}
+
+.rb-home .rb-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.75rem;
+  align-items: center;
+}
+
+@media (width >= 64rem) {
+  .rb-home .rb-hero__grid {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 3.5rem;
+  }
+}
+
+.rb-home .rb-hero__title {
+  margin-top: 1rem;
+  font-size: clamp(2.9rem, 6.4vw, 5.4rem);
+  line-height: 1;
+}
+
+.rb-home .rb-hero__title em {
+  display: block;
+}
+
+.rb-home .rb-hero__deck {
+  margin-top: 1.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  font-variation-settings: "SOFT" 100;
+  line-height: 1.35;
+}
+
+.rb-home .rb-hero__body {
+  max-width: 32rem;
+  margin-top: 1rem;
+  color: var(--rb-muted-text);
+}
+
+.rb-home .rb-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.rb-home .rb-hero__story-link {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  min-height: 2.75rem;
+  font-weight: 800;
+}
+
+.rb-home .rb-hero__story-link svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* The facts strip is a row of small burlap labels joined by a seam. */
+.rb-home .rb-hero__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-home .rb-hero__facts li {
+  padding: 0.3rem 0.75rem;
+  border: 2px dashed color-mix(in oklab, var(--color-rust) 55%, transparent);
+  border-radius: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.rb-home .rb-hero__art {
+  position: relative;
+  padding-top: 1.4rem;
+}
+
+/* The tag hangs over the illustration's top edge, like the plate label on
+   the mockup. */
+.rb-home .rb-hero__tag {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
+/* ---------- Ribbon ----------------------------------------------------- */
+
+.rb-home .rb-ribbon {
+  padding-block: 1rem;
+}
+
+.rb-home .rb-ribbon__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-block: 0;
+  list-style: none;
+}
+
+.rb-home .rb-ribbon__patch {
+  --rb-radius: 0.6rem;
+  --rb-stitch: var(--color-rust);
+
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.6rem;
+  background: var(--color-wool);
+  box-shadow: var(--shadow-patch);
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-style: italic;
+}
+
+/* ---------- Storybook -------------------------------------------------- */
+
+.rb-home .rb-story {
+  padding-top: 0.5rem;
+}
+
+.rb-home .rb-cast {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.75rem 2rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.rb-home .rb-cast__member {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.rb-home .rb-cast__member .rb-bead {
+  --rb-bead-size: 2rem;
+}
+
+.rb-home .rb-cast__amigo {
+  color: var(--rb-muted-text);
+}
+
+/* The tabs are a row of felt tags joined along a seam. */
+.rb-home .rb-story__tabs {
+  margin-bottom: 1.25rem;
+}
+
+.rb-home .rb-story__tab-list {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width < 48rem) {
+  .rb-home .rb-story__tab-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.rb-home .rb-story__tab {
+  display: flex;
+  flex-direction: column;
+  min-height: 3.25rem;
+  padding: 0.45rem 0.6rem;
+  border: 2px dashed transparent;
+  border-radius: 0.6rem;
+  background: var(--color-wool);
+  color: var(--color-thread);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.rb-home .rb-story__tab:hover {
+  border-color: color-mix(in oklab, var(--color-rust) 60%, transparent);
+}
+
+.rb-home .rb-story__tab[aria-current="true"] {
+  border-color: var(--color-thread);
+  background: var(--color-lantern);
+}
+
+.rb-home .rb-story__tab-num {
+  color: var(--color-rust);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.rb-home .rb-story__tab[aria-current="true"] .rb-story__tab-num {
+  color: var(--color-thread);
+}
+
+/* The strip: one chapter per view, snapping, scrolled sideways. */
+.rb-home .rb-story__track {
+  display: grid;
+  grid-auto-columns: 100%;
+  grid-auto-flow: column;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-color: var(--color-rust) transparent;
+}
+
+.rb-home .rb-chapter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+@media (width >= 64rem) {
+  .rb-home .rb-chapter {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    gap: 2.75rem;
+  }
+}
+
+.rb-home .rb-chapter:focus-visible {
+  outline-offset: -3px;
+}
+
+.rb-home .rb-chapter__title {
+  margin-top: 0.6rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.rb-home .rb-chapter__story {
+  margin-top: 0.9rem;
+  color: var(--rb-muted-text);
+}
+
+.rb-home .rb-chapter .rb-note {
+  background: var(--color-wool);
+}
+
+.rb-home .rb-chapter__count {
+  color: var(--rb-muted-text);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.rb-home .rb-story__paging {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.rb-home .rb-story__paging[hidden] {
+  display: none;
+}
+
+.rb-home .rb-story__page-btn {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 2px dashed var(--color-rust);
+  border-radius: 0.6rem;
+  background: var(--color-wool);
+  color: var(--color-thread);
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rb-home .rb-story__page-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.rb-home .rb-story__page-btn:disabled {
+  border-color: color-mix(in oklab, var(--color-thread) 30%, transparent);
+  color: var(--color-thread-muted);
+  cursor: default;
+}
+
+.rb-home .rb-story__count {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* ---------- Workbench -------------------------------------------------- */
+
+.rb-home .rb-workbench .rb-code {
+  --rb-stitch: color-mix(in oklab, var(--color-stitch-cream) 55%, transparent);
+
+  background: var(--color-night-raised);
+}
+
+.rb-home .rb-workbench .lantern-syntax {
+  background: var(--color-night-raised);
+}
+
+.rb-home .rb-workbench__start {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem 3rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-block: 1.5rem;
+  border-block: 2px dashed color-mix(in oklab, var(--color-stitch-cream) 40%, transparent);
+}
+
+@media (width >= 56rem) {
+  .rb-home .rb-workbench__start {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  }
+}
+
+.rb-home .rb-workbench__heading {
+  margin-top: 0.4rem;
+  font-size: 1.7rem;
+}
+
+.rb-home .rb-workbench__text {
+  max-width: 34rem;
+  margin-block: 0.6rem 1.5rem;
+  color: var(--rb-muted-text);
+  font-size: 0.97rem;
+}
+
+.rb-home .rb-workbench__steps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 2.5rem;
+}
+
+@media (width >= 64rem) {
+  .rb-home .rb-workbench__steps {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+}
+
+.rb-home .rb-workbench__col {
+  min-width: 0;
+}
+
+.rb-home .rb-step-head {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.rb-home .rb-step-head h3 {
+  font-size: 1.5rem;
+}
+
+/* ---------- Notes ------------------------------------------------------ */
+
+.rb-home .rb-notes__numeral {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-style: italic;
+  line-height: 1;
+}
+
+.rb-home .rb-notes .rb-card__meta {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--rb-link);
+}
+
+.rb-home .rb-notes .rb-card__meta svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ---------- Stage ------------------------------------------------------ */
+
+.rb-home .rb-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem 3.5rem;
+  align-items: center;
+  margin-top: clamp(3rem, 7vw, 5rem);
+}
+
+@media (width >= 56rem) {
+  .rb-home .rb-stage {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+}
+
+.rb-home .rb-stage__title {
+  margin-block: 0.5rem 1rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.rb-home .rb-stage__copy p + p {
+  margin-top: 0.8rem;
+}
+
+.rb-home .rb-stage__copy p:not(.rb-kicker) {
+  color: var(--rb-muted-text);
+}
+
+.rb-home .rb-stage__copy .rb-btn {
+  margin-top: 1.5rem;
+}
+
+/* ---------- Fine print ------------------------------------------------- */
+
+.rb-home .rb-fine-print {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem 4rem;
+  margin-top: clamp(3rem, 7vw, 5rem);
+  padding-top: 2.5rem;
+  border-top: 2px dashed color-mix(in oklab, var(--color-rust) 55%, transparent);
+}
+
+@media (width >= 56rem) {
+  .rb-home .rb-fine-print {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+}
+
+.rb-home .rb-fine-print__title {
+  margin-top: 0.5rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+/* ---------- Closing ---------------------------------------------------- */
+
+.rb-home .rb-closing__inner {
+  text-align: center;
+}
+
+.rb-home .rb-closing__title {
+  margin-top: 1rem;
+  font-size: clamp(2.3rem, 5.5vw, 4.4rem);
+}
+
+.rb-home .rb-closing__title em {
+  display: block;
+}
+
+.rb-home .rb-closing__body {
+  max-width: 34rem;
+  margin: 1.25rem auto 0;
+  font-size: 1.2rem;
+}
+
+.rb-home .rb-closing__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.rb-home .rb-closing__note {
+  max-width: 22rem;
+  margin: 2rem auto 0;
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+/* On a phone the counter takes its own row above the two buttons. */
+@media (width < 30rem) {
+  .rb-home .rb-story__count {
+    flex-basis: 100%;
+    order: -1;
+    text-align: center;
+  }
+}

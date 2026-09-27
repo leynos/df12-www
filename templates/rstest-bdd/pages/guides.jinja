@@ -1,0 +1,37 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% from "data/guides.jinja" import guides %}
+{% block title %}Guides · rstest-bdd{% endblock %}
+{% block description %}Seven short rstest-bdd guides, one task each, with code compiled against rstest-bdd {{ rstest_bdd_version }}.{% endblock %}
+{% block main_class %} class="rb-guides"{% endblock %}
+{% block content %}
+      {% call ui.page_head(
+        'Guides',
+        'The pattern book.',
+        'Seven short guides, one task each. Every sample compiles against rstest-bdd ' ~ rstest_bdd_version ~ ', and each guide ends at the matching section of the full user’s guide.',
+        image={
+          'name': 'sewing-box',
+          'alt': 'At dusk on a patchwork quilt, the rabbit reads a felt pattern book beside a lantern, Marrow the crab climbs out of an open sewing box with a spool of rust-red wool, and the robot lines up spools of thread by colour.',
+          'label': 'The sewing box',
+          'caption': 'Clover reads the pattern while Marrow fetches the thread and Bobbin sorts the spools.',
+          'eager': true,
+        }) %}
+        {{ ui.button('Start with feature files', '/rstest-bdd/guides/feature-files/', icon='arrow-right') }}
+      {% endcall %}
+
+      <section class="rb-shell rb-section rb-guides__index" aria-labelledby="guides-title">
+        <h2 id="guides-title" class="sr-only">All guides</h2>
+        <div class="rb-quilt">
+          {% for guide in guides %}
+          {{ ui.guide_card(guide, loop.index, guides | length) }}
+          {% endfor %}
+          <a class="rb-card rb-patch rb-patch--linen rb-stitched" href="{{ users_guide_url }}">
+            <img class="rb-card__badge" src="/rstest-bdd/assets/images/badges/users-guide.webp" width="256" height="256" alt="" loading="lazy" decoding="async" />
+            <span class="rb-kicker">Reference</span>
+            <h3 class="rb-card__title">The full user’s guide</h3>
+            <p class="rb-card__body">Every feature, organized by the three amigos, in the df12 reference library.</p>
+            <span class="rb-card__meta">Covers everything, at length</span>
+          </a>
+        </div>
+      </section>
+{% endblock %}

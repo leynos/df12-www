@@ -1,0 +1,363 @@
+/* Needlework: the materials every rstest-bdd component is sewn from.
+ *
+ * Seven materials, each with one job (see the design language):
+ *
+ *   .rb-stitched       a running stitch sewn just inside an element's edge
+ *   .rb-seam           a dashed thread line between sections or patches
+ *   .rb-blanket-top    a blanket-stitched top edge for a band that hangs
+ *   .rb-pinked-bottom  a pinking-shears zigzag along a band's bottom edge
+ *   .rb-bead           a round felt button with a stitched rim
+ *   .rb-tag            a felt label with an eyelet, set at a slight angle
+ *   .rb-gingham        the picnic blanket: the one printed fabric
+ *
+ * plus the patch colours, which re-point the type and stitch roles for
+ * everything sewn onto them. Stitches are drawn with gradients rather than
+ * `border-style: dashed`, whose dash length each browser picks for itself;
+ * a gradient keeps the stitch the same length everywhere. Every stitch is
+ * decoration over a boundary the fill already draws, so each pseudo-element
+ * ignores the pointer and carries no content. */
+
+/* ---------- Running stitch --------------------------------------------- */
+
+.rb-stitched {
+  --rb-stitch-inset: 7px;
+  --rb-stitch-dash: 9px;
+  --rb-stitch-gap: 6px;
+  --rb-stitch-width: 2px;
+
+  position: relative;
+  isolation: isolate;
+}
+
+.rb-stitched::before {
+  --rb-local-run: repeating-linear-gradient(
+    90deg,
+    var(--rb-stitch) 0 var(--rb-stitch-dash),
+    transparent 0 calc(var(--rb-stitch-dash) + var(--rb-stitch-gap))
+  );
+  --rb-local-rise: repeating-linear-gradient(
+    180deg,
+    var(--rb-stitch) 0 var(--rb-stitch-dash),
+    transparent 0 calc(var(--rb-stitch-dash) + var(--rb-stitch-gap))
+  );
+
+  position: absolute;
+  z-index: -1;
+  inset: var(--rb-stitch-inset);
+  border-radius: max(0px, calc(var(--rb-radius, 0.9rem) - var(--rb-stitch-inset)));
+  background:
+    var(--rb-local-run) top left / 100% var(--rb-stitch-width) no-repeat,
+    var(--rb-local-run) bottom left / 100% var(--rb-stitch-width) no-repeat,
+    var(--rb-local-rise) top left / var(--rb-stitch-width) 100% no-repeat,
+    var(--rb-local-rise) top right / var(--rb-stitch-width) 100% no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+/* A tighter stitch for small things: tabs, tags, chips. */
+.rb-stitched--fine {
+  --rb-stitch-inset: 4px;
+  --rb-stitch-dash: 5px;
+  --rb-stitch-gap: 4px;
+  --rb-stitch-width: 1.5px;
+}
+
+/* ---------- Seam ------------------------------------------------------- */
+
+.rb-seam {
+  height: 2px;
+  border: 0;
+  background: repeating-linear-gradient(90deg, var(--rb-stitch) 0 10px, transparent 0 17px);
+}
+
+/* ---------- Blanket-stitched top edge ---------------------------------- */
+
+/* A band hangs from its top edge: a thread runs along it and loops down
+   every 16px. The stitch straddles the seam, starting 6px above the band,
+   so the loops sew the band to whatever sits above it. That puts half of
+   every stitch on the neighbouring ground, which is usually wool: cream
+   thread would vanish there, so the stitch takes --rb-blanket, a darker
+   tonal cream on the night bands, and the band's own stitch elsewhere. */
+.rb-blanket-top {
+  position: relative;
+}
+
+.rb-blanket-top::after {
+  --rb-local-thread: var(--rb-blanket, var(--rb-stitch));
+
+  position: absolute;
+  inset: -6px 0 auto;
+  height: 12px;
+  background:
+    linear-gradient(var(--rb-local-thread), var(--rb-local-thread)) 0 5px / 100% 2px no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      var(--rb-local-thread) 7px 9px,
+      transparent 9px 16px
+    )
+    0 0 / 100% 12px no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+/* ---------- Pinked edge ------------------------------------------------ */
+
+/* Pinking shears leave a zigzag. The mask cuts 8px-deep teeth along the
+   bottom; padding-bottom keeps content clear of them. */
+.rb-pinked-bottom {
+  --rb-pink: 16px;
+
+  padding-bottom: calc(var(--rb-pink) / 2);
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / var(--rb-pink)
+    100%;
+}
+
+/* ---------- Bead: a felt button with a stitched rim -------------------- */
+
+.rb-bead {
+  --rb-bead-fill: var(--color-pumpkin);
+  --rb-bead-ink: var(--color-thread);
+  --rb-bead-size: 2.4rem;
+
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--rb-bead-size);
+  height: var(--rb-bead-size);
+  border-radius: 50%;
+  background: var(--rb-bead-fill);
+  box-shadow: var(--shadow-patch);
+  color: var(--rb-bead-ink);
+  font-family: var(--font-display);
+  font-size: calc(var(--rb-bead-size) * 0.46);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rb-bead::before {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(var(--color-stitch-cream) 0 9deg, transparent 9deg 20deg);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  content: "";
+  pointer-events: none;
+}
+
+/* A bead with no number is a sewn-on button: four holes and a cross of
+   thread, drawn in the thread colour. */
+.rb-bead--button::after {
+  width: 36%;
+  height: 36%;
+  background:
+    radial-gradient(circle, var(--rb-bead-ink) 0 1.6px, transparent 2px) 0 0 / 50% 50%,
+    linear-gradient(45deg, transparent 46%, var(--color-stitch-cream) 46% 54%, transparent 54%),
+    linear-gradient(-45deg, transparent 46%, var(--color-stitch-cream) 46% 54%, transparent 54%);
+  content: "";
+}
+
+/* Thread on pumpkin is 4.26:1: a numeral is large, bold display type,
+   which needs 3:1, and clears it. The lantern and wool beads carry thread
+   at 8.39:1 and 13.86:1. */
+.rb-bead--lantern {
+  --rb-bead-fill: var(--color-lantern);
+}
+
+.rb-bead--wool {
+  --rb-bead-fill: var(--color-wool);
+}
+
+.rb-bead--night {
+  --rb-bead-fill: var(--color-night);
+  --rb-bead-ink: var(--color-lantern);
+}
+
+.rb-bead--moss {
+  --rb-bead-fill: var(--color-moss);
+  --rb-bead-ink: var(--color-wool);
+}
+
+.rb-bead--cranberry {
+  --rb-bead-fill: var(--color-cranberry);
+  --rb-bead-ink: var(--color-wool);
+}
+
+.rb-bead--robot {
+  --rb-bead-fill: var(--color-robot);
+}
+
+/* ---------- Tag -------------------------------------------------------- */
+
+.rb-tag {
+  --rb-stitch: var(--color-rust);
+  --rb-radius: 0.4rem;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.1rem 0.55rem 1.6rem;
+  border-radius: 0.4rem;
+  background: var(--color-burlap);
+  box-shadow: var(--shadow-patch);
+  color: var(--color-thread);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-style: italic;
+  line-height: 1.2;
+  transform: rotate(-3deg);
+}
+
+/* The eyelet: a punched hole with a brass ring. */
+.rb-tag::after {
+  position: absolute;
+  top: 50%;
+  left: 0.6rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 2px solid var(--color-thread-muted);
+  border-radius: 50%;
+  background: var(--color-wool);
+  content: "";
+  transform: translateY(-50%);
+}
+
+/* ---------- Gingham ---------------------------------------------------- */
+
+/* The picnic blanket: cranberry bands at half strength crossing over wool,
+   so the crossings print at full strength. Never behind text. */
+.rb-gingham {
+  --rb-local-band: color-mix(in oklab, var(--color-cranberry) 55%, transparent);
+
+  background-color: var(--color-wool);
+  background-image:
+    linear-gradient(90deg, var(--rb-local-band) 50%, transparent 50%),
+    linear-gradient(var(--rb-local-band) 50%, transparent 50%);
+  background-size: 22px 22px;
+}
+
+/* ---------- Patch colours ---------------------------------------------- */
+
+/* A patch is a flat, softly rounded piece of felt. Its colour modifier
+   re-points the type and stitch roles for everything sewn onto it. Pumpkin
+   and Bobbin's blue-grey are decorative fills only — neither carries body
+   type — so text-bearing patches in those hues use rust and info. */
+.rb-patch {
+  --rb-radius: 0.9rem;
+
+  border-radius: var(--rb-radius);
+  background-color: var(--color-wool);
+  box-shadow: var(--shadow-patch);
+  color: var(--color-thread);
+}
+
+.rb-patch--linen {
+  background-color: var(--color-linen);
+}
+
+.rb-patch--burlap {
+  --rb-muted-text: var(--color-thread-muted);
+
+  background-color: var(--color-burlap);
+}
+
+.rb-patch--night {
+  --rb-focus: var(--color-lantern);
+  --rb-accent-text: var(--color-pumpkin-lift);
+  --rb-muted-text: var(--color-night-muted);
+  --rb-link: var(--color-lantern);
+  --rb-stitch: var(--color-stitch-cream);
+
+  background-color: var(--color-night);
+  color: var(--color-starlight);
+}
+
+.rb-patch--lantern {
+  --rb-accent-text: var(--color-thread);
+  --rb-muted-text: var(--color-thread);
+  --rb-link: var(--color-thread);
+  --rb-stitch: var(--color-thread);
+
+  background-color: var(--color-lantern);
+  color: var(--color-thread);
+}
+
+/* Wool on rust 6.13:1, on moss 4.90:1, on cranberry 7.13:1, on the info
+   blue-grey 6.62:1: the light patch type throughout. */
+.rb-patch--rust,
+.rb-patch--moss,
+.rb-patch--cranberry,
+.rb-patch--robot {
+  --rb-focus: var(--color-wool);
+  --rb-accent-text: var(--color-wool);
+  --rb-muted-text: var(--color-wool);
+  --rb-link: var(--color-wool);
+  --rb-stitch: var(--color-stitch-cream);
+
+  color: var(--color-wool);
+}
+
+.rb-patch--rust {
+  background-color: var(--color-rust);
+}
+
+.rb-patch--moss {
+  background-color: var(--color-moss);
+}
+
+.rb-patch--cranberry {
+  background-color: var(--color-cranberry);
+}
+
+.rb-patch--robot {
+  background-color: var(--color-info);
+}
+
+/* ---------- Quilting --------------------------------------------------- */
+
+/* Quilting stitches run in a diamond lattice across a padded ground. The
+   lines are rust at 9%, so type on the ground keeps its contrast (thread
+   on the darkest crossing still clears 12:1). */
+.rb-quilted {
+  --rb-local-quilt: color-mix(in oklab, var(--color-rust) 9%, transparent);
+
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0 46px, var(--rb-local-quilt) 46px 48px),
+    repeating-linear-gradient(-45deg, transparent 0 46px, var(--rb-local-quilt) 46px 48px);
+}
+
+/* ---------- Patchwork strip -------------------------------------------- */
+
+/* A strip of patches in the palette, joined by seams and hemmed with a
+   cream running stitch top and bottom. Pure ornament: the markup carries
+   aria-hidden and no content. */
+.rb-patchwork {
+  --rb-local-width: 64px;
+
+  height: 30px;
+  background:
+    repeating-linear-gradient(90deg, var(--color-stitch-cream) 0 8px, transparent 0 14px) 0 5px /
+    100% 2px no-repeat,
+    repeating-linear-gradient(90deg, var(--color-stitch-cream) 0 8px, transparent 0 14px) 0
+    calc(100% - 5px) / 100% 2px no-repeat,
+    repeating-linear-gradient(
+      90deg,
+      var(--color-pumpkin) 0 calc(var(--rb-local-width) - 2px),
+      var(--color-thread) 0 var(--rb-local-width),
+      var(--color-lantern) 0 calc(var(--rb-local-width) * 2 - 2px),
+      var(--color-thread) 0 calc(var(--rb-local-width) * 2),
+      var(--color-moss) 0 calc(var(--rb-local-width) * 3 - 2px),
+      var(--color-thread) 0 calc(var(--rb-local-width) * 3),
+      var(--color-cranberry) 0 calc(var(--rb-local-width) * 4 - 2px),
+      var(--color-thread) 0 calc(var(--rb-local-width) * 4),
+      var(--color-night) 0 calc(var(--rb-local-width) * 5 - 2px),
+      var(--color-thread) 0 calc(var(--rb-local-width) * 5),
+      var(--color-robot) 0 calc(var(--rb-local-width) * 6 - 2px),
+      var(--color-thread) 0 calc(var(--rb-local-width) * 6),
+      var(--color-rust) 0 calc(var(--rb-local-width) * 7 - 2px),
+      var(--color-thread) 0 calc(var(--rb-local-width) * 7)
+    );
+}

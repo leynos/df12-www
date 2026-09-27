@@ -22,6 +22,7 @@ df12-www/
 │   ├── mxd/
 │   ├── episodic/
 │   ├── netsuke/
+│   ├── rstest-bdd/
 │   ├── stilyagi/
 │   └── weaver/
 ├── reference/
@@ -34,6 +35,7 @@ df12-www/
 │   ├── mxd/
 │   ├── episodic/
 │   ├── netsuke/
+│   ├── rstest-bdd/
 │   ├── stilyagi/
 │   └── weaver/
 ├── tests/
@@ -90,9 +92,9 @@ Scaleway-specific variants, and deployment configuration).
 
 Generated output directory. The main df12 site pages live at the top level.
 Sub-site output lands under path-prefixed subdirectories (`mxd/`, `episodic/`,
-`netsuke/`, `weaver/`, `stilyagi/`, `cuprum/`), each containing the full static
-site including assets, doc pages, and shared content pages. This directory is
-the deployment root.
+`netsuke/`, `weaver/`, `stilyagi/`, `cuprum/`, `rstest-bdd/`), each containing
+the full static site including assets, doc pages, and shared content pages.
+This directory is the deployment root.
 
 ### `reference/`
 
@@ -123,7 +125,8 @@ Build-time scripts outside the Python package:
   the Netsuke documentation sub-site.
 - `generate_*_pygments_css.py` — Regenerate the marked Pygments block in each
   sub-site's syntax stylesheet from its Pygments `Style`; Cuprum's is
-  `generate_cuprum_pygments_css.py`.
+  `generate_cuprum_pygments_css.py`, and rstest-bdd's
+  `generate_rstest_bdd_pygments_css.py`.
 - `cuprum_api_parser.py` and `build_cuprum_api_data.py` — Read Cuprum's public
   API from a Cuprum checkout, with `ast` alone, and write the generated
   `templates/cuprum/data/api.jinja` the API reference renders; run through
@@ -133,21 +136,23 @@ Build-time scripts outside the Python package:
 
 Frontend source files. `styles/` contains one Tailwind CSS entry point per
 compiled site — `site.css` for the main site, and `mxd.css`, `episodic.css`,
-`weaver.css`, `stilyagi.css`, `netsuke.css` and `cuprum.css` for those
-sub-sites — plus any plugins. Each is compiled to its own file under `public/`:
-`public/assets/site.css`, `public/mxd/assets/tailwind.css`,
+`weaver.css`, `stilyagi.css`, `netsuke.css`, `cuprum.css` and `rstest-bdd.css`
+for those sub-sites — plus any plugins. Each is compiled to its own file under
+`public/`: `public/assets/site.css`, `public/mxd/assets/tailwind.css`,
 `public/episodic/assets/styles/tailwind.css`,
 `public/weaver/assets/styles/weaver.css`,
 `public/stilyagi/assets/styles/stilyagi.css`,
-`public/netsuke/assets/css/himotoshi.css`, and
-`public/cuprum/assets/styles/cuprum.css`.
+`public/netsuke/assets/css/himotoshi.css`,
+`public/cuprum/assets/styles/cuprum.css`, and
+`public/rstest-bdd/assets/styles/rstest-bdd.css`.
 
 An entry point that has grown past a single file keeps its partials in a
 directory beside it. `styles/episodic/`, `styles/weaver/`, `styles/stilyagi/`,
-`styles/netsuke/` and `styles/cuprum/` are the examples: the entry point
-declares the theme and imports partials named for what they style, each into an
-explicit cascade layer. Netsuke's `styles/netsuke/himotoshi.css` carries the
-generated Pygments block that `scripts/generate_himotoshi_pygments_css.py` owns.
+`styles/netsuke/`, `styles/cuprum/` and `styles/rstest-bdd/` are the examples:
+the entry point declares the theme and imports partials named for what they
+style, each into an explicit cascade layer. Netsuke's
+`styles/netsuke/himotoshi.css` carries the generated Pygments block that
+`scripts/generate_himotoshi_pygments_css.py` owns.
 
 `static/` holds the hand-crafted assets — stylesheets, scripts, images, fonts,
 and favicons — that are published at the same path. Its layout mirrors the
@@ -165,21 +170,29 @@ the same kind of `syntax.css`, and `src/static/cuprum/assets/images/` holds,
 beside its illustrations, the engraved alpha masks (`*-mask.webp`) its marks
 are painted through: `seal-emblem-mask.webp`, `skyline-engraving-mask.webp`, and
 `town-hall-engraving-mask.webp`. The documentation's engraved plates use the
-same convention; their masks live under `src/static/cuprum/assets/images/docs/`.
+same convention; their masks live under
+`src/static/cuprum/assets/images/docs/`. rstest-bdd's
+`src/static/rstest-bdd/assets/` holds its `syntax.css`, its fonts, its
+illustrations as 768- and 1536-pixel WebP pairs, the eight storybook chapters
+under `images/story/`, and the round felt guide badges, with transparent
+corners, under `images/badges/`.
 
 ### `templates/`
 
 Per-sub-site Jinja template sets. Each subdirectory (`mxd/`, `episodic/`,
-`netsuke/`, `weaver/`, `stilyagi/`, `cuprum/`) holds the templates for that
-sub-site's design system. Episodic, Netsuke, and Cuprum keep shared macros in
-`components.jinja`; Cuprum adds `_icons.jinja`, `_marks.jinja` for its
-fictional municipal marks, and `data/` for the lists its pages loop over;
-Netsuke adds `chrome.jinja` for page furniture, `docs_nav.jinja` for the docs
-navigation, `examples_data.jinja` for the examples catalogue, and
-`forthcoming_data.jinja` for the forthcoming-capability preview catalogue.
-Netsuke, Weaver, Stilyagi, and Cuprum each centralize their chrome in a
-`_layout.jinja`: every Netsuke content page reaches it through `doc_page.jinja`
-and the homepage extends it directly; the one standalone document is
+`netsuke/`, `weaver/`, `stilyagi/`, `cuprum/`, `rstest-bdd/`) holds the
+templates for that sub-site's design system. Episodic, Netsuke, Cuprum, and
+rstest-bdd keep shared macros in `components.jinja`; Cuprum adds `_icons.jinja`,
+`_marks.jinja` for its fictional municipal marks, and `data/` for the lists
+its pages loop over; rstest-bdd adds `data/` for its guides, storybook, and
+roadmap, and `samples/`, a Cargo package whose files its pages include as code
+and `make rstest-bdd-samples` compiles and runs; Netsuke adds `chrome.jinja`
+for page furniture, `docs_nav.jinja` for the docs navigation,
+`examples_data.jinja` for the examples catalogue, and `forthcoming_data.jinja`
+for the forthcoming-capability preview catalogue. Netsuke, Weaver, Stilyagi,
+Cuprum, and rstest-bdd each centralize their chrome in a `_layout.jinja`: every
+Netsuke content page reaches it through `doc_page.jinja` and the homepage
+extends it directly; the one standalone document is
 `pages/icon-replacements.jinja`, which carries its own head and scripts. These
 are distinct from the main-site templates in `df12_pages/templates/`.
 

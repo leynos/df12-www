@@ -1,0 +1,309 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% from "data/story.jinja" import chapters, snippets %}
+{% from "data/guides.jinja" import guides %}
+{% block title %}{{ homepage.title }}{% endblock %}
+{% block description %}Turn readable Gherkin scenarios into ordinary Rust tests. Reuse rstest fixtures, run cargo test, and follow Marrow the crab to the lantern picnic.{% endblock %}
+{% block main_class %} class="rb-home"{% endblock %}
+{% block content %}
+{#- The cast, sewn to a strip once on this page. They map to the three
+    amigos the user's guide is organized around. -#}
+{% set cast = [
+  {'name': 'Clover', 'tone': 'wool', 'role': 'owns the promise', 'amigo': 'the product owner, who writes and reviews the feature file'},
+  {'name': 'Bobbin', 'tone': 'robot', 'role': 'builds the mechanism', 'amigo': 'the developer, who writes the steps and fixtures'},
+  {'name': 'Marrow', 'tone': 'pumpkin', 'role': 'checks what arrived', 'amigo': 'the tester, who runs the scenarios and reads the failures'},
+] %}
+{#- Three notes from the workbench, each pointing into the guides. -#}
+{% set notes = [
+  {'patch': 'moss', 'title': 'Reuse the preparation.', 'guide': 'fixtures-and-state',
+   'body': 'Unit, integration, and scenario tests draw on the same <code>rstest</code> fixtures. State lives where rstest puts it, not in a framework-mandated <code>World</code>. Reusing a fixture does not mean sharing a mutable one.'},
+  {'patch': 'night', 'title': 'Make the examples explicit.', 'guide': 'steps',
+   'body': 'Placeholders such as <code>{count:u32}</code> parse through <code>FromStr</code> before the step runs. An Outline repeats a scenario for each row of its Examples table.'},
+  {'patch': 'cranberry', 'title': 'Find the useful mismatch.', 'guide': 'binding-and-filtering',
+   'body': 'Ordinary assertions check the result. A failure names the step, the function, the feature, and the scenario, so the broken promise is one read away.'},
+] %}
+{% set guide_titles = {} %}
+{% for guide in guides %}{% set _ = guide_titles.update({guide.slug: guide.title}) %}{% endfor %}
+
+      <section class="rb-hero rb-quilted" aria-labelledby="hero-title">
+        <div class="rb-shell rb-hero__grid">
+          <div class="rb-hero__copy">
+            <p class="rb-kicker">Behaviour-driven development · Rust</p>
+            <h1 id="hero-title" class="rb-hero__title">Small stories. <em>Real Rust tests.</em></h1>
+            <p class="rb-hero__deck">Agree what should happen. Write it down. Put it to the test.</p>
+            <p class="rb-hero__body">
+              rstest-bdd connects plain-language Gherkin scenarios to Rust
+              functions and <code>rstest</code> fixtures. Every scenario becomes
+              an ordinary test, and <code>cargo test</code> runs it beside the
+              rest.
+            </p>
+            <div class="rb-hero__actions">
+              {{ ui.button('Write a first scenario', '/rstest-bdd/getting-started/', icon='arrow-right') }}
+              <a class="rb-hero__story-link" href="#story">Follow Marrow’s story {{ icons.icon('arrow-down') }}</a>
+            </div>
+            <ul class="rb-hero__facts" aria-label="Release facts">
+              <li>rstest-bdd {{ rstest_bdd_version }}</li>
+              <li>Stable Rust {{ rust_floor }}+</li>
+              <li>rstest {{ rstest_version }}+</li>
+              <li><a href="{{ repository_url }}/blob/main/LICENSE">ISC licence</a></li>
+            </ul>
+          </div>
+          <div class="rb-hero__art">
+            <p class="rb-tag rb-stitched rb-stitched--fine rb-hero__tag" aria-hidden="true">Marrow &amp; the lantern picnic</p>
+            {{ ui.figure({
+              'name': 'picnic-quilt',
+              'alt': 'A needle-felted picnic at dusk on a patchwork landscape: a cream rabbit pours tea, Marrow the round orange crab holds a shortbread biscuit, and a blue-grey sewn robot unfolds a napkin, beside a trolley of glowing lanterns and a banner of three pictures.',
+              'label': 'The promise',
+              'caption': 'The lanterns arrived. The kettle was on.',
+              'eager': true,
+              'sizes': '(min-width: 64rem) 52vw, 100vw',
+            }) }}
+          </div>
+        </div>
+      </section>
+
+      <div class="rb-ribbon rb-gingham">
+        <ul class="rb-shell rb-ribbon__list" aria-label="What rstest-bdd is">
+          <li class="rb-ribbon__patch rb-stitched rb-stitched--fine">A story everyone can read.</li>
+          <li class="rb-ribbon__patch rb-stitched rb-stitched--fine">Steps Rust can execute.</li>
+          <li class="rb-ribbon__patch rb-stitched rb-stitched--fine">The test runner already in use.</li>
+        </ul>
+      </div>
+
+      <section id="story" class="rb-story rb-surface-linen rb-blanket-top" aria-labelledby="story-title">
+        <div class="rb-shell rb-section">
+          {{ ui.section_head('1', 'The lantern picnic', 'A promise worth getting right.', 'story-title',
+             lede='Clover plans a picnic. Bobbin builds a lantern trolley. Marrow turns their agreement into something all three can check.') }}
+          <ul class="rb-cast" aria-label="The cast">
+            {% for member in cast %}
+            <li class="rb-cast__member">
+              {{ ui.bead('', member.tone) }}
+              <span><strong>{{ member.name }}</strong> {{ member.role }} <span class="rb-cast__amigo">— {{ member.amigo }}</span></span>
+            </li>
+            {% endfor %}
+          </ul>
+
+          <nav class="rb-story__tabs" aria-label="Chapters">
+            <ol class="rb-story__tab-list">
+              {% for chapter in chapters %}
+              <li><a class="rb-story__tab" href="#chapter-{{ '%02d' % loop.index }}" data-rb-chapter-tab><span class="rb-story__tab-num" aria-hidden="true">{{ '%02d' % loop.index }}</span>{{ chapter.tab }}</a></li>
+              {% endfor %}
+            </ol>
+          </nav>
+
+          <div class="rb-story__track" tabindex="0" role="region" aria-label="The lantern picnic, in eight chapters" data-rb-storybook>
+            {% for chapter in chapters %}
+            {% set n = '%02d' % loop.index %}
+            <article id="chapter-{{ n }}" class="rb-chapter" aria-labelledby="chapter-{{ n }}-title" data-rb-chapter>
+              {{ ui.figure({
+                'name': 'story/chapter-' ~ n,
+                'alt': chapter.alt,
+                'label': 'Chapter ' ~ n,
+                'caption': chapter.caption,
+                'sizes': '(min-width: 64rem) 40vw, 90vw',
+              }, 'rb-chapter__figure') }}
+              <div class="rb-chapter__copy">
+                <p class="rb-kicker">Chapter {{ n }} · {{ chapter.label }}</p>
+                <h3 id="chapter-{{ n }}-title" class="rb-chapter__title">{{ chapter.title }}</h3>
+                <p class="rb-chapter__story">{{ chapter.story }}</p>
+                {% call ui.note('In rstest-bdd · ' ~ chapter.concept) %}
+                <p>{{ chapter.technical }}</p>
+                {% endcall %}
+                {% if chapter.code.lexer == 'output' %}
+                {% call ui.output('cargo test', 'Real output') %}{{ snippets[loop.index0] }}{% endcall %}
+                {% elif chapter.code.lexer == 'console' %}
+                {% call ui.code_panel('Terminal', copy='console') %}
+                {% highlight 'console', 'lantern-syntax' %}{{ snippets[loop.index0] }}{% endhighlight %}
+                {% endcall %}
+                {% else %}
+                {% call ui.code_panel(chapter.code.file, sample=chapter.code.file) %}
+                {% highlight chapter.code.lexer, 'lantern-syntax' %}{{ snippets[loop.index0] }}{% endhighlight %}
+                {% endcall %}
+                {% endif %}
+                <p class="rb-chapter__count" aria-hidden="true">{{ n }} / {{ '%02d' % chapters | length }}</p>
+              </div>
+            </article>
+            {% endfor %}
+          </div>
+          {#- Hidden until storybook.ts wires them: without script they
+              would be buttons that do nothing. -#}
+          <div class="rb-story__paging" data-rb-story-paging hidden>
+            <button class="rb-story__page-btn" type="button" data-rb-story-prev>{{ icons.icon('arrow-left') }}<span>Previous chapter</span></button>
+            <p class="rb-story__count" aria-live="polite" data-rb-story-count></p>
+            <button class="rb-story__page-btn" type="button" data-rb-story-next><span>Next chapter</span>{{ icons.icon('arrow-right') }}</button>
+          </div>
+          <noscript><p class="rb-story__noscript">All eight chapters are above: scroll the strip sideways, or use the chapter links.</p></noscript>
+        </div>
+      </section>
+
+      <section id="workbench" class="rb-workbench rb-surface-night rb-blanket-top" aria-labelledby="workbench-title">
+        <div class="rb-shell rb-section">
+          {{ ui.section_head('2', 'From the story to the test', 'Readable on paper. Runnable in Rust.', 'workbench-title',
+             lede='A feature file describes the behaviour. Attribute macros connect its lines to ordinary functions. One attribute binds the two into a test.', tone='lantern') }}
+
+          <div class="rb-workbench__start">
+            <div>
+              <p class="rb-kicker">Start here</p>
+              <h3 class="rb-workbench__heading">Add the test dependencies.</h3>
+              <p class="rb-workbench__text">
+                Three dev-dependencies. The macros live in their own crate, so
+                a test imports them from <code>rstest_bdd_macros</code>.
+              </p>
+            </div>
+            {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
+            {% highlight 'toml', 'lantern-syntax' %}
+[dev-dependencies]
+rstest = "{{ rstest_version }}"
+rstest-bdd = "{{ rstest_bdd_version }}"
+rstest-bdd-macros = "{{ rstest_bdd_version }}"
+            {% endhighlight %}
+            {% endcall %}
+          </div>
+
+          <div class="rb-workbench__steps">
+            <div class="rb-workbench__col">
+              <div class="rb-step-head">{{ ui.bead('1', 'lantern') }}<h3>Describe a delivery.</h3></div>
+              {{ ui.sample('tests/features/lantern.feature') }}
+              <p class="rb-workbench__text">The scenario states an observable result. Rust supplies the implementation and the assertions.</p>
+              <div class="rb-step-head">{{ ui.bead('3', 'lantern') }}<h3>Use the usual runner.</h3></div>
+              {% call ui.code_panel('Terminal', copy='console') %}
+              {% highlight 'console', 'lantern-syntax' %}
+$ cargo test lantern_delivery
+              {% endhighlight %}
+              {% endcall %}
+              <p class="rb-workbench__text">
+                The scenario runs as <code>lantern_delivery</code>, beside the
+                unit and integration tests. Outline rows run as
+                <code>case_1</code>, <code>case_2</code>, and so on.
+              </p>
+            </div>
+            <div class="rb-workbench__col">
+              <div class="rb-step-head">{{ ui.bead('2', 'lantern') }}<h3>Connect the Rust steps.</h3></div>
+              {{ ui.sample('tests/lantern.rs') }}
+              <p class="rb-workbench__text">
+                A small in-memory model. In an application’s tests the steps
+                call the real delivery code. Set
+                <code>trolley.upright = false;</code> in <code>depart</code> to
+                watch the promise fail.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="notes" class="rb-notes" aria-labelledby="notes-title">
+        <div class="rb-shell rb-section">
+          {{ ui.section_head('3', 'Notes from the workbench', 'Small parts. Useful together.', 'notes-title',
+             lede='BDD works when the examples clarify the domain. The plumbing should get out of the way of that conversation.') }}
+          <div class="rb-quilt">
+            {% for note in notes %}
+            <article class="rb-card rb-patch rb-patch--{{ note.patch }} rb-stitched">
+              <span class="rb-notes__numeral" aria-hidden="true">{{ ['I.', 'II.', 'III.'][loop.index0] }}</span>
+              <h3 class="rb-card__title">{{ note.title }}</h3>
+              <p class="rb-card__body">{{ note.body | safe }}</p>
+              <a class="rb-card__meta" href="/rstest-bdd/guides/{{ note.guide }}/">{{ guide_titles[note.guide] }} {{ icons.icon('arrow-right') }}</a>
+            </article>
+            {% endfor %}
+          </div>
+
+          <div class="rb-stage">
+            {{ ui.figure({
+              'name': 'three-stages',
+              'alt': 'The rabbit, Marrow, and the robot push a toy trolley with an upright glowing lantern across a patchwork quilt towards three felt puppet-theatre stages: oatmeal wool, mustard with brass cogs, and night blue with embroidered stars.',
+              'label': 'The same rehearsal',
+              'caption': 'Marrow, Clover, and Bobbin take the repaired trolley to a new stage.',
+            }) }}
+            <div class="rb-stage__copy">
+              <p class="rb-kicker">The same rehearsal, a different stage</p>
+              <h3 class="rb-stage__title">Choose where the scenario runs.</h3>
+              <p>
+                Harness adapters supply the environment around a scenario.
+                {{ rstest_bdd_version }} ships a standard harness, a Tokio
+                harness, and a GPUI harness, and the interface to write another.
+              </p>
+              <p>
+                The application code still has to suit the stage it is given. A
+                new stage is not a portability spell.
+              </p>
+              {{ ui.button('How harnesses work', '/rstest-bdd/harnesses/', 'outline', icon='arrow-right') }}
+            </div>
+          </div>
+
+          <div class="rb-fine-print">
+            <div>
+              <p class="rb-kicker">The honest small print</p>
+              <h3 class="rb-fine-print__title">Know what the checks promise.</h3>
+            </div>
+            <div>
+              <details class="rb-details">
+                <summary>Does the compiler catch a missing step?</summary>
+                <div class="rb-details__body">
+                  <p>
+                    Not by default. A missing step fails when its scenario runs,
+                    and the failure names the step, the feature, and the
+                    scenario. Enable
+                    <code>rstest-bdd-macros/strict-compile-time-validation</code>
+                    and the same mistake stops the build, provided every step the
+                    scenario uses is defined in the crate being compiled.
+                  </p>
+                  <p><a href="/rstest-bdd/guides/tooling/">Strict validation in the tooling guide</a></p>
+                </div>
+              </details>
+              <details class="rb-details">
+                <summary>When is rstest-bdd a good fit?</summary>
+                <div class="rb-details__body">
+                  <p>
+                    When a team wants readable acceptance scenarios and wants to
+                    keep <code>rstest</code> fixtures and <code>cargo test</code>.
+                    cucumber-rs offers its own runner and a <code>World</code>
+                    model; the right choice depends on the suite.
+                  </p>
+                  <p><a href="/rstest-bdd/compare/">rstest-bdd and cucumber-rs, side by side</a></p>
+                </div>
+              </details>
+              <details class="rb-details">
+                <summary>What can a feature file express?</summary>
+                <div class="rb-details__body">
+                  <p>
+                    Background, Scenario Outlines with Examples, data tables,
+                    docstrings, tags, and keywords in any language Gherkin
+                    supports. The repository runs a Japanese household ledger end
+                    to end.
+                  </p>
+                  <p><a href="/rstest-bdd/guides/feature-files/">Write feature files</a></p>
+                </div>
+              </details>
+              <details class="rb-details">
+                <summary>What are the boundaries?</summary>
+                <div class="rb-details__body">
+                  <p>
+                    Feature files are read and step definitions registered at
+                    compile time, so there is no dynamic step registration. The
+                    <code>*</code> step keyword is not matched. Async scenarios run
+                    on Tokio’s current-thread runtime.
+                  </p>
+                  <p><a href="/docs-rstest-bdd-limitations-and-roadmap.html">Limitations in the user’s guide</a></p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rb-closing rb-surface-lantern rb-blanket-top" aria-labelledby="closing-title">
+        <div class="rb-shell rb-section rb-closing__inner">
+          <p class="rb-kicker">4 · Time for tea</p>
+          <h2 id="closing-title" class="rb-closing__title">The promise held. <em>On with the picnic.</em></h2>
+          <p class="rb-closing__body">Start with one behaviour that matters. Give it a readable example and a real assertion.</p>
+          <div class="rb-closing__actions">
+            {{ ui.button('Write a first scenario', '/rstest-bdd/getting-started/', 'night', icon='arrow-right') }}
+            {{ ui.button('Read the guides', '/rstest-bdd/guides/', 'outline') }}
+          </div>
+          <p class="rb-closing__note">Marrow has put the clipboard down. Please respect this development.</p>
+        </div>
+      </section>
+{% endblock %}
+{% block scripts %}
+    <script src="/rstest-bdd/assets/js/storybook.js" defer></script>
+{% endblock %}

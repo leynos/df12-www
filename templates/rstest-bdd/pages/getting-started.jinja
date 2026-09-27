@@ -1,0 +1,225 @@
+{% extends "_layout.jinja" %}
+{% import "components.jinja" as ui %}
+{% import "_icons.jinja" as icons %}
+{% block title %}Getting started · rstest-bdd{% endblock %}
+{% block description %}From an empty test directory to a passing rstest-bdd scenario and a useful failure, with code compiled against rstest-bdd {{ rstest_bdd_version }}.{% endblock %}
+{% block main_class %} class="rb-start"{% endblock %}
+{% block content %}
+{% set sections = [
+  {'id': 'crates', 'label': 'Add the crates'},
+  {'id': 'feature', 'label': 'Write the feature'},
+  {'id': 'steps', 'label': 'Write the steps'},
+  {'id': 'run', 'label': 'Run it'},
+  {'id': 'break', 'label': 'Break the promise'},
+  {'id': 'repeat', 'label': 'Repeat with examples'},
+  {'id': 'next', 'label': 'Where next'},
+] %}
+      {% call ui.page_head(
+        'Getting started · rstest-bdd ' ~ rstest_bdd_version,
+        'One scenario, start to finish.',
+        'Add three dev-dependencies, write four lines of Gherkin, bind them to Rust, and run cargo test. Then break it on purpose.',
+        image={
+          'name': 'first-patch',
+          'alt': 'Marrow the felt crab sews a first small patch onto the corner of a blank cream quilt with rust-red wool, while the rabbit holds up a pattern of three pictures and the robot offers a spool of thread.',
+          'label': 'The first patch',
+          'caption': 'Marrow sews the first patch; Clover holds the pattern and Bobbin brings the thread.',
+          'eager': true,
+        }) %}
+        {{ ui.button('Add the crates', '#crates', icon='arrow-down') }}
+      {% endcall %}
+
+      <div class="rb-shell">
+        {{ ui.facts([
+          ('Rust', 'Stable, ' ~ rust_floor ~ ' or newer'),
+          ('rstest', rstest_version ~ '+'),
+          ('rstest-bdd', rstest_bdd_version ~ ', released ' ~ rstest_bdd_released),
+          ('Installs', 'Nothing globally'),
+        ], 'Prerequisites') }}
+      </div>
+
+      <div class="rb-shell rb-guide">
+        <nav class="rb-toc rb-stitched" aria-label="On this page">
+          <div class="rb-toc__rail">
+            <p class="rb-toc__heading">On this page</p>
+            <ol class="rb-toc__list">
+              {% for section in sections %}<li><a href="#{{ section.id }}">{{ section.label }}</a></li>{% endfor %}
+            </ol>
+          </div>
+          <details class="rb-toc__menu">
+            <summary>On this page {{ icons.icon('chevron-solid', 'rb-toc__chevron') }}</summary>
+            <ol class="rb-toc__list">
+              {% for section in sections %}<li><a href="#{{ section.id }}">{{ section.label }}</a></li>{% endfor %}
+            </ol>
+          </details>
+          <p class="rb-toc__source">Full reference: <a href="{{ users_guide_url }}">the user’s guide</a></p>
+        </nav>
+
+        <div class="rb-guide__body">
+          <section id="crates" aria-labelledby="crates-title">
+            <h2 id="crates-title">Add the crates</h2>
+            <p>
+              Scenarios are tests, so the crates are dev-dependencies. The
+              step and scenario macros are published separately from the
+              runtime, in <code>rstest-bdd-macros</code>, and a test imports
+              them from <code>rstest_bdd_macros</code>.
+            </p>
+            {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
+            {% highlight 'toml', 'lantern-syntax' %}
+[dev-dependencies]
+rstest = "{{ rstest_version }}"
+rstest-bdd = "{{ rstest_bdd_version }}"
+rstest-bdd-macros = "{{ rstest_bdd_version }}"
+            {% endhighlight %}
+            {% endcall %}
+          </section>
+
+          <section id="feature" aria-labelledby="feature-title">
+            <h2 id="feature-title">Write the feature</h2>
+            <p>
+              A feature file is plain text. One <code>Scenario</code> states
+              one behaviour: where it starts, what happens, and what should be
+              true afterwards. The file below is the whole of it.
+            </p>
+            {{ ui.sample('tests/features/lantern.feature') }}
+            <p>
+              The <code>#[scenario]</code> attribute names this file by a path
+              relative to the crate root, and reads it when the test compiles.
+              Editing the feature file triggers a rebuild.
+            </p>
+          </section>
+
+          <section id="steps" aria-labelledby="steps-title">
+            <h2 id="steps-title">Write the steps</h2>
+            <p>
+              Each line of the scenario needs a function whose attribute
+              carries the same words. The test file below binds all three, and
+              the scenario itself.
+            </p>
+            {{ ui.sample('tests/lantern.rs') }}
+            <ul>
+              <li>The <code>trolley</code> fixture supplies a fresh <code>Trolley</code> for each scenario.</li>
+              <li>A step asks for the fixture by name. <code>&amp;mut Trolley</code> lets it change the trolley; <code>&amp;Trolley</code> only reads it.</li>
+              <li><code>#[scenario]</code> names the file and the scenario. The function becomes the test, and its body runs after the last step, with the same trolley.</li>
+            </ul>
+          </section>
+
+          <section id="run" aria-labelledby="run-title">
+            <h2 id="run-title">Run it</h2>
+            <p>
+              The scenario is an ordinary test named after the function, so
+              <code>cargo test</code> runs it and a filter selects it.
+            </p>
+            {% call ui.code_panel('Terminal', copy='console') %}
+            {% highlight 'console', 'lantern-syntax' %}
+$ cargo test --test lantern
+            {% endhighlight %}
+            {% endcall %}
+            {% call ui.output('Output', 'rstest-bdd ' ~ rstest_bdd_version) %}
+running 1 test
+test lantern_delivery ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+            {% endcall %}
+          </section>
+
+          <section id="break" aria-labelledby="break-title">
+            <h2 id="break-title">Break the promise</h2>
+            <p>
+              A test earns its keep when it fails. Tip the lantern over in the
+              <code>When</code> step by adding one line to <code>depart</code>:
+            </p>
+            {% call ui.code_panel('tests/lantern.rs, with one line added', copy=false, foot='The added line is the last one in the function.') %}
+            {% highlight 'rust', 'lantern-syntax' %}
+#[when("the departure bell rings")]
+fn depart(trolley: &mut Trolley) {
+    trolley.arrived = true;
+    trolley.upright = false;
+}
+            {% endhighlight %}
+            {% endcall %}
+            <p>The run now fails, and says where:</p>
+            {% call ui.output('Output', 'failed') %}
+running 1 test
+test lantern_delivery ... FAILED
+
+failures:
+
+---- lantern_delivery stdout ----
+
+thread 'lantern_delivery' (726627) panicked at tests/lantern.rs:32:5:
+assertion failed: trolley.upright
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'lantern_delivery' (726627) panicked at tests/lantern.rs:35:1:
+Step failed at index 2: Then the lantern arrives upright - Panic in step 'the lantern arrives upright', function 'check': assertion failed: trolley.upright (feature: tests/features/lantern.feature, scenario: Deliver a lantern)
+
+
+failures:
+    lantern_delivery
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+            {% endcall %}
+            {% call ui.note('Reading the failure') %}
+            <p>
+              The first panic is the assertion. The second is rstest-bdd’s
+              summary: the step’s position and text, the function that ran it,
+              and the feature and scenario it came from. Take the line back out
+              and the test passes again.
+            </p>
+            {% endcall %}
+          </section>
+
+          <section id="repeat" aria-labelledby="repeat-title">
+            <h2 id="repeat-title">Repeat with examples</h2>
+            <p>
+              One lantern is a start. A Scenario Outline runs the same
+              scenario once per row of its Examples table, and each
+              <code>&lt;count&gt;</code> is replaced by the row’s value before
+              the steps are matched.
+            </p>
+            {{ ui.sample('tests/features/counting.feature') }}
+            <p>
+              The steps read the count with a typed placeholder,
+              <code>{count:u32}</code>, which parses the text through
+              <code>FromStr</code> before the step runs. The scenario function
+              receives each row’s column as a <code>String</code>.
+            </p>
+            {{ ui.sample('tests/counting.rs') }}
+            {% call ui.output('cargo test --test counting', 'rstest-bdd ' ~ rstest_bdd_version) %}
+running 3 tests
+test counting_lanterns::case_2 ... ok
+test counting_lanterns::case_1 ... ok
+test counting_lanterns::case_3 ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+            {% endcall %}
+            <p>
+              Three rows, three tests, reported separately. The zero row is
+              not an afterthought: an empty trolley that acquires a lantern on
+              the way is a bug too.
+            </p>
+          </section>
+
+          <section id="next" aria-labelledby="next-title">
+            <h2 id="next-title">Where next</h2>
+            <div class="rb-quilt rb-start__next">
+              <a class="rb-card rb-patch rb-patch--night rb-stitched" href="/rstest-bdd/guides/">
+                <span class="rb-kicker">Seven guides</span>
+                <h3 class="rb-card__title">The pattern book</h3>
+                <p class="rb-card__body">Feature files, steps, fixtures, filtering, async, tooling, and the 0.6 upgrade.</p>
+              </a>
+              <a class="rb-card rb-patch rb-patch--moss rb-stitched" href="/rstest-bdd/harnesses/">
+                <span class="rb-kicker">New in 0.6</span>
+                <h3 class="rb-card__title">Harnesses</h3>
+                <p class="rb-card__body">Run the same scenario on Tokio, in GPUI, or on a stage of your own.</p>
+              </a>
+              <a class="rb-card rb-patch rb-patch--linen rb-stitched" href="{{ users_guide_url }}">
+                <span class="rb-kicker">Reference</span>
+                <h3 class="rb-card__title">The full user’s guide</h3>
+                <p class="rb-card__body">Every feature, organized by the three amigos, in the df12 reference library.</p>
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+{% endblock %}

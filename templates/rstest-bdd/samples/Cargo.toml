@@ -1,0 +1,15 @@
+[package]
+name = "lantern-picnic"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+description = "Every code sample on the df12 rstest-bdd site, compiled and run against the published crates."
+
+[dev-dependencies]
+rstest = "0.26.1"
+rstest-bdd = "0.6.0"
+rstest-bdd-macros = "0.6.0"
+rstest-bdd-harness = "0.6.0"
+rstest-bdd-harness-tokio = "0.6.0"
+tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }

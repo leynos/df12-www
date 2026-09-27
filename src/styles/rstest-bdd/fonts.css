@@ -1,0 +1,65 @@
+/* Self-hosted faces for the rstest-bdd sub-site.
+ *
+ * Every face is served from this origin, so loading a page discloses no
+ * address to a third party. Fraunces and Nunito are the Fontsource 5.3.0
+ * builds of the upstream variable fonts; the Fraunces file is the "full"
+ * build, which keeps the SOFT and WONK axes the display type uses. JetBrains
+ * Mono is the Fontsource 5.3.0 static cut at 400 and 600. Each licence sits
+ * beside its fonts under src/static/rstest-bdd/assets/fonts/.
+ *
+ * URLs are absolute: this file is inlined into the compiled stylesheet, so a
+ * relative path would be rebased against the entrypoint rather than the
+ * published sheet.
+ */
+
+/* Fraunces — display. Variable in optical size, weight, softness, and
+   wonkiness. */
+@font-face {
+  font-family: Fraunces;
+  src: url("/rstest-bdd/assets/fonts/fraunces-latin-full-normal.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Fraunces;
+  src: url("/rstest-bdd/assets/fonts/fraunces-latin-full-italic.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Nunito — body and controls. */
+@font-face {
+  font-family: Nunito;
+  src: url("/rstest-bdd/assets/fonts/nunito-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Nunito;
+  src: url("/rstest-bdd/assets/fonts/nunito-latin-wght-italic.woff2") format("woff2-variations");
+  font-weight: 200 1000;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* JetBrains Mono — code. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/rstest-bdd/assets/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/rstest-bdd/assets/fonts/jetbrains-mono-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}

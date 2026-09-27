@@ -1,0 +1,130 @@
+{#
+  Shared chrome for the rstest-bdd sub-site.
+
+  A page overrides `title` and `description`, sets `main_class` when its
+  body needs a page-scoped class, and fills `content`. Every page's styles
+  compile into the one sheet linked below; the page partials scope their
+  rules under the <main> class. The masthead and footer live here so every
+  page shares one source. `footer_art` holds the footer's line about the
+  illustrations; shared_content_page.jinja empties it, because the cast
+  never appears on a legal notice.
+#}
+{% import "_icons.jinja" as icons %}
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}rstest-bdd{% endblock %}</title>
+    <meta name="description" content="{% block description %}Behaviour-driven development for Rust, built on rstest and run by cargo test.{% endblock %}" />
+    <meta property="og:title" content="{{ self.title() }}" />
+    <meta property="og:description" content="{{ self.description() }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://df12.studio/rstest-bdd/assets/images/picnic-quilt-1536.webp" />
+    <meta name="theme-color" content="#16283a" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preload" href="/rstest-bdd/assets/fonts/fraunces-latin-full-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/rstest-bdd/assets/styles/rstest-bdd.css" />
+  </head>
+  <body>
+    <a class="rb-skip" href="#main-content">Skip to content</a>
+    <header class="rb-mast rb-surface-night">
+      <div class="rb-mast__inner">
+        <a class="rb-wordmark" href="/rstest-bdd/" aria-label="rstest-bdd home">
+          <span class="rb-bead rb-bead--button" aria-hidden="true"></span>
+          <span class="rb-wordmark__name" aria-hidden="true">rstest<span>-bdd</span></span>
+          <span class="rb-wordmark__imprint" aria-hidden="true">A df12 production</span>
+        </a>
+        <nav class="rb-nav" aria-label="Primary">
+          {#- Below the desktop breakpoint the list becomes a native popover,
+              opened by a labelled button with no script. -#}
+          <button class="rb-nav__toggle" type="button" popovertarget="rb-primary-nav">
+            {{ icons.icon('menu') }}<span>Menu</span>
+          </button>
+          <ul id="rb-primary-nav" class="rb-nav__list" popover>
+            <li class="rb-nav__up">
+              <a class="rb-nav__link" href="/"><span aria-hidden="true">←&nbsp;</span>df12</a>
+            </li>
+            {% for link in nav_links %}
+            <li>
+              <a class="rb-nav__link" href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+            </li>
+            {% endfor %}
+            <li class="rb-nav__menu-only">
+              <a class="rb-nav__link" href="{{ repository_url }}">GitHub</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="rb-mast__actions">
+          <a class="rb-mast__github" href="{{ repository_url }}">{{ icons.icon('github') }}<span>GitHub</span></a>
+          <a class="rb-btn rb-btn--compact" href="/rstest-bdd/getting-started/">Get started</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content"{% block main_class %}{% endblock %}>
+      {% block content %}{% endblock %}
+    </main>
+
+    <div class="rb-patchwork" aria-hidden="true"></div>
+    <footer class="rb-footer rb-surface-night">
+      <div class="rb-footer__grid">
+        <div class="rb-footer__about">
+          <a class="rb-wordmark" href="/rstest-bdd/" aria-label="rstest-bdd home">
+            <span class="rb-bead rb-bead--button" aria-hidden="true"></span>
+            <span class="rb-wordmark__name" aria-hidden="true">rstest<span>-bdd</span></span>
+          </a>
+          <p class="rb-footer__blurb mt-4">
+            Behaviour-driven development for Rust: Gherkin scenarios bound to
+            step functions and rstest fixtures, run by cargo test.
+            rstest-bdd {{ rstest_bdd_version }}, ISC licensed.
+          </p>
+          <p class="rb-footer__motto">Serious tools,<br />playful <em>worlds.</em></p>
+        </div>
+        <div>
+          <h2 class="rb-footer__heading">Read</h2>
+          <ul class="rb-footer__list">
+            <li><a href="/rstest-bdd/getting-started/">Getting started</a></li>
+            <li><a href="/rstest-bdd/guides/">Guides</a></li>
+            <li><a href="/rstest-bdd/harnesses/">Harnesses</a></li>
+            <li><a href="/rstest-bdd/compare/">Compare</a></li>
+            <li><a href="/rstest-bdd/roadmap/">Roadmap</a></li>
+            <li><a href="{{ users_guide_url }}">The full user's guide</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="rb-footer__heading">Source</h2>
+          <ul class="rb-footer__list">
+            <li><a href="{{ repository_url }}">Repository</a></li>
+            <li><a href="https://crates.io/crates/rstest-bdd">crates.io</a></li>
+            <li><a href="https://docs.rs/rstest-bdd/{{ rstest_bdd_version }}/rstest_bdd/">API on docs.rs</a></li>
+            <li><a href="{{ repository_url }}/releases">Releases</a></li>
+            <li><a href="{{ repository_url }}/blob/main/LICENSE">Licence (ISC)</a></li>
+            <li><a href="{{ repository_url }}/issues">Issues</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="rb-footer__heading">df12</h2>
+          <ul class="rb-footer__list">
+            {% if parent_link %}
+            <li><a href="{{ parent_link.href }}">{{ parent_link.label }}</a></li>
+            {% endif %}
+            <li><a href="/cuprum/">Cuprum</a></li>
+            <li><a href="/netsuke/">Netsuke</a></li>
+            <li><a href="/rstest-bdd/privacy-policy/">Privacy Policy</a></li>
+            <li><a href="/rstest-bdd/terms-of-use/">Terms of Use</a></li>
+            <li><a href="/rstest-bdd/code-of-conduct/">Code of Conduct</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="rb-footer__strip">
+        <hr class="rb-seam" />
+        <span>A df12 Productions project, based in Edinburgh, Scotland.</span>
+        {% block footer_art %}<span>Illustrated by the df12 Productions plushie gang.</span>{% endblock %}
+      </div>
+    </footer>
+    <script src="/rstest-bdd/assets/js/telemetry.js"></script>
+    <script src="/rstest-bdd/assets/js/copy-code.js" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

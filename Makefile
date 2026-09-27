@@ -40,7 +40,7 @@ PYTEST_FILTER += -m 'not playwright'
 endif
 
 .PHONY: help all clean build build-release lint fmt check-fmt check-site-data \
-        cuprum-api-data check-cuprum-api-data \
+        cuprum-api-data check-cuprum-api-data rstest-bdd-samples \
         docs-check markdownlint nixie site-data spelling stylelint test typecheck \
         typecheck-js venv-ruff \
         $(TOOLS) \
@@ -67,6 +67,9 @@ cuprum-api-data: ## Regenerate the Cuprum API reference from a Cuprum checkout a
 
 check-cuprum-api-data: ## Check the committed Cuprum API reference against its source
 	uv run scripts/build_cuprum_api_data.py --cuprum-root "$(CUPRUM_SOURCE)" --check
+
+rstest-bdd-samples: ## Compile and run every rstest-bdd code sample against the published crates
+	cargo test --manifest-path templates/rstest-bdd/samples/Cargo.toml --locked
 
 # Biome, Tailwind, and the test runner all live in node_modules, so every
 # target that shells out to bun has to depend on this. `bun` is order-only:

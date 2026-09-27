@@ -1,0 +1,38 @@
+{#
+  Shared legal copy (terms, privacy, code of conduct) rendered through the
+  rstest-bdd chrome. The body arrives as sanitised HTML from the Markdown in
+  config/shared/, so it carries no classes beyond the content-toc,
+  content-section, and content-card structure the generator adds; everything
+  inside it is styled by the element and structure selectors under .rb-legal,
+  following the Netsuke legal pages' layout. No illustrations appear here,
+  and the footer drops its line about them: a legal notice is not the place
+  for a felt crab.
+#}
+{% extends "_layout.jinja" %}
+{% block title %}{{ title }} · rstest-bdd{% endblock %}
+{% block description %}{{ summary or title ~ " for the rstest-bdd site." }}{% endblock %}
+{% block main_class %} class="rb-legal-page"{% endblock %}
+{% block footer_art %}{% endblock %}
+{% block content %}
+      <div class="rb-legal-page__shell">
+        <nav class="rb-legal-page__crumbs" aria-label="Breadcrumb">
+          <ol>
+            {% if parent_link %}
+            <li><a href="{{ parent_link.href }}">{{ parent_link.label }}</a></li>
+            {% endif %}
+            <li><a href="/rstest-bdd/">rstest-bdd</a></li>
+            <li aria-current="page">{{ title }}</li>
+          </ol>
+        </nav>
+        <div class="rb-legal-page__panel rb-patch rb-stitched">
+          <p class="rb-legal-page__eyebrow rb-stitched rb-stitched--fine">{{ eyebrow or "Legal" }}</p>
+          <h1 class="rb-legal-page__title">{{ title }}</h1>
+          {% if summary %}
+          <p class="rb-legal-page__summary">{{ summary }}</p>
+          {% endif %}
+          <article class="rb-legal">
+            {{ body_html | safe }}
+          </article>
+        </div>
+      </div>
+{% endblock %}

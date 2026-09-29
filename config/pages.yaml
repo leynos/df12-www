@@ -832,17 +832,6 @@ pages:
       filesystem work to unprivileged users. Keep CI environments reproducible
       without burning down your permissions tree.
 
-  pylint-pypy-shim:
-    label: "pylint-pypy-shim"
-    repo: leynos/pylint-pypy-shim
-    language: python
-    category: library
-    filename_prefix: docs-pylint-pypy-shim-
-    page_title_suffix: "pylint-pypy-shim"
-    description: >
-      Pylint on PyPy without the crashes. Patches Astroid's runtime
-      introspection so linting works where CPython assumptions don't hold.
-
   rstest-bdd:
     label: "rstest-bdd"
     repo: leynos/rstest-bdd

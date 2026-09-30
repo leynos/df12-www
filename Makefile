@@ -27,7 +27,7 @@ TY_VERSION ?= 0.0.82
 TY = $(UV_ENV) uv tool run ty==$(TY_VERSION)
 SKIP_PLAYWRIGHT ?= 0
 PYTEST_FILTER ?=
-TYPOS_CONFIG_BUILDER_VERSION ?= v0.1.1
+TYPOS_CONFIG_BUILDER_VERSION ?= v0.1.3
 TYPOS_CONFIG_BUILDER = uv tool run --from \
 	"git+https://github.com/leynos/typos-config-builder.git@$(TYPOS_CONFIG_BUILDER_VERSION)" \
 	typos-config-builder

@@ -9,6 +9,6 @@
 <p>Dotted-name propagation determines which loggers see the record. Each queued record captures its handler set. Removing a handler affects future records; it does not rewrite pending dispatch.</p><p>Output workers isolate file and network I/O from the ordinary producer path. Python handlers and formatters still require the GIL. Bounded queues, callback cost, and blocking handler policies prevent a blanket guarantee of non-blocking logging.</p>
 </section>
 <section aria-labelledby="survey"><h2 id="survey">Survey the machinery</h2>
-{{ ui.figure('record-transport-survey-sem', 'A ceramic panda carries a record crate through layered teal channels while a capybara sits beside a buffer and a dinosaur examines a bridge.', '04', 'A transport unit crosses the dispatch lane. The queue occupant has requested no modifications.') }}<p>The survey plate makes boundaries memorable; the literal path above defines the software model. <a href="/femtologging/docs/guides/operations/">Read the capacity and shutdown contracts.</a></p>
+{{ ui.plate('panorama', 'wide', sizes='(width < 1024px) 100vw, 860px') }}<p>The survey plate makes boundaries memorable; the literal path above defines the software model. The plate’s numbered markers follow the same order as that path. <a href="/femtologging/docs/guides/operations/">Read the capacity and shutdown contracts.</a></p>
 </section>
 {% endblock %}

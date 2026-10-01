@@ -241,11 +241,15 @@ appears on a legal page. See section 5.9 of the
 
 femtologging uses the materials-science brand pack: carbon/alumina surfaces,
 IBM Plex, lattice marks, and authored SVG icons. Its `fl-` component classes
-keep the palette semantic. The `FemtoStyle` Pygments style is compiled by
-`scripts/generate_femtologging_pygments_css.py`; never hand-edit the generated
-syntax partial. The 0.2.0-beta1 copy is prospective, and source links identify
-the verified revision. Sample files and their downloads must stay
-byte-identical. See [femtologging sub-site](docs/femtologging-site.md) for
+keep the palette semantic. Its illustrations are survey plates — fictional
+false-colour micrographs — catalogued once in
+`templates/femtologging/data/plates.jinja` and rendered by the `plate` macro.
+The raster carries no text: the instrument strip, the illustrative scale, the
+numbered markers, and the caption are HTML. The `FemtoStyle` Pygments style is
+compiled by `scripts/generate_femtologging_pygments_css.py`; never hand-edit
+the generated syntax partial. The 0.2.0-beta1 copy is prospective, and source
+links identify the verified revision. Sample files and their downloads must
+stay byte-identical. See [femtologging sub-site](docs/femtologging-site.md) for
 provenance and checks.
 
 ### Prefer semantic classes over literal colours

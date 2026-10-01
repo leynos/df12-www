@@ -4,6 +4,7 @@
 @import "./femtologging/base.css" layer(base);
 @import "./femtologging/chrome.css" layer(components);
 @import "./femtologging/content.css" layer(components);
+@import "./femtologging/survey.css" layer(components);
 @import "./femtologging/syntax.css" layer(components);
 
 @source "../../templates/femtologging/**/*.jinja";
@@ -64,4 +65,8 @@
   --color-link-dark: #63d6cf;
   --color-rule-light: #c2c3bc;
   --color-rule-dark: #48545c;
+
+  /* Cards raised off the alumina reading surface. Carbon text holds 16:1,
+     muted ink 5.6:1, and ink teal 6.7:1 on it. */
+  --color-paper-raised: #f8f6f1;
 }

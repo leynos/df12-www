@@ -5,6 +5,8 @@
   --fl-link: var(--color-primary);
   --fl-rule: var(--color-rule-light);
   --fl-focus: var(--color-carbon);
+  --fl-surface: var(--color-paper-raised);
+  --fl-reticle: color-mix(in oklab, var(--color-carbon) 6%, transparent);
 }
 
 body {

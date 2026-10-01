@@ -34,53 +34,58 @@ wheel has been verified.
 ## Design and asset provenance
 
 The primary direction is the supplied brand pack: carbon/alumina surfaces, IBM
-Plex, the lattice mark, its authored SVG icons, and the three anchor
-illustrations. Font licences accompany the redistributed WOFF2 files. The
-concepts inform the roadmap’s explicitly exploratory what-ifs.
+Plex, the lattice mark, and its authored SVG icons. Font licences accompany the
+redistributed WOFF2 files. The concept mockups inform the cover, the
+magnification series, the specimen notes, and the roadmap's exploratory
+what-ifs.
 
-Prospective copy and visual direction were written before implementation to
-`femtologging-reference/prospective-site-copy.md` and `visual-direction.md`.
-The new illustration was generated with the built-in imagegen tool before
-building the site, using the pipeline and habitat anchors as style references.
-The PNG is retained as `femtologging-reference/record-transport-survey.png`.
-The original WebP and PNG are retained. The site uses the subsequent
-`assets/images/record-transport-survey-sem.webp` variant, encoded at quality
+### Survey plates
 
-1. The original brand-pack WebP anchors are preserved.
+Every illustration is a *survey plate*: a fictional false-colour scanning
+electron micrograph, lit from within by the amber record crates and the teal
+crystal channels. `templates/femtologging/data/plates.jinja` is the single
+catalogue. Each entry records the raster, its dimensions, plate number,
+specimen ID, alt text, caption, illustrative scale, and any numbered callouts.
+The same file holds the magnification series, the three specimens, and the
+`page_plates` mapping that gives product pages a plate in their header. Task
+guides, reference pages, and legal pages carry none.
 
-The final generation prompt was:
+The `plate` macro in `components.jinja` renders an entry. The raster carries no
+text. The instrument strip (specimen ID, detector mode, and an illustrative
+scale bar), the numbered markers, and the caption are HTML. A legend in the
+caption repeats every marker in words, so the markers are hidden from assistive
+technology. Every caption says “Fictional scientific illustration”. Specimen
+IDs identify artwork, not test results. Scale values are fiction and always
+render beside “illustrative scale”. The strip is a container query target and
+drops detail as the plate narrows, rather than wrapping.
 
-> Use case: stylized-concept. Asset type: wide 3:2 editorial website
-> illustration
-> for femtologging, a Rust logging extension for Python. Input images are style
-> reference only: preserve the engineering and animal anatomy of the supplied
-> femtofauna brand plates. Create a new scene: an oblique cutaway specimen tray
-> in a severe materials science laboratory. In the foreground an ivory ceramic
-> articulated robot panda with black sensor patches carries a translucent amber
-> cubic log-record crate along a crystalline teal transport trench; a low
-> blunt-muzzled robotic capybara sits beside a circular buffer cavity mid-right;
-> a small long-neck segmented ceramic sauropod inspects an interface bridge in
-> the distant upper-left. Machinery dominates, animals discovered in it. Carbon
-> #12171B machined metal, alumina #F2EEE6 ceramic, teal #63D6CF channels, amber
-> #E1A64B crates, tiny gold bond wires, rivets, oxide and grain boundaries, fine
-> SEM-inspired texture. Strong diagonal layers, intricate credible modelmaking,
-> largely grey with restrained false colour, crisp foreground detail. Calm
-> institutional observer, quietly delightful. Fictional scientific illustration,
-> not actual microscopy. No text, labels, logos, numbers, scale bars, UI,
-> watermarks, rainbow neon, plushies, generic cube robots, or glossy plastic.
+Callout coordinates are percentages of the uncropped raster. A plate with
+callouts must therefore keep its aspect ratio; header plates crop to 3:2 and
+carry no callouts. A marker's label appears beside it only on the cover at
+desktop widths, where `side: 'left'` places the label left of the marker.
 
-A subsequent imagegen edit used the transport plate as its composition
-reference and the three user-supplied SEM images as material references. It
-preserves the fauna and transport machinery, adds granular etched surfaces,
-bright secondary-electron edge relief, muted teal/amber false colour, and a
-“SIMULATED MICROGRAPH” instrument strip. No numerical measurement is asserted.
-The edit target and the references were passed as separate image inputs; their
-watermarks, logos, and original subjects were excluded from the prompt. The
-resulting PNG is retained as
-`femtologging-reference/record-transport-survey-sem.png`.
+### Generation
 
-Captions are HTML. Every meaningful plate identifies its fictional context;
-legal pages contain no survey art. No image represents benchmark evidence.
+The fifteen plates were generated with gpt-image-2 on 1 October 2026, using the
+brand-pack anchors as character references and crops of the concept mockups as
+lighting references. The cover plate was then used as the style reference for
+the rest of the set. Each prompt asked for the same material grammar:
+monochrome SEM greys with granular secondary-electron texture and edge-relief
+halos; amber only on the record crates and their light; teal only on crystal
+channels and instruments; carbon falloff and shallow depth of field. Every
+prompt also excluded text, numbers, labels, scale bars, logos, plush, cartoon,
+and glossy plastic.
+
+The PNG originals are retained in `femtologging-reference/survey-plates/`. The
+WebP files under `src/static/femtologging/assets/images/` were encoded at
+quality 80 with Pillow. Each plate has a full-size file and a `-half` file at
+half its linear size, which the macro offers through `srcset`. The sub-site's
+images are outside the main site's `build:images` step, so re-encode both sizes
+when replacing a plate.
+
+The earlier brand-pack anchors and the record-transport survey are superseded
+on the site. Their originals remain in the brand pack and the reference
+directory.
 
 ## Code panels and verification
 

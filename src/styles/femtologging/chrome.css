@@ -10,6 +10,8 @@
   --fl-link: var(--color-link-dark);
   --fl-rule: var(--color-rule-dark);
   --fl-focus: var(--color-amber);
+  --fl-surface: color-mix(in oklab, var(--color-graphite) 72%, transparent);
+  --fl-reticle: color-mix(in oklab, var(--color-instrument) 7%, transparent);
 
   color: var(--fl-ink);
   background: var(--color-carbon);

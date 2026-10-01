@@ -1,33 +1,3 @@
-.fl-hero {
-  padding-block: 64px 0;
-}
-
-.fl-hero__grid {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 48px;
-  align-items: center;
-}
-
-.fl-hero h1 {
-  overflow-wrap: anywhere;
-  font-size: clamp(3rem, 5.2vw, 5.5rem);
-  letter-spacing: -0.05em;
-  margin: 24px 0;
-  line-height: 1.02;
-}
-
-.fl-hero h1 em {
-  font-style: normal;
-  color: var(--color-instrument);
-}
-
-.fl-hero__copy {
-  font-size: 1.125rem;
-  max-width: 42ch;
-  color: var(--fl-muted);
-}
-
 .fl-actions {
   display: flex;
   flex-wrap: wrap;
@@ -38,53 +8,6 @@
 .fl-version {
   color: var(--fl-muted);
   font: 0.8125rem / 1.7 var(--font-mono);
-}
-
-.fl-hero__plate {
-  min-width: 0;
-}
-
-.fl-hero__plate img {
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 16px;
-}
-
-.fl-figure {
-  margin: 0;
-  min-width: 0;
-}
-
-.fl-figure > img {
-  border-radius: 12px;
-  width: 100%;
-}
-
-.fl-figure figcaption {
-  padding-block: 16px;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  color: var(--fl-muted);
-  display: grid;
-  gap: 8px;
-}
-
-.fl-ribbon {
-  border-top: 1px solid var(--fl-rule);
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding-block: 24px;
-  margin-top: 44px;
-}
-
-.fl-ribbon span {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  font: 0.8125rem / 1.5 var(--font-mono);
-  color: var(--fl-muted);
 }
 
 .fl-section {
@@ -179,50 +102,6 @@
   font-size: inherit;
 }
 
-.fl-output {
-  margin-top: 16px;
-  padding: 16px 20px;
-  border-left: 3px solid var(--fl-link);
-  font: 0.875rem / 1.6 var(--font-mono);
-  overflow-wrap: anywhere;
-}
-
-.fl-path {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  padding: 0;
-  list-style: none;
-  border: 1px solid var(--fl-rule);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.fl-path li {
-  padding: 24px;
-  border-right: 1px solid var(--fl-rule);
-}
-
-.fl-path li:last-child {
-  border: 0;
-}
-
-.fl-path .fl-icon {
-  color: var(--fl-link);
-  margin-bottom: 16px;
-}
-
-.fl-path strong {
-  display: block;
-  font-size: 1rem;
-}
-
-.fl-path span {
-  color: var(--fl-muted);
-  display: block;
-  font-size: 0.875rem;
-  margin-top: 8px;
-}
-
 .fl-boundaries {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -246,70 +125,6 @@
 
 .fl-boundaries a {
   font-weight: 500;
-}
-
-.fl-specimens {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-}
-
-.fl-specimens figure {
-  border: 1px solid var(--fl-rule);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.fl-specimens img {
-  border-radius: 0;
-  aspect-ratio: 1.3;
-  object-fit: cover;
-}
-
-.fl-specimens figcaption {
-  padding: 24px;
-}
-
-.fl-specimens h3 {
-  font-size: 1.5rem;
-  margin: 0 0 12px;
-  color: var(--fl-ink);
-}
-
-.fl-specimens p {
-  margin: 0;
-}
-
-.fl-closing {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 40px;
-  padding-block: 56px;
-  border-top: 1px solid var(--fl-rule);
-}
-
-.fl-closing h2 {
-  font-size: 2.25rem;
-  margin: 0;
-}
-
-.fl-page-head {
-  padding-block: 64px 48px;
-  border-bottom: 1px solid var(--fl-rule);
-}
-
-.fl-page-head h1 {
-  font-size: clamp(2.5rem, 4.5vw, 4.5rem);
-  letter-spacing: -0.04em;
-  max-width: 20ch;
-  margin: 20px 0;
-}
-
-.fl-deck {
-  max-width: 62ch;
-  font-size: 1.25rem;
-  color: var(--fl-muted);
 }
 
 .fl-article-grid {
@@ -533,46 +348,23 @@
 }
 
 @media (width < 1024px) {
-  .fl-hero__grid {
-    gap: 32px;
-  }
-
   .fl-article-grid {
     grid-template-columns: 200px minmax(0, 1fr);
     gap: 32px;
   }
-
-  .fl-path li {
-    padding: 16px;
-  }
 }
 
 @media (width < 768px) {
-  .fl-hero {
-    padding-top: 40px;
-  }
-
-  .fl-hero__grid,
   .fl-two,
-  .fl-specimens,
   .fl-article-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .fl-hero h1 {
-    font-size: clamp(2.8rem, 11vw, 4.5rem);
-  }
-
-  .fl-hero__plate img {
-    aspect-ratio: 1.5;
   }
 
   .fl-section {
     padding-block: 48px;
   }
 
-  .fl-section__head,
-  .fl-closing {
+  .fl-section__head {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
@@ -585,28 +377,6 @@
   .fl-boundaries > div {
     padding: 24px 0;
     border-bottom: 1px solid var(--fl-rule);
-  }
-
-  .fl-path {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .fl-path li {
-    border-right: 0;
-    border-bottom: 1px solid var(--fl-rule);
-  }
-
-  .fl-path .fl-icon {
-    margin: 0 16px 0 0;
-    float: left;
-  }
-
-  .fl-path span {
-    margin-left: 40px;
-  }
-
-  .fl-page-head {
-    padding-block: 40px 32px;
   }
 
   .fl-article-grid {

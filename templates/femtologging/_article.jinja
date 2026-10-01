@@ -2,6 +2,7 @@
 {% import 'components.jinja' as ui with context %}
 {% import '_code.jinja' as samples with context %}
 {% from 'data/pages.jinja' import catalogue %}
+{% from 'data/plates.jinja' import page_plates %}
 {% macro local_navigation() -%}
     <nav aria-label="On this page"><p class="fl-label">On this page</p><ul class="fl-toc">{% for section in article.sections %}<li><a href="#{{ section.id }}">{{ section.title }}</a></li>{% endfor %}</ul></nav>
     <nav aria-label="Documentation"><details{% if article.group == 'Guides' %} open{% endif %}><summary>Task guides</summary><ul>{% for item in catalogue.values() if item.group == 'Guides' %}<li><a href="/femtologging/{{ item.slug }}/"{% if item.key == article.key %} aria-current="page"{% endif %}>{{ item.title }}</a></li>{% endfor %}</ul></details><details{% if article.group == 'API reference' %} open{% endif %}><summary>API reference</summary><ul>{% for item in catalogue.values() if item.group == 'API reference' %}<li><a href="/femtologging/{{ item.slug }}/"{% if item.key == article.key %} aria-current="page"{% endif %}>{{ item.title }}</a></li>{% endfor %}</ul></details></nav>
@@ -9,7 +10,7 @@
 {% block title %}{{ article.title | replace('<br>', ' ') }} · femtologging{% endblock %}
 {% block description %}{{ article.intro }}{% endblock %}
 {% block content %}
-{{ ui.page_head(article.group, article.title | replace('<br>', ' '), article.intro) }}
+{{ ui.page_head(article.group, article.title | replace('<br>', ' '), article.intro, page_plates.get(article.key)) }}
 <div class="fl-shell fl-article-grid">
   <aside class="fl-aside">
     <div class="fl-aside__rail">{{ local_navigation() }}</div>

@@ -11,7 +11,7 @@ python -m venv .venv
 python -m pip install .</code></pre></div><p>On Windows, activate the environment with <code>.venv\Scripts\Activate.ps1</code>. Confirm the Rust toolchain is on PATH before invoking pip.</p>
 </section>
 <section aria-labelledby="emit"><h2 id="emit">Configure and emit</h2>
-<p><code>basicConfig</code> configures a native stream handler on the root logger. A named logger propagates to it. Per-call <code>extra</code> fields travel with the record, but the default text formatter prints only the logger, level, and message.</p>{{ samples.code('first-record.py') }}<div class="fl-output">survey.transport [INFO] record received</div>
+<p><code>basicConfig</code> configures a native stream handler on the root logger. A named logger propagates to it. Per-call <code>extra</code> fields travel with the record, but the default text formatter prints only the logger, level, and message.</p>{{ samples.code('first-record.py') }}{% call samples.output() %}survey.transport [INFO] record received{% endcall %}
 </section>
 <section aria-labelledby="drain"><h2 id="drain">Drain both queue boundaries</h2>
 <p>Stop producers first. Flush the named logger, then the root logger that owns its output. Clearing the root handlers releases the configured native output workers after draining.</p><p>A successful logging call is not a delivery receipt. Check flush results and drop counters. Explicitly owned handler objects should be removed and closed; the <a href="/femtologging/examples/">worked examples</a> demonstrate this lifecycle.</p>

@@ -1,0 +1,17 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides-handlers'] %}
+{% block article_body %}
+<section aria-labelledby="choose"><h2 id="choose">Choose the transport</h2>
+<div class="fl-table-scroll" tabindex="0" role="region" aria-label="Handler choices"><table><thead><tr><th>Output</th><th>Surface</th><th>Boundary to check</th></tr></thead><tbody><tr><td>Console</td><td><code>FemtoStreamHandler</code></td><td>stdout/stderr, flush acknowledgement</td></tr><tr><td>File</td><td><code>FemtoFileHandler</code></td><td>Capacity and overflow policy</td></tr><tr><td>Size rotation</td><td><code>FemtoRotatingFileHandler</code></td><td>Positive size and backup count</td></tr><tr><td>Time rotation</td><td><code>FemtoTimedRotatingFileHandler</code></td><td>Schedule, timezone, retention</td></tr><tr><td>Socket</td><td><code>SocketHandlerBuilder</code></td><td>MessagePack framing, TLS, retries</td></tr><tr><td>HTTP</td><td><code>HTTPHandlerBuilder</code></td><td>One request per record, bounded close</td></tr></tbody></table></div>
+</section>
+<section aria-labelledby="file"><h2 id="file">Set file policies deliberately</h2>
+<p>File handler defaults are <code>capacity=1024</code>, <code>flush_interval=1</code>, and <code>policy="drop"</code>. The flush interval counts records. Drop, block, and <code>timeout:N</code> are handler queue policies, not guarantees about the logger queue that precedes them.</p><p>Size rotation needs both <code>max_bytes</code> and <code>backup_count</code> greater than zero. Timed rotation supports S, M, H, D, MIDNIGHT, and W0–W6; a timed <code>backup_count</code> of zero keeps all backups.</p>
+</section>
+<section aria-labelledby="network"><h2 id="network">Treat network output as a destination</h2>
+<p>Socket handlers frame MessagePack records with a four-byte big-endian length prefix. TLS requires TCP; Unix sockets are available on POSIX. Oversized frames can be dropped. Configure connect/write timeouts and backoff.</p><p>HTTP handlers send one record per request. Close waits for at most the write timeout; an unresponsive worker can be abandoned with queued records still pending. Review messages and fields before sending them to external sinks.</p>
+</section>
+<section aria-labelledby="custom"><h2 id="custom">Adapt a Python handler</h2>
+<p>Configure a Python handler completely before registering it. Capability detection is cached at registration: use <code>handle_record(record)</code> for a rich record dictionary or <code>handle(logger, level, message)</code> for the simpler contract.</p><p><code>StdlibHandlerAdapter</code> translates records for an existing <code>logging.Handler</code>. <a href="/femtologging/examples/#stdlib-handler">Run the adapter example.</a></p>
+</section>
+{% endblock %}

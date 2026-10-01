@@ -1,0 +1,39 @@
+{% import 'components.jinja' as ui with context %}
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="femto">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}femtologging · Logging, under the microscope.{% endblock %}</title>
+    <meta name="description" content="{% block description %}A Rust logging runtime for Python. Bounded queues, worker-backed output, and structured records. Explore the prospective 0.2.0 release.{% endblock %}">
+    <meta property="og:title" content="{{ self.title() }}">
+    <meta property="og:description" content="{{ self.description() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://df12.studio/femtologging/assets/images/anchor-pipeline.webp">
+    <meta name="theme-color" content="#12171b">
+    <link rel="icon" href="/femtologging/assets/logos/favicon.svg" type="image/svg+xml">
+    <link rel="preload" href="/femtologging/assets/fonts/sans-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/femtologging/assets/styles/femtologging.css">
+  </head>
+  <body>
+    <a class="fl-skip" href="#main-content">Skip to content</a>
+    <header class="fl-mast fl-dark">
+      <div class="fl-shell fl-mast__inner">
+        <a class="fl-wordmark" href="/femtologging/" aria-label="femtologging home"><img src="/femtologging/assets/logos/lockup-reversed.svg" alt="femtologging" width="204" height="40"></a>
+        <nav class="fl-nav" aria-label="Primary"><ul>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}</ul></nav>
+        <div class="fl-mast__actions"><a class="fl-mast__github" href="{{ repository_url }}">GitHub {{ ui.icon('branch') }}</a>{{ ui.button('Get started', '/femtologging/getting-started/') }}</div>
+        <details class="fl-mobile"><summary>Menu {{ ui.icon('branch') }}</summary><nav aria-label="Mobile primary"><ul>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}<li><a href="/femtologging/getting-started/">Get started</a></li><li><a class="fl-mast__github" href="{{ repository_url }}">GitHub</a></li><li><a href="/">← df12</a></li></ul></nav></details>
+      </div>
+    </header>
+    <main id="main-content">{% block content %}{% endblock %}</main>
+    <footer class="fl-footer fl-dark">
+      <div class="fl-shell fl-footer__grid">
+        <div><a class="fl-wordmark" href="/femtologging/"><img src="/femtologging/assets/logos/lockup-reversed.svg" alt="femtologging home" width="204" height="40"></a><p>Python above. Rust below.</p><p class="fl-label">A df12 Production · Edinburgh</p></div>
+        <div><h2>Read</h2><ul><li><a href="/femtologging/getting-started/">Get started</a></li><li><a href="/femtologging/docs/">Documentation</a></li><li><a href="/femtologging/examples/">Worked examples</a></li><li><a href="/femtologging/performance/">Performance</a></li></ul></div>
+        <div><h2>Project</h2><ul><li><a href="{{ repository_url }}">Source on GitHub</a></li><li><a href="/femtologging/contributing/">Contributing</a></li><li><a href="/femtologging/design/">Design and field guide</a></li><li><a href="{{ source_base }}/LICENSE">ISC licence</a></li></ul></div>
+        <div><h2>df12</h2><ul><li><a href="/">df12 Productions</a></li><li><a href="/femtologging/privacy-policy/">Privacy policy</a></li><li><a href="/femtologging/terms-of-use/">Terms of use</a></li><li><a href="/femtologging/code-of-conduct/">Code of conduct</a></li></ul></div>
+      </div>
+      <div class="fl-shell fl-footer__strip"><span>Logging, under the microscope.</span><span>Release target {{ femto_version }} · Forthcoming</span></div>
+    </footer>
+  </body>
+</html>

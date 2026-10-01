@@ -1,0 +1,22 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['getting-started'] %}
+{% block article_body %}
+<section aria-labelledby="install"><h2 id="install">Build the documented source</h2>
+<p>The next release is assumed to be <code>0.2.0-beta1</code>. It is forthcoming. The package-index command below is the prospective release command; use the source build today.</p><div class="fl-code"><div class="fl-code__head">Forthcoming release · not the current installation path</div><pre tabindex="0" aria-label="Prospective beta installation"><code>python -m pip install femtologging=={{ femto_pypi }}</code></pre></div><p>Source requirements: Python {{ python_floor }} or later and a Rust toolchain. The examples on this site were run with CPython 3.13 on Linux against revision <code>{{ femto_revision }}</code>. The checkout still declares package version 0.1.0; these are source-verified 0.2.0 examples.</p><div class="fl-code"><div class="fl-code__head">Current source installation</div><pre tabindex="0" aria-label="Install the documented source"><code>git clone https://github.com/leynos/femtologging.git
+cd femtologging
+git checkout {{ femto_revision }}
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install .</code></pre></div><p>On Windows, activate the environment with <code>.venv\Scripts\Activate.ps1</code>. Confirm the Rust toolchain is on PATH before invoking pip.</p>
+</section>
+<section aria-labelledby="emit"><h2 id="emit">Configure and emit</h2>
+<p><code>basicConfig</code> configures a native stream handler on the root logger. A named logger propagates to it. Per-call <code>extra</code> fields travel with the record, but the default text formatter prints only the logger, level, and message.</p>{{ samples.code('first-record.py') }}<div class="fl-output">survey.transport [INFO] record received</div>
+</section>
+<section aria-labelledby="drain"><h2 id="drain">Drain both queue boundaries</h2>
+<p>Stop producers first. Flush the named logger, then the root logger that owns its output. Clearing the root handlers releases the configured native output workers after draining.</p><p>A successful logging call is not a delivery receipt. Check flush results and drop counters. Explicitly owned handler objects should be removed and closed; the <a href="/femtologging/examples/">worked examples</a> demonstrate this lifecycle.</p>
+</section>
+<section aria-labelledby="next"><h2 id="next">Choose the next boundary</h2>
+<ul><li><a href="/femtologging/docs/guides/handlers/">Choose stream, file, rotation, or network output.</a></li><li><a href="/femtologging/docs/guides/structured-records/">Add per-call fields and exception details.</a></li><li><a href="/femtologging/docs/guides/operations/">Handle queue pressure and shutdown.</a></li><li><a href="/femtologging/compatibility/">Check the supported stdlib surface before migrating.</a></li></ul>
+</section>
+{% endblock %}

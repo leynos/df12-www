@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides-formatting-and-filtering'] %}
+{% block article_body %}
+<section aria-labelledby="formatter"><h2 id="formatter">Pass a callable formatter</h2>
+<p>Default text output is <code>{logger} [LEVEL] message</code>. Handler builders accept a callable that takes a record mapping and returns a string. The <a href="/femtologging/examples/#request-context">request-context example</a> produces JSON with the record’s structured metadata.</p><p>Formatter identifiers support only <code>"default"</code>. <code>FormatterBuilder</code> registration is a placeholder: registering a named formatter does not connect it to an output handler.</p>
+</section>
+<section aria-labelledby="filters"><h2 id="filters">Filter before dispatch</h2>
+<p><code>LevelFilterBuilder</code>, <code>NameFilterBuilder</code>, and <code>PythonCallbackFilterBuilder</code> configure logger filters. They run in declaration order on the producer thread. A callback may be a callable or a stdlib-style object with <code>filter(record)</code>.</p><p>A truthy callback accepts the record. Supported new scalar attributes are validated and copied into Rust metadata before enqueueing. Callback cost therefore belongs to the application-side logging path.</p>
+</section>
+<section aria-labelledby="bounds"><h2 id="bounds">Validate enrichment</h2>
+<p>Do not overwrite stdlib record attributes or femtologging metadata. New fields use non-empty string keys and scalar values. Invalid values, reserved keys, or oversized payloads fail validation rather than silently becoming structured context.</p><p>Handler-level filters and levels remain unsupported. See <a href="/femtologging/docs/guides/structured-records/">structured record limits</a> and <a href="/femtologging/docs/api/records-and-filters/">the record/filter reference</a>.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['examples'] %}
+{% block article_body %}
+<section aria-labelledby="console-and-file"><h2 id="console-and-file">Console and file output</h2>
+<p>Attach two handlers to one named logger. A simple custom handler signals that dispatch has reached both outputs; then flush, read the file, detach, and close.</p>{{ samples.code("console-and-file.py") }}<div class="fl-output">survey.output [INFO] sample prepared</div>
+</section>
+<section aria-labelledby="request-context"><h2 id="request-context">Per-call request context</h2>
+<p>A callable formatter serializes the message and <code>metadata.key_values</code>. A per-call field also suits concurrent asyncio operations. The Event acknowledges formatter delivery before the logger flush.</p>{{ samples.code("request-context.py") }}<div class="fl-output">{"fields": {"request_id": "42"}, "message": "request accepted"}</div><p>The current native mapping normalizes this integer to a string. Consumers should validate their actual output schema.</p>
+</section>
+<section aria-labelledby="stdlib-handler"><h2 id="stdlib-handler">Reuse a stdlib handler</h2>
+<p>The adapter translates to a LogRecord for a configured stdlib stream handler. The observed handler confirms delivery before checking output and closing the adapter.</p>{{ samples.code("stdlib-handler.py") }}<div class="fl-output">INFO: interface inspection complete</div>
+</section>
+{% endblock %}

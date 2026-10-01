@@ -161,13 +161,15 @@ class TestBuildLibrariesConfig:
         assert libraries.links[0].href == href, "the href should be kept verbatim"
 
 
-def test_shipped_config_lists_cuprum_and_rstest_bdd() -> None:
-    """The homepage's Tools section lists the two initial libraries."""
+def test_shipped_config_lists_local_library_subsites() -> None:
+    """The homepage lists all three local library sub-sites."""
     libraries = _homepage().systems.libraries
 
     assert libraries is not None, "homepage.systems.libraries should be configured"
     by_label = {link.label: link for link in libraries.links}
-    assert set(by_label) == {"Cuprum", "rstest-bdd"}
+    assert set(by_label) == {"femtologging", "Cuprum", "rstest-bdd"}
+    assert by_label["femtologging"].href == "femtologging/"
+    assert not by_label["femtologging"].external
     assert by_label["Cuprum"].href == "cuprum/"
     assert not by_label["Cuprum"].external, "Cuprum is a local sub-site"
     assert by_label["rstest-bdd"].href == "rstest-bdd/"
@@ -193,6 +195,8 @@ def test_rendered_homepage_lists_libraries_in_the_tools_section(tmp_path: Path) 
         title = anchor.select_one(".library-card__title")
         assert title is not None, "each library link names its library"
         links[title.get_text(strip=True)] = anchor
+    assert links["femtologging"]["href"] == "femtologging/"
+    assert "target" not in links["femtologging"].attrs
     assert links["Cuprum"]["href"] == "cuprum/"
     assert "target" not in links["Cuprum"].attrs
     assert links["rstest-bdd"]["href"] == "rstest-bdd/"

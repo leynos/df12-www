@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides-migration'] %}
+{% block article_body %}
+<section aria-labelledby="v0-1-0"><h2 id="v0-1-0">Account for the 0.1.0 names</h2>
+<p>Use the <code>FemtoLogger</code> and <code>Femto*Handler</code> names for the runtime classes and <code>get_logger</code> for registered loggers. The compatibility alias <code>getLogger</code> is available. Consult the <a href="{{ source_base }}/docs/v0-1-0-migration-guide.md">0.1.0 migration guide</a> for earlier renames.</p>
+</section>
+<section aria-labelledby="v0-2-0"><h2 id="v0-2-0">Prepare for the 0.2.0 changes</h2>
+<p><code>BasicConfig</code> now has slots. Assign only its five declared fields; auxiliary attributes raise <code>AttributeError</code>. Move unrelated caller state out of the configuration object.</p><p>Named logger methods support inline <code>extra</code> fields and scoped context propagation. Inline values win on collision. Context is thread-local, so do not carry it across awaits. <code>exception()</code> still lacks an <code>extra</code> parameter.</p>
+</section>
+<section aria-labelledby="adapter"><h2 id="adapter">Reuse a handler through the adapter</h2>
+<p><code>StdlibHandlerAdapter</code> lets an existing <code>logging.Handler</code> receive translated records. It does not unify the two logging managers or restore unsupported call-site metadata and lazy formatting.</p><p><a href="/femtologging/examples/#stdlib-handler">Run the complete adapter example</a>, then check <a href="/femtologging/compatibility/">compatibility and limits</a> before changing application-wide logging.</p>
+</section>
+{% endblock %}

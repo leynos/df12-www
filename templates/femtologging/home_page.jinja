@@ -1,0 +1,35 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as samples with context %}
+{% block content %}
+<section class="fl-hero fl-dark"><div class="fl-shell">
+  <div class="fl-hero__grid">
+    <div><p class="fl-label">The femtofauna survey · A Python logging runtime</p>
+      <h1>Logging,<br>under the<br><em>microscope.</em></h1>
+      <p class="fl-hero__copy">Python above. Rust below. A Rust logging runtime for Python, with bounded queues, worker-backed output, and structured records.</p>
+      <div class="fl-actions">{{ ui.button('Get started', '/femtologging/getting-started/') }}{{ ui.button('Read the docs', '/femtologging/docs/', true) }}</div>
+      <p class="fl-version">{{ femto_version }} forthcoming · Python {{ python_floor }}+<br>Prospective 0.2.0 documentation</p>
+    </div>
+    <div class="fl-hero__plate">{{ ui.figure('anchor-pipeline', 'Two ceramic robot pandas carry amber record crates through teal machinery. A capybara occupies a circular buffer and a dinosaur inspects a bridge.', '01', 'Record transport, viewed in cross-section. One trolley remains unaccounted for.', true) }}</div>
+  </div>
+  <div class="fl-ribbon"><span>{{ ui.icon('record') }} Structured context</span><span>{{ ui.icon('queue') }} Bounded queues</span><span>{{ ui.icon('worker') }} Rust workers</span><span>{{ ui.icon('compatibility') }} Explicit compatibility</span></div>
+</div></section>
+<section class="fl-section"><div class="fl-shell fl-two">
+  <div><p class="fl-label">01 / First observation</p><h2>A record enters<br>the system.</h2><p class="fl-intro">Configure output, emit a message, then drain the named logger and its root output before exit. The application owns the lifecycle.</p><p>The 0.2.0 surface adds validated <code>extra</code> fields to named loggers. Context travels with the record; the message remains a string.</p><p><a href="/femtologging/getting-started/">Build from source and run the example {{ ui.icon('arrow-right') }}</a></p><p class="fl-version">Source revision {{ femto_revision[:7] }}<br>Release target {{ femto_version }}</p></div>
+  <div>{{ samples.code('first-record.py') }}<div class="fl-output">survey.transport [INFO] record received</div></div>
+</div></section>
+<section class="fl-section fl-dark"><div class="fl-shell">
+  <div class="fl-section__head"><div><p class="fl-label">02 / Runtime cross-section</p><h2>The path is small.<br>The boundaries matter.</h2></div><p>Python creates the record. Rust routes it to handlers. Each output has its own queue and worker.</p></div>
+  <ol class="fl-path" aria-label="Record path">{% for name, icon, detail in [('Python', 'record', 'Message, extra, exception'), ('Logger', 'branch', 'Levels and propagation'), ('Queue', 'queue', 'Finite capacity'), ('Handler', 'handler', 'Worker-backed output'), ('Output', 'output', 'Stream, file, or network')] %}<li>{{ ui.icon(icon) }}<strong>{{ name }}</strong><span>{{ detail }}</span></li>{% endfor %}</ol>
+  <div class="fl-boundaries"><div><h3>Capacity is a choice.</h3><p>Full queues can reject records. Handler policies and drop counters need an operational plan.</p><a href="/femtologging/docs/guides/operations/">Handle pressure and shutdown {{ ui.icon('arrow-right') }}</a></div><div><h3>Output has an owner.</h3><p>Stream, file, rotating file, socket, and HTTP handlers have different failure and shutdown contracts.</p><a href="/femtologging/docs/guides/handlers/">Choose an output {{ ui.icon('arrow-right') }}</a></div><div><h3>Familiar has limits.</h3><p>Named loggers and handler adapters support adoption. Full stdlib parity remains a goal.</p><a href="/femtologging/compatibility/">Check compatibility {{ ui.icon('arrow-right') }}</a></div></div>
+</div></section>
+<section class="fl-section"><div class="fl-shell">
+  <div class="fl-section__head"><div><p class="fl-label">03 / Specimen catalogue</p><h2>Machinery. With residents.</h2></div><p>The survey is fiction. The queue policy is configuration.</p></div>
+  <div class="fl-specimens">
+    <figure class="fl-figure"><img src="/femtologging/assets/images/anchor-panda.webp" alt="An ivory ceramic robot panda examines an amber record crate in an etched transport trench." width="1536" height="1024" loading="lazy"><figcaption><span class="fl-label">FL-P-001 · Transport</span><h3>The record carrier</h3><p>Transport observed at the worker boundary.</p><a href="/femtologging/architecture/">Inspect the architecture</a><span class="fl-label">Fictional scientific illustration</span></figcaption></figure>
+    <figure class="fl-figure"><img src="/femtologging/assets/images/anchor-habitat.webp" alt="A ceramic capybara sits beside amber record crates around a circular queue cavity." width="1536" height="1024" loading="lazy"><figcaption><span class="fl-label">FL-Q-002 · Queue habitat</span><h3>The queue occupant</h3><p>Occupancy continues to rise. The capybara remains seated.</p><a href="/femtologging/docs/guides/operations/">Inspect queue behaviour</a><span class="fl-label">Fictional scientific illustration</span></figcaption></figure>
+    <figure class="fl-figure"><img src="/femtologging/assets/images/record-transport-survey-sem.webp" alt="A ceramic dinosaur inspects a bridge above a transport lane shared by a panda and a capybara." width="1536" height="1024" loading="lazy"><figcaption><span class="fl-label">FL-C-003 · Interface survey</span><h3>The boundary inspector</h3><p>Interface inspection complete. Sauropod incidental.</p><a href="/femtologging/compatibility/">Inspect the supported surface</a><span class="fl-label">Fictional scientific illustration</span></figcaption></figure>
+  </div>
+</div></section>
+<section class="fl-dark"><div class="fl-shell fl-closing"><div><p class="fl-label">Continue the investigation</p><h2>Start with one record.</h2></div><div class="fl-actions">{{ ui.button('Get started', '/femtologging/getting-started/') }}{{ ui.button('Explore the roadmap', '/femtologging/roadmap/', true) }}</div></div></section>
+{% endblock %}

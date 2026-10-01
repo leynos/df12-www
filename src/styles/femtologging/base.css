@@ -1,0 +1,74 @@
+:root {
+  --fl-ink: var(--color-base-content);
+  --fl-button-rule: var(--color-primary);
+  --fl-muted: var(--color-muted-light);
+  --fl-link: var(--color-primary);
+  --fl-rule: var(--color-rule-light);
+  --fl-focus: var(--color-carbon);
+}
+
+body {
+  margin: 0;
+  background: var(--color-base-100);
+  color: var(--fl-ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--fl-link);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+:focus-visible {
+  outline: 3px solid var(--fl-focus);
+  outline-offset: 4px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+p {
+  margin-block: 0 1rem;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+code {
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
+
+summary {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

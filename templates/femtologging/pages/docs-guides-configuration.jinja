@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides-configuration'] %}
+{% block article_body %}
+<section aria-labelledby="basic"><h2 id="basic">Use the small configuration surface</h2>
+<p><code>basicConfig</code> accepts <code>level</code>, <code>filename</code>, <code>stream</code>, <code>force</code>, and <code>handlers</code>. Filename and stream are mutually exclusive, and cannot be combined with handlers. <code>force=True</code> clears existing root handlers.</p><p><code>BasicConfig</code> is slotted in 0.2.0. Auxiliary attributes raise <code>AttributeError</code>. Store caller-owned state separately.</p>
+</section>
+<section aria-labelledby="builders"><h2 id="builders">Prepare a complete graph</h2>
+<p><code>ConfigBuilder</code> registers handler and filter builders, then binds their identifiers to <code>LoggerConfigBuilder</code> entries. A root logger configuration is required. <code>build_and_init()</code> validates references and prepares configuration before mutating live logger state.</p><p>Set <code>with_propagate(False)</code> when a named logger owns all of its output. Default levels and disabling existing loggers are explicit builder options. Use <code>RuntimeConfigBuilder</code> and <code>LoggerMutationBuilder</code> for the supported mutation surface.</p>
+</section>
+<section aria-labelledby="compat"><h2 id="compat">Check declarative restrictions</h2>
+<p><code>dictConfig</code> supports a restricted version-1 schema with a mandatory root. Logger filters may use level/name declarations or callable factories. Incremental updates, handler filters, handler levels, and handler formatter attachment are unsupported.</p><p><code>fileConfig</code> translates INI to that restricted schema. Default substitutions work; formatter sections and handler-level overrides raise <code>ValueError</code>. A failed configuration leaves live logger state intact.</p>
+</section>
+{% endblock %}

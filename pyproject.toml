@@ -134,3 +134,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 exclude = ["features"]
+
+[tool.ty.src]
+# Runnable upstream examples are verified in a femtologging source environment.
+# They are downloadable content, not imports of the website application.
+exclude = ["templates/femtologging/samples", "src/static/femtologging/assets/samples"]

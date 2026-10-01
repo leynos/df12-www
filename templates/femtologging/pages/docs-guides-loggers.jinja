@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides-loggers'] %}
+{% block article_body %}
+<section aria-labelledby="names"><h2 id="names">Name the logger</h2>
+<p><code>get_logger(name)</code> returns a registered singleton. Dotted names establish parent relationships: <code>service.api</code> has parent <code>service</code>, which ultimately reaches <code>root</code>. Empty names, leading or trailing dots, and consecutive dots are invalid.</p><p>Set the level explicitly when configuring a component. <code>set_propagate(False)</code> isolates a logger whose own handlers provide all output.</p>
+</section>
+<section aria-labelledby="emit"><h2 id="emit">Emit a complete message</h2>
+<p><code>log(level, message)</code> accepts case-insensitive level names TRACE, DEBUG, INFO, WARN, WARNING, ERROR, and CRITICAL. The <code>debug</code>, <code>info</code>, <code>warning</code>, <code>error</code>, and <code>critical</code> methods take a final message string and optional structured fields.</p><p>Build the message before calling the logger. Lazy stdlib formatting with extra positional arguments is unsupported. The return value is the formatted string for an accepted record, or <code>None</code> when filtered; it does not confirm delivery.</p>
+</section>
+<section aria-labelledby="routing"><h2 id="routing">Keep output ownership explicit</h2>
+<p><code>add_handler</code> and <code>remove_handler</code> change the handlers for subsequent records. Queued records retain their captured handler set, so detaching a handler does not cancel pending work. Stop producers and drain before closing an output.</p><p><code>isEnabledFor</code> checks the effective level. <code>get_dropped()</code> exposes local logger queue drops. <code>reset_manager()</code> is a test utility; it is unsafe as live reconfiguration while other threads use existing loggers.</p>
+</section>
+{% endblock %}

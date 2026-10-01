@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['contributing'] %}
+{% block article_body %}
+<section aria-labelledby="source"><h2 id="source">Start from a source checkout</h2>
+<p>Clone the <a href="{{ repository_url }}">repository</a>, read its contributor instructions, and use <code>make build</code> for the development extension. The upstream developer guide describes the Rust and Python toolchain.</p><p>The source revision behind this site is <code>{{ femto_revision }}</code>. The site’s examples were built in a separate environment, leaving the checked-out project’s package metadata unchanged.</p>
+</section>
+<section aria-labelledby="verify"><h2 id="verify">Verify behaviour at the output</h2>
+<p>Follow upstream formatting, linting, typechecking, and test targets. Exercise producer-side validation, queue pressure, worker errors, and orderly shutdown. Include output assertions for API changes; an accepted logging call is not a delivery assertion.</p><p>For a bug report, include Python/platform versions, the build feature set, handler configuration, queue policy, observed diagnostics, and a small reproducer without credentials.</p>
+</section>
+<section aria-labelledby="read"><h2 id="read">Read the design record</h2>
+<ul><li><a href="{{ source_base }}/docs/developers-guide.md">Developer guide</a></li><li><a href="{{ source_base }}/docs/dev-workflow.md">Build and test workflow</a></li><li><a href="{{ source_base }}/docs/adr-001-python-exception-logging.md">Exception payload ADR</a></li><li><a href="/femtologging/code-of-conduct/">Code of conduct</a></li></ul>
+</section>
+{% endblock %}

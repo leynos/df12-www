@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['compatibility'] %}
+{% block article_body %}
+<section aria-labelledby="matrix"><h2 id="matrix">Check the supported surface</h2>
+<div class="fl-table-scroll" tabindex="0" role="region" aria-label="Compatibility matrix"><table><thead><tr><th>Surface</th><th>Status</th><th>Contract</th></tr></thead><tbody><tr><td>Named loggers and propagation</td><td>Supported</td><td>Dotted names, levels, get_logger/getLogger</td></tr><tr><td>Inline extra, exc_info, stack_info</td><td>Supported</td><td>Validated fields; exception() lacks extra</td></tr><tr><td>Existing logging.Handler</td><td>Adapter</td><td>StdlibHandlerAdapter, separate managers</td></tr><tr><td>basicConfig</td><td>Restricted</td><td>Five fields; no format/datefmt</td></tr><tr><td>dictConfig / fileConfig</td><td>Restricted</td><td>No incremental updates or handler formatter attachment</td></tr><tr><td>Lazy message arguments</td><td>Unsupported</td><td>Pass a complete message string</td></tr><tr><td>LoggerAdapter, caller introspection</td><td>Unsupported</td><td>Do not assume full LogRecord parity</td></tr><tr><td>Journald / OpenTelemetry exporters</td><td>Planned</td><td>No exporter capability claim</td></tr></tbody></table></div>
+</section>
+<section aria-labelledby="platform"><h2 id="platform">Separate platform and build features</h2>
+<p>Package metadata requires Python {{ python_floor }}+. Source verification on this site uses CPython 3.13 and Linux; that is evidence for the examples, not a complete wheel availability matrix. Rust is required for a source build.</p><p>Unix sockets require POSIX. TLS sockets use TCP. Rust <code>log-compat</code> and <code>tracing-compat</code> are optional Cargo features with process-global registration constraints. Consult the bridge reference before mixing native logging frameworks.</p>
+</section>
+<section aria-labelledby="adopt"><h2 id="adopt">Migrate one boundary at a time</h2>
+<p>Keep the managers separate. Start with one component, make output ownership explicit, and check flush and failure behaviour under load. <a href="/femtologging/docs/guides/migration/">Use the migration guide</a> and <a href="/femtologging/examples/#stdlib-handler">adapter example</a>.</p>
+</section>
+{% endblock %}

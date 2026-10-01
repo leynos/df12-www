@@ -1,0 +1,8 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% block title %}{{ title }} · femtologging{% endblock %}
+{% block description %}{{ summary or title }} for the femtologging site.{% endblock %}
+{% block content %}
+{{ ui.page_head('df12 Productions', title, summary or 'Shared policies for the df12 Productions sites.') }}
+<div class="fl-shell"><article class="fl-legal">{{ body_html | safe }}</article></div>
+{% endblock %}

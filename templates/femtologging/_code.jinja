@@ -1,0 +1,3 @@
+{% macro code(file, label='Python') -%}
+<div class="fl-code"><div class="fl-code__head"><span>{{ label }}</span><a href="/femtologging/assets/samples/{{ file }}" download>Download {{ file }}</a></div><div class="fl-code__scroll" tabindex="0" role="region" aria-label="{{ file }}">{% highlight 'python', 'fl-syntax' %}{% include 'samples/' ~ file %}{% endhighlight %}</div></div>
+{%- endmacro %}

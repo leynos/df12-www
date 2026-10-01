@@ -1,0 +1,13 @@
+{% extends '_article.jinja' %}
+{% from 'data/api.jinja' import api %}
+{% block article_body %}
+<p>The declarations below are transcribed from the public source and extension stubs at <code>{{ femto_revision[:7] }}</code>. Ellipses mark defaults unspecified by the stub. <code>Self</code> denotes the same fluent builder type; <code>_Any</code> is the stub’s alias for <code>typing.Any</code>.</p>
+{% for entry in api[api_group] %}
+<section class="fl-symbol" aria-labelledby="{{ entry.name }}">
+  <h2 id="{{ entry.name }}">{{ entry.name }}</h2>
+  <p>{{ entry.description }}</p>
+  {% if entry.signature %}<pre tabindex="0" aria-label="{{ entry.name }} declarations"><code>{{ entry.signature }}</code></pre>{% endif %}
+  <p class="fl-contract"><a href="{{ source_base }}/femtologging/{{ entry.file }}">View source declaration</a></p>
+</section>
+{% endfor %}
+{% endblock %}

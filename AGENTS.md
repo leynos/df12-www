@@ -46,9 +46,9 @@ is authored directly as HTML.
 - **`config/pages.yaml`** is the single source of layout and copy data. It
   defines the main site's homepage, about page, and documentation bundles, and a
   `sites:` mapping that configures each sub-site (`mxd`, `episodic`, `netsuke`,
-  `weaver`, `stilyagi`, `cuprum`, `rstest-bdd`). A sub-site entry declares its
-  `output_dir`, `templates_dir`, `stylesheet`, `base_path`, theme metadata,
-  navigation links, shared-content pages, and content pages.
+  `weaver`, `stilyagi`, `cuprum`, `rstest-bdd`, `femtologging`). A sub-site
+  entry declares its `output_dir`, `templates_dir`, `stylesheet`, `base_path`,
+  theme metadata, navigation links, shared-content pages, and content pages.
 - **`config/shared/*.md`** holds copy shared across sub-sites — the privacy
   policy, terms of use, and code of conduct. Each sub-site opts in through its
   `shared_content` list and renders the same Markdown through its own chrome.
@@ -86,21 +86,22 @@ a clean tree, and will not deploy.
 
 Every published file therefore has a source elsewhere in the repository:
 
-| Published under `public/`                 | Comes from                                            |
-| ----------------------------------------- | ----------------------------------------------------- |
-| `**/*.html`                               | `df12_pages` rendering `templates/` against `config/` |
-| `assets/site.css`                         | Tailwind compiling `src/styles/`                      |
-| `mxd/assets/tailwind.css`                 | Tailwind compiling `src/styles/`                      |
-| `episodic/assets/styles/tailwind.css`     | Tailwind compiling `src/styles/`                      |
-| `weaver/assets/styles/weaver.css`         | Tailwind compiling `src/styles/`                      |
-| `stilyagi/assets/styles/stilyagi.css`     | Tailwind compiling `src/styles/`                      |
-| `netsuke/assets/css/himotoshi.css`        | Tailwind compiling `src/styles/`                      |
-| `cuprum/assets/styles/cuprum.css`         | Tailwind compiling `src/styles/`                      |
-| `rstest-bdd/assets/styles/rstest-bdd.css` | Tailwind compiling `src/styles/`                      |
-| `images/*.webp`, `images/*.avif`          | `scripts/generate-image-variants.ts`                  |
-| `*/assets/js/*.js`                        | swc compiling `src/static/**/assets/js/*.ts`          |
-| `netsuke/assets/search/*.json`            | `scripts/build-netsuke-search-index.mjs`              |
-| everything else                           | `src/static/`, copied by `scripts/copy-static.ts`     |
+| Published under `public/`                     | Comes from                                            |
+| --------------------------------------------- | ----------------------------------------------------- |
+| `**/*.html`                                   | `df12_pages` rendering `templates/` against `config/` |
+| `assets/site.css`                             | Tailwind compiling `src/styles/`                      |
+| `mxd/assets/tailwind.css`                     | Tailwind compiling `src/styles/`                      |
+| `episodic/assets/styles/tailwind.css`         | Tailwind compiling `src/styles/`                      |
+| `weaver/assets/styles/weaver.css`             | Tailwind compiling `src/styles/`                      |
+| `stilyagi/assets/styles/stilyagi.css`         | Tailwind compiling `src/styles/`                      |
+| `netsuke/assets/css/himotoshi.css`            | Tailwind compiling `src/styles/`                      |
+| `cuprum/assets/styles/cuprum.css`             | Tailwind compiling `src/styles/`                      |
+| `rstest-bdd/assets/styles/rstest-bdd.css`     | Tailwind compiling `src/styles/`                      |
+| `images/*.webp`, `images/*.avif`              | `scripts/generate-image-variants.ts`                  |
+| `*/assets/js/*.js`                            | swc compiling `src/static/**/assets/js/*.ts`          |
+| `netsuke/assets/search/*.json`                | `scripts/build-netsuke-search-index.mjs`              |
+| `femtologging/assets/styles/femtologging.css` | Tailwind compiling `src/styles/`                      |
+| everything else                               | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 To add an asset, put it in `src/static/` at the path it should occupy in the
 published site, then rebuild.
@@ -141,7 +142,7 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Eight entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Nine entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode), `src/styles/mxd.css` for the mxd sub-site (the `mxd`
 theme), `src/styles/episodic.css` for Episodic (the `episodic` theme),
@@ -149,7 +150,8 @@ theme), `src/styles/episodic.css` for Episodic (the `episodic` theme),
 `src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme),
 `src/styles/netsuke.css` for Netsuke (the `netsuke` theme),
 `src/styles/cuprum.css` for Cuprum (the `cuprum` theme), and
-`src/styles/rstest-bdd.css` for rstest-bdd (the `rstest-bdd` theme).
+`src/styles/rstest-bdd.css` for rstest-bdd (the `rstest-bdd` theme), and
+`src/styles/femtologging.css` for femtologging (the `femto` theme).
 
 Weaver's entrypoint is the one to read first when adding a sub-site stylesheet,
 and Episodic's follows the same shape. It declares the theme, then imports
@@ -236,6 +238,15 @@ A test holds every panel to its file and the package's versions to the config,
 so move them together. The felt cast — Marrow, Clover, and Bobbin — never
 appears on a legal page. See section 5.9 of the
 [Developer's Guide](docs/developers-guide.md).
+
+femtologging uses the materials-science brand pack: carbon/alumina surfaces,
+IBM Plex, lattice marks, and authored SVG icons. Its `fl-` component classes
+keep the palette semantic. The `FemtoStyle` Pygments style is compiled by
+`scripts/generate_femtologging_pygments_css.py`; never hand-edit the generated
+syntax partial. The 0.2.0-beta1 copy is prospective, and source links identify
+the verified revision. Sample files and their downloads must stay
+byte-identical. See [femtologging sub-site](docs/femtologging-site.md) for
+provenance and checks.
 
 ### Prefer semantic classes over literal colours
 

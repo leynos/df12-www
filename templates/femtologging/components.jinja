@@ -1,0 +1,16 @@
+{% macro icon(name) -%}
+<svg class="fl-icon" aria-hidden="true" width="24" height="24"><use href="/femtologging/assets/icons/sprite.svg#{{ name }}"></use></svg>
+{%- endmacro %}
+{% macro button(label, href, secondary=false) -%}
+<a class="fl-button{% if secondary %} fl-button--outline{% endif %}" href="{{ href }}">{{ label }}{{ icon('arrow-right') }}</a>
+{%- endmacro %}
+
+{% macro figure(name, alt, number, caption, eager=false) -%}
+<figure class="fl-figure"><img src="/femtologging/assets/images/{{ name }}.webp" alt="{{ alt }}" width="1536" height="1024" loading="{{ 'eager' if eager else 'lazy' }}"{% if eager %} fetchpriority="high"{% endif %}><figcaption><span class="fl-label">Fig. {{ number }} · Fictional scientific illustration</span><span>{{ caption }}</span></figcaption></figure>
+{%- endmacro %}
+{% macro page_head(kicker, title, intro) -%}
+<header class="fl-page-head"><div class="fl-shell"><p class="fl-label">{{ kicker }}</p><h1>{{ title }}</h1><p class="fl-deck">{{ intro }}</p><p class="fl-version">0.2.0 surface · {{ femto_version }} forthcoming</p></div></header>
+{%- endmacro %}
+{% macro route_list(items) -%}
+<div class="fl-route-list">{% for item in items %}<a href="/femtologging/{{ item.slug }}/"><span class="fl-label">{{ '%02d' | format(loop.index) }}</span><span><strong>{{ item.title }}</strong><span>{{ item.intro }}</span></span>{{ icon('arrow-right') }}</a>{% endfor %}</div>
+{%- endmacro %}

@@ -62,10 +62,11 @@ The `plate` macro in `components.jinja` renders an entry. The raster carries no
 text. The instrument strip (specimen ID, detector mode, and an illustrative
 scale bar), the numbered markers, and the caption are HTML. A legend in the
 caption repeats every marker in words, so the markers are hidden from assistive
-technology. Every caption says “Fictional scientific illustration”. Specimen
-IDs identify artwork, not test results. Scale values are fiction and always
-render beside “illustrative scale”. The strip is a container query target and
-drops detail as the plate narrows, rather than wrapping.
+technology. Captions carry a plate number rather than a repeated disclaimer;
+the Design and field guide states once that every plate is fictional scientific
+illustration. Specimen IDs identify artwork, not test results. Scale values are
+fiction and always render beside “illustrative scale”. The strip is a container
+query target and drops detail as the plate narrows, rather than wrapping.
 
 Callout coordinates are percentages of the uncropped raster. A plate with
 callouts must therefore keep its aspect ratio; header plates crop to 3:2 and

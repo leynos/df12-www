@@ -39,7 +39,7 @@
     {{ ui.section_head('smaller', '02 / Magnification series', 'Explore a smaller world.', 'From your application<br>to the femtoscale.' | safe) }}
     <figure class="fl-series">
       <ol>{% for step in magnification %}{% set p = plates[step.plate] %}<li><img src="/femtologging/assets/images/{{ p.file }}-half.webp" alt="{{ p.alt }}" width="{{ p.width // 2 }}" height="{{ p.height // 2 }}" loading="lazy" decoding="async"><span class="fl-series__power">{{ step.power }}</span><span class="fl-series__title">{{ step.title }}</span></li>{% endfor %}</ol>
-      <figcaption><span class="fl-label">Plates 05–09 · Fictional scientific illustration</span> Five fields of view, from the application to a single transport unit. Powers of ten are illustrative; calibration remains disputed.</figcaption>
+      <figcaption><span class="fl-label">Plates 05–09</span> Five fields of view, from the application to a single transport unit. Powers of ten are illustrative; calibration remains disputed.</figcaption>
     </figure>
   </div>
 </section>

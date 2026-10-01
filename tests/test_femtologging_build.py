@@ -73,8 +73,10 @@ def test_forthcoming_release_and_legal_art_boundaries(built_site: Path) -> None:
         assert "forthcoming" in soup.get_text().lower(), page
         for figure in soup.select("figure"):
             caption = figure.find("figcaption")
-            assert caption is not None
-            assert "Fictional scientific illustration" in caption.get_text()
+            assert caption is not None, page
+            assert caption.get_text(strip=True), page
+    design = BeautifulSoup((SITE / "design" / "index.html").read_text(), "html.parser")
+    assert "fictional scientific illustration" in design.get_text().lower()
     for slug in ("privacy-policy", "terms-of-use", "code-of-conduct"):
         soup = BeautifulSoup((SITE / slug / "index.html").read_text(), "html.parser")
         assert soup.select_one(".fl-legal")

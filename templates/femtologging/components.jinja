@@ -18,7 +18,7 @@
     <p class="fl-databar"><span>{{ p.specimen }}</span><span class="fl-databar__mode">SE · false colour · simulated</span>{{ scale_bar(p.scale) }}</p>
   </div>
   <figcaption>
-    <span class="fl-plate__text"><span class="fl-label">Plate {{ p.plate }} · Fictional scientific illustration</span><span class="fl-plate__caption">{{ p.caption }}</span></span>
+    <span class="fl-plate__text"><span class="fl-label">Plate {{ p.plate }}</span><span class="fl-plate__caption">{{ p.caption }}</span></span>
     {%- if p.callouts %}<ol class="fl-legend">{% for c in p.callouts %}<li><span><strong>{{ c.title }}.</strong> {{ c.text }}</span></li>{% endfor %}</ol>{% endif %}
   </figcaption>
 </figure>

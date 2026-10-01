@@ -175,7 +175,6 @@
 .fl-article h2 {
   font-size: 1.875rem;
   margin-block: 48px 20px;
-  scroll-margin-top: 24px;
   letter-spacing: -0.025em;
 }
 
@@ -296,24 +295,6 @@
 
 .fl-symbol .fl-contract {
   color: var(--fl-muted);
-}
-
-.fl-legal {
-  max-width: 75ch;
-  padding-block: 48px 80px;
-}
-
-.fl-legal h2 {
-  margin-block: 32px 16px;
-}
-
-.fl-legal h3 {
-  margin-block: 24px 12px;
-}
-
-.fl-legal ul {
-  padding-left: 24px;
-  list-style: disc;
 }
 
 .fl-swatches {

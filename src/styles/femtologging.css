@@ -5,6 +5,7 @@
 @import "./femtologging/chrome.css" layer(components);
 @import "./femtologging/content.css" layer(components);
 @import "./femtologging/survey.css" layer(components);
+@import "./femtologging/legal.css" layer(components);
 @import "./femtologging/syntax.css" layer(components);
 
 @source "../../templates/femtologging/**/*.jinja";

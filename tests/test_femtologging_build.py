@@ -79,3 +79,26 @@ def test_forthcoming_release_and_legal_art_boundaries(built_site: Path) -> None:
         soup = BeautifulSoup((SITE / slug / "index.html").read_text(), "html.parser")
         assert soup.select_one(".fl-legal")
         assert not soup.select("figure, .fl-specimens"), slug
+
+
+def test_chrome_offers_df12_and_legal_pages_follow_the_shared_layout(
+    built_site: Path,
+) -> None:
+    """Every page links back to df12; legal pages use the breadcrumb panel."""
+    assert built_site.is_dir()
+    for page in SITE.rglob("index.html"):
+        soup = BeautifulSoup(page.read_text(), "html.parser")
+        for nav in ("Primary", "Mobile primary"):
+            up = soup.select_one(f'nav[aria-label="{nav}"] .fl-nav__up a[href="/"]')
+            assert up is not None, (page, nav)
+            assert "df12" in up.get_text(), (page, nav)
+    for slug in ("privacy-policy", "terms-of-use", "code-of-conduct"):
+        soup = BeautifulSoup((SITE / slug / "index.html").read_text(), "html.parser")
+        crumbs = soup.select('nav.fl-crumbs[aria-label="Breadcrumb"] li')
+        assert crumbs[-1].get("aria-current") == "page", slug
+        panel = soup.select_one(".fl-legal-page__panel")
+        assert panel is not None, slug
+        assert panel.select_one(".fl-legal-page__eyebrow"), slug
+        assert panel.select_one("h1"), slug
+        assert panel.select_one("article.fl-legal"), slug
+        assert not soup.select(".fl-page-head"), slug

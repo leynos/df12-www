@@ -9,6 +9,11 @@
   --fl-reticle: color-mix(in oklab, var(--color-carbon) 6%, transparent);
 }
 
+html {
+  /* Clear the sticky masthead when jumping to an anchor. */
+  scroll-padding-top: 112px;
+}
+
 body {
   margin: 0;
   background: var(--color-base-100);

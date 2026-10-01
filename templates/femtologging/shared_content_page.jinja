@@ -1,8 +1,29 @@
+{#
+  Shared legal copy (terms, privacy, code of conduct) rendered through the
+  femtologging chrome, in the layout of the Netsuke legal pages: a breadcrumb,
+  then one reading panel holding the eyebrow, title, summary, and body. The
+  body arrives as sanitized HTML from config/shared/, wrapped by the generator
+  in content-toc, content-section, and content-card structure; .fl-legal styles
+  those by element and structure. No survey plates, captions, or release line
+  appear here: a legal notice is not a specimen.
+#}
 {% extends '_layout.jinja' %}
-{% import 'components.jinja' as ui with context %}
 {% block title %}{{ title }} · femtologging{% endblock %}
-{% block description %}{{ summary or title }} for the femtologging site.{% endblock %}
+{% block description %}{{ summary or title ~ ' for the femtologging site.' }}{% endblock %}
 {% block content %}
-{{ ui.page_head('df12 Productions', title, summary or 'Shared policies for the df12 Productions sites.') }}
-<div class="fl-shell"><article class="fl-legal">{{ body_html | safe }}</article></div>
+<div class="fl-legal-page">
+  <nav class="fl-crumbs" aria-label="Breadcrumb">
+    <ol>
+      {% if parent_link %}<li><a href="{{ parent_link.href }}">{{ parent_link.label }}</a></li>{% endif %}
+      <li><a href="/femtologging/">femtologging</a></li>
+      <li aria-current="page">{{ title }}</li>
+    </ol>
+  </nav>
+  <div class="fl-legal-page__panel">
+    <p class="fl-legal-page__eyebrow">{{ eyebrow or 'Legal' }}</p>
+    <h1>{{ title }}</h1>
+    {% if summary %}<p class="fl-legal-page__summary">{{ summary }}</p>{% endif %}
+    <article class="fl-legal">{{ body_html | safe }}</article>
+  </div>
+</div>
 {% endblock %}

@@ -358,21 +358,17 @@
   clip-path: inset(50%);
 }
 
+/* Each fact hangs from its own rule, so the row wraps cleanly at any width. */
 .fl-facts {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px 0;
+  gap: 20px 32px;
   margin: 40px 0 0;
 }
 
 .fl-facts > div {
-  padding-inline: 24px;
-  border-left: 1px solid var(--fl-rule);
-}
-
-.fl-facts > div:first-child {
-  padding-left: 0;
-  border-left: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--fl-rule);
 }
 
 .fl-facts dt {
@@ -903,17 +899,6 @@
 }
 
 @media (width < 768px) {
-  .fl-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .fl-facts > div,
-  .fl-facts > div:first-child {
-    padding-inline: 0 12px;
-    border-left: 0;
-  }
-
   .fl-cover h1 {
     font-size: clamp(2.75rem, 12vw, 4.5rem);
   }

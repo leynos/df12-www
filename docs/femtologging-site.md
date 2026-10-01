@@ -39,6 +39,14 @@ redistributed WOFF2 files. The concept mockups inform the cover, the
 magnification series, the specimen notes, and the roadmap's exploratory
 what-ifs.
 
+The masthead is sticky, and its first navigation item is “← df12”, as on the
+Cuprum and rstest-bdd sub-sites. The root's `scroll-padding-top` keeps anchor
+targets clear of it. The shared legal pages follow the Netsuke layout: a
+breadcrumb, then one raised panel with the eyebrow from `config/pages.yaml`,
+the title, the summary, and the body. `legal.css` styles the generator's
+contents list, sections, and badge cards. Legal pages carry no plates and no
+page head.
+
 ### Survey plates
 
 Every illustration is a *survey plate*: a fictional false-colour scanning

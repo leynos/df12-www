@@ -1,0 +1,236 @@
+/*
+ * Legal pages: the shared privacy, terms, and conduct copy, laid out as the
+ * Netsuke legal pages are — a breadcrumb, then one raised reading panel with
+ * an eyebrow pill, the title, a summary, and the body. The body is Markdown
+ * rendered by the shared-content generator, so element selectors style it,
+ * along with the contents list, sections, and badge cards it is wrapped in.
+ * The layout is Netsuke's; the materials are alumina, carbon, and ink teal.
+ */
+
+.fl-legal-page {
+  width: min(56rem, calc(100% - 80px));
+  margin-inline: auto;
+  padding-block: 48px 96px;
+}
+
+.fl-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 0 0 28px;
+  padding: 0;
+  list-style: none;
+  color: var(--fl-muted);
+  font: 0.8125rem / 1.6 var(--font-mono);
+}
+
+.fl-crumbs li + li::before {
+  content: "/";
+  margin-right: 10px;
+}
+
+.fl-legal-page__panel {
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid var(--fl-rule);
+  border-radius: 24px;
+  background: var(--fl-surface);
+}
+
+.fl-legal-page__eyebrow {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 14px;
+  border: 1px solid var(--fl-rule);
+  border-radius: 999px;
+  background: var(--color-base-100);
+  color: var(--fl-link);
+  font: 600 0.75rem / 1.6 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.fl-legal-page h1 {
+  margin: 24px 0 0;
+  font-size: clamp(2.25rem, 5vw, 3rem);
+  letter-spacing: -0.035em;
+}
+
+.fl-legal-page__summary {
+  max-width: 40rem;
+  margin-top: 16px;
+  color: var(--fl-muted);
+  font-size: 1.125rem;
+}
+
+.fl-legal {
+  margin-top: 40px;
+  line-height: 1.8;
+}
+
+.fl-legal > * + *,
+.fl-legal .content-section > * + * {
+  margin-top: 16px;
+}
+
+.fl-legal > :first-child {
+  margin-top: 0;
+}
+
+.fl-legal p {
+  margin-bottom: 0;
+}
+
+.fl-legal h2 {
+  font-size: 1.625rem;
+  letter-spacing: -0.02em;
+}
+
+.fl-legal h3 {
+  margin-top: 28px;
+  font-size: 1.25rem;
+}
+
+.fl-legal h4 {
+  margin-top: 24px;
+  font-size: 1.0625rem;
+}
+
+.fl-legal ul,
+.fl-legal ol {
+  padding-left: 24px;
+}
+
+.fl-legal ul {
+  list-style: disc;
+}
+
+.fl-legal ol {
+  list-style: decimal;
+}
+
+.fl-legal li + li,
+.fl-legal li > ul,
+.fl-legal li > ol {
+  margin-top: 8px;
+}
+
+.fl-legal li::marker {
+  color: var(--fl-link);
+}
+
+.fl-legal blockquote {
+  margin-inline: 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--fl-link);
+  color: var(--fl-muted);
+}
+
+.fl-legal hr {
+  margin-block: 40px;
+  border: 0;
+  border-top: 1px solid var(--fl-rule);
+}
+
+.fl-legal table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.fl-legal th,
+.fl-legal td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--fl-rule);
+  text-align: left;
+}
+
+/* The contents list: a card of links, one per section. */
+.fl-legal .content-toc {
+  padding: 22px 24px;
+  border: 1px solid var(--fl-rule);
+  border-radius: 16px;
+  background: var(--color-base-100);
+}
+
+.fl-legal .content-toc ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  list-style: none;
+}
+
+.fl-legal .content-toc li + li {
+  margin-top: 0;
+}
+
+.fl-legal .content-section {
+  margin-top: 44px;
+}
+
+.fl-legal .content-section--divider {
+  padding-top: 32px;
+  border-top: 1px solid var(--fl-rule);
+}
+
+/* A card: a badge in carbon beside its body, like an instrument readout. */
+.fl-legal .content-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 22px 24px;
+  border: 1px solid var(--fl-rule);
+  border-radius: 16px;
+  background: var(--color-base-100);
+}
+
+.fl-legal .content-card__badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--color-carbon);
+  color: var(--color-instrument);
+  font: 600 0.8125rem / 1 var(--font-mono);
+  text-transform: uppercase;
+}
+
+/* Amber marks the card that asks for action, as it marks records elsewhere. */
+.fl-legal .content-card--accent .content-card__badge {
+  background: var(--color-amber);
+  color: var(--color-carbon);
+}
+
+.fl-legal .content-card__body {
+  min-width: 0;
+}
+
+.fl-legal .content-card__body > * + * {
+  margin-top: 8px;
+}
+
+.fl-legal .content-card__body h3 {
+  margin-top: 0;
+}
+
+@media (width < 768px) {
+  .fl-legal-page {
+    width: calc(100% - 40px);
+    padding-block: 32px 64px;
+  }
+
+  .fl-legal .content-card {
+    flex-direction: column;
+  }
+}
+
+@media (width < 390px) {
+  .fl-legal-page {
+    width: calc(100% - 32px);
+  }
+}

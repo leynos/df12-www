@@ -30,7 +30,12 @@
   vertical-align: middle;
 }
 
+/* The masthead stays in view; anchor targets clear it through the root's
+   scroll padding in base.css. */
 .fl-mast {
+  position: sticky;
+  top: 0;
+  z-index: 40;
   border-bottom: 1px solid var(--fl-rule);
 }
 
@@ -74,6 +79,20 @@
   align-items: center;
   gap: 8px;
   min-height: 44px;
+}
+
+/* The way back to df12 reads as a utility, set apart from the destinations. */
+.fl-nav .fl-nav__up {
+  padding-right: 20px;
+  border-right: 1px solid var(--fl-rule);
+}
+
+.fl-nav__up a {
+  color: var(--fl-muted);
+}
+
+.fl-nav__up a:hover {
+  color: var(--fl-ink);
 }
 
 .fl-nav a[aria-current] {
@@ -129,7 +148,10 @@
   min-height: 48px;
 }
 
+/* An open menu scrolls within the sticky masthead rather than past it. */
 .fl-mobile nav {
+  max-height: calc(100dvh - 104px);
+  overflow-y: auto;
   padding-block: 16px;
 }
 

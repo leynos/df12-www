@@ -20,9 +20,9 @@
     <header class="fl-mast fl-dark">
       <div class="fl-shell fl-mast__inner">
         <a class="fl-wordmark" href="/femtologging/" aria-label="femtologging home"><img src="/femtologging/assets/logos/lockup-reversed.svg" alt="femtologging" width="204" height="40"></a>
-        <nav class="fl-nav" aria-label="Primary"><ul>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}</ul></nav>
+        <nav class="fl-nav" aria-label="Primary"><ul><li class="fl-nav__up"><a href="/"><span aria-hidden="true">←&nbsp;</span>df12</a></li>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}</ul></nav>
         <div class="fl-mast__actions"><a class="fl-mast__github" href="{{ repository_url }}">GitHub {{ ui.icon('branch') }}</a>{{ ui.button('Get started', '/femtologging/getting-started/') }}</div>
-        <details class="fl-mobile"><summary>Menu {{ ui.icon('branch') }}</summary><nav aria-label="Mobile primary"><ul>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}<li><a href="/femtologging/getting-started/">Get started</a></li><li><a class="fl-mast__github" href="{{ repository_url }}">GitHub</a></li><li><a href="/">← df12</a></li></ul></nav></details>
+        <details class="fl-mobile"><summary>Menu {{ ui.icon('branch') }}</summary><nav aria-label="Mobile primary"><ul><li class="fl-nav__up"><a href="/"><span aria-hidden="true">←&nbsp;</span>df12</a></li>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}<li><a href="/femtologging/getting-started/">Get started</a></li><li><a class="fl-mast__github" href="{{ repository_url }}">GitHub</a></li></ul></nav></details>
       </div>
     </header>
     <main id="main-content">{% block content %}{% endblock %}</main>

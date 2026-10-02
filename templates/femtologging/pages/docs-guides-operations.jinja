@@ -1,0 +1,17 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides-operations'] %}
+{% block article_body %}
+<section aria-labelledby="pressure"><h2 id="pressure">Observe each queue boundary</h2>
+<p>The logger has a bounded queue with default capacity 1024. A saturated logger queue drops records and reports pressure through <code>get_dropped()</code> and rate-limited warnings. Handler capacities are independently configurable through builders; 1024 is not a universal maximum.</p><p>File policies are drop, block, or timeout. A blocking handler policy can stall dispatch and cause pressure upstream. It does not make the logger queue durable. Monitor both logger drops and handler diagnostics.</p>
+</section>
+<section aria-labelledby="flush"><h2 id="flush">Stop producers before draining</h2>
+<ol><li>Stop new logging calls.</li><li>Wait for any application-specific delivery acknowledgement when Python callbacks or handlers are involved.</li><li>Call <code>flush_handlers()</code> on the logger, then on ancestor loggers that own output. Check each boolean result.</li><li>Detach and close explicitly owned handlers. Release configured native handler references only after the queues drain.</li></ol><div class="fl-note"><p>Source verification at revision <code>{{ femto_revision[:7] }}</code> found that an immediate logger flush can time out while a queued Python handler waits for the GIL. The worked examples wait on an Event set during delivery before flushing. A sleep of arbitrary duration is not a delivery acknowledgement.</p></div><p>Logger drain has a two-second bound. Stream flush defaults to one second and returns False for failure, closure, a disconnected worker, or timeout. Successful flush is not a promise of durable storage beyond the underlying I/O contract.</p>
+</section>
+<section aria-labelledby="missing"><h2 id="missing">Investigate missing output</h2>
+<ul><li>Check effective levels, filters, propagation, and attached handlers.</li><li>Check logger drops and worker warnings before increasing capacity.</li><li>Check permissions, disk state, frame sizes, credentials, and endpoint reachability.</li><li>Check every flush result and keep the process alive long enough for bounded close.</li></ul><p>HTTP close can abandon an unresponsive worker after the write timeout. Queued requests may complete only if the process continues running. Avoid shutdown paths that assume all network records have arrived.</p>
+</section>
+<section aria-labelledby="sensitive"><h2 id="sensitive">Keep destinations explicit</h2>
+<p>Secrets, access tokens, personal data, stack traces, and source paths need review before network output. Journald and OpenTelemetry exporters are planned integrations; Rust log/tracing bridges do not imply those exporters exist.</p>
+</section>
+{% endblock %}

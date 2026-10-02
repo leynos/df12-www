@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['architecture'] %}
+{% block article_body %}
+<section aria-labelledby="path"><h2 id="path">Follow the literal record path</h2>
+<ol class="fl-path" aria-label="Architecture record path">{% for name, icon, detail in [('Python', 'record', 'Capture and validate'), ('Logger', 'branch', 'Filter and route'), ('Channel', 'queue', 'Bounded dispatch'), ('Handler', 'worker', 'Dedicated worker'), ('Output', 'output', 'I/O and flush')] %}<li>{{ ui.icon(icon) }}<strong>{{ name }}</strong><span>{{ detail }}</span></li>{% endfor %}</ol><p>PyO3 exposes the runtime to Python. Producer-side level checks, callback filters, exception capture, and context validation happen before dispatch. Rust-owned records then cross crossbeam-channel queues to logger and handler workers.</p>
+</section>
+<section aria-labelledby="boundaries"><h2 id="boundaries">Keep the queue boundaries separate</h2>
+<p>Dotted-name propagation determines which loggers see the record. Each queued record captures its handler set. Removing a handler affects future records; it does not rewrite pending dispatch.</p><p>Output workers isolate file and network I/O from the ordinary producer path. Python handlers and formatters still require the GIL. Bounded queues, callback cost, and blocking handler policies prevent a blanket guarantee of non-blocking logging.</p>
+</section>
+<section aria-labelledby="survey"><h2 id="survey">Survey the machinery</h2>
+{{ ui.plate('panorama', 'wide', sizes='(width < 1024px) 100vw, 860px') }}<p>The survey plate makes boundaries memorable; the literal path above defines the software model. The plate’s numbered markers follow the same order as that path. <a href="/femtologging/docs/guides/operations/">Read the capacity and shutdown contracts.</a></p>
+</section>
+{% endblock %}

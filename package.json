@@ -9,7 +9,7 @@
     "build:js": "bun run scripts/compile-browser-scripts.ts",
     "build:search": "bun run scripts/build-netsuke-search-index.mjs && bun run scripts/build-episodic-search-index.mjs",
     "check:search": "bun run scripts/build-episodic-search-index.mjs --check",
-    "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify && bun run build:css:mxd && bun run build:css:episodic && bun run build:css:weaver && bun run build:css:stilyagi && bun run build:css:netsuke && bun run build:css:cuprum && bun run build:css:rstest-bdd",
+    "build:css": "bunx tailwindcss -i ./src/styles/site.css -o ./public/assets/site.css --minify && bun run build:css:mxd && bun run build:css:episodic && bun run build:css:weaver && bun run build:css:stilyagi && bun run build:css:netsuke && bun run build:css:cuprum && bun run build:css:rstest-bdd && bun run build:css:femtologging",
     "build:css:mxd": "bunx tailwindcss -i ./src/styles/mxd.css -o ./public/mxd/assets/tailwind.css --minify",
     "build:css:episodic": "bunx tailwindcss -i ./src/styles/episodic.css -o ./public/episodic/assets/styles/tailwind.css --minify",
     "build:css:weaver": "bunx tailwindcss -i ./src/styles/weaver.css -o ./public/weaver/assets/styles/weaver.css --minify",
@@ -27,7 +27,8 @@
     "typecheck:js": "tsc -p tsconfig.browser.json --noEmit && tsc -p tsconfig.scripts.json --noEmit",
     "lint:js:fix": "biome check --write .",
     "test:js": "bun test tests/js",
-    "bump": "uv run pages bump"
+    "bump": "uv run pages bump",
+    "build:css:femtologging": "bunx tailwindcss -i ./src/styles/femtologging.css -o ./public/femtologging/assets/styles/femtologging.css --minify"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

@@ -2444,3 +2444,10 @@ bun add -d playwright
 bun x playwright install chromium
 uv run pytest tests/test_stilyagi_focus.py -v
 ```
+
+## femtologging sub-site
+
+The femtologging site follows the native YAML/Jinja/static-asset pipeline. See
+[femtologging sub-site](femtologging-site.md) for its prospective release
+status, API inventory, image provenance, Pygments generation, and executable
+sample verification. Its legal notices use the shared Markdown mechanism.

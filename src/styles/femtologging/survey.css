@@ -1,0 +1,965 @@
+/*
+ * The survey instrument: plates, the cover, specimen cards, and the dark
+ * surfaces they sit on. Colour comes from theme tokens; the only literals are
+ * mask alphas and the noise filter's white, neither of which is a palette role.
+ */
+
+.fl-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Carbon with specimen-chamber glow and secondary-electron grain. */
+.fl-grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.fl-grain::before,
+.fl-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.fl-grain::before {
+  background:
+    radial-gradient(
+      60% 70% at 88% 18%,
+      color-mix(in oklab, var(--color-amber) 13%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 60% at 6% 96%,
+      color-mix(in oklab, var(--color-instrument) 9%, transparent),
+      transparent 70%
+    );
+}
+
+.fl-grain::after {
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The microscope field's reticle: a faint square lattice behind a band. */
+.fl-lattice {
+  background-image:
+    linear-gradient(var(--fl-reticle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fl-reticle) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
+}
+
+.fl-tagline {
+  font: 0.75rem / 1.7 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+/* ---- Plates ------------------------------------------------------------ */
+
+.fl-plate {
+  margin: 0;
+  min-width: 0;
+}
+
+.fl-plate__field {
+  position: relative;
+  container-type: inline-size;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--color-carbon);
+  box-shadow: 0 32px 80px -48px color-mix(in oklab, var(--color-amber) 55%, transparent);
+}
+
+.fl-plate__field img {
+  width: 100%;
+}
+
+.fl-plate figcaption {
+  display: grid;
+  gap: 8px;
+  padding-top: 14px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--fl-muted);
+}
+
+.fl-plate__text {
+  display: grid;
+  gap: 4px;
+}
+
+/* The instrument strip printed along the foot of every micrograph. */
+.fl-databar {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  padding: 6px 14px;
+  background: var(--color-carbon);
+  border-top: 1px solid var(--color-rule-dark);
+  color: var(--color-muted-dark);
+  font: 0.6875rem / 1.6 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The strip sheds detail as the plate narrows, never wrapping a field. */
+@container (width < 560px) {
+  .fl-databar__mode {
+    display: none;
+  }
+}
+
+@container (width < 320px) {
+  .fl-databar {
+    justify-content: flex-end;
+    padding-inline: 10px;
+  }
+
+  .fl-databar > span:first-child {
+    display: none;
+  }
+}
+
+.fl-scale {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-alumina);
+  white-space: nowrap;
+
+  /* Units are case-sensitive: uppercase turns µm into a Greek capital that reads as MM. */
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.fl-scale__bar {
+  display: inline-block;
+  width: 56px;
+  height: 7px;
+  border: 1.5px solid currentcolor;
+  border-top: 0;
+}
+
+.fl-scale__note {
+  color: var(--color-muted-dark);
+}
+
+.fl-marker {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+
+  /* Centre the dot, not the dot and its label, on the point. */
+  translate: -14px -50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fl-marker__dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--color-instrument);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--color-carbon) 85%, transparent);
+  color: var(--color-alumina);
+  font: 600 0.75rem / 1 var(--font-mono);
+  box-shadow: 0 0 18px color-mix(in oklab, var(--color-instrument) 55%, transparent);
+}
+
+.fl-marker__label {
+  display: none;
+}
+
+.fl-legend {
+  list-style: none;
+  counter-reset: legend;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 8px 24px;
+  margin: 4px 0 0;
+  padding: 0;
+}
+
+.fl-legend li {
+  counter-increment: legend;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.fl-legend li::before {
+  content: counter(legend);
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--fl-link);
+  border-radius: 50%;
+  font: 600 0.6875rem / 1 var(--font-mono);
+  color: var(--fl-ink);
+}
+
+.fl-legend strong {
+  color: var(--fl-ink);
+  font-weight: 600;
+}
+
+/* A plate set wide in a section or article. */
+.fl-plate--wide {
+  margin-block: 40px;
+}
+
+.fl-article .fl-plate {
+  margin-block: 32px;
+}
+
+/* Page-head plates crop to one frame; they carry no markers. */
+.fl-plate--head .fl-plate__field img {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+/* ---- Cover ------------------------------------------------------------- */
+
+.fl-cover {
+  display: grid;
+  overflow: hidden;
+  border-bottom: 1px solid var(--fl-rule);
+}
+
+.fl-cover > * {
+  grid-area: 1 / 1;
+}
+
+.fl-cover__copy {
+  position: relative;
+  z-index: 1;
+  place-self: center center;
+  width: min(1280px, calc(100% - 80px));
+  padding-block: 72px 112px;
+}
+
+.fl-cover__copy > * {
+  max-width: min(38rem, 46%);
+}
+
+.fl-cover h1 {
+  margin: 20px 0 16px;
+  font-size: clamp(3.25rem, 6vw, 6.25rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.fl-cover h1 em {
+  font-style: normal;
+  color: var(--color-instrument);
+  text-shadow: 0 0 48px color-mix(in oklab, var(--color-instrument) 45%, transparent);
+}
+
+.fl-cover__line {
+  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+
+.fl-cover__copy-text {
+  color: var(--fl-muted);
+  font-size: 1.0625rem;
+}
+
+.fl-plate--cover {
+  place-self: start end;
+  width: min(72%, 1240px);
+}
+
+.fl-plate--cover .fl-plate__field {
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* The plate dissolves into the carbon under the headline and the strip. */
+.fl-plate--cover .fl-plate__field img {
+  mask-image:
+    linear-gradient(to right, transparent 0, black 34%),
+    linear-gradient(to top, transparent 0, black 22%);
+  mask-composite: intersect;
+}
+
+.fl-plate--cover .fl-databar {
+  background: transparent;
+  border: 0;
+  padding-inline: 24px 40px;
+  justify-content: flex-end;
+  gap: 32px;
+}
+
+.fl-plate--cover figcaption {
+  padding: 0 40px 28px 24px;
+  justify-items: end;
+  text-align: right;
+}
+
+.fl-plate--cover .fl-marker__label {
+  display: grid;
+  gap: 2px;
+  padding: 8px 12px;
+  border-left: 2px solid var(--color-instrument);
+  background: color-mix(in oklab, var(--color-carbon) 88%, transparent);
+  color: var(--color-muted-dark);
+  font: 0.6875rem / 1.45 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fl-plate--cover .fl-marker__label strong {
+  color: var(--color-alumina);
+  font-weight: 600;
+}
+
+.fl-marker--left {
+  flex-direction: row-reverse;
+  translate: calc(-100% + 14px) -50%;
+}
+
+.fl-plate--cover .fl-marker--left .fl-marker__label {
+  border-left: 0;
+  border-right: 2px solid var(--color-instrument);
+  text-align: right;
+}
+
+/* On the cover the markers carry their own labels, so the legend is for assistive technology. */
+.fl-plate--cover .fl-legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Each fact hangs from its own rule, so the row wraps cleanly at any width. */
+.fl-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+  margin: 40px 0 0;
+}
+
+.fl-facts > div {
+  padding-top: 12px;
+  border-top: 1px solid var(--fl-rule);
+}
+
+.fl-facts dt {
+  color: var(--fl-link);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.fl-facts dd {
+  margin: 2px 0 0;
+  color: var(--fl-muted);
+  font: 0.8125rem / 1.5 var(--font-mono);
+}
+
+/* ---- Capabilities ------------------------------------------------------ */
+
+.fl-capabilities {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.fl-capabilities li {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 28px;
+  border: 1px solid var(--fl-rule);
+  border-radius: 14px;
+  background: var(--fl-surface);
+  transition: border-color 160ms ease;
+}
+
+.fl-capabilities li:hover,
+.fl-capabilities li:focus-within {
+  border-color: var(--fl-link);
+}
+
+.fl-capabilities__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--fl-link);
+  border-radius: 12px;
+  color: var(--fl-link);
+}
+
+.fl-capabilities h3 {
+  margin: 8px 0 0;
+  font-size: 1.25rem;
+}
+
+.fl-capabilities p {
+  flex: 1;
+  margin: 0;
+  color: var(--fl-muted);
+  font-size: 0.9375rem;
+}
+
+.fl-capabilities a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 500;
+}
+
+/* ---- Magnification series ---------------------------------------------- */
+
+.fl-series {
+  margin: 0;
+}
+
+.fl-series ol {
+  list-style: none;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 44px 0 0;
+}
+
+/* The magnification rail joins the five fields of view. */
+.fl-series ol::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  inset-inline: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-rule-dark), var(--color-instrument));
+}
+
+.fl-series li {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+
+.fl-series li::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  translate: -50% 0;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-instrument);
+  border-radius: 50%;
+  background: var(--color-carbon);
+}
+
+.fl-series li:last-child::before {
+  width: 16px;
+  height: 16px;
+  top: -42px;
+  background: var(--color-instrument);
+  box-shadow: 0 0 16px var(--color-instrument);
+}
+
+.fl-series img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid var(--color-rule-dark);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.fl-series__power {
+  color: var(--fl-link);
+  font: 600 0.9375rem / 1.4 var(--font-mono);
+}
+
+.fl-series__title {
+  color: var(--fl-muted);
+  font: 0.8125rem / 1.5 var(--font-mono);
+}
+
+.fl-series figcaption {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--fl-rule);
+  color: var(--fl-muted);
+  font-size: 0.875rem;
+}
+
+/* ---- Record path ------------------------------------------------------- */
+
+.fl-path {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.fl-path li {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 22px;
+  border: 1px solid var(--fl-rule);
+  border-radius: 12px;
+  background: var(--fl-surface);
+}
+
+/* A chevron in each gap reads as the direction of travel. */
+.fl-path li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  width: 8px;
+  height: 8px;
+  border-top: 1.5px solid var(--fl-link);
+  border-right: 1.5px solid var(--fl-link);
+  rotate: 45deg;
+  translate: 0 -50%;
+}
+
+.fl-path__step {
+  color: var(--fl-muted);
+  font: 0.6875rem / 1.4 var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.fl-path .fl-icon {
+  color: var(--fl-link);
+  margin-block: 6px 4px;
+}
+
+.fl-path strong {
+  font-size: 1.0625rem;
+}
+
+.fl-path li > span:last-child {
+  color: var(--fl-muted);
+  font-size: 0.875rem;
+}
+
+/* ---- Specimens --------------------------------------------------------- */
+
+.fl-specimens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 20px;
+}
+
+.fl-specimen {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--fl-rule);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--fl-surface);
+}
+
+.fl-specimen .fl-plate__field {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.fl-specimen .fl-plate__field img {
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+.fl-specimen figcaption {
+  padding: 12px 22px 0;
+  font-size: 0.8125rem;
+}
+
+.fl-specimen__notes {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 12px 22px 24px;
+}
+
+.fl-specimen h3 {
+  margin: 6px 0 2px;
+  font-size: 1.375rem;
+}
+
+.fl-specimen__species {
+  margin: 0 0 12px;
+  color: var(--fl-muted);
+  font-style: italic;
+}
+
+.fl-specimen__notes > p:not([class]) {
+  flex: 1;
+  font-size: 0.9375rem;
+}
+
+.fl-specimen a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 500;
+}
+
+/* ---- Page heads -------------------------------------------------------- */
+
+.fl-page-head {
+  padding-block: 64px 56px;
+  border-bottom: 1px solid var(--fl-rule);
+}
+
+.fl-page-head__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 56px;
+  align-items: center;
+}
+
+.fl-page-head h1 {
+  font-size: clamp(2.5rem, 4.5vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  max-width: 20ch;
+  margin: 20px 0;
+}
+
+.fl-deck {
+  max-width: 58ch;
+  font-size: 1.25rem;
+  color: var(--fl-muted);
+}
+
+/* ---- Output ------------------------------------------------------------ */
+
+.fl-output {
+  --fl-focus: var(--color-amber);
+
+  display: grid;
+  margin-block: 16px 32px;
+  border: 1px solid var(--color-rule-dark);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--color-carbon);
+}
+
+.fl-output__head {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--color-rule-dark);
+  color: var(--color-muted-dark);
+  font: 0.75rem / 1.5 var(--font-mono);
+}
+
+/* Log lines glow amber: they are the transported records. */
+.fl-output samp {
+  padding: 16px 20px;
+  color: var(--color-amber);
+  font: 0.875rem / 1.6 var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Roadmap ----------------------------------------------------------- */
+
+.fl-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 0.75rem / 1.5 var(--font-mono);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--fl-muted);
+}
+
+.fl-status--done {
+  color: var(--color-primary);
+}
+
+.fl-status--explore {
+  color: var(--color-warning);
+}
+
+.fl-checklist {
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.fl-article .fl-checklist {
+  padding: 0;
+}
+
+.fl-checklist li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.fl-checklist .fl-icon {
+  color: var(--color-primary);
+}
+
+.fl-checklist__box {
+  width: 18px;
+  height: 18px;
+  margin: 4px 0 0 3px;
+  border: 1.5px solid var(--fl-muted);
+  border-radius: 4px;
+}
+
+.fl-whatifs {
+  display: grid;
+  gap: 20px;
+  margin-block: 24px;
+}
+
+.fl-whatif {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+  padding: 20px;
+  border: 1px solid var(--fl-rule);
+  border-radius: 16px;
+  background: var(--fl-surface);
+}
+
+.fl-whatif h3 {
+  margin-top: 4px;
+}
+
+.fl-whatif figcaption {
+  font-size: 0.8125rem;
+}
+
+/* ---- Closing band ------------------------------------------------------ */
+
+.fl-closing-band {
+  background-image:
+    linear-gradient(
+      90deg,
+      var(--color-carbon) 40%,
+      color-mix(in oklab, var(--color-carbon) 70%, transparent)
+    ),
+    url("/femtologging/assets/images/mag-b-half.webp");
+  background-position:
+    center,
+    right center;
+  background-size:
+    cover,
+    60% auto;
+  background-repeat: no-repeat;
+}
+
+.fl-closing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding-block: 88px;
+}
+
+.fl-closing h2 {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  letter-spacing: -0.04em;
+  margin: 12px 0;
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+
+@media (width < 1200px) {
+  .fl-cover > * {
+    grid-area: auto;
+  }
+
+  .fl-cover__copy {
+    padding-block: 48px 16px;
+  }
+
+  .fl-cover__copy > * {
+    max-width: 40rem;
+  }
+
+  .fl-plate--cover {
+    width: 100%;
+  }
+
+  .fl-plate--cover .fl-plate__field img {
+    mask-image: linear-gradient(to bottom, transparent 0, black 18%);
+    mask-composite: add;
+  }
+
+  /* Stacked, the strip sits over the bright foot of the plate. */
+  .fl-plate--cover .fl-databar {
+    background: var(--color-carbon);
+    border-top: 1px solid var(--color-rule-dark);
+    justify-content: space-between;
+    padding-inline: 20px;
+  }
+
+  .fl-plate--cover .fl-marker__label {
+    display: none;
+  }
+
+  .fl-plate--cover .fl-legend {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    text-align: left;
+    justify-self: stretch;
+  }
+
+  .fl-plate--cover figcaption {
+    width: min(1280px, calc(100% - 80px));
+    margin-inline: auto;
+    padding: 16px 0 32px;
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+@media (width < 1024px) {
+  .fl-capabilities {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fl-series ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 0;
+  }
+
+  .fl-series ol::before,
+  .fl-series li::before {
+    display: none;
+  }
+
+  /* The final field earns the full width: it is the reveal. */
+  .fl-series li:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .fl-series li:last-child img {
+    aspect-ratio: 16 / 9;
+    object-position: 50% 35%;
+  }
+
+  .fl-path {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .fl-path li:nth-child(3)::after {
+    display: none;
+  }
+
+  .fl-page-head__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+}
+
+@media (width < 768px) {
+  .fl-cover h1 {
+    font-size: clamp(2.75rem, 12vw, 4.5rem);
+  }
+
+  .fl-plate--cover figcaption {
+    width: calc(100% - 40px);
+  }
+
+  .fl-capabilities,
+  .fl-path {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fl-path li:not(:last-child)::after {
+    top: auto;
+    bottom: -12px;
+    right: 50%;
+    rotate: 135deg;
+    translate: 50% 0;
+  }
+
+  .fl-path li:nth-child(3)::after {
+    display: block;
+  }
+
+  .fl-tagline {
+    text-align: left;
+  }
+
+  .fl-whatif {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .fl-closing {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding-block: 56px;
+  }
+
+  .fl-closing-band {
+    background-size: cover, cover;
+  }
+
+  .fl-page-head {
+    padding-block: 40px 32px;
+  }
+}
+
+@media (width < 390px) {
+  .fl-cover__copy,
+  .fl-plate--cover figcaption {
+    width: calc(100% - 32px);
+  }
+}
+
+.fl-article .fl-path {
+  padding: 0;
+}
+
+.fl-article .fl-path li {
+  margin: 0;
+}

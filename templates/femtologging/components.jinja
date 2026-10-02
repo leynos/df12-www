@@ -1,0 +1,49 @@
+{% from 'data/plates.jinja' import plates %}
+{% macro icon(name) -%}
+<svg class="fl-icon" aria-hidden="true" width="24" height="24"><use href="/femtologging/assets/icons/sprite.svg#{{ name }}"></use></svg>
+{%- endmacro %}
+{% macro button(label, href, secondary=false) -%}
+<a class="fl-button{% if secondary %} fl-button--outline{% endif %}" href="{{ href }}">{{ label }}{{ icon('arrow-right') }}</a>
+{%- endmacro %}
+
+{#- A survey plate. The raster carries no labels: markers, the instrument bar,
+    and the caption are HTML, and the legend repeats every marker for assistive
+    technology, so the markers themselves are hidden from it. -#}
+{% macro plate(key, variant='', eager=false, sizes='100vw') -%}
+{%- set p = plates[key] -%}
+<figure class="fl-plate{% if variant %} fl-plate--{{ variant }}{% endif %}">
+  <div class="fl-plate__field">
+    <img src="/femtologging/assets/images/{{ p.file }}.webp" srcset="/femtologging/assets/images/{{ p.file }}-half.webp {{ p.width // 2 }}w, /femtologging/assets/images/{{ p.file }}.webp {{ p.width }}w" sizes="{{ sizes }}" alt="{{ p.alt }}" width="{{ p.width }}" height="{{ p.height }}" decoding="async" loading="{{ 'eager' if eager else 'lazy' }}"{% if eager %} fetchpriority="high"{% endif %}>
+    {%- for c in p.callouts %}<span class="fl-marker{% if c.side == 'left' %} fl-marker--left{% endif %}" style="--x: {{ c.x }}%; --y: {{ c.y }}%" aria-hidden="true"><span class="fl-marker__dot">{{ loop.index }}</span><span class="fl-marker__label"><strong>{{ c.title }}</strong>{{ c.text }}</span></span>{% endfor %}
+    <p class="fl-databar"><span>{{ p.specimen }}</span><span class="fl-databar__mode">SE · false colour · simulated</span>{{ scale_bar(p.scale) }}</p>
+  </div>
+  <figcaption>
+    <span class="fl-plate__text"><span class="fl-label">Plate {{ p.plate }}</span><span class="fl-plate__caption">{{ p.caption }}</span></span>
+    {%- if p.callouts %}<ol class="fl-legend">{% for c in p.callouts %}<li><span><strong>{{ c.title }}.</strong> {{ c.text }}</span></li>{% endfor %}</ol>{% endif %}
+  </figcaption>
+</figure>
+{%- endmacro %}
+{% macro scale_bar(value) -%}
+<span class="fl-scale"><span class="fl-scale__bar"></span><span>{{ value }} <span class="fl-scale__note">illustrative scale</span></span></span>
+{%- endmacro %}
+{% macro specimen_card(s, number) -%}
+<article class="fl-specimen">
+  {{ plate(s.plate, 'specimen', sizes='(width < 768px) 100vw, 420px') }}
+  <div class="fl-specimen__notes">
+    <p class="fl-label">Fig. {{ number }} · {{ s.role }}</p>
+    <h3>{{ s.name }}</h3>
+    <p class="fl-specimen__species">{{ s.species }}</p>
+    <p>{{ s.note }}</p>
+    <a href="{{ s.href }}">{{ s.link }} {{ icon('arrow-right') }}</a>
+  </div>
+</article>
+{%- endmacro %}
+{% macro section_head(id, kicker, title, tagline='', lede='') -%}
+<div class="fl-section__head"><div><p class="fl-label">{{ kicker }}</p><h2 id="{{ id }}">{{ title }}</h2>{% if lede %}<p class="fl-intro">{{ lede }}</p>{% endif %}</div>{% if tagline %}<p class="fl-tagline">{{ tagline }}</p>{% endif %}</div>
+{%- endmacro %}
+{% macro page_head(kicker, title, intro, plate_key=none) -%}
+<header class="fl-page-head fl-dark fl-grain"><div class="fl-shell{% if plate_key %} fl-page-head__grid{% endif %}"><div class="fl-page-head__copy"><p class="fl-label">{{ kicker }}</p><h1>{{ title }}</h1><p class="fl-deck">{{ intro }}</p><p class="fl-version">0.2.0 surface · {{ femto_version }} forthcoming</p></div>{% if plate_key %}{{ plate(plate_key, 'head', eager=true, sizes='(width < 1024px) 100vw, 560px') }}{% endif %}</div></header>
+{%- endmacro %}
+{% macro route_list(items) -%}
+<div class="fl-route-list">{% for item in items %}<a href="/femtologging/{{ item.slug }}/"><span class="fl-label">{{ '%02d' | format(loop.index) }}</span><span><strong>{{ item.title }}</strong><span>{{ item.intro }}</span></span>{{ icon('arrow-right') }}</a>{% endfor %}</div>
+{%- endmacro %}

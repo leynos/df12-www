@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['performance'] %}
+{% block article_body %}
+<section aria-labelledby="evidence"><h2 id="evidence">Evidence status</h2>
+<p>This site publishes no throughput multiplier or latency guarantee. The source contains a benchmark design, but that alone cannot substantiate a comparison. The illustration plates contain no runtime measurements.</p>
+</section>
+<section aria-labelledby="measure"><h2 id="measure">Keep the workload accountable</h2>
+<ul><li>Producer latency: time the logging call, including formatting, filters, and validation.</li><li>Delivery latency: observe the output, not merely enqueue completion.</li><li>Saturation: record queue capacities, policies, accepted calls, delivered records, drops, and warnings.</li><li>Shutdown: wait for every output boundary and report failed flushes.</li></ul><p>Record Python and Rust versions, dependency versions, CPU, operating system, handler transport, message sizes, producer counts, warm-up, and repeat count. Compare equivalent formatting and destinations.</p>
+</section>
+<section aria-labelledby="reproduce"><h2 id="reproduce">Start from the benchmark design</h2>
+<p><a href="{{ source_base }}/docs/benchmarking-and-optimization-design.md">Read the source benchmark methodology.</a> Performance results belong here when runnable artefacts, output accounting, and workload metadata exist. A smaller queue or discarded output is not an optimization result.</p>
+</section>
+{% endblock %}

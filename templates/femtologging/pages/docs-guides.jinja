@@ -1,0 +1,8 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides'] %}
+{% block article_body %}
+<section><h2 id='contents'>Task guides</h2>
+{{ ui.route_list(catalogue.values() | selectattr('group', 'equalto', 'Guides') | list) }}
+</section>
+{% endblock %}

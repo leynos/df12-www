@@ -1,0 +1,73 @@
+/* Native df12 build entry. The specimen pack supplies the palette, not CSS. */
+@import "tailwindcss";
+@import "./femtologging/fonts.css";
+@import "./femtologging/base.css" layer(base);
+@import "./femtologging/chrome.css" layer(components);
+@import "./femtologging/content.css" layer(components);
+@import "./femtologging/survey.css" layer(components);
+@import "./femtologging/legal.css" layer(components);
+@import "./femtologging/syntax.css" layer(components);
+
+@source "../../templates/femtologging/**/*.jinja";
+
+@plugin "daisyui" {
+  themes: femto --default;
+  logs: false;
+}
+
+@plugin "daisyui/theme" {
+  name: "femto";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #f2eee6;
+  --color-base-200: #d8d5ce;
+  --color-base-300: #aeb8bf;
+  --color-base-content: #12171b;
+  --color-primary: #14615c;
+  --color-primary-content: #f2eee6;
+  --color-secondary: #12171b;
+  --color-secondary-content: #f2eee6;
+  --color-accent: #e1a64b;
+  --color-accent-content: #12171b;
+  --color-neutral: #1d252b;
+  --color-neutral-content: #f2eee6;
+  --color-info: #14615c;
+  --color-info-content: #f2eee6;
+  --color-success: #14615c;
+  --color-success-content: #f2eee6;
+  --color-warning: #78500c;
+  --color-warning-content: #f2eee6;
+  --color-error: #a13c2f;
+  --color-error-content: #f2eee6;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.875rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --color-carbon: #12171b;
+  --color-graphite: #1d252b;
+  --color-alumina: #f2eee6;
+  --color-instrument: #63d6cf;
+  --color-amber: #e1a64b;
+  --color-muted-light: #5a646b;
+  --color-muted-dark: #aeb8bf;
+
+  /* The pale teal is for dark grounds; light-surface links use primary. */
+  --color-link-dark: #63d6cf;
+  --color-rule-light: #c2c3bc;
+  --color-rule-dark: #48545c;
+
+  /* Cards raised off the alumina reading surface. Carbon text holds 16:1,
+     muted ink 5.6:1, and ink teal 6.7:1 on it. */
+  --color-paper-raised: #f8f6f1;
+}

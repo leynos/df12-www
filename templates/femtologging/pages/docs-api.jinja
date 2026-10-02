@@ -1,0 +1,8 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-api'] %}
+{% block article_body %}
+<section><h2 id='contents'>API reference</h2>
+{{ ui.route_list(catalogue.values() | selectattr('group', 'equalto', 'API reference') | list) }}{% from 'data/api.jinja' import internal_exports %}<h3 id="internal-exports">Internal and diagnostic exports</h3><p>The following exports are not an adoption API: <code>reset_manager</code> resets test state; <code>hello</code> is an extension smoke check; <code>rust</code> exposes the extension module. Underscored test hooks are not stable production APIs.</p><ul>{% for name in internal_exports %}<li><code>{{ name }}</code></li>{% endfor %}</ul>
+</section>
+{% endblock %}

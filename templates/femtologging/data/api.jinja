@@ -1,0 +1,514 @@
+{# Public export inventory from source revision f5bcaa8257f4c59a361dc4f41585b9ecccb9f345. #}
+{% set api = {'loggers': [{'name': 'FemtoLogger',
+              'description': 'Named routing, producer-side validation, bounded dispatch, and drop '
+                             'accounting. Logging returns a formatted string or None; it is not a delivery '
+                             'acknowledgement.',
+              'signature': 'class FemtoLogger:\n'
+                           '    def __init__(self, name: str) -> None:\n'
+                           '        ...\n'
+                           '    @property\n'
+                           '    def parent(self) -> str | None:\n'
+                           '        ...\n'
+                           '    @property\n'
+                           '    def level(self) -> str:\n'
+                           '        ...\n'
+                           '    @property\n'
+                           '    def propagate(self) -> bool:\n'
+                           '        ...\n'
+                           '    def log(self, level: LevelArg, message: str, /, *, exc_info: ExcInfo=None, '
+                           'stack_info: bool=False, extra: StructuredFields | None=None) -> str | None:\n'
+                           '        ...\n'
+                           '    def set_level(self, level: LevelArg) -> None:\n'
+                           '        ...\n'
+                           '    def set_propagate(self, flag: bool) -> None:\n'
+                           '        ...\n'
+                           '    def add_handler(self, handler: object) -> None:\n'
+                           '        ...\n'
+                           '    def remove_handler(self, handler: object) -> bool:\n'
+                           '        ...\n'
+                           '    def clear_handlers(self) -> None:\n'
+                           '        ...\n'
+                           '    def clear_filters(self) -> None:\n'
+                           '        ...\n'
+                           '    def get_dropped(self) -> int:\n'
+                           '        ...\n'
+                           '    def flush_handlers(self) -> bool:\n'
+                           '        ...\n'
+                           '    def isEnabledFor(self, level: LevelArg) -> bool:\n'
+                           '        ...\n'
+                           '    def debug(self, message: str, /, *, exc_info: ExcInfo=None, stack_info: '
+                           'bool=False, extra: StructuredFields | None=None) -> str | None:\n'
+                           '        ...\n'
+                           '    def info(self, message: str, /, *, exc_info: ExcInfo=None, stack_info: '
+                           'bool=False, extra: StructuredFields | None=None) -> str | None:\n'
+                           '        ...\n'
+                           '    def warning(self, message: str, /, *, exc_info: ExcInfo=None, stack_info: '
+                           'bool=False, extra: StructuredFields | None=None) -> str | None:\n'
+                           '        ...\n'
+                           '    def error(self, message: str, /, *, exc_info: ExcInfo=None, stack_info: '
+                           'bool=False, extra: StructuredFields | None=None) -> str | None:\n'
+                           '        ...\n'
+                           '    def critical(self, message: str, /, *, exc_info: ExcInfo=None, stack_info: '
+                           'bool=False, extra: StructuredFields | None=None) -> str | None:\n'
+                           '        ...\n'
+                           '    def exception(self, message: str, /, *, exc_info: ExcInfo=True, stack_info: '
+                           'bool=False) -> str | None:\n'
+                           '        ...',
+              'file': '_femtologging_rs.pyi'},
+             {'name': 'get_logger',
+              'description': 'Return the registered singleton for a valid dotted name. Empty or malformed '
+                             'names fail validation.',
+              'signature': '',
+              'file': '__init__.py'},
+             {'name': 'getLogger',
+              'description': 'Compatibility alias for get_logger. It uses the femtologging manager.',
+              'signature': '',
+              'file': '__init__.py'},
+             {'name': 'debug',
+              'description': 'Module-level convenience logging through the root. For per-component '
+                             'ownership, prefer a named logger.',
+              'signature': '',
+              'file': '__init__.py'},
+             {'name': 'info',
+              'description': 'Module-level convenience logging through the root. For per-component '
+                             'ownership, prefer a named logger.',
+              'signature': '',
+              'file': '__init__.py'},
+             {'name': 'warn',
+              'description': 'Module-level convenience logging through the root. For per-component '
+                             'ownership, prefer a named logger.',
+              'signature': '',
+              'file': '__init__.py'},
+             {'name': 'error',
+              'description': 'Module-level convenience logging through the root. For per-component '
+                             'ownership, prefer a named logger.',
+              'signature': '',
+              'file': '__init__.py'}],
+ 'handlers': [{'name': 'FemtoHandler',
+               'description': 'Options and record-facing surface. See the declarations and behavioural guide '
+                              'for supported settings.',
+               'signature': '',
+               'file': '__init__.py'},
+              {'name': 'FemtoStreamHandler',
+               'description': 'stdout/stderr output on a dedicated worker. Flush returns a boolean '
+                              'acknowledgement, not an unconditional success.',
+               'signature': '',
+               'file': '__init__.py'},
+              {'name': 'FemtoFileHandler',
+               'description': 'Worker-backed file output. Defaults: capacity 1024, flush_interval 1 record, '
+                              'policy drop. Flush and close are explicit.',
+               'signature': '',
+               'file': '__init__.py'},
+              {'name': 'FemtoRotatingFileHandler',
+               'description': 'Size-based file rotation. Both max_bytes and backup_count must be positive to '
+                              'enable rollover.',
+               'signature': 'class FemtoRotatingFileHandler:\n'
+                            '    def __init__(self, path: str, options: HandlerOptions | None=...) -> None:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def max_bytes(self) -> int:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def backup_count(self) -> int:\n'
+                            '        ...\n'
+                            '    def handle(self, logger: str, level: LevelArg, message: str) -> None:\n'
+                            '        ...\n'
+                            '    def flush(self) -> bool:\n'
+                            '        ...\n'
+                            '    def close(self) -> None:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'FemtoTimedRotatingFileHandler',
+               'description': 'Scheduled file rotation. A zero backup count keeps all timestamped backups.',
+               'signature': 'class FemtoTimedRotatingFileHandler:\n'
+                            '    def __init__(self, path: str, options: TimedHandlerOptions | None=...) -> '
+                            'None:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def when(self) -> str:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def interval(self) -> int:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def backup_count(self) -> int:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def utc(self) -> bool:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def at_time(self) -> str | None:\n'
+                            '        ...\n'
+                            '    def handle(self, logger: str, level: LevelArg, message: str) -> None:\n'
+                            '        ...\n'
+                            '    def flush(self) -> bool:\n'
+                            '        ...\n'
+                            '    def close(self) -> None:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'FemtoSocketHandler',
+               'description': 'MessagePack output with four-byte length framing. Build via '
+                              'SocketHandlerBuilder. TLS requires TCP; Unix sockets require POSIX.',
+               'signature': '',
+               'file': '__init__.py'},
+              {'name': 'FemtoHTTPHandler',
+               'description': 'Worker-backed HTTP output. Build via HTTPHandlerBuilder. Bounded close may '
+                              'abandon pending requests when the endpoint does not respond.',
+               'signature': '',
+               'file': '__init__.py'},
+              {'name': 'StreamHandlerBuilder',
+               'description': 'Fluent configuration for StreamHandler. Validate options and call build '
+                              'before registering output.',
+               'signature': 'class StreamHandlerBuilder:\n'
+                            '    def __init__(self) -> None:\n'
+                            '        ...\n'
+                            '    @staticmethod\n'
+                            '    def stdout() -> StreamHandlerBuilder:\n'
+                            '        ...\n'
+                            '    @staticmethod\n'
+                            '    def stderr() -> StreamHandlerBuilder:\n'
+                            '        ...\n'
+                            '    def with_capacity(self, capacity: int) -> Self:\n'
+                            '        ...\n'
+                            '    def with_flush_after_ms(self, flush_ms: int) -> Self:\n'
+                            '        ...\n'
+                            '    def with_formatter(self, formatter: object) -> Self:\n'
+                            '        ...\n'
+                            '    def as_dict(self) -> dict[str, object]:\n'
+                            '        ...\n'
+                            '    def build(self) -> FemtoStreamHandler:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'FileHandlerBuilder',
+               'description': 'Fluent configuration for FileHandler. Validate options and call build before '
+                              'registering output.',
+               'signature': 'class FileHandlerBuilder:\n'
+                            '    def __init__(self, path: str) -> None:\n'
+                            '        ...\n'
+                            '    def with_capacity(self, capacity: int) -> Self:\n'
+                            '        ...\n'
+                            '    def with_flush_after_records(self, interval: int) -> Self:\n'
+                            '        ...\n'
+                            '    def with_overflow_policy(self, policy: OverflowPolicy) -> Self:\n'
+                            '        ...\n'
+                            '    def with_formatter(self, formatter: object) -> Self:\n'
+                            '        ...\n'
+                            '    def as_dict(self) -> dict[str, object]:\n'
+                            '        ...\n'
+                            '    def build(self) -> FemtoFileHandler:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'RotatingFileHandlerBuilder',
+               'description': 'Fluent configuration for RotatingFileHandler. Validate options and call build '
+                              'before registering output.',
+               'signature': 'class RotatingFileHandlerBuilder:\n'
+                            '    def __init__(self, path: str) -> None:\n'
+                            '        ...\n'
+                            '    def with_max_bytes(self, max_bytes: int) -> Self:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'TimedRotatingFileHandlerBuilder',
+               'description': 'Fluent configuration for TimedRotatingFileHandler. Validate options and call '
+                              'build before registering output.',
+               'signature': 'class TimedRotatingFileHandlerBuilder:\n'
+                            '    def __init__(self, path: str, options: TimedHandlerOptions | None=...) -> '
+                            'None:\n'
+                            '        ...\n'
+                            '    def with_when(self, when: str) -> Self:\n'
+                            '        ...\n'
+                            '    def with_interval(self, interval: int) -> Self:\n'
+                            '        ...\n'
+                            '    def with_utc(self, use_utc: bool) -> Self:\n'
+                            '        ...\n'
+                            '    def with_at_time(self, at_time: dt.time | None) -> Self:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'SocketHandlerBuilder',
+               'description': 'Fluent configuration for SocketHandler. Validate options and call build '
+                              'before registering output.',
+               'signature': 'class SocketHandlerBuilder:\n'
+                            '    def __init__(self) -> None:\n'
+                            '        ...\n'
+                            '    def with_tcp(self, host: str, port: int) -> Self:\n'
+                            '        ...\n'
+                            '    def with_unix_path(self, path: str) -> Self:\n'
+                            '        ...\n'
+                            '    def with_max_frame_size(self, size: int) -> Self:\n'
+                            '        ...\n'
+                            '    def with_tls(self, domain: str | None=..., *, insecure: bool=...) -> Self:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'HTTPHandlerBuilder',
+               'description': 'Fluent configuration for HTTPHandler. Validate options and call build before '
+                              'registering output.',
+               'signature': 'class HTTPHandlerBuilder:\n'
+                            '    def __init__(self) -> None:\n'
+                            '        ...\n'
+                            '    def with_endpoint(self, url: str, method: str=...) -> Self:\n'
+                            '        ...\n'
+                            '    def with_url(self, url: str) -> Self:\n'
+                            '        ...\n'
+                            '    def with_method(self, method: str) -> Self:\n'
+                            '        ...\n'
+                            '    def with_auth(self, config: HTTPBasicAuthConfig | HTTPTokenAuthConfig) -> '
+                            'Self:\n'
+                            '        ...\n'
+                            '    def with_basic_auth(self, username: str, password: str) -> Self:\n'
+                            '        ...\n'
+                            '    def with_bearer_token(self, token: str) -> Self:\n'
+                            '        ...\n'
+                            '    def with_headers(self, headers: Mapping[str, str]) -> Self:\n'
+                            '        ...\n'
+                            '    def with_json_format(self) -> Self:\n'
+                            '        ...\n'
+                            '    def with_record_fields(self, fields: list[str]) -> Self:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'HandlerOptions',
+               'description': 'Options and record-facing surface. See the declarations and behavioural guide '
+                              'for supported settings.',
+               'signature': 'class HandlerOptions:\n'
+                            '    max_bytes: int\n'
+                            '    backup_count: int\n'
+                            '    def __init__(self, capacity: int=..., flush_interval: int=..., policy: '
+                            'PolicyName=..., rotation: tuple[int, int] | None=...) -> None:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'TimedHandlerOptions',
+               'description': 'Options and record-facing surface. See the declarations and behavioural guide '
+                              'for supported settings.',
+               'signature': 'class TimedHandlerOptions:\n'
+                            '    when: str\n'
+                            '    interval: int\n'
+                            '    backup_count: int\n'
+                            '    utc: bool\n'
+                            '    def __init__(self, capacity: int=..., flush_interval: int=..., policy: '
+                            'PolicyName=..., when: str=..., interval: int=..., backup_count: int=..., utc: '
+                            'bool=..., at_time: dt.time | None=...) -> None:\n'
+                            '        ...\n'
+                            '    @property\n'
+                            '    def at_time(self) -> str | None:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'BackoffConfig',
+               'description': 'Options and record-facing surface. See the declarations and behavioural guide '
+                              'for supported settings.',
+               'signature': 'class BackoffConfig:\n'
+                            '    def __init__(self, config: BackoffConfigDict | None=None) -> None:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'OverflowPolicy',
+               'description': 'File handler queue policy: drop, block, or timeout in milliseconds. It does '
+                              'not change the upstream logger queue policy.',
+               'signature': 'class OverflowPolicy:\n'
+                            '    @staticmethod\n'
+                            '    def drop() -> OverflowPolicy:\n'
+                            '        ...\n'
+                            '    @staticmethod\n'
+                            '    def block() -> OverflowPolicy:\n'
+                            '        ...\n'
+                            '    @staticmethod\n'
+                            '    def timeout(timeout_ms: int) -> OverflowPolicy:\n'
+                            '        ...',
+               'file': '_femtologging_rs.pyi'},
+              {'name': 'StdlibHandlerAdapter',
+               'description': 'Translate rich runtime records to a configured logging.Handler. Configure '
+                              'before registration; flush and close the adapter after delivery.',
+               'signature': 'class StdlibHandlerAdapter:\n'
+                            '    def __init__(self, handler: logging.Handler) -> None:\n'
+                            '        ...\n'
+                            '    @staticmethod\n'
+                            '    def handle(_logger: str, _level: str, _message: str) -> None:\n'
+                            '        ...\n'
+                            '    def handle_record(self, record: FemtoRecord) -> None:\n'
+                            '        ...\n'
+                            '    def flush(self) -> None:\n'
+                            '        ...\n'
+                            '    def close(self) -> None:\n'
+                            '        ...',
+               'file': 'adapter.py'}],
+ 'configuration': [{'name': 'BasicConfig',
+                    'description': 'Slotted configuration in the prospective 0.2.0 surface. Only five '
+                                   'declared fields are supported.',
+                    'signature': 'class BasicConfig:\n'
+                                 '    level: str | int | None = None\n'
+                                 '    filename: str | None = None\n'
+                                 '    stream: typ.TextIO | None = None\n'
+                                 '    force: bool = False\n'
+                                 '    handlers: cabc.Iterable[FemtoHandler] | None = None',
+                    'file': '_basic_config.py'},
+                   {'name': 'basicConfig',
+                    'description': 'Configure the root using level, filename, stream, force, or handlers. '
+                                   'Output choices are mutually exclusive; stdlib format/datefmt are '
+                                   'unsupported.',
+                    'signature': 'def basicConfig(config: BasicConfig, /) -> None:\n    ...',
+                    'file': '_basic_config.py'},
+                   {'name': 'ConfigBuilder',
+                    'description': 'Prepare handler/filter references and the mandatory root configuration '
+                                   'before initializing live logger state.',
+                    'signature': '',
+                    'file': '__init__.py'},
+                   {'name': 'LoggerConfigBuilder',
+                    'description': 'Fluent configuration for LoggerConfig. Validate options and call build '
+                                   'before registering output.',
+                    'signature': '',
+                    'file': '__init__.py'},
+                   {'name': 'RuntimeConfigBuilder',
+                    'description': 'Apply the supported live logger mutations after validation.',
+                    'signature': 'class RuntimeConfigBuilder:\n'
+                                 '    def __init__(self) -> None:\n'
+                                 '        ...\n'
+                                 '    def with_filter(self, fid: str, builder: RuntimeFilterBuilder) -> '
+                                 'Self:\n'
+                                 '        ...\n'
+                                 '    def with_handler(self, hid: str, builder: RuntimeHandlerBuilder) -> '
+                                 'Self:\n'
+                                 '        ...\n'
+                                 '    def with_logger(self, lname: str, builder: LoggerMutationBuilder) -> '
+                                 'Self:\n'
+                                 '        ...\n'
+                                 '    def with_root_logger(self, builder: LoggerMutationBuilder) -> Self:\n'
+                                 '        ...\n'
+                                 '    def apply(self) -> None:\n'
+                                 '        ...\n'
+                                 '    def as_dict(self) -> dict[str, object]:\n'
+                                 '        ...',
+                    'file': '_femtologging_rs.pyi'},
+                   {'name': 'LoggerMutationBuilder',
+                    'description': 'Describe logger level, propagation, handler, and filter mutations by '
+                                   'identifier.',
+                    'signature': 'class LoggerMutationBuilder:\n'
+                                 '    def __init__(self) -> None:\n'
+                                 '        ...\n'
+                                 '    def with_level(self, level: LevelArg) -> Self:\n'
+                                 '        ...\n'
+                                 '    def with_propagate(self, propagate: bool) -> Self:\n'
+                                 '        ...\n'
+                                 '    def replace_handlers(self, ids: list[str]) -> Self:\n'
+                                 '        ...\n'
+                                 '    def append_handlers(self, ids: list[str]) -> Self:\n'
+                                 '        ...\n'
+                                 '    def remove_handlers(self, ids: list[str]) -> Self:\n'
+                                 '        ...\n'
+                                 '    def clear_handlers(self) -> Self:\n'
+                                 '        ...\n'
+                                 '    def replace_filters(self, ids: list[str]) -> Self:\n'
+                                 '        ...\n'
+                                 '    def append_filters(self, ids: list[str]) -> Self:\n'
+                                 '        ...\n'
+                                 '    def remove_filters(self, ids: list[str]) -> Self:\n'
+                                 '        ...\n'
+                                 '    def clear_filters(self) -> Self:\n'
+                                 '        ...\n'
+                                 '    def as_dict(self) -> dict[str, object]:\n'
+                                 '        ...',
+                    'file': '_femtologging_rs.pyi'},
+                   {'name': 'dictConfig',
+                    'description': 'Restricted version-1 dictionary configuration. Root is required; handler '
+                                   'filters/levels/formatters and incremental updates are unsupported.',
+                    'signature': 'def dictConfig(config: cabc.Mapping[str, object]) -> None:\n    ...',
+                    'file': 'config.py'},
+                   {'name': 'fileConfig',
+                    'description': 'INI configuration translated into the restricted dictConfig schema. '
+                                   'Unsupported handler overrides and formatter sections raise ValueError.',
+                    'signature': 'def fileConfig(fname: str | bytes | PathLike[str] | PathLike[bytes], '
+                                 'defaults: cabc.Mapping[str, object] | None=None, *, '
+                                 'disable_existing_loggers: bool=True, encoding: str | None=None) -> None:\n'
+                                 '    ...',
+                    'file': 'file_config.py'}],
+ 'records-and-filters': [{'name': 'EXCEPTION_SCHEMA_VERSION',
+                          'description': 'Exception payload schema version. Validate consumer compatibility '
+                                         'before interpreting a structured exception.',
+                          'signature': '',
+                          'file': '__init__.py'},
+                         {'name': 'LevelFilterBuilder',
+                          'description': 'Fluent configuration for LevelFilter. Validate options and call '
+                                         'build before registering output.',
+                          'signature': 'class LevelFilterBuilder:\n'
+                                       '    def __init__(self) -> None:\n'
+                                       '        ...\n'
+                                       '    def with_max_level(self, level: LevelArg) -> Self:\n'
+                                       '        ...\n'
+                                       '    def as_dict(self) -> dict[str, object]:\n'
+                                       '        ...\n'
+                                       '    def build(self) -> object:\n'
+                                       '        ...',
+                          'file': '_femtologging_rs.pyi'},
+                         {'name': 'NameFilterBuilder',
+                          'description': 'Fluent configuration for NameFilter. Validate options and call '
+                                         'build before registering output.',
+                          'signature': 'class NameFilterBuilder:\n'
+                                       '    def __init__(self) -> None:\n'
+                                       '        ...\n'
+                                       '    def with_prefix(self, prefix: str) -> Self:\n'
+                                       '        ...\n'
+                                       '    def as_dict(self) -> dict[str, object]:\n'
+                                       '        ...\n'
+                                       '    def build(self) -> object:\n'
+                                       '        ...',
+                          'file': '_femtologging_rs.pyi'},
+                         {'name': 'PythonCallbackFilterBuilder',
+                          'description': 'Fluent configuration for PythonCallbackFilter. Validate options '
+                                         'and call build before registering output.',
+                          'signature': 'class PythonCallbackFilterBuilder:\n'
+                                       '    def __init__(self, callback: object, /) -> None:\n'
+                                       '        ...\n'
+                                       '    def as_dict(self) -> dict[str, object]:\n'
+                                       '        ...',
+                          'file': '_femtologging_rs.pyi'},
+                         {'name': 'FormatterBuilder',
+                          'description': 'Exported placeholder for named formatter registration. Handler IDs '
+                                         'other than default are not connected; use callable formatters.',
+                          'signature': '',
+                          'file': '__init__.py'},
+                         {'name': 'log_context',
+                          'description': 'Thread-local scoped scalar fields. Inline extra wins on collision; '
+                                         'avoid holding a scope across an await.',
+                          'signature': 'def log_context(**fields: object) -> cabc.Iterator[None]:\n    ...',
+                          'file': '_log_context.py'},
+                         {'name': 'filter_frames',
+                          'description': 'Filter structured stack frames using the supplied path patterns.',
+                          'signature': 'def filter_frames(payload: Mapping[str, _Any], *, exclude_filenames: '
+                                       'list[str] | None=..., exclude_functions: list[str] | None=..., '
+                                       'max_depth: int | None=..., exclude_logging: bool=...) -> dict[str, '
+                                       '_Any]:\n'
+                                       '    ...',
+                          'file': '_femtologging_rs.pyi'},
+                         {'name': 'get_logging_infrastructure_patterns',
+                          'description': 'Return patterns used to identify logging infrastructure frames.',
+                          'signature': 'def get_logging_infrastructure_patterns() -> list[str]:\n    ...',
+                          'file': '_femtologging_rs.pyi'}],
+ 'rust-bridges': [{'name': 'setup_rust_logging',
+                   'description': 'Optional log-compat bridge. Install the process-global log logger once; '
+                                  'targets route to femtologging names.',
+                   'signature': '',
+                   'file': '__init__.py'},
+                  {'name': 'setup_rust_tracing',
+                   'description': 'Optional tracing-compat bridge. Event/span mapping is separate from an '
+                                  'OpenTelemetry exporter. Global subscriber registration is constrained.',
+                   'signature': '',
+                   'file': '__init__.py'}],
+ 'errors': [{'name': 'FilterBuildError',
+             'description': 'Filter construction failed. Check the filter definition and referenced '
+                            'identifiers.',
+             'signature': '',
+             'file': '__init__.py'},
+            {'name': 'HandlerConfigError',
+             'description': 'Handler configuration rejected before output initialization. Check transport, '
+                            'formatter ID, capacity, and option combinations.',
+             'signature': '',
+             'file': '__init__.py'},
+            {'name': 'HandlerIOError',
+             'description': 'Handler I/O failure. Inspect the path or destination, permissions, and worker '
+                            'diagnostics.',
+             'signature': '',
+             'file': '__init__.py'},
+            {'name': 'ROTATION_VALIDATION_MSG',
+             'description': 'Exported diagnostic text for invalid rotation settings.',
+             'signature': '',
+             'file': '__init__.py'},
+            {'name': 'TIMED_ROTATION_VALIDATION_MSG',
+             'description': 'Exported diagnostic text for invalid rotation settings.',
+             'signature': '',
+             'file': '__init__.py'}]} %}
+{% set internal_exports = ['_clear_rotating_fresh_failure_for_test', '_clear_timed_rotation_test_times_for_test', '_force_rotating_fresh_failure_for_test', '_has_test_util', '_has_tracing_compat', '_set_timed_rotation_test_times_for_test', 'hello', 'reset_manager', 'rust'] %}

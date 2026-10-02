@@ -1,0 +1,277 @@
+.fl-shell {
+  width: min(1280px, calc(100% - 80px));
+  margin-inline: auto;
+}
+
+.fl-dark {
+  --fl-ink: var(--color-alumina);
+  --fl-button-rule: var(--color-instrument);
+  --fl-muted: var(--color-muted-dark);
+  --fl-link: var(--color-link-dark);
+  --fl-rule: var(--color-rule-dark);
+  --fl-focus: var(--color-amber);
+  --fl-surface: color-mix(in oklab, var(--color-graphite) 72%, transparent);
+  --fl-reticle: color-mix(in oklab, var(--color-instrument) 7%, transparent);
+
+  color: var(--fl-ink);
+  background: var(--color-carbon);
+}
+
+.fl-label {
+  font: 0.75rem / 1.5 var(--font-mono);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--fl-muted);
+}
+
+.fl-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+
+/* The masthead stays in view; anchor targets clear it through the root's
+   scroll padding in base.css. */
+.fl-mast {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--fl-rule);
+}
+
+.fl-mast__inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  min-height: 88px;
+}
+
+.fl-wordmark {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.fl-wordmark img {
+  width: 204px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.fl-nav {
+  margin-left: auto;
+}
+
+.fl-nav ul,
+.fl-mobile ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.fl-nav a,
+.fl-mast__github {
+  color: var(--fl-ink);
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+/* The way back to df12 reads as a utility, set apart from the destinations. */
+.fl-nav .fl-nav__up {
+  padding-right: 20px;
+  border-right: 1px solid var(--fl-rule);
+}
+
+.fl-nav__up a {
+  color: var(--fl-muted);
+}
+
+.fl-nav__up a:hover {
+  color: var(--fl-ink);
+}
+
+.fl-nav a[aria-current] {
+  color: var(--fl-link);
+  text-decoration: underline;
+  text-underline-offset: 8px;
+}
+
+.fl-mast__actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.fl-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 48px;
+  padding: 10px 20px;
+  border: 1px solid var(--fl-button-rule);
+  border-radius: 8px;
+  background: var(--color-instrument);
+  color: var(--color-carbon);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.fl-button:hover {
+  background: var(--color-alumina);
+  border-color: var(--fl-ink);
+  color: var(--color-carbon);
+  text-decoration: none;
+}
+
+.fl-button--outline {
+  color: var(--fl-ink);
+  border-color: var(--fl-muted);
+  background: transparent;
+}
+
+.fl-mobile {
+  display: none;
+  margin-left: auto;
+}
+
+.fl-mobile summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+}
+
+/* An open menu scrolls within the sticky masthead rather than past it. */
+.fl-mobile nav {
+  max-height: calc(100dvh - 104px);
+  overflow-y: auto;
+  padding-block: 16px;
+}
+
+.fl-mobile ul {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0;
+}
+
+.fl-mobile a {
+  display: block;
+  min-height: 44px;
+  padding: 8px 0;
+}
+
+.fl-skip {
+  position: absolute;
+  top: 0;
+  left: 16px;
+  transform: translateY(-150%);
+  z-index: 10;
+  background: var(--color-alumina);
+  color: var(--color-carbon);
+  padding: 16px;
+}
+
+.fl-skip:focus {
+  transform: none;
+}
+
+.fl-footer {
+  padding-top: 64px;
+}
+
+.fl-footer__grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: 40px;
+}
+
+.fl-footer__grid p {
+  color: var(--fl-muted);
+  margin-top: 20px;
+}
+
+.fl-footer h2 {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.fl-footer ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fl-footer li a {
+  display: inline-block;
+  padding-block: 7px;
+  font-size: 0.9375rem;
+  color: var(--fl-muted);
+}
+
+.fl-footer__strip {
+  border-top: 1px solid var(--fl-rule);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: 24px;
+  margin-top: 48px;
+  font: 0.75rem / 1.6 var(--font-mono);
+  color: var(--fl-muted);
+}
+
+@media (width < 1200px) {
+  .fl-nav,
+  .fl-mast__actions {
+    display: none;
+  }
+
+  .fl-mobile {
+    display: block;
+  }
+
+  .fl-mast__inner {
+    align-items: flex-start;
+    padding-block: 20px;
+  }
+
+  .fl-wordmark {
+    margin-top: 4px;
+  }
+}
+
+@media (width < 768px) {
+  .fl-shell {
+    width: calc(100% - 40px);
+  }
+
+  .fl-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 20px;
+  }
+
+  .fl-footer__grid > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .fl-footer__strip {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (width < 390px) {
+  .fl-shell {
+    width: calc(100% - 32px);
+  }
+
+  .fl-wordmark img {
+    width: 164px;
+  }
+}

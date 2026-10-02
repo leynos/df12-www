@@ -1,0 +1,8 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs'] %}
+{% block article_body %}
+<section><h2 id='contents'>Documentation</h2>
+<p>Start with <a href="/femtologging/getting-started/">a first record</a>, run <a href="/femtologging/examples/">the complete examples</a>, or check <a href="/femtologging/compatibility/">compatibility</a>. These pages describe implemented source for the forthcoming beta. The full user’s guide is linked below.</p><h3>Task guides</h3>{{ ui.route_list(catalogue.values() | selectattr('group', 'equalto', 'Guides') | list) }}<h3>API reference</h3>{{ ui.route_list(catalogue.values() | selectattr('group', 'equalto', 'API reference') | list) }}<h3>User’s guide</h3><p><a href="/docs-femtologging-introduction.html">Read the femtologging user’s guide</a> in the df12 documentation. It follows the upstream guide on the default branch, so it may describe work beyond the documented revision.</p>
+</section>
+{% endblock %}

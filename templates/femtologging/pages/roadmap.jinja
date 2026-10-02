@@ -1,0 +1,38 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['roadmap'] %}
+{% set implemented = [
+  'Worker-backed stream, file, rotation, socket, and HTTP output.',
+  'Named logger hierarchy, restricted configuration, and callback filtering.',
+  'Inline structured fields and scoped context through named loggers.',
+  'Rust log/tracing bridges behind optional features.',
+] %}
+{% set planned = [
+  ('Formatter registration', 'Named formatter identifiers that resolve to working formatters, not exported placeholders.'),
+  ('Batching', 'Handler-side batches that amortize transport cost without hiding drops or reordering.'),
+  ('Benchmark reporting', 'Published results backed by runnable artefacts and workload metadata.'),
+  ('Observability exporters', 'Journald and OpenTelemetry sinks, configured explicitly. The tracing bridge is a separate capability.'),
+] %}
+{% set whatifs = [
+  ('petri-context', 'Context that follows the task', 'A contextvars-backed scope could keep fields isolated across awaits. It needs cancellation, nesting, and bridge-boundary tests before replacing thread-local context.'),
+  ('petri-batch', 'Batches with an accountable boundary', 'A batch-aware handler could amortize transport cost. Ordering, partial failure, flush barriers, and overflow accounting must remain explicit.'),
+  ('petri-gauge', 'A closer instrument view', 'A future inspection surface could expose queue pressure without inventing durability guarantees. Any visualization must report observed counters and their scope.'),
+] %}
+{% block article_body %}
+<section aria-labelledby="implemented"><h2 id="implemented">Implemented in the documented source</h2>
+<p class="fl-status fl-status--done">{{ ui.icon('check') }} Implemented · Release forthcoming</p>
+<ul class="fl-checklist">{% for item in implemented %}<li>{{ ui.icon('check') }}<span>{{ item }}</span></li>{% endfor %}</ul>
+<p>The next assumed release is {{ femto_version }}. These statements describe revision <code>{{ femto_revision[:7] }}</code>, not an already published beta.</p>
+</section>
+<section aria-labelledby="planned"><h2 id="planned">Planned work</h2>
+<p class="fl-status">{{ ui.icon('info') }} Planned · No delivery date</p>
+<ul class="fl-checklist fl-checklist--open">{% for title, text in planned %}<li><span class="fl-checklist__box" aria-hidden="true"></span><span><strong>{{ title }}.</strong> {{ text }}</span></li>{% endfor %}</ul>
+<p><a href="{{ source_base }}/docs/roadmap.md">Read the upstream roadmap at the documented revision.</a> Check <a href="{{ repository_url }}/blob/main/docs/roadmap.md">the live roadmap</a> for subsequent progress.</p>
+</section>
+<section aria-labelledby="exploratory"><h2 id="exploratory">What-ifs from the field station</h2>
+<p class="fl-status fl-status--explore">{{ ui.icon('microscope') }} Exploratory · Ideas in the petri dish</p>
+<p>The cultures below are design questions, not commitments. Each names what would have to be proven before it could become planned work.</p>
+<div class="fl-whatifs">{% for key, title, text in whatifs %}<article class="fl-whatif">{{ ui.plate(key, 'whatif', sizes='(width < 768px) 100vw, 240px') }}<div><p class="fl-label">Exploratory · Culture {{ '%02d' | format(loop.index) }}</p><h3>{{ title }}</h3><p>{{ text }}</p></div></article>{% endfor %}</div>
+<p>The concepts suggest alternative futures. They do not set release promises.</p>
+</section>
+{% endblock %}

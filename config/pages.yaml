@@ -109,6 +109,11 @@ homepage:
       heading: Libraries
       kicker: Smaller parts, built to be built with.
       links:
+        - label: femtologging
+          description: A Rust logging runtime for Python. Structured records, bounded queues, and worker-backed output.
+          href: "femtologging/"
+          meta_label: Learn more
+          external: false
         - label: Cuprum
           description: Typed, async command execution for Python. Approved programs, exact argv, structured results.
           href: "cuprum/"
@@ -1767,4 +1772,64 @@ sites:
       - { key: harnesses, label: Harnesses, template: pages/harnesses.jinja, output_slug: harnesses }
       - { key: compare, label: Compare, template: pages/compare.jinja, output_slug: compare }
       - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
+    pages: {}
+
+  femtologging:
+    output_dir: public/femtologging
+    templates_dir: templates/femtologging
+    stylesheet: /femtologging/assets/styles/femtologging.css
+    base_path: /femtologging/
+    theme:
+      site_name: femtologging
+      hero_eyebrow: The femtofauna survey
+      hero_tagline: Logging, under the microscope.
+    parent_link:
+      label: "← df12 Productions"
+      href: /
+    template_vars:
+      femto_version: "0.2.0-beta1"
+      femto_pypi: "0.2.0b1"
+      femto_revision: "f5bcaa8257f4c59a361dc4f41585b9ecccb9f345"
+      femto_verified_on: "2026-10-01"
+      python_floor: "3.12"
+      repository_url: "https://github.com/leynos/femtologging"
+      source_base: "https://github.com/leynos/femtologging/blob/f5bcaa8257f4c59a361dc4f41585b9ecccb9f345"
+    nav_links:
+      - { label: Home, href: /femtologging/ }
+      - { label: Docs, href: /femtologging/docs/ }
+      - { label: Examples, href: /femtologging/examples/ }
+      - { label: Architecture, href: /femtologging/architecture/ }
+      - { label: Compatibility, href: /femtologging/compatibility/ }
+      - { label: Roadmap, href: /femtologging/roadmap/ }
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    homepage:
+      title: "femtologging · Logging, under the microscope."
+    content_pages:
+      - { key: getting-started, label: "A first record, end to end.", template: pages/getting-started.jinja, output_slug: getting-started }
+      - { key: docs-guides-loggers, label: "Create and route loggers", template: pages/docs-guides-loggers.jinja, output_slug: docs/guides/loggers }
+      - { key: docs-guides-handlers, label: "Choose and configure output", template: pages/docs-guides-handlers.jinja, output_slug: docs/guides/handlers }
+      - { key: docs-guides-configuration, label: "Configure the runtime", template: pages/docs-guides-configuration.jinja, output_slug: docs/guides/configuration }
+      - { key: docs-guides-formatting-and-filtering, label: "Format and filter records", template: pages/docs-guides-formatting-and-filtering.jinja, output_slug: docs/guides/formatting-and-filtering }
+      - { key: docs-guides-structured-records, label: "Add context and exception details", template: pages/docs-guides-structured-records.jinja, output_slug: docs/guides/structured-records }
+      - { key: docs-guides-operations, label: "Handle pressure and shutdown", template: pages/docs-guides-operations.jinja, output_slug: docs/guides/operations }
+      - { key: docs-guides-migration, label: "Migrate existing logging code", template: pages/docs-guides-migration.jinja, output_slug: docs/guides/migration }
+      - { key: examples, label: "Worked examples", template: pages/examples.jinja, output_slug: examples }
+      - { key: architecture, label: "Python above. Rust below.", template: pages/architecture.jinja, output_slug: architecture }
+      - { key: compatibility, label: "Compatibility, with boundaries.", template: pages/compatibility.jinja, output_slug: compatibility }
+      - { key: performance, label: "Measure the runtime.", template: pages/performance.jinja, output_slug: performance }
+      - { key: roadmap, label: "An observed runtime. Several possible futures.", template: pages/roadmap.jinja, output_slug: roadmap }
+      - { key: contributing, label: "Contribute across the boundary.", template: pages/contributing.jinja, output_slug: contributing }
+      - { key: design, label: "The femtofauna field guide.", template: pages/design.jinja, output_slug: design }
+      - { key: docs-api-loggers, label: "Loggers and routing", template: pages/docs-api-loggers.jinja, output_slug: docs/api/loggers }
+      - { key: docs-api-handlers, label: "Handlers and transports", template: pages/docs-api-handlers.jinja, output_slug: docs/api/handlers }
+      - { key: docs-api-configuration, label: "Configuration and mutation", template: pages/docs-api-configuration.jinja, output_slug: docs/api/configuration }
+      - { key: docs-api-records-and-filters, label: "Records, formatters, and filters", template: pages/docs-api-records-and-filters.jinja, output_slug: docs/api/records-and-filters }
+      - { key: docs-api-rust-bridges, label: "Rust logging bridges", template: pages/docs-api-rust-bridges.jinja, output_slug: docs/api/rust-bridges }
+      - { key: docs-api-errors, label: "Errors and diagnostics", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors }
+      - { key: docs, label: "Documentation", template: pages/docs.jinja, output_slug: docs }
+      - { key: docs-guides, label: "Task guides", template: pages/docs-guides.jinja, output_slug: docs/guides }
+      - { key: docs-api, label: "API reference", template: pages/docs-api.jinja, output_slug: docs/api }
     pages: {}

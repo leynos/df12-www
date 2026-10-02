@@ -1,0 +1,14 @@
+{% extends '_article.jinja' %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['docs-guides-structured-records'] %}
+{% block article_body %}
+<section aria-labelledby="extra"><h2 id="extra">Prefer per-call fields for async work</h2>
+<p><code>extra</code> accepts a mapping with string keys and values of type <code>str</code>, <code>int</code>, <code>float</code>, <code>bool</code>, or <code>None</code>. It is available on <code>log</code>, <code>debug</code>, <code>info</code>, <code>warning</code>, <code>error</code>, and <code>critical</code>.</p><p>Inline values override active <code>log_context</code> keys. Native <code>metadata.key_values</code> representations may normalize values to strings: the source-verified JSON example renders request ID 42 as <code>"42"</code>. Check the sink’s schema rather than assuming scalar type preservation.</p>
+</section>
+<section aria-labelledby="scope"><h2 id="scope">Keep scoped context on its thread</h2>
+<p><code>log_context(**fields)</code> enriches named logger records while the scope is active on the calling thread. Holding it across an <code>await</code> can share context between concurrent tasks on one event-loop thread. Use per-call <code>extra</code> for asyncio work; task-local context remains exploratory work.</p><div class="fl-note"><p>Limits per record: 64 keys, 64 UTF-8 bytes per key, 1024 UTF-8 bytes per value, and 16 KiB total serialized enrichment. Reserved metadata and stdlib LogRecord names cannot be overwritten.</p></div>
+</section>
+<section aria-labelledby="exceptions"><h2 id="exceptions">Capture exception and stack payloads</h2>
+<p><code>exc_info</code> accepts True, an exception instance, an exception tuple, or False/None. <code>stack_info=True</code> captures the current call stack. <code>exception()</code> defaults exception capture to True but does not accept <code>extra</code>.</p><p>Exception records use a versioned schema. Consumers must check <code>EXCEPTION_SCHEMA_VERSION</code> and the documented mismatch policy. Payloads contain sensitive messages and source paths; review them before export.</p>
+</section>
+{% endblock %}

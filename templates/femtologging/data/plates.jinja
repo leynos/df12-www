@@ -1,0 +1,144 @@
+{#- Survey plates: one record per illustration, shared by every page that shows it.
+    Specimen IDs identify artwork, never test results. Scale values are fiction and
+    always render beside an "illustrative scale" label. Callout x/y are percentages
+    of the uncropped raster, so a plate with callouts must keep its aspect ratio;
+    a label sits to the right of its marker unless 'side' says 'left'. -#}
+{% set plates = {
+  'cover': {
+    'file': 'cover', 'width': 2400, 'height': 1344, 'plate': '01', 'specimen': 'FL-S-001',
+    'alt': 'Three ceramic robot pandas push glowing amber record crates along an etched rail. A robot capybara rests beside a ring of crates and a long-neck robot dinosaur watches from a bridge.',
+    'caption': 'Record transport in cross-section. Three units in transit; the buffer occupant remains seated.',
+    'scale': '5 fm',
+    'callouts': [
+      {'x': 66, 'y': 76, 'title': 'Transport units', 'text': 'Records en route to a handler worker', 'side': 'left'},
+      {'x': 76.5, 'y': 46, 'title': 'Queue occupant', 'text': 'Bounded buffer, at rest', 'side': 'left'},
+      {'x': 64.5, 'y': 15, 'title': 'Interface inspector', 'text': 'Compatibility bridge, under review', 'side': 'left'},
+    ],
+  },
+  'cutaway': {
+    'file': 'cutaway', 'width': 2400, 'height': 1344, 'plate': '02', 'specimen': 'FL-S-002',
+    'alt': 'Robot pandas push lit record crates along a trench toward a robot capybara seated in a buffer of crates, beneath a dinosaur on a bridge.',
+    'caption': 'The dispatch lane, viewed obliquely. The inspector has not left the bridge since the survey began.',
+    'scale': '5 fm', 'callouts': [],
+  },
+  'panorama': {
+    'file': 'panorama', 'width': 2400, 'height': 800, 'plate': '03', 'specimen': 'FL-X-003',
+    'alt': 'A side-on cutaway of one channel. From left: a robot dinosaur at a coupling, four robot pandas pushing glowing crates, a robot capybara in a buffer bay of crates, and teal crystals at the exit.',
+    'caption': 'One channel, sectioned along its length. Read left to right, as the record travels.',
+    'scale': '2 fm',
+    'callouts': [
+      {'x': 20, 'y': 40, 'title': 'Coupling', 'text': 'Where Python hands the record to Rust'},
+      {'x': 45, 'y': 46, 'title': 'Transport', 'text': 'Records crossing the channel in order'},
+      {'x': 74, 'y': 46, 'title': 'Buffer bay', 'text': 'A bounded handler queue'},
+      {'x': 91, 'y': 42, 'title': 'Crystal field', 'text': 'Output: stream, file, or network'},
+    ],
+  },
+  'expedition-tray': {
+    'file': 'expedition-tray', 'width': 1536, 'height': 1024, 'plate': '04', 'specimen': 'FL-T-004',
+    'alt': 'An open field specimen case holds a robot panda with a glowing crate, a robot dinosaur beside a teal adapter, and a robot capybara beside stacked crates. Blank tags hang from each compartment.',
+    'caption': 'Specimen case, packed for the next expedition. The tags have been left blank deliberately.',
+    'scale': '1 cm', 'callouts': [],
+  },
+  'mag-a': {
+    'file': 'mag-a', 'width': 1024, 'height': 1024, 'plate': '05', 'specimen': 'FL-M-005',
+    'alt': 'A laptop showing blurred code on a dark laboratory bench beneath the objective lens of an electron microscope.',
+    'caption': 'The application, before magnification. Nothing unusual is visible at this scale.',
+    'scale': '10 cm', 'callouts': [],
+  },
+  'mag-b': {
+    'file': 'mag-b', 'width': 1024, 'height': 1024, 'plate': '06', 'specimen': 'FL-M-006',
+    'alt': 'An oblique view of a microfabricated die: blocks of etched machinery, gold bond wires, and teal channels carrying pinpoints of amber light.',
+    'caption': 'The pipeline at die scale. Amber points move along the teal channels at irregular intervals.',
+    'scale': '1 mm', 'callouts': [],
+  },
+  'mag-c': {
+    'file': 'mag-c', 'width': 1024, 'height': 1024, 'plate': '07', 'specimen': 'FL-M-007',
+    'alt': 'A branching network of etched rails lined with teal crystals. Small glowing crates travel the rails toward a circular buffer full of crates.',
+    'caption': 'Transport channels and a circular buffer. The carriers are not yet resolved at this magnification.',
+    'scale': '1 µm', 'callouts': [],
+  },
+  'mag-d': {
+    'file': 'mag-d', 'width': 1024, 'height': 1024, 'plate': '08', 'specimen': 'FL-M-008',
+    'alt': 'Three robot pandas at a rail junction: one lifts a glowing crate, one pushes a loaded trolley, one works a switch lever.',
+    'caption': 'Workers at a dispatch junction. One unit is attending to the points.',
+    'scale': '10 nm', 'callouts': [],
+  },
+  'mag-e': {
+    'file': 'mag-e', 'width': 1024, 'height': 1024, 'plate': '09', 'specimen': 'FL-M-009',
+    'alt': 'A close-up of a robot panda with ceramic face plates and gold whiskers, one paw on a glowing amber crate, looking up toward the viewer.',
+    'caption': 'A single transport unit. The specimen appears to have noticed the observer.',
+    'scale': '8 fm', 'callouts': [],
+  },
+  'specimen-panda': {
+    'file': 'specimen-panda', 'width': 1024, 'height': 1024, 'plate': '10', 'specimen': 'FL-P-010',
+    'alt': 'A robot panda seated on an aluminium specimen stub, holding a glowing amber record crate in its lap.',
+    'caption': 'Transport unit, mounted for imaging. It declined to surrender the crate.',
+    'scale': '2 fm', 'callouts': [],
+  },
+  'specimen-capybara': {
+    'file': 'specimen-capybara', 'width': 1024, 'height': 1024, 'plate': '11', 'specimen': 'FL-Q-011',
+    'alt': 'A robot capybara resting on an aluminium specimen stub, one paw against a stack of three glowing record crates.',
+    'caption': 'Queue occupant, mounted for imaging. The stack has not changed height.',
+    'scale': '4 fm', 'callouts': [],
+  },
+  'specimen-dinosaur': {
+    'file': 'specimen-dinosaur', 'width': 1024, 'height': 1024, 'plate': '12', 'specimen': 'FL-C-012',
+    'alt': 'A small long-neck robot dinosaur on an aluminium specimen stub, inspecting a teal-lit two-sided adapter.',
+    'caption': 'Interface inspector, mounted for imaging. Both halves of the adapter were found to fit.',
+    'scale': '3 fm', 'callouts': [],
+  },
+  'petri-context': {
+    'file': 'petri-context', 'width': 1024, 'height': 1024, 'plate': '13', 'specimen': 'FL-X-013',
+    'alt': 'A petri dish holding forking etched channels. A robot panda pushes a glowing crate trailed by a fine teal thread.',
+    'caption': 'Culture 13. The thread follows the crate through every fork.',
+    'scale': '1 µm', 'callouts': [],
+  },
+  'petri-batch': {
+    'file': 'petri-batch', 'width': 1024, 'height': 1024, 'plate': '14', 'specimen': 'FL-X-014',
+    'alt': 'A petri dish holding a rail yard. A robot capybara sits beside one flatbed trolley of glowing crates strapped into a single batch with a blank tag.',
+    'caption': 'Culture 14. One batch, one tag. The tag is still blank.',
+    'scale': '1 µm', 'callouts': [],
+  },
+  'petri-gauge': {
+    'file': 'petri-gauge', 'width': 1024, 'height': 1024, 'plate': '15', 'specimen': 'FL-X-015',
+    'alt': 'A petri dish with a small brass gauge on a channel wall. A robot panda stands beside its trolley of glowing crates, studying the dial.',
+    'caption': 'Culture 15. The gauge has no calibration; no reading has been recorded.',
+    'scale': '1 µm', 'callouts': [],
+  },
+} %}
+{#- The magnification series, outermost field first. Powers of ten are as fictional
+    as the fauna; the series is a reveal, not a measurement. -#}
+{% set magnification = [
+  {'plate': 'mag-a', 'power': '10⁰ m', 'title': 'Your Python application'},
+  {'plate': 'mag-b', 'power': '10⁻³ m', 'title': 'The pipeline'},
+  {'plate': 'mag-c', 'power': '10⁻⁶ m', 'title': 'Transport channels'},
+  {'plate': 'mag-d', 'power': '10⁻⁹ m', 'title': 'Workers at a junction'},
+  {'plate': 'mag-e', 'power': '10⁻¹⁵ m', 'title': 'A closer look'},
+] %}
+{#- The resident cast. Each species keeps one stable technical meaning. -#}
+{% set specimens = [
+  {'plate': 'specimen-panda', 'icon': 'panda', 'name': 'Robot panda', 'species': 'Ailuropoda logistica',
+   'role': 'Transport and handoff',
+   'note': 'Carries one record at a time from the producer to a handler’s queue. Rarely seen without a crate.',
+   'href': '/femtologging/architecture/', 'link': 'Follow the record path'},
+  {'plate': 'specimen-capybara', 'icon': 'capybara', 'name': 'Robot capybara', 'species': 'Queueus chillus',
+   'role': 'Queues and back-pressure',
+   'note': 'Occupies the bounded queue in front of each handler. Its calm is not an overflow policy; yours is.',
+   'href': '/femtologging/docs/guides/operations/', 'link': 'Plan for a full queue'},
+  {'plate': 'specimen-dinosaur', 'icon': 'dinosaur', 'name': 'Robot dinosaur', 'species': 'Femtosaurus compatibilis',
+   'role': 'Compatibility and interfaces',
+   'note': 'Inspects every adapter between the stdlib surface and the runtime. Keeps meticulous notes on what does not fit.',
+   'href': '/femtologging/compatibility/', 'link': 'Check the supported surface'},
+] %}
+{#- Product pages open with a plate in their header; task guides and reference stay quiet. -#}
+{% set page_plates = {
+  'getting-started': 'mag-a',
+  'examples': 'mag-d',
+  'architecture': 'cutaway',
+  'compatibility': 'specimen-dinosaur',
+  'performance': 'petri-gauge',
+  'roadmap': 'expedition-tray',
+  'contributing': 'mag-b',
+  'design': 'specimen-panda',
+  'docs': 'mag-c',
+} %}

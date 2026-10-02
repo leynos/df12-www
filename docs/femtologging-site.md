@@ -1,8 +1,7 @@
 # femtologging sub-site
 
-The site at `/femtologging/` uses the native df12 generator. Its 28 routes
-follow the proposed sitemap in the sibling `femtologging-reference` directory.
-The parent homepage includes a library link to the sub-site.
+The site at `/femtologging/` uses the native df12 generator and publishes 28
+routes. The parent homepage includes a library link to the sub-site.
 
 ## Sources and release status
 
@@ -85,16 +84,14 @@ channels and instruments; carbon falloff and shallow depth of field. Every
 prompt also excluded text, numbers, labels, scale bars, logos, plush, cartoon,
 and glossy plastic.
 
-The PNG originals are retained in `femtologging-reference/survey-plates/`. The
-WebP files under `src/static/femtologging/assets/images/` were encoded at
+The WebP files under `src/static/femtologging/assets/images/` were encoded at
 quality 80 with Pillow. Each plate has a full-size file and a `-half` file at
 half its linear size, which the macro offers through `srcset`. The sub-site's
 images are outside the main site's `build:images` step, so re-encode both sizes
 when replacing a plate.
 
 The earlier brand-pack anchors and the record-transport survey are superseded
-on the site. Their originals remain in the brand pack and the reference
-directory.
+on the site.
 
 ## Code panels and verification
 

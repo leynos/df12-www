@@ -1,4 +1,5 @@
 {
+  "gitignore": true,
   // The estate baseline, copied verbatim from leynos/concordat's
   // platform-standards/canon/lint/markdown/.markdownlint-cli2.jsonc and
   // audited by its markdown-formatting-baseline rule (PD-005). Change the

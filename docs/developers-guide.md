@@ -343,6 +343,22 @@ generated blocks because stylelint does not apply fixes inside a disabled
 range, which is what keeps the formatter and the generators from undoing each
 other; rerunning the generators after `make fmt` reports `unchanged`.
 
+### 2.6. Spelling gate
+
+`make spelling` enforces en-GB-oxendict spelling by running the
+`typos-config-builder` gate, pinned by `TYPOS_CONFIG_BUILDER_VERSION` in the
+`Makefile` (currently `v0.1.3`). The gate regenerates `typos.toml` from the
+live shared dictionary and this repository's `typos.local.toml` overlay on
+every run, runs Typos over tracked Markdown, and enforces the shared phrase
+corrections that single-word checks cannot express. `typos.toml` is therefore a
+generated file that continuous integration never drift checks; commit the
+regenerated file when it changes, and keep repository-specific exceptions in
+`typos.local.toml` as narrow patterns. The builder requires Python 3.14 or
+newer, so the target passes `--python 3.14` and `uv` fetches that interpreter
+when the host lacks one. Raise the pin together with the regenerated
+`typos.toml`, never on its own. The gate is part of `make all` and of the
+Markdown gate.
+
 ## 3. Generated versus hand-crafted files
 
 Everything under `public/` is build output and is git-ignored in its entirety.

@@ -469,12 +469,8 @@ loosening the rule in `biome.jsonc`, which turns one considered exception into
 a silent blanket. `style/useForOf` is raised to an error above the recommended
 preset and is deliberate policy, not an inherited default.
 
-For Markdown changes, run `make markdownlint` and `make nixie`. The Markdown
-gate runs `make spelling`, the shared en-GB-oxendict gate. It regenerates
-`typos.toml` from the live shared dictionary and the `typos.local.toml` overlay
-on every run, so `typos.toml` is never drift checked in continuous integration.
-Put narrow repository-only exceptions in `typos.local.toml`; never edit the
-generated configuration by hand.
+For Markdown changes, run `make markdownlint` and `make nixie`. The spelling
+guidance is in the marked block near the end of this file.
 
 ### Variable Declarations
 

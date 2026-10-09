@@ -25,7 +25,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install mdtablefix
-        uses: leynos/shared-actions/.github/actions/install-mdtablefix@c5a54701c8603a0fa756a6b34c49bc2af75a6c11
+        uses: leynos/shared-actions/.github/actions/install-mdtablefix@0606ca899ce2995a0c4bc78e660e80832e6e8855
         with:
           version: "0.6.1"
       - run: mdtablefix --check --git --include-untracked --wrap --renumber --breaks --ellipsis --fences

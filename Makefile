@@ -1,7 +1,13 @@
 # Every uv call goes through the vendored helper, which cleans the environment,
 # uses the global uv cache, runs offline first and goes online at most once. See
 # https://github.com/leynos/shared-actions/tree/main/uv_gate for the contract.
+# The one exception is typos-config-builder at a release tag, which the spelling
+# baseline requires to be called directly.
 UV_GATE ?= python3 scripts/uv_gate.py
+UV ?= uv
+# The helper finds uv on PATH, so a caller's UV=/path/to/uv is honoured by putting
+# that uv's directory first on PATH for every recipe.
+export PATH := $(if $(findstring /,$(UV)),$(patsubst %/,%,$(dir $(UV))):)$(PATH)
 # `command -v` rather than `which`: under `bun run`, node_modules/.bin leads
 # PATH, and the `which` npm package (a stylelint dependency) installs a shim
 # there that starts node on every lookup, slowing every nested make.

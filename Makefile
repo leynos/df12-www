@@ -1,3 +1,13 @@
+# Every uv call goes through the vendored helper, which cleans the environment,
+# uses the global uv cache, runs offline first and goes online at most once. See
+# https://github.com/leynos/shared-actions/tree/main/uv_gate for the contract.
+# The one exception is typos-config-builder at a release tag, which the spelling
+# baseline requires to be called directly.
+UV_GATE ?= python3 scripts/uv_gate.py
+UV ?= uv
+# The helper finds uv on PATH, so a caller's UV=/path/to/uv is honoured by putting
+# that uv's directory first on PATH for every recipe.
+export PATH := $(if $(findstring /,$(UV)),$(patsubst %/,%,$(dir $(UV))):)$(PATH)
 # `command -v` rather than `which`: under `bun run`, node_modules/.bin leads
 # PATH, and the `which` npm package (a stylelint dependency) installs a shim
 # there that starts node on every lookup, slowing every nested make.
@@ -15,7 +25,6 @@ MDTABLEFIX_RULES = --wrap --renumber --breaks --ellipsis --fences
 NIXIE ?= $(shell command -v nixie)
 TOOLS = $(MDLINT) $(NIXIE) uv bun
 VENV_TOOLS = pytest
-UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
 # Ruff comes from the dev group, so uv.lock fixes its version; ty is pinned
 # here. A new release of either therefore cannot fail the gates on code
 # nobody has changed: moving to it is a deliberate bump and its fixes.
@@ -24,7 +33,7 @@ UV_ENV = UV_CACHE_DIR=.uv-cache UV_TOOL_DIR=.uv-tools
 # `uv run` would sync it first.
 RUFF = .venv/bin/ruff
 TY_VERSION ?= 0.0.82
-TY = $(UV_ENV) uv tool run ty==$(TY_VERSION)
+TY = $(UV_GATE) tool --from ty==$(TY_VERSION) -- ty
 SKIP_PLAYWRIGHT ?= 0
 PYTEST_FILTER ?=
 TYPOS_CONFIG_BUILDER_VERSION ?= v0.1.3
@@ -39,34 +48,33 @@ ifeq ($(strip $(SKIP_PLAYWRIGHT)),1)
 PYTEST_FILTER += -m 'not playwright'
 endif
 
-.PHONY: help all clean build build-release lint fmt check-fmt check-site-data \
+.PHONY: prepare help all clean build build-release lint fmt check-fmt check-site-data \
         cuprum-api-data check-cuprum-api-data rstest-bdd-samples \
         docs-check markdownlint nixie site-data spelling stylelint test typecheck \
         typecheck-js venv-ruff \
         $(TOOLS) \
         $(VENV_TOOLS) dev
 
+prepare: ## Install the locked development environment, offline first
+	$(UV_GATE) prepare --group dev
+
 .DEFAULT_GOAL := all
 
 all: build check-fmt lint stylelint test test-js typecheck docs-check spelling
 
-.venv: pyproject.toml
-	$(UV_ENV) uv venv --clear
+build: uv prepare ## Build virtual-env and install deps
 
-build: uv .venv ## Build virtual-env and install deps
-	$(UV_ENV) uv sync --group dev
+site-data: prepare ## Regenerate committed Episodic data from its authoritative roadmap
+	$(UV_GATE) run -- python scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)"
 
-site-data: ## Regenerate committed Episodic data from its authoritative roadmap
-	uv run scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)"
+check-site-data: prepare ## Check the committed Episodic roadmap projection for drift
+	$(UV_GATE) run -- python scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)" --check
 
-check-site-data: ## Check the committed Episodic roadmap projection for drift
-	uv run scripts/build_episodic_roadmap_data.py --episodic-root "$(EPISODIC_SOURCE)" --check
+cuprum-api-data: prepare ## Regenerate the Cuprum API reference from a Cuprum checkout at the documented release
+	$(UV_GATE) run -- python scripts/build_cuprum_api_data.py --cuprum-root "$(CUPRUM_SOURCE)"
 
-cuprum-api-data: ## Regenerate the Cuprum API reference from a Cuprum checkout at the documented release
-	uv run scripts/build_cuprum_api_data.py --cuprum-root "$(CUPRUM_SOURCE)"
-
-check-cuprum-api-data: ## Check the committed Cuprum API reference against its source
-	uv run scripts/build_cuprum_api_data.py --cuprum-root "$(CUPRUM_SOURCE)" --check
+check-cuprum-api-data: prepare ## Check the committed Cuprum API reference against its source
+	$(UV_GATE) run -- python scripts/build_cuprum_api_data.py --cuprum-root "$(CUPRUM_SOURCE)" --check
 
 rstest-bdd-samples: ## Compile and run every rstest-bdd code sample against the published crates
 	cargo test --manifest-path templates/rstest-bdd/samples/Cargo.toml --locked
@@ -108,7 +116,7 @@ define ensure_tool
 endef
 
 define ensure_tool_venv
-	$(UV_ENV) uv run which $(1) >/dev/null 2>&1 || { \
+	$(UV_GATE) run -- which $(1) >/dev/null 2>&1 || { \
 	  printf "Error: '%s' is required in the virtualenv, but is not installed\n" "$(1)" >&2; \
 	  exit 1; \
 	}
@@ -122,7 +130,7 @@ endif
 
 ifneq ($(strip $(VENV_TOOLS)),)
 .PHONY: $(VENV_TOOLS)
-$(VENV_TOOLS): ## Verify required CLI tools in venv
+$(VENV_TOOLS): prepare ## Verify required CLI tools in venv
 	$(call ensure_tool_venv,$@)
 endif
 
@@ -160,7 +168,7 @@ stylelint: $(NODE_MODULES_STAMP) ## Lint the handwritten and Tailwind CSS
 
 typecheck: build typecheck-js ## Run typechecking
 	$(TY) --version
-	$(TY) check
+	$(TY) check --python .venv
 
 typecheck-js: $(NODE_MODULES_STAMP) ## Typecheck the browser scripts and build scripts
 	bun run typecheck:js
@@ -176,7 +184,7 @@ nixie: $(NIXIE) ## Validate Mermaid diagrams
 	$(NIXIE) --no-sandbox
 
 test: build uv $(VENV_TOOLS) ## Run tests
-	$(UV_ENV) uv run pytest -v $(PYTEST_FILTER)
+	$(UV_GATE) run -- pytest -v $(PYTEST_FILTER)
 
 docs-check: $(NODE_MODULES_STAMP) ## Validate TypeScript documentation with TypeDoc
 	bun run docs:check

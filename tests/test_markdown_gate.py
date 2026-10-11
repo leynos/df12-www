@@ -117,7 +117,9 @@ class Sandbox:
         """Run one make target under the controlled environment."""
         assert MAKE is not None
         return subprocess.run(  # noqa: S603 - fixed argv, no shell
-            [MAKE, target, *overrides],
+            # UV_GATE=uv: the stub uv stands in for the vendored helper, whose
+            # python3 launcher is not on the controlled PATH.
+            [MAKE, target, "UV_GATE=uv", *overrides],
             cwd=REPO_ROOT,
             capture_output=True,
             text=True,

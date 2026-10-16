@@ -21,7 +21,7 @@
    'notes': 'Used under auto or rust when the extension imports. splice() on Linux, a read/write loop on macOS. Each hop that cannot be handed over safely runs on the Python pump instead.'},
   {'name': 'Pumping on Windows',
    'python': 'available', 'rust': 'python-only',
-   'notes': 'Asyncio’s Proactor pipes use overlapped handles the synchronous native pump cannot safely use, so every hop declines with platform_unsupported.'},
+   'notes': 'Asyncio’s Proactor pipes use overlapped handles the synchronous native pump cannot safely use, so every hop declines with platform_unsupported. A raw overlapped handle handed straight to the native shim is rejected and recorded as windows_raw_handle_rejected rather than used.'},
   {'name': 'Capturing stdout and stderr',
    'python': 'available', 'rust': 'inert',
    'notes': 'rust_consume_stream exists and is tested, and tests fail if production code routes through it. Integration waits on a measured 20% wall-time win (roadmap phase 6).'},

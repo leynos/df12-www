@@ -1654,11 +1654,11 @@ sites:
       # is not named), and as the git tag that source links point at. Move
       # them together, with the verification date, after re-running every
       # snippet, and regenerate the API reference from the new tag.
-      cuprum_version: "0.2.0-beta1"
-      cuprum_pypi: "0.2.0b1"
-      cuprum_tag: "v0.2.0-beta1"
+      cuprum_version: "0.2.0-beta2"
+      cuprum_pypi: "0.2.0b2"
+      cuprum_tag: "v0.2.0-beta2"
       cuprum_previous: "0.1.0"
-      cuprum_verified_on: "2026-09-25"
+      cuprum_verified_on: "2026-10-16"
       python_floor: "3.12"
       repository_url: "https://github.com/leynos/cuprum"
     nav_links:

@@ -18,8 +18,9 @@
     truncation marker and terminator; captured output is always complete.
     Set <code>max_echo_line_bytes=None</code> only where unbounded mirroring
     is safe. {{ api.ref('CommandResult') }}<code>.relay_fallbacks</code>
-    records any echo that fell back after a text sink could not encode it,
-    by stream and without the output itself.
+    records any echo that fell back, by stream and closed category and
+    without the output itself; see
+    <a href="#sink-fails">when an echo destination fails</a>.
   </p>
 </section>
 
@@ -95,6 +96,48 @@ assert asyncio.run(first_line()) == "0"
   </p>
 </section>
 
+<section aria-labelledby="sink-fails">
+  <h2 id="sink-fails">When an echo destination fails</h2>
+  <p>
+    A sink can fail while echoing: a text-only console may be unable to
+    encode the child's output, or the reader at the other end of a pipe may
+    go away. A sink that cannot encode is always handled: echo stops for that
+    stream while capture completes. A sink whose destination has closed is
+    handled only when the run opts in, with
+    {{ api.ref('BrokenPipePolicy') }}<code>.BEST_EFFORT</code> on
+    {{ api.ref('RunOutputOptions') }}:
+  </p>
+{% call ui.code_panel('broken_pipe.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import (
+    BrokenPipePolicy,
+    Program,
+    ProgramCatalogue,
+    RunOutputOptions,
+    sh,
+)
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="broken-pipe")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hello')")
+options = RunOutputOptions(broken_pipe_policy=BrokenPipePolicy.BEST_EFFORT)
+assert options.broken_pipe_policy is BrokenPipePolicy.BEST_EFFORT
+result = command.run_sync(output=options)
+assert result.ok and result.stdout == "hello\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Under best-effort, a <code>BrokenPipeError</code> from the sink disables
+    echo for the affected stream only; capture, line observation, and child
+    reaping continue, and the result's <code>relay_fallbacks</code> names the
+    <code>broken_pipe</code> category. The default, <code>STRICT</code>,
+    propagates the error and aborts the run. Only <code>BrokenPipeError</code>
+    is affected; any other sink <code>OSError</code> propagates under both
+    policies.
+  </p>
+</section>
+
 <section aria-labelledby="quiet">
   <h2 id="quiet">A heartbeat for a quiet child</h2>
   <p>
@@ -118,5 +161,57 @@ result = command.run_sync(output=RunOutputOptions(idle_after=30.0))
 assert result.ok and result.stdout == "done\n"
 {% endhighlight %}
 {% endcall %}
+</section>
+
+<section aria-labelledby="binary">
+  <h2 id="binary">Binary output</h2>
+  <p>
+    Capture decodes by default, so <code>stdout</code> and <code>stderr</code>
+    are strings, and a byte the child wrote that is not valid UTF-8 arrives
+    as <code>U+FFFD</code>. That is right for text and wrong for an archive
+    or an image, because a decoded capture cannot be turned back into the
+    bytes the child wrote. {{ api.ref('SafeCmd.run_bytes') }} and
+    <code>Pipeline.run_bytes()</code>, with <code>run_bytes_sync()</code>
+    counterparts, are the same runs with capture left undecoded:
+  </p>
+{% call ui.code_panel('binary_output.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="binary-output")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+payload = bytes(range(256)) + b"\xff\x00\xfe\x80"
+result = python(
+    "-c", f"import sys; sys.stdout.buffer.write({payload!r})"
+).run_bytes_sync()
+assert result.ok
+assert result.stdout == payload
+{% endhighlight %}
+{% endcall %}
+  <p>
+    The byte-mode entry points take the same <code>output</code>,
+    <code>timeout</code>, <code>context</code>, and, for a single command,
+    <code>stdin</code> arguments, and return {{ api.ref('BytesCommandResult') }}
+    or {{ api.ref('BytesPipelineResult') }}, which declare the same fields as
+    their text counterparts with <code>stdout</code> and <code>stderr</code>
+    as <code>bytes | None</code>. The mode is explicit: <code>run()</code>
+    never returns bytes and <code>run_bytes()</code> never returns text. A
+    timeout still carries its partial output in the same field,
+    <code>capture=False</code> still yields <code>None</code>, and an
+    external cancellation still re-raises <code>asyncio.CancelledError</code>.
+  </p>
+  <p>
+    Binary mode covers capture. A caller-supplied <code>on_line</code> is
+    rejected with <code>ValueError</code> before the child is spawned, since a
+    callback carrying decoded text would be a second, contradictory contract
+    for the same stream. Echo, sinks, and the heartbeat are unaffected, and
+    hooks registered with {{ api.ref('observe') }} still receive decoded
+    lines: undecodable bytes are replaced in the event while the captured
+    payload keeps the child's own bytes. That replacement is scoped to byte
+    mode; a text-mode run under <code>errors="strict"</code> still raises
+    <code>UnicodeDecodeError</code> as before.
+  </p>
 </section>
 {% endblock %}

@@ -335,8 +335,11 @@
 
 {#- An install command on a stamped slip: a prompt, the command as code in
     its own scroll region, and the copy enhancement. -#}
-{% macro install_slip(command, label) -%}
-<div class="cu-slip" data-cu-copy="text" data-cu-copy-label="{{ label }} command">
+{#- `paper=true` selects the ink-and-cream variant for a slip that sits on the
+    paper ground, as in a documentation page, where the dark default's
+    yellow label would fail contrast. -#}
+{% macro install_slip(command, label, paper=false) -%}
+<div class="cu-slip{% if paper %} cu-slip--paper{% endif %}" data-cu-copy="text" data-cu-copy-label="{{ label }} command">
   <span class="cu-slip__label" data-cu-copy-slot>{{ label }}</span>
   <div class="cu-slip__body" tabindex="0" role="region" aria-label="{{ label }}">
     <span class="cu-slip__prompt" aria-hidden="true">$</span>

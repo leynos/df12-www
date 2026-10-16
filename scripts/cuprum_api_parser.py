@@ -467,6 +467,42 @@ def _class_members(node: ast.ClassDef) -> tuple[Member, ...]:
     return tuple(members)
 
 
+def _inherited_members(
+    node: ast.ClassDef,
+    module: str,
+    resolver: _Resolver,
+    seen: set[str],
+    visited: set[str],
+) -> list[Member]:
+    """Collect the public members a class inherits from bases in the package.
+
+    A class can take part of its public surface from a mixin, as ``SafeCmd``
+    takes ``start()`` from a private base, and that surface belongs in the
+    class's entry. Only bases defined inside the package are followed: a
+    standard-library or third-party base is outside the documented source.
+    Members are listed in base order, nearest base first, and a name the
+    class or an earlier base already defines is not listed again.
+    """
+    members: list[Member] = []
+    for base in node.bases:
+        if not isinstance(base, ast.Name):
+            continue
+        try:
+            owner, definition = resolver.find(module, base.id)
+        except ApiSourceError:
+            continue
+        key = f"{owner}:{base.id}"
+        if not isinstance(definition, ast.ClassDef) or key in visited:
+            continue
+        visited.add(key)
+        for member in _class_members(definition):
+            if member.name not in seen:
+                seen.add(member.name)
+                members.append(member)
+        members.extend(_inherited_members(definition, owner, resolver, seen, visited))
+    return members
+
+
 def _clean(text: str | None) -> str | None:
     """Dedent a raw string literal the way :func:`ast.get_docstring` does."""
     if text is None:
@@ -534,6 +570,10 @@ def _entry(
                 )
                 else "class"
             )
+            own = _class_members(node)
+            inherited = _inherited_members(
+                node, module, resolver, {m.name for m in own}, set()
+            )
             return ApiEntry(
                 name,
                 kind,
@@ -543,7 +583,7 @@ def _entry(
                 _class_signature(node),
                 tuple(ast.unparse(base) for base in node.bases),
                 parse_docstring(ast.get_docstring(node)),
-                _class_members(node),
+                (*own, *inherited),
             )
         case ast.FunctionDef() | ast.AsyncFunctionDef():
             prefix = "async " if isinstance(node, ast.AsyncFunctionDef) else ""

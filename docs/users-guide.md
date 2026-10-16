@@ -220,8 +220,8 @@ sub-site carries [worked examples](/cuprum/examples/), an
 [Rust extension preview](/cuprum/internals/rust-extension/), a
 [roadmap](/cuprum/roadmap/), and the [Setwork](/cuprum/setwork/) preview.
 
-The sub-site documents Cuprum 0.2.0-beta1, installed with
-`pip install cuprum==0.2.0b1`. Every code sample was run against that release
+The sub-site documents Cuprum 0.2.0-beta2, installed with
+`pip install cuprum==0.2.0b2`. Every code sample was run against that release
 before publication, and each panel's footer names it. Where the site's
 navigation would otherwise overflow a narrow window, it degrades to a
 drop-down: the documentation's own navigation becomes a `<details>` drop-down

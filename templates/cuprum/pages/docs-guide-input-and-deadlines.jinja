@@ -10,9 +10,13 @@
     {{ api.ref('StdinInput') }}<code>(text=...)</code> encodes text with the
     context's encoding; <code>StdinInput(data=...)</code> passes bytes. Give
     one, not both. {{ api.ref('ExecutionContext') }}<code>.env</code>
-    overlays the live parent environment rather than replacing it, so an
-    empty mapping still inherits everything; <code>cwd</code> sets the
-    child's working directory.
+    overlays the live parent environment by default, so an empty mapping
+    still inherits everything; <code>cwd</code> sets the child's working
+    directory. Everything about <em>how</em> a command runs goes to
+    <code>run_sync()</code> or <code>run()</code>, never to the builder,
+    which rejects <code>cwd=</code>, <code>env=</code>,
+    <code>timeout=</code>, and the other execution-option names with a
+    <code>TypeError</code> rather than turning them into child flags.
   </p>
 {% call ui.code_panel('input_and_context.py', 'Tested', foot=[docs_tested]) %}
 {% highlight 'python', 'cuprum-syntax' %}
@@ -33,10 +37,58 @@ result = command.run_sync(
 assert result.stdout == "ready hello\n"
 {% endhighlight %}
 {% endcall %}
+</section>
+
+<section aria-labelledby="environment">
+  <h2 id="environment">Compose the environment</h2>
   <p>
-    Code that needs a replacement environment rather than an overlay must
-    build that policy itself: an overlay can add and change variables but
-    never removes one.
+    {{ api.ref('cuprum.context', 'EnvMode') }}<code>.OVERLAY</code> is the
+    default policy: values resolve against the live <code>os.environ</code>
+    when each child is spawned, not against a snapshot, so a variable set
+    after a scope starts is still seen. <code>OVERLAY</code> and
+    <code>INHERIT</code> compose: each keeps the mode an outer scope chose
+    and layers its values over the inherited overlay. <code>REPLACE</code>
+    alone draws a boundary: it starts from an empty environment, applies
+    only its mapping, and discards every outer overlay. The
+    <code>UNSET</code> value removes a variable from a composed child
+    environment, which an overlay could not do before.
+  </p>
+{% call ui.code_panel('env_modes.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import os
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+from cuprum.context import EnvMode, UNSET, env
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="env-modes")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+show = "-c", "import os; print(os.getenv('CUPRUM_DEMO'), os.getenv('CUPRUM_KEEP'))"
+
+os.environ["CUPRUM_KEEP"] = "kept"
+with env({"CUPRUM_DEMO": "overlaid"}, CUPRUM_DEMO="won"):
+    assert python(*show).run_sync().stdout == "won kept\n"
+with env({"CUPRUM_DEMO": UNSET, "CUPRUM_KEEP": UNSET}):
+    assert python(*show).run_sync().stdout == "None None\n"
+with env({"CUPRUM_DEMO": "only"}, mode=EnvMode.REPLACE):
+    assert python(*show).run_sync().stdout == "only None\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Precedence, lowest first: the process's <code>os.environ</code>, read at
+    spawn time; ambient scoped overlays, inner values winning, with a nested
+    <code>REPLACE</code> discarding everything outside it; then the per-call
+    <code>ExecutionContext.env</code> mapping, whose values win overall and
+    whose <code>env_mode</code> can also be <code>REPLACE</code>.
+    <code>os.environ</code> itself is never mutated. On POSIX the child's
+    <code>PATH</code> is what resolves a bare program name, so a replacement
+    policy that omits it can make the name fail to resolve; prefer an
+    absolute program path, or an
+    <a href="/cuprum/docs/guides/policy-and-hooks/#bind">executable binding</a>,
+    with a deliberately minimal environment. The effective mode reaches every
+    {{ api.ref('ExecEvent') }} and labels the execution and failure
+    counters, so a non-zero exit under a replacement policy is
+    distinguishable from an ordinary one.
   </p>
 </section>
 
@@ -111,6 +163,65 @@ with scoped(ScopeConfig(timeout=1.0)):
     enforces one deadline for the whole run and reports its expiry once per
     stage. Every expiry also writes a structured <code>WARNING</code> to the
     <code>cuprum.timeout</code> logger, whether or not a hook is observing.
+  </p>
+</section>
+
+<section aria-labelledby="descendants">
+  <h2 id="descendants">Reclaim the descendants a child leaves behind</h2>
+  <p>
+    A timeout terminates the process Cuprum spawned, but only that process.
+    When the child has spawned descendants of its own, they are not
+    signalled, and one that holds an inherited pipe open keeps the run
+    waiting out its end-of-file window before <code>TimeoutExpired</code> is
+    raised, while the work the deadline was meant to stop carries on.
+    {{ api.ref('ExecutionContext') }}<code>.process_group</code> takes a
+    {{ api.ref('ProcessGroupPolicy') }}. The default, <code>INHERIT</code>,
+    tears down the direct child only; <code>OWN_GROUP</code> makes the child
+    lead a new session and process group, so teardown signals the whole
+    group and every descendant still in it:
+  </p>
+{% call ui.code_panel('process_group.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import ExecutionContext, ProcessGroupPolicy, Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="process-group")
+command = sh.make(Program(sys.executable), catalogue=catalogue)(
+    "-c", "import os, sys; print(os.getpgrp() == os.getpid())"
+)
+owned = ExecutionContext(process_group=ProcessGroupPolicy.OWN_GROUP)
+assert owned.process_group is ProcessGroupPolicy.OWN_GROUP
+assert command.run_sync(context=owned).stdout == "True\n"
+assert ExecutionContext().process_group is ProcessGroupPolicy.INHERIT
+{% endhighlight %}
+{% endcall %}
+  <p>
+    The last assertion is the compatibility promise: a context that says
+    nothing keeps the child in the caller's group, so no existing run is
+    affected. Under <code>OWN_GROUP</code> teardown signals exactly the group
+    the spawn created, never the caller's, with the same two-phase grace:
+    <code>SIGTERM</code>, <code>cancel_grace</code>, then
+    <code>SIGKILL</code>. Settlement is then decided by the group rather than
+    the direct child, so a descendant the child left behind is still reached
+    after the child has exited.
+  </p>
+  <p>
+    Two trade-offs are worth knowing before opting in. Session leadership
+    detaches the child from the controlling terminal: a terminal
+    <code>SIGINT</code> or <code>SIGHUP</code> stops at the run rather than
+    reaching the child, and a child that opens <code>/dev/tty</code> fails for
+    want of one. And the guarantee is bounded by the kernel: a descendant
+    that calls <code>setsid()</code> or <code>setpgid()</code> leaves the
+    group and is out of reach, as are ancestors and siblings; containing a
+    process that actively escapes needs a supervisor, a cgroup, or a
+    container. <code>OWN_GROUP</code> raises <code>ValueError</code> at spawn
+    on Windows, which has no POSIX process groups and whose Job Objects
+    cannot be assigned atomically with process creation; <code>INHERIT</code>
+    works everywhere. A teardown outcome Cuprum could not resolve is
+    reported as a <code>group_teardown</code> event and a
+    <code>WARNING</code>, so a teardown that left a process alive is never
+    silent.
   </p>
 </section>
 {% endblock %}

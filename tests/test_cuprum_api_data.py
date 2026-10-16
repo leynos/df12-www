@@ -62,8 +62,19 @@ PACKAGE = {
             """Stop."""
 
 
+        class _Startable:
+            """A private mixin whose public method the subclass inherits."""
+
+            def start(self) -> int:
+                """Start it."""
+                return 1
+
+            def _hidden(self) -> None:
+                """Not documented either."""
+
+
         @dc.dataclass(frozen=True)
-        class Settings:
+        class Settings(_Startable):
             """Run settings.
 
             Attributes
@@ -212,14 +223,21 @@ def test_a_dataclass_signature_comes_from_its_fields(api: dict[str, typ.Any]) ->
 def test_class_members_keep_public_fields_properties_and_one_overload(
     api: dict[str, typ.Any],
 ) -> None:
-    """Private methods and overload stubs are skipped; a property is marked."""
+    """Private methods and overload stubs are skipped; a property is marked.
+
+    A public method inherited from a base defined in the package is listed
+    after the class's own members; the base's private method is not.
+    """
     members = {member.name: member.kind for member in api["Settings"].members}
     assert members == {
         "depth": "field",
         "label": "field",
         "doubled": "property",
         "scale": "method",
+        "start": "method",
     }
+    assert [member.name for member in api["Settings"].members][-1] == "start"
+    assert api["Settings"].bases == ("_Startable",)
 
 
 def test_enumeration_members_carry_their_docstrings(api: dict[str, typ.Any]) -> None:
@@ -259,13 +277,21 @@ def test_a_name_imported_from_outside_the_package_is_refused(
 
 
 def test_inline_markup_becomes_code_and_links() -> None:
-    """Literals and references render as code, and known names link."""
+    """Literals and references render as code, and known names link.
+
+    A link names the page that holds the entry, so a reference across groups
+    resolves rather than pointing at a fragment the current page lacks.
+    """
     html = builder.inline_html(
-        "Use ``a < b`` with :class:`SafeCmd` or `x`.", frozenset({"SafeCmd"})
+        "Use ``a < b`` with :class:`SafeCmd` or `x`; see :meth:`ExecEvent.phase`.",
+        {"SafeCmd": "commands", "ExecEvent": "observation"},
     )
     assert html == (
-        'Use <code>a &lt; b</code> with <a href="#SafeCmd"><code>SafeCmd</code></a> '
-        "or <code>x</code>."
+        "Use <code>a &lt; b</code> with "
+        '<a href="/cuprum/docs/api/commands/#SafeCmd"><code>SafeCmd</code></a> '
+        "or <code>x</code>; see "
+        '<a href="/cuprum/docs/api/observation/#ExecEvent">'
+        "<code>ExecEvent.phase</code></a>."
     )
 
 

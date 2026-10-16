@@ -12,12 +12,70 @@
     bounded:
   </p>
   <ul>
-    <li><strong>Lifecycle events.</strong> {{ api.ref('observe') }} delivers an {{ api.ref('ExecEvent') }} as a command plans, starts, writes, exits, or times out. Correlate by <code>exec_id</code>, not <code>pid</code>, which the operating system recycles.</li>
+    <li><strong>Lifecycle events.</strong> {{ api.ref('observe') }} delivers an {{ api.ref('ExecEvent') }} as a command plans, starts, writes, exits, or times out, and one <code>settled</code> event with its terminal outcome. Correlate by <code>exec_id</code>, not <code>pid</code>, which the operating system recycles.</li>
     <li><strong>Lines.</strong> <code>on_line</code> or {{ api.ref('SafeCmd.lines') }}, in <a href="/cuprum/docs/guides/output/">Control output</a>, for progress as it happens.</li>
     <li><strong>A heartbeat.</strong> <code>idle_after</code> says that no monitored output arrived; it says nothing about whether the child is stuck.</li>
+    <li><strong>Control operations.</strong> {{ api.ref('observe_control') }} reports what <code>signal()</code>, <code>terminate()</code>, or <code>kill()</code> on a {{ api.ref('RunningCommand') }} did to the child, which the exit code alone cannot say.</li>
+    <li><strong>Echo fallbacks.</strong> {{ api.ref('observe_echo') }} reports a truncated line, or a sink that could not encode or had closed.</li>
     <li><strong>Stream operations.</strong> One aggregate event per completed drain or pipeline transfer, for throughput.</li>
     <li><strong>The Rust pump.</strong> Whether each pipeline hop used the native pump or fell back to Python; a decline is a routing decision, not a failure. See the <a href="/cuprum/internals/rust-extension/">Rust extension</a>.</li>
   </ul>
+  <p>
+    Only {{ api.ref('observe') }} hooks can fail a run. Every other channel
+    is fail-open: a hook that raises is logged at <code>WARNING</code> and
+    the operation it was observing carries on. Their events carry only
+    bounded values, never output, argument vectors, or exception text, so the
+    ready-made metrics hooks can label series without unbounded cardinality.
+  </p>
+</section>
+
+<section aria-labelledby="settled">
+  <h2 id="settled">Read the one terminal outcome</h2>
+  <p>
+    Every execution whose <code>plan</code> event began observation ends with
+    exactly one <code>settled</code> event, including a spawn failure, a
+    timeout, and a cancellation, which have no <code>exit</code> event to
+    speak of. Its {{ api.ref('cuprum.events', 'TerminalOutcome') }} is one of
+    <code>exit_zero</code>, <code>exit_nonzero</code>, <code>timeout</code>,
+    <code>cancelled</code>, or <code>error</code>; it carries a
+    <code>pid</code> and <code>exit_code</code> only when those are known and
+    never any exception text. Phases will be added again, so give a hook that
+    matches on <code>phase</code> a default arm:
+  </p>
+{% call ui.code_panel('settled.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import ExecEvent, Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="phases")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+outcomes = []
+
+
+def hook(event: ExecEvent) -> None:
+    match event.phase:
+        case "settled":
+            outcomes.append(event.terminal_outcome)
+        case _:
+            pass  # Phases this hook does not track, including future ones.
+
+
+with sh.observe(hook):
+    python("-c", "pass").run_sync()
+assert [outcome.value for outcome in outcomes] == ["exit_zero"]
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Every event also carries the execution's <code>env_mode</code> and
+    <code>capture_mode</code>, known before the child spawns and describing
+    the whole run, so a byte-exact run under a replacement environment is
+    distinguishable from a text run under an overlay in every log record,
+    span, and counter. A binding adds <code>resolved_path</code>, the
+    executable that ran, to the event and the result. Catalogue lookup and
+    allowlist refusals happen before an <code>exec_id</code> is minted and
+    emit no events at all.
+  </p>
 </section>
 
 <section aria-labelledby="telemetry">
@@ -61,10 +119,75 @@ assert [span.name for span in tracer.spans] and tracer.spans[0].ended
 {% endhighlight %}
 {% endcall %}
   <p>
-    The structured logging adapter records <code>argv</code> verbatim, so a
+    <code>MetricsHook</code> counts <code>cuprum_failures_total</code> and
+    observes <code>cuprum_duration_seconds</code> from <code>settled</code>,
+    so the failure counter covers every outcome except <code>exit_zero</code>,
+    and <code>cuprum_terminal_outcomes_total</code> is labelled by the
+    outcome. <code>cuprum_executions_total</code> and
+    <code>cuprum_failures_total</code> carry <code>env_mode</code> and
+    <code>capture_mode</code> labels, bounded by construction;
+    <code>resolved_path</code> deliberately never becomes a label.
+    <code>TracingHook</code> closes its span on <code>settled</code>. The
+    structured logging adapter records <code>argv</code> verbatim, so a
     secret passed as an argument reaches the log: pass secrets through the
     environment or a file. Never turn untrusted arguments into metric
     labels.
+  </p>
+</section>
+
+<section aria-labelledby="control">
+  <h2 id="control">Watch what a stop request did</h2>
+  <p>
+    An exit code of <code>-15</code> is the same whether the child took the
+    first <code>SIGTERM</code> or needed <code>SIGKILL</code> after its grace
+    ran out, and a stop refused because the child had already gone leaves no
+    trace at all. {{ api.ref('observe_control') }} registers a
+    {{ api.ref('ControlHook') }} on a context-local channel; every completed
+    <code>signal()</code>, <code>terminate()</code>, and <code>kill()</code>
+    on a {{ api.ref('RunningCommand') }} then reports one
+    {{ api.ref('ControlEvent') }} with the closed
+    {{ api.ref('ControlOperation') }} and {{ api.ref('ControlOutcome') }},
+    the measured duration, and the run's <code>exec_id</code>:
+  </p>
+{% call ui.code_panel('control_observation.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import asyncio
+import sys
+
+from cuprum import ExecutionContext, Program, ProgramCatalogue, observe_control, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="control")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+command = python("-c", "import time; time.sleep(30)")
+events = []
+
+
+async def stop_a_child() -> None:
+    async with await command.start(
+        context=ExecutionContext(cancel_grace=0.2),
+    ) as handle:
+        await handle.terminate()
+
+
+with observe_control(events.append):
+    asyncio.run(stop_a_child())
+assert [(event.operation, event.outcome) for event in events] == [
+    ("terminate", "delivered"),
+]
+{% endhighlight %}
+{% endcall %}
+  <p>
+    An outcome of <code>escalated</code> means the child ignored
+    <code>SIGTERM</code> and had to be killed; <code>refused_exited</code> and
+    <code>refused_unsupported</code> mirror the two <code>signal()</code>
+    refusals. Emission is fail-open, so an observer that raises cannot
+    replace the refusal the caller is owed or interrupt the cleanup under
+    way, and a caller who registers nothing pays no clock read.
+    {{ api.ref('cuprum.adapters.control_metrics', 'control_metrics_hook') }}
+    projects the events to bounded counters and a duration histogram whose
+    only labels are the operation and the outcome; the PID reaches the event
+    and the span but never a label, because a recycled PID would fold two
+    children into one series.
   </p>
 </section>
 

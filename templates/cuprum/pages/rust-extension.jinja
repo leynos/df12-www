@@ -33,7 +33,7 @@
   ],
   'branches': [
     {'when': 'Hop cannot be handed over safely', 'then': 'The hop runs on the Python pump and the reason is recorded: a DEBUG record on cuprum._pipeline_streams and, if registered, a decline metric.'},
-    {'when': 'Windows', 'then': 'Every hop declines with platform_unsupported and uses the Python pump. Pipelines stay correct.'},
+    {'when': 'Windows', 'then': 'Every hop declines with platform_unsupported and uses the Python pump. A raw overlapped handle handed straight to the native shim is rejected, and counted as windows_raw_handle_rejected, rather than used. Pipelines stay correct.'},
     {'when': 'rust selected but not installed', 'then': 'Pipeline execution raises ImportError rather than silently falling back.'},
   ],
   'takeaway': 'Only the inter-stage copy has a native path. Capture, echo, line events, spawning, policy, and results are the same Python code on every backend.',
@@ -68,14 +68,15 @@
         {% call ui.callout('preview', 'Technical preview') %}
         <p>
           ADR-001, which introduces the extension, is still marked
-          <em>Proposed</em>. Cuprum {{ cuprum_version }} is the first release
-          with native wheels, for glibc-based Linux (x86_64, aarch64), macOS
-          (x86_64, arm64), and Windows (x86_64). Each targets the CPython 3.12
-          stable ABI, so one wheel per platform serves 3.12 and every later
-          version (ADR-016). Other platforms, and free-threaded builds, install
-          the pure-Python wheel; Windows arm64 is planned for a later beta. To
-          build for another platform, use a checkout with Rust 1.85 or later
-          and <code>maturin develop</code>.
+          <em>Proposed</em>. Native wheels have shipped since 0.2.0-beta1, for
+          glibc-based Linux (x86_64, aarch64), macOS (x86_64, arm64), and
+          Windows (x86_64). Each targets the CPython 3.12 stable ABI, so one
+          wheel per platform serves 3.12 and every later version (ADR-016).
+          Other platforms, and free-threaded builds, install the pure-Python
+          wheel, as does the source distribution, whose build never compiles
+          the extension; Windows arm64 is planned for a later beta. To build
+          for another platform, use a checkout with Rust 1.85 or later and
+          <code>maturin develop</code>.
         </p>
         {% endcall %}
       </div>
@@ -172,7 +173,11 @@ False
           <p>
             The unsafe Rust is confined to audited boundary crates, with Verus,
             Kani, and Miri evidence archived, and the native pump’s lifecycle
-            is modelled with Loom.
+            is modelled with Loom. Since 0.2.0-beta1, Miri runs across more of
+            the stream boundary, and a <code>RustStreamError</code> enum at
+            the PyO3 boundary maps every native failure to the same Python
+            exception the pure path would raise, so both backends fail the
+            same way.
           </p>
         </div>
         <div class="cu-prose">

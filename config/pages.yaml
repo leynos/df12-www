@@ -441,6 +441,8 @@ pages:
   git-donkey:
     label: "git-donkey"
     repo: leynos/git-donkey
+    latest_release: v0.2.0
+    latest_release_published_at: '2026-09-14T02:02:18Z'
     language: python
     category: tool
     filename_prefix: docs-git-donkey-
@@ -464,8 +466,8 @@ pages:
   lading:
     label: "Lading"
     repo: leynos/lading
-    latest_release: v0.2.0
-    latest_release_published_at: '2026-06-21T14:18:45Z'
+    latest_release: v0.3.1
+    latest_release_published_at: '2026-09-14T21:38:38Z'
     language: python
     category: tool
     filename_prefix: docs-lading-
@@ -489,8 +491,8 @@ pages:
   mdtablefix:
     label: "mdtablefix"
     repo: leynos/mdtablefix
-    latest_release: v0.5.0
-    latest_release_published_at: '2026-07-27T18:21:15Z'
+    latest_release: v0.6.1
+    latest_release_published_at: '2026-09-29T14:12:16Z'
     language: rust
     category: tool
     filename_prefix: docs-mdtablefix-
@@ -647,6 +649,8 @@ pages:
   typos-config-builder:
     label: "typos-config-builder"
     repo: leynos/typos-config-builder
+    latest_release: v0.1.3
+    latest_release_published_at: '2026-09-27T23:36:37Z'
     language: python
     category: tool
     filename_prefix: docs-typos-config-builder-
@@ -683,8 +687,8 @@ pages:
   whitaker:
     label: "Whitaker"
     repo: leynos/whitaker
-    latest_release: v0.2.7
-    latest_release_published_at: '2026-07-22T22:35:51Z'
+    latest_release: v0.2.9
+    latest_release_published_at: '2026-09-24T12:08:16Z'
     language: rust
     category: tool
     filename_prefix: docs-whitaker-
@@ -763,6 +767,8 @@ pages:
   falcon-correlate:
     label: "Falcon Correlate"
     repo: leynos/falcon-correlate
+    latest_release: v0.1.0
+    latest_release_published_at: '2026-08-23T12:59:24Z'
     language: python
     category: library
     filename_prefix: docs-falcon-correlate-
@@ -799,8 +805,8 @@ pages:
   monotony:
     label: "Monotony"
     repo: leynos/monotony
-    latest_release: v0.1.0
-    latest_release_published_at: '2026-06-28T22:49:39Z'
+    latest_release: v1.0.0
+    latest_release_published_at: '2026-08-24T00:38:43Z'
     language: rust
     category: library
     filename_prefix: docs-monotony-
@@ -812,8 +818,8 @@ pages:
   ortho-config:
     label: "Ortho Config"
     repo: leynos/ortho-config
-    latest_release: v0.7.0
-    latest_release_published_at: '2026-01-02T06:16:15Z'
+    latest_release: v0.9.1
+    latest_release_published_at: '2026-09-04T19:19:30Z'
     language: rust
     category: library
     filename_prefix: docs-ortho-config-
@@ -826,8 +832,8 @@ pages:
   pg-embedded-setup-unpriv:
     label: "pg-embedded-setup-unpriv"
     repo: leynos/pg-embed-setup-unpriv
-    latest_release: v0.5.2
-    latest_release_published_at: '2026-07-20T22:38:16Z'
+    latest_release: v0.6.3
+    latest_release_published_at: '2026-09-30T13:15:53Z'
     language: rust
     category: library
     filename_prefix: docs-pg-embedded-
@@ -1277,19 +1283,20 @@ sites:
       site_status: "Active development"
       repository_url: "https://github.com/leynos/episodic"
     content_pages:
-      - { key: why, label: Why Episodic, template: pages/why.jinja, output_slug: why }
-      - { key: workflow, label: Workflow, template: pages/workflow.jinja, output_slug: workflow }
-      - { key: content, label: Content and provenance, template: pages/content.jinja, output_slug: workflow/content }
-      - { key: quality, label: Quality and human review, template: pages/quality.jinja, output_slug: workflow/quality }
-      - { key: audio, label: Audio production, template: pages/audio.jinja, output_slug: workflow/audio }
-      - { key: architecture, label: Architecture, template: pages/architecture.jinja, output_slug: architecture }
-      - { key: interfaces, label: Interfaces, template: pages/interfaces.jinja, output_slug: interfaces }
-      - { key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs }
-      - { key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: docs/getting-started }
-      - { key: api, label: API and integration reference, template: pages/api.jinja, output_slug: docs/api }
-      - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
-      - { key: contributing, label: Contributing, template: pages/contributing.jinja, output_slug: contributing }
-      - { key: hosting, label: Hosting contract, template: pages/hosting.jinja, output_slug: hosting }
+      - {key: why, label: Why Episodic, template: pages/why.jinja, output_slug: why}
+      - {key: workflow, label: Workflow, template: pages/workflow.jinja, output_slug: workflow}
+      - {key: content, label: Content and provenance, template: pages/content.jinja, output_slug: workflow/content}
+      - {key: quality, label: Quality and human review, template: pages/quality.jinja, output_slug: workflow/quality}
+      - {key: audio, label: Audio production, template: pages/audio.jinja, output_slug: workflow/audio}
+      - {key: architecture, label: Architecture, template: pages/architecture.jinja, output_slug: architecture}
+      - {key: interfaces, label: Interfaces, template: pages/interfaces.jinja, output_slug: interfaces}
+      - {key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs}
+      - {key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: 
+          docs/getting-started}
+      - {key: api, label: API and integration reference, template: pages/api.jinja, output_slug: docs/api}
+      - {key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap}
+      - {key: contributing, label: Contributing, template: pages/contributing.jinja, output_slug: contributing}
+      - {key: hosting, label: Hosting contract, template: pages/hosting.jinja, output_slug: hosting}
     pages: {}
 
   netsuke:
@@ -1681,37 +1688,60 @@ sites:
     homepage:
       title: "Cuprum — typed command execution for Python"
     content_pages:
-      - { key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: getting-started }
-      - { key: examples, label: Worked examples, template: pages/examples.jinja, output_slug: examples }
-      - { key: examples-first-command, label: Run an approved command, template: pages/examples-first-command.jinja, output_slug: examples/first-command }
-      - { key: examples-pipeline-tee, label: Pipeline, tee, and stage failure, template: pages/examples-pipeline-tee.jinja, output_slug: examples/pipeline-tee }
-      - { key: examples-deployment-helper, label: A deployment helper with scoped policy, template: pages/examples-deployment-helper.jinja, output_slug: examples/deployment-helper }
-      - { key: examples-ci-observability, label: Observe CI commands, template: pages/examples-ci-observability.jinja, output_slug: examples/ci-observability }
-      - { key: examples-concurrent-jobs, label: Run jobs concurrently, template: pages/examples-concurrent-jobs.jinja, output_slug: examples/concurrent-jobs }
-      - { key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals }
-      - { key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: internals/rust-extension }
-      - { key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs }
-      - { key: docs-guides, label: Guides, template: pages/docs-guides.jinja, output_slug: docs/guides }
-      - { key: docs-guide-run-a-command, label: "Run a command", template: pages/docs-guide-run-a-command.jinja, output_slug: docs/guides/run-a-command }
-      - { key: docs-guide-output, label: "Control output", template: pages/docs-guide-output.jinja, output_slug: docs/guides/output }
-      - { key: docs-guide-input-and-deadlines, label: "Input, environment, and deadlines", template: pages/docs-guide-input-and-deadlines.jinja, output_slug: docs/guides/input-and-deadlines }
-      - { key: docs-guide-pipelines-and-concurrency, label: "Pipelines and concurrency", template: pages/docs-guide-pipelines-and-concurrency.jinja, output_slug: docs/guides/pipelines-and-concurrency }
-      - { key: docs-guide-catalogues-and-builders, label: "Catalogues and builders", template: pages/docs-guide-catalogues-and-builders.jinja, output_slug: docs/guides/catalogues-and-builders }
-      - { key: docs-guide-policy-and-hooks, label: "Scopes, policy, and hooks", template: pages/docs-guide-policy-and-hooks.jinja, output_slug: docs/guides/policy-and-hooks }
-      - { key: docs-guide-observe, label: "Observe production runs", template: pages/docs-guide-observe.jinja, output_slug: docs/guides/observe }
-      - { key: docs-guide-troubleshoot, label: "Troubleshoot a run", template: pages/docs-guide-troubleshoot.jinja, output_slug: docs/guides/troubleshoot }
-      - { key: docs-guide-migrate, label: "Migrate to 0.2.0", template: pages/docs-guide-migrate.jinja, output_slug: docs/guides/migrate }
-      - { key: docs-api, label: API reference, template: pages/docs-api.jinja, output_slug: docs/api }
-      - { key: docs-api-commands, label: "Commands and results", template: pages/docs-api-commands.jinja, output_slug: docs/api/commands }
-      - { key: docs-api-catalogues, label: "Programs and catalogues", template: pages/docs-api-catalogues.jinja, output_slug: docs/api/catalogues }
-      - { key: docs-api-pipelines, label: "Pipelines and concurrency", template: pages/docs-api-pipelines.jinja, output_slug: docs/api/pipelines }
-      - { key: docs-api-policy, label: "Scopes, policy, and hooks", template: pages/docs-api-policy.jinja, output_slug: docs/api/policy }
-      - { key: docs-api-observation, label: "Events and observation", template: pages/docs-api-observation.jinja, output_slug: docs/api/observation }
-      - { key: docs-api-rust, label: "Rust pump and backends", template: pages/docs-api-rust.jinja, output_slug: docs/api/rust }
-      - { key: docs-api-adapters, label: "Adapters and sinks", template: pages/docs-api-adapters.jinja, output_slug: docs/api/adapters }
-      - { key: docs-api-errors, label: "Errors", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors }
-      - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
-      - { key: setwork, label: Setwork, template: pages/setwork.jinja, output_slug: setwork }
+      - {key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: 
+          getting-started}
+      - {key: examples, label: Worked examples, template: pages/examples.jinja, output_slug: examples}
+      - {key: examples-first-command, label: Run an approved command, template: pages/examples-first-command.jinja, 
+          output_slug: examples/first-command}
+      - {key: examples-pipeline-tee, label: Pipeline, tee: null, and stage failure: null, template: 
+          pages/examples-pipeline-tee.jinja, output_slug: examples/pipeline-tee}
+      - {key: examples-deployment-helper, label: A deployment helper with scoped policy, template: 
+          pages/examples-deployment-helper.jinja, output_slug: examples/deployment-helper}
+      - {key: examples-ci-observability, label: Observe CI commands, template: pages/examples-ci-observability.jinja, 
+          output_slug: examples/ci-observability}
+      - {key: examples-concurrent-jobs, label: Run jobs concurrently, template: pages/examples-concurrent-jobs.jinja, 
+          output_slug: examples/concurrent-jobs}
+      - {key: internals, label: Internals, template: pages/internals.jinja, output_slug: internals}
+      - {key: rust-extension, label: Rust extension, template: pages/rust-extension.jinja, output_slug: 
+          internals/rust-extension}
+      - {key: docs, label: Documentation, template: pages/docs.jinja, output_slug: docs}
+      - {key: docs-guides, label: Guides, template: pages/docs-guides.jinja, output_slug: docs/guides}
+      - {key: docs-guide-run-a-command, label: "Run a command", template: pages/docs-guide-run-a-command.jinja, 
+          output_slug: docs/guides/run-a-command}
+      - {key: docs-guide-output, label: "Control output", template: pages/docs-guide-output.jinja, output_slug: 
+          docs/guides/output}
+      - {key: docs-guide-input-and-deadlines, label: "Input, environment, and deadlines", template: 
+          pages/docs-guide-input-and-deadlines.jinja, output_slug: docs/guides/input-and-deadlines}
+      - {key: docs-guide-pipelines-and-concurrency, label: "Pipelines and concurrency", template: 
+          pages/docs-guide-pipelines-and-concurrency.jinja, output_slug: docs/guides/pipelines-and-concurrency}
+      - {key: docs-guide-catalogues-and-builders, label: "Catalogues and builders", template: 
+          pages/docs-guide-catalogues-and-builders.jinja, output_slug: docs/guides/catalogues-and-builders}
+      - {key: docs-guide-policy-and-hooks, label: "Scopes, policy, and hooks", template: 
+          pages/docs-guide-policy-and-hooks.jinja, output_slug: docs/guides/policy-and-hooks}
+      - {key: docs-guide-observe, label: "Observe production runs", template: pages/docs-guide-observe.jinja, 
+          output_slug: docs/guides/observe}
+      - {key: docs-guide-troubleshoot, label: "Troubleshoot a run", template: pages/docs-guide-troubleshoot.jinja, 
+          output_slug: docs/guides/troubleshoot}
+      - {key: docs-guide-migrate, label: "Migrate to 0.2.0", template: pages/docs-guide-migrate.jinja, output_slug: 
+          docs/guides/migrate}
+      - {key: docs-api, label: API reference, template: pages/docs-api.jinja, output_slug: docs/api}
+      - {key: docs-api-commands, label: "Commands and results", template: pages/docs-api-commands.jinja, output_slug: 
+          docs/api/commands}
+      - {key: docs-api-catalogues, label: "Programs and catalogues", template: pages/docs-api-catalogues.jinja, 
+          output_slug: docs/api/catalogues}
+      - {key: docs-api-pipelines, label: "Pipelines and concurrency", template: pages/docs-api-pipelines.jinja, 
+          output_slug: docs/api/pipelines}
+      - {key: docs-api-policy, label: "Scopes, policy, and hooks", template: pages/docs-api-policy.jinja, output_slug: 
+          docs/api/policy}
+      - {key: docs-api-observation, label: "Events and observation", template: pages/docs-api-observation.jinja, 
+          output_slug: docs/api/observation}
+      - {key: docs-api-rust, label: "Rust pump and backends", template: pages/docs-api-rust.jinja, output_slug: 
+          docs/api/rust}
+      - {key: docs-api-adapters, label: "Adapters and sinks", template: pages/docs-api-adapters.jinja, output_slug: 
+          docs/api/adapters}
+      - {key: docs-api-errors, label: "Errors", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors}
+      - {key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap}
+      - {key: setwork, label: Setwork, template: pages/setwork.jinja, output_slug: setwork}
     pages: {}
 
   rstest-bdd:
@@ -1760,18 +1790,23 @@ sites:
     homepage:
       title: "rstest-bdd — Small stories. Real Rust tests."
     content_pages:
-      - { key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: getting-started }
-      - { key: guides, label: Guides, template: pages/guides.jinja, output_slug: guides }
-      - { key: guide-feature-files, label: Write feature files, template: pages/guide-feature-files.jinja, output_slug: guides/feature-files }
-      - { key: guide-steps, label: Define steps, template: pages/guide-steps.jinja, output_slug: guides/steps }
-      - { key: guide-fixtures-and-state, label: Fixtures and state, template: pages/guide-fixtures-and-state.jinja, output_slug: guides/fixtures-and-state }
-      - { key: guide-binding-and-filtering, label: Bind and filter scenarios, template: pages/guide-binding-and-filtering.jinja, output_slug: guides/binding-and-filtering }
-      - { key: guide-async, label: Async scenarios, template: pages/guide-async.jinja, output_slug: guides/async }
-      - { key: guide-tooling, label: Tooling, template: pages/guide-tooling.jinja, output_slug: guides/tooling }
-      - { key: guide-migrate-to-0-6, label: Migrate to 0.6, template: pages/guide-migrate-to-0-6.jinja, output_slug: guides/migrate-to-0-6 }
-      - { key: harnesses, label: Harnesses, template: pages/harnesses.jinja, output_slug: harnesses }
-      - { key: compare, label: Compare, template: pages/compare.jinja, output_slug: compare }
-      - { key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap }
+      - {key: getting-started, label: Getting started, template: pages/getting-started.jinja, output_slug: 
+          getting-started}
+      - {key: guides, label: Guides, template: pages/guides.jinja, output_slug: guides}
+      - {key: guide-feature-files, label: Write feature files, template: pages/guide-feature-files.jinja, output_slug: 
+          guides/feature-files}
+      - {key: guide-steps, label: Define steps, template: pages/guide-steps.jinja, output_slug: guides/steps}
+      - {key: guide-fixtures-and-state, label: Fixtures and state, template: pages/guide-fixtures-and-state.jinja, 
+          output_slug: guides/fixtures-and-state}
+      - {key: guide-binding-and-filtering, label: Bind and filter scenarios, template: 
+          pages/guide-binding-and-filtering.jinja, output_slug: guides/binding-and-filtering}
+      - {key: guide-async, label: Async scenarios, template: pages/guide-async.jinja, output_slug: guides/async}
+      - {key: guide-tooling, label: Tooling, template: pages/guide-tooling.jinja, output_slug: guides/tooling}
+      - {key: guide-migrate-to-0-6, label: Migrate to 0.6, template: pages/guide-migrate-to-0-6.jinja, output_slug: 
+          guides/migrate-to-0-6}
+      - {key: harnesses, label: Harnesses, template: pages/harnesses.jinja, output_slug: harnesses}
+      - {key: compare, label: Compare, template: pages/compare.jinja, output_slug: compare}
+      - {key: roadmap, label: Roadmap, template: pages/roadmap.jinja, output_slug: roadmap}
     pages: {}
 
   femtologging:
@@ -1795,12 +1830,12 @@ sites:
       repository_url: "https://github.com/leynos/femtologging"
       source_base: "https://github.com/leynos/femtologging/blob/f5bcaa8257f4c59a361dc4f41585b9ecccb9f345"
     nav_links:
-      - { label: Home, href: /femtologging/ }
-      - { label: Docs, href: /femtologging/docs/ }
-      - { label: Examples, href: /femtologging/examples/ }
-      - { label: Architecture, href: /femtologging/architecture/ }
-      - { label: Compatibility, href: /femtologging/compatibility/ }
-      - { label: Roadmap, href: /femtologging/roadmap/ }
+      - {label: Home, href: /femtologging/}
+      - {label: Docs, href: /femtologging/docs/}
+      - {label: Examples, href: /femtologging/examples/}
+      - {label: Architecture, href: /femtologging/architecture/}
+      - {label: Compatibility, href: /femtologging/compatibility/}
+      - {label: Roadmap, href: /femtologging/roadmap/}
     shared_content:
       - terms-of-use
       - privacy-policy
@@ -1808,28 +1843,46 @@ sites:
     homepage:
       title: "femtologging · Logging, under the microscope."
     content_pages:
-      - { key: getting-started, label: "A first record, end to end.", template: pages/getting-started.jinja, output_slug: getting-started }
-      - { key: docs-guides-loggers, label: "Create and route loggers", template: pages/docs-guides-loggers.jinja, output_slug: docs/guides/loggers }
-      - { key: docs-guides-handlers, label: "Choose and configure output", template: pages/docs-guides-handlers.jinja, output_slug: docs/guides/handlers }
-      - { key: docs-guides-configuration, label: "Configure the runtime", template: pages/docs-guides-configuration.jinja, output_slug: docs/guides/configuration }
-      - { key: docs-guides-formatting-and-filtering, label: "Format and filter records", template: pages/docs-guides-formatting-and-filtering.jinja, output_slug: docs/guides/formatting-and-filtering }
-      - { key: docs-guides-structured-records, label: "Add context and exception details", template: pages/docs-guides-structured-records.jinja, output_slug: docs/guides/structured-records }
-      - { key: docs-guides-operations, label: "Handle pressure and shutdown", template: pages/docs-guides-operations.jinja, output_slug: docs/guides/operations }
-      - { key: docs-guides-migration, label: "Migrate existing logging code", template: pages/docs-guides-migration.jinja, output_slug: docs/guides/migration }
-      - { key: examples, label: "Worked examples", template: pages/examples.jinja, output_slug: examples }
-      - { key: architecture, label: "Python above. Rust below.", template: pages/architecture.jinja, output_slug: architecture }
-      - { key: compatibility, label: "Compatibility, with boundaries.", template: pages/compatibility.jinja, output_slug: compatibility }
-      - { key: performance, label: "Measure the runtime.", template: pages/performance.jinja, output_slug: performance }
-      - { key: roadmap, label: "An observed runtime. Several possible futures.", template: pages/roadmap.jinja, output_slug: roadmap }
-      - { key: contributing, label: "Contribute across the boundary.", template: pages/contributing.jinja, output_slug: contributing }
-      - { key: design, label: "The femtofauna field guide.", template: pages/design.jinja, output_slug: design }
-      - { key: docs-api-loggers, label: "Loggers and routing", template: pages/docs-api-loggers.jinja, output_slug: docs/api/loggers }
-      - { key: docs-api-handlers, label: "Handlers and transports", template: pages/docs-api-handlers.jinja, output_slug: docs/api/handlers }
-      - { key: docs-api-configuration, label: "Configuration and mutation", template: pages/docs-api-configuration.jinja, output_slug: docs/api/configuration }
-      - { key: docs-api-records-and-filters, label: "Records, formatters, and filters", template: pages/docs-api-records-and-filters.jinja, output_slug: docs/api/records-and-filters }
-      - { key: docs-api-rust-bridges, label: "Rust logging bridges", template: pages/docs-api-rust-bridges.jinja, output_slug: docs/api/rust-bridges }
-      - { key: docs-api-errors, label: "Errors and diagnostics", template: pages/docs-api-errors.jinja, output_slug: docs/api/errors }
-      - { key: docs, label: "Documentation", template: pages/docs.jinja, output_slug: docs }
-      - { key: docs-guides, label: "Task guides", template: pages/docs-guides.jinja, output_slug: docs/guides }
-      - { key: docs-api, label: "API reference", template: pages/docs-api.jinja, output_slug: docs/api }
+      - {key: getting-started, label: "A first record, end to end.", template: pages/getting-started.jinja, output_slug: 
+          getting-started}
+      - {key: docs-guides-loggers, label: "Create and route loggers", template: pages/docs-guides-loggers.jinja, 
+          output_slug: docs/guides/loggers}
+      - {key: docs-guides-handlers, label: "Choose and configure output", template: pages/docs-guides-handlers.jinja, 
+          output_slug: docs/guides/handlers}
+      - {key: docs-guides-configuration, label: "Configure the runtime", template: pages/docs-guides-configuration.jinja,
+        output_slug: docs/guides/configuration}
+      - {key: docs-guides-formatting-and-filtering, label: "Format and filter records", template: 
+          pages/docs-guides-formatting-and-filtering.jinja, output_slug: docs/guides/formatting-and-filtering}
+      - {key: docs-guides-structured-records, label: "Add context and exception details", template: 
+          pages/docs-guides-structured-records.jinja, output_slug: docs/guides/structured-records}
+      - {key: docs-guides-operations, label: "Handle pressure and shutdown", template: 
+          pages/docs-guides-operations.jinja, output_slug: docs/guides/operations}
+      - {key: docs-guides-migration, label: "Migrate existing logging code", template: pages/docs-guides-migration.jinja,
+        output_slug: docs/guides/migration}
+      - {key: examples, label: "Worked examples", template: pages/examples.jinja, output_slug: examples}
+      - {key: architecture, label: "Python above. Rust below.", template: pages/architecture.jinja, output_slug: 
+          architecture}
+      - {key: compatibility, label: "Compatibility, with boundaries.", template: pages/compatibility.jinja, output_slug: 
+          compatibility}
+      - {key: performance, label: "Measure the runtime.", template: pages/performance.jinja, output_slug: performance}
+      - {key: roadmap, label: "An observed runtime. Several possible futures.", template: pages/roadmap.jinja, 
+          output_slug: roadmap}
+      - {key: contributing, label: "Contribute across the boundary.", template: pages/contributing.jinja, output_slug: 
+          contributing}
+      - {key: design, label: "The femtofauna field guide.", template: pages/design.jinja, output_slug: design}
+      - {key: docs-api-loggers, label: "Loggers and routing", template: pages/docs-api-loggers.jinja, output_slug: 
+          docs/api/loggers}
+      - {key: docs-api-handlers, label: "Handlers and transports", template: pages/docs-api-handlers.jinja, output_slug: 
+          docs/api/handlers}
+      - {key: docs-api-configuration, label: "Configuration and mutation", template: pages/docs-api-configuration.jinja, 
+          output_slug: docs/api/configuration}
+      - {key: docs-api-records-and-filters, label: "Records, formatters, and filters", template: 
+          pages/docs-api-records-and-filters.jinja, output_slug: docs/api/records-and-filters}
+      - {key: docs-api-rust-bridges, label: "Rust logging bridges", template: pages/docs-api-rust-bridges.jinja, 
+          output_slug: docs/api/rust-bridges}
+      - {key: docs-api-errors, label: "Errors and diagnostics", template: pages/docs-api-errors.jinja, output_slug: 
+          docs/api/errors}
+      - {key: docs, label: "Documentation", template: pages/docs.jinja, output_slug: docs}
+      - {key: docs-guides, label: "Task guides", template: pages/docs-guides.jinja, output_slug: docs/guides}
+      - {key: docs-api, label: "API reference", template: pages/docs-api.jinja, output_slug: docs/api}
     pages: {}

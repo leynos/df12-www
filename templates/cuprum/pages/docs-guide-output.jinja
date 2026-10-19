@@ -109,29 +109,44 @@ assert asyncio.run(first_line()) == "0"
   </p>
 {% call ui.code_panel('broken_pipe.py', 'Tested', foot=[docs_tested]) %}
 {% highlight 'python', 'cuprum-syntax' %}
+import io
 import sys
 
 from cuprum import (
     BrokenPipePolicy,
+    ExecutionContext,
     Program,
     ProgramCatalogue,
     RunOutputOptions,
     sh,
 )
 
+
+class ClosedReader(io.TextIOBase):
+    """An echo destination whose reader has gone away."""
+
+    def write(self, text: str) -> int:
+        raise BrokenPipeError
+
+
 catalogue = ProgramCatalogue.from_programs(sys.executable, name="broken-pipe")
 command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hello')")
-options = RunOutputOptions(broken_pipe_policy=BrokenPipePolicy.BEST_EFFORT)
-assert options.broken_pipe_policy is BrokenPipePolicy.BEST_EFFORT
-result = command.run_sync(output=options)
+result = command.run_sync(
+    output=RunOutputOptions(echo=True, broken_pipe_policy=BrokenPipePolicy.BEST_EFFORT),
+    context=ExecutionContext(stdout_sink=ClosedReader()),
+)
 assert result.ok and result.stdout == "hello\n"
+assert [(f.stream, f.error_category) for f in result.relay_fallbacks] == [
+    ("stdout", "broken_pipe")
+]
 {% endhighlight %}
 {% endcall %}
   <p>
-    Under best-effort, a <code>BrokenPipeError</code> from the sink disables
+    Under best-effort, the <code>BrokenPipeError</code> from the sink disables
     echo for the affected stream only; capture, line observation, and child
-    reaping continue, and the result's <code>relay_fallbacks</code> names the
-    <code>broken_pipe</code> category. The default, <code>STRICT</code>,
+    reaping continue, and the result's <code>relay_fallbacks</code> records
+    one entry naming the stream and the <code>broken_pipe</code> category,
+    never the output. The default, <code>STRICT</code>,
     propagates the error and aborts the run. Only <code>BrokenPipeError</code>
     is affected; any other sink <code>OSError</code> propagates under both
     policies.

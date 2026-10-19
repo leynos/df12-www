@@ -95,7 +95,7 @@
   {'status': 'shipped', 'group': 'builders', 'ref': 'ADR-019 · #437', 'released': '0.2.0b2',
    'title': 'An owned handle for a running command',
    'body': 'SafeCmd.start() returns a RunningCommand with wait(), signal(), terminate(), and kill(), settled once however the child ends; async with tears a live child down.',
-   'exit': 'Every control operation is idempotent, a stopped child still reports its output, and no child is left unreaped.',
+   'exit': 'terminate() and kill() are safe to repeat after the child has gone, signal() on an exited child raises SignalAfterExitError, a stopped child still reports its output, and no child is left unreaped.',
    'href': 'docs/adr-019-control-observation-channel.md'},
   {'status': 'shipped', 'group': 'builders', 'ref': '#444', 'released': '0.2.0b2',
    'title': 'Byte-exact result mode',

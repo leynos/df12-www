@@ -81,7 +81,7 @@ assert result.exit_code == 7
   <h2 id="arguments">Build arguments deliberately</h2>
   <p>
     The builder accepts exactly {{ api.ref('ArgValue') }}: strings,
-    numbers, booleans, and paths, as positional arguments. Anything else, a
+    numbers, booleans, and paths, as positional or keyword values. Anything else, a
     list, a dict, or <code>bytes</code>, raises <code>TypeError</code> naming
     the type rather than reaching the child as its <code>repr</code>; decode
     filesystem bytes with <code>os.fsdecode()</code> first. Keyword arguments
@@ -271,7 +271,7 @@ Path(workdir).rmdir()
     ('input=...', 'stdin=StdinInput(text=...) or StdinInput(data=...)'),
     ('timeout=...', 'timeout=...; catch cuprum.TimeoutExpired, a TimeoutError'),
     ('A shell pipe, a | b', '(a_cmd | b_cmd).run_sync()'),
-    ('stdout=None (inherit the terminal)', 'output=RunOutputOptions(capture=False, echo=True)'),
+    ('stdout=None (inherit the terminal)', 'output=RunOutputOptions(capture=False, stdout=StdioTarget.inherit(), stderr=StdioTarget.inherit())'),
     ('subprocess.Popen and .terminate()', 'await cmd.start(); see Hold a running child, above'),
   ] %}
   <tr role="row">

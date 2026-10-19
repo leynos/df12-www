@@ -13,8 +13,10 @@ from __future__ import annotations
 import shutil
 import string
 import subprocess
+import tempfile
 import textwrap
 import typing as typ
+from pathlib import Path
 
 import pytest
 from hypothesis import given, settings
@@ -38,11 +40,20 @@ PACKAGE = {
     "__init__.py": '''
         """A fixture package."""
         from pkg import sh
-        from pkg.core import Colour, Settings, run
+        from pkg.core import Colour, Handle, Settings, run
         from pkg.types import Name
         from .context import current, get_current
 
-        __all__ = ["Colour", "Name", "Settings", "current", "get_current", "run", "sh"]
+        __all__ = [
+            "Colour",
+            "Handle",
+            "Name",
+            "Settings",
+            "current",
+            "get_current",
+            "run",
+            "sh",
+        ]
     ''',
     "types.py": """
         import typing as typ
@@ -71,6 +82,35 @@ PACKAGE = {
 
             def _hidden(self) -> None:
                 """Not documented either."""
+
+
+        class _Left(_Startable):
+            """One side of a diamond, inheriting ``start`` unchanged."""
+
+            def left(self) -> None:
+                """Only on the left."""
+
+
+        class _Right(_Startable):
+            """The other side, overriding ``start``."""
+
+            def start(self) -> int:
+                """Start it from the right."""
+                return 2
+
+
+        class _Generic[T](_Right):
+            """A generic base, used subscripted by its subclass."""
+
+            def detach(self) -> None:
+                """Release it."""
+
+
+        class Handle(_Left, _Generic["Handle"], dict):
+            """A diamond with a subscripted base and an external one."""
+
+            def own(self) -> None:
+                """Defined on the class itself."""
 
 
         @dc.dataclass(frozen=True)
@@ -187,6 +227,7 @@ def test_every_export_resolves_through_its_re_exports(api: dict[str, typ.Any]) -
     """Names re-exported through subpackages resolve to their defining module."""
     assert set(api) == {
         "Colour",
+        "Handle",
         "Name",
         "Settings",
         "current",
@@ -238,6 +279,116 @@ def test_class_members_keep_public_fields_properties_and_one_overload(
     }
     assert [member.name for member in api["Settings"].members][-1] == "start"
     assert api["Settings"].bases == ("_Startable",)
+
+
+def test_inherited_members_follow_method_resolution_order(
+    api: dict[str, typ.Any],
+) -> None:
+    """A diamond takes an overridden member from the class Python would.
+
+    ``Handle(_Left, _Generic["Handle"], dict)`` inherits ``start`` from
+    ``_Right`` through the subscripted base, not from ``_Startable`` through
+    ``_Left``, because ``_Right`` precedes ``_Startable`` in the method
+    resolution order. The class's own members come first, each inherited
+    name is listed once, and the external base contributes nothing.
+    """
+    members = api["Handle"].members
+    assert [member.name for member in members] == ["own", "left", "detach", "start"]
+    start = next(member for member in members if member.name == "start")
+    assert start.doc.summary == "Start it from the right."
+    assert api["Handle"].bases == ("_Left", "_Generic['Handle']", "dict")
+
+
+def test_an_unreadable_base_module_fails_the_build(tmp_path: PathType) -> None:
+    """A base whose module cannot be read is an error, not a silent skip.
+
+    Only a base outside the package, or one that is not a class, is skipped;
+    a module the package names but the checkout cannot parse would otherwise
+    leave an entry quietly missing the members it inherits.
+    """
+    root = _write_package(tmp_path)
+    core = root / "pkg" / "core.py"
+    core.write_text(
+        core.read_text(encoding="utf-8").replace(
+            "class _Startable:",
+            "from pkg.broken import _Elsewhere\n\nclass _Startable(_Elsewhere):",
+        ),
+        encoding="utf-8",
+    )
+    (root / "pkg" / "broken.py").write_text("class _Elsewhere(:\n", encoding="utf-8")
+    with pytest.raises(ApiSourceError, match="broken"):
+        load_api(root, "pkg")
+
+
+_METHOD_NAMES = ("alpha", "beta", "gamma")
+
+
+@st.composite
+def _hierarchies(draw: st.DrawFn) -> list[tuple[str, list[str], list[str]]]:
+    """Draw a small class hierarchy as ``(name, bases, methods)`` triples.
+
+    Each class may inherit from any earlier class, so the graph is acyclic,
+    and Python's own ``__mro__`` of the executed module is the oracle.
+    """
+    count = draw(st.integers(min_value=1, max_value=5))
+    classes: list[tuple[str, list[str], list[str]]] = []
+    for index in range(count):
+        name = f"K{index}"
+        earlier = [previous for previous, _, _ in classes]
+        bases = (
+            draw(st.lists(st.sampled_from(earlier), unique=True, max_size=3))
+            if earlier
+            else []
+        )
+        methods = draw(
+            st.lists(st.sampled_from(_METHOD_NAMES), unique=True, max_size=3)
+        )
+        classes.append((name, bases, methods))
+    return classes
+
+
+def _hierarchy_source(classes: list[tuple[str, list[str], list[str]]]) -> str:
+    """Render the drawn hierarchy as a module, exporting every class."""
+    lines = ["__all__ = [" + ", ".join(f'"{name}"' for name, _, _ in classes) + "]", ""]
+    for name, bases, methods in classes:
+        lines.append(f"class {name}({', '.join(bases)}):")
+        lines.append(f'    """{name}."""')
+        for method in methods:
+            lines.append(f"    def {method}(self) -> None:")
+            lines.append(f'        """{method} on {name}."""')
+        lines.append("")
+    return "\n".join(lines)
+
+
+@given(_hierarchies())
+@settings(max_examples=40, deadline=None)
+def test_inherited_members_match_the_interpreter(
+    classes: list[tuple[str, list[str], list[str]]],
+) -> None:
+    """The parser lists what ``__mro__`` would, once each, in that order.
+
+    The module is executed to obtain Python's own method resolution order;
+    a hierarchy Python refuses is skipped, since the parser's fallback for it
+    is documented as best effort rather than as Python's order.
+    """
+    source = _hierarchy_source(classes)
+    namespace: dict[str, typ.Any] = {}
+    try:
+        exec(source, namespace)  # noqa: S102 - generated class declarations only
+    except TypeError:
+        return
+    with tempfile.TemporaryDirectory() as directory:
+        package = Path(directory) / "pkg"
+        package.mkdir()
+        (package / "__init__.py").write_text(source, encoding="utf-8")
+        entries = {entry.name: entry for entry in load_api(Path(directory), "pkg")}
+    for name, _, _ in classes:
+        expected: list[tuple[str, str]] = []
+        for ancestor in namespace[name].__mro__[:-1]:
+            for method in vars(ancestor):
+                if method in _METHOD_NAMES and method not in {m for m, _ in expected}:
+                    expected.append((method, f"{method} on {ancestor.__name__}."))
+        assert [(m.name, m.doc.summary) for m in entries[name].members] == expected
 
 
 def test_enumeration_members_carry_their_docstrings(api: dict[str, typ.Any]) -> None:
@@ -295,6 +446,24 @@ def test_inline_markup_becomes_code_and_links() -> None:
     )
 
 
+def test_a_module_reference_links_by_its_dotted_name() -> None:
+    """A ``:mod:`` reference is known by its full name, not its last segment.
+
+    The label is still the short name, so the link reads as the module does
+    in prose, while the anchor is the dotted name the module entry carries.
+    """
+    html = builder.inline_html(
+        "See :mod:`cuprum.events` and :mod:`~cuprum.sinks`; not :mod:`cuprum.other`.",
+        {"cuprum.events": "observation", "cuprum.sinks": "adapters"},
+    )
+    assert html == (
+        'See <a href="/cuprum/docs/api/observation/#cuprum.events">'
+        "<code>events</code></a> and "
+        '<a href="/cuprum/docs/api/adapters/#cuprum.sinks"><code>sinks</code></a>; '
+        "not <code>other</code>."
+    )
+
+
 def test_long_declarations_are_set_one_parameter_to_a_line() -> None:
     """Annotated defaults are spaced, and a long list wraps."""
     short = builder.display_line(
@@ -329,8 +498,8 @@ def test_grouping_refuses_an_unplaced_or_stale_name(
         builder.group_entries(list(api.values()))
     message = str(excinfo.value)
     assert (
-        "unplaced ['Colour', 'Name', 'Settings', 'current', 'get_current', 'sh']"
-        in message
+        "unplaced ['Colour', 'Handle', 'Name', 'Settings', 'current', "
+        "'get_current', 'sh']" in message
     )
     assert "no longer exported ['gone']" in message
 
@@ -376,6 +545,7 @@ def test_check_mode_reports_drift(
                 "lede": "Everything.",
                 "names": (
                     "Colour",
+                    "Handle",
                     "Name",
                     "Settings",
                     "current",

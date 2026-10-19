@@ -93,8 +93,9 @@ workflow log:
       every observed execution exactly once with a bounded
       <code>terminal_outcome</code> (here <code>exit_zero</code>), even when
       no child ever started. Each event also carries the program, the
-      argument vector, the process ID, timings, and an <code>exec_id</code>
-      that ties one run's events together.
+      argument vector, and an <code>exec_id</code> that ties one run's events
+      together, plus the process ID and timings where the phase has them: the
+      plan has no process yet, and a spawn failure settles without one.
     </p>
     <p>
       The workflow log is what GitHub Actions reads: the output inside a

@@ -467,12 +467,92 @@ def _class_members(node: ast.ClassDef) -> tuple[Member, ...]:
     return tuple(members)
 
 
+def _base_name(base: ast.expr) -> str | None:
+    """Return the bare name a base expression refers to, or ``None``.
+
+    A generic base such as ``_Registration["Hook"]`` is an ``ast.Subscript``
+    whose value names the class; the subscript is a type argument and plays
+    no part in resolution. A dotted or computed base is not followed.
+    """
+    match base:
+        case ast.Name(id=name):
+            return name
+        case ast.Subscript(value=ast.Name(id=name)):
+            return name
+        case _:
+            return None
+
+
+def _package_class(
+    base: ast.expr, module: str, resolver: _Resolver
+) -> tuple[str, ast.ClassDef] | None:
+    """Resolve ``base`` to a class defined in the package, or ``None``.
+
+    A base that is not a plain or subscripted name, that is imported from
+    outside the package, or that resolves to something other than a class is
+    outside the documented source and is skipped. Any other failure to read
+    the package, such as a missing or unparsable module, is not a skip and
+    propagates as :class:`ApiSourceError`.
+    """
+    name = _base_name(base)
+    if name is None:
+        return None
+    try:
+        owner, definition = resolver.find(module, name)
+    except ApiSourceError as error:
+        if "outside the package" in str(error) or "cannot find a definition" in str(
+            error
+        ):
+            return None
+        raise
+    if not isinstance(definition, ast.ClassDef):
+        return None
+    return owner, definition
+
+
+def _linearize(
+    node: ast.ClassDef, module: str, resolver: _Resolver
+) -> list[tuple[str, ast.ClassDef]]:
+    """Return the class and its in-package ancestors in method resolution order.
+
+    This is Python's C3 linearization restricted to the bases the package
+    defines, so a member overridden in one branch of a diamond is taken from
+    the class Python would take it from. A hierarchy C3 cannot order falls
+    back to a depth-first walk in base order rather than failing the build.
+    """
+    parents = [
+        resolved
+        for base in node.bases
+        if (resolved := _package_class(base, module, resolver)) is not None
+    ]
+    sequences = [
+        _linearize(definition, owner, resolver) for owner, definition in parents
+    ]
+    sequences.append(list(parents))
+    result: list[tuple[str, ast.ClassDef]] = [(module, node)]
+    while any(sequences):
+        for sequence in sequences:
+            head = sequence[0]
+            if not any(head in rest[1:] for rest in sequences if rest):
+                break
+        else:
+            # No consistent order exists; keep what was ordered and append
+            # the rest depth-first so every ancestor is still visited once.
+            for sequence in sequences:
+                for item in sequence:
+                    if item not in result:
+                        result.append(item)
+            return result
+        result.append(head)
+        sequences = [
+            [item for item in sequence if item != head] for sequence in sequences
+        ]
+        sequences = [sequence for sequence in sequences if sequence]
+    return result
+
+
 def _inherited_members(
-    node: ast.ClassDef,
-    module: str,
-    resolver: _Resolver,
-    seen: set[str],
-    visited: set[str],
+    node: ast.ClassDef, module: str, resolver: _Resolver, seen: set[str]
 ) -> list[Member]:
     """Collect the public members a class inherits from bases in the package.
 
@@ -480,26 +560,16 @@ def _inherited_members(
     takes ``start()`` from a private base, and that surface belongs in the
     class's entry. Only bases defined inside the package are followed: a
     standard-library or third-party base is outside the documented source.
-    Members are listed in base order, nearest base first, and a name the
-    class or an earlier base already defines is not listed again.
+    Ancestors are visited in method resolution order, so a name is taken
+    from the class Python would take it from, and a name the class or an
+    earlier ancestor already defines is not listed again.
     """
     members: list[Member] = []
-    for base in node.bases:
-        if not isinstance(base, ast.Name):
-            continue
-        try:
-            owner, definition = resolver.find(module, base.id)
-        except ApiSourceError:
-            continue
-        key = f"{owner}:{base.id}"
-        if not isinstance(definition, ast.ClassDef) or key in visited:
-            continue
-        visited.add(key)
-        for member in _class_members(definition):
+    for _owner, ancestor in _linearize(node, module, resolver)[1:]:
+        for member in _class_members(ancestor):
             if member.name not in seen:
                 seen.add(member.name)
                 members.append(member)
-        members.extend(_inherited_members(definition, owner, resolver, seen, visited))
     return members
 
 
@@ -572,7 +642,7 @@ def _entry(
             )
             own = _class_members(node)
             inherited = _inherited_members(
-                node, module, resolver, {m.name for m in own}, set()
+                node, module, resolver, {m.name for m in own}
             )
             return ApiEntry(
                 name,

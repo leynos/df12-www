@@ -33,9 +33,12 @@
   <h2 id="settled">Read the one terminal outcome</h2>
   <p>
     Every execution whose <code>plan</code> event began observation ends with
-    exactly one <code>settled</code> event, including a spawn failure, a
-    timeout, and a cancellation, which have no <code>exit</code> event to
-    speak of. Its {{ api.ref('cuprum.events', 'TerminalOutcome') }} is one of
+    exactly one <code>settled</code> event, including a spawn failure and a
+    cancellation, which have no <code>exit</code> event to speak of. A
+    timeout keeps its <code>exit</code> event: the <code>timeout</code> event
+    comes first, then <code>exit</code>, then <code>settled</code>, and only
+    then does <code>TimeoutExpired</code> reach the caller. Its
+    {{ api.ref('cuprum.events', 'TerminalOutcome') }} is one of
     <code>exit_zero</code>, <code>exit_nonzero</code>, <code>timeout</code>,
     <code>cancelled</code>, or <code>error</code>; it carries a
     <code>pid</code> and <code>exit_code</code> only when those are known and
@@ -201,10 +204,11 @@ assert "session-314" not in repr(exports) + repr(tracer.spans)
 <section aria-labelledby="control">
   <h2 id="control">Watch what a stop request did</h2>
   <p>
-    An exit code of <code>-15</code> is the same whether the child took the
-    first <code>SIGTERM</code> or needed <code>SIGKILL</code> after its grace
-    ran out, and a stop refused because the child had already gone leaves no
-    trace at all. {{ api.ref('observe_control') }} registers a
+    An exit code of <code>-15</code> says the child ended on
+    <code>SIGTERM</code>, and <code>-9</code> that it needed
+    <code>SIGKILL</code> after its grace ran out, but neither records which
+    control request was made, and a stop refused because the child had
+    already gone leaves no trace at all. {{ api.ref('observe_control') }} registers a
     {{ api.ref('ControlHook') }} on a context-local channel; every completed
     <code>signal()</code>, <code>terminate()</code>, and <code>kill()</code>
     on a {{ api.ref('RunningCommand') }} then reports one

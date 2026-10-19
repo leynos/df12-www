@@ -437,8 +437,12 @@ def _reference(target: str, known: cabc.Mapping[str, str]) -> str:
     name on another, such as an adapter's docstring naming ``ExecEvent``,
     resolves instead of pointing at a fragment the current page lacks.
     """
-    label = target.rsplit(".", 1)[-1] if target.startswith(("cuprum.", "~")) else target
+    full = target.removeprefix("~")
+    label = full.rsplit(".", 1)[-1] if target.startswith(("cuprum.", "~")) else full
     code = f"<code>{label}</code>"
+    if full in known:
+        # A module entry is known by its dotted name, as `cuprum.events`.
+        return f'<a href="/cuprum/docs/api/{known[full]}/#{full}">{code}</a>'
     head = label.split(".", 1)[0].removesuffix("()")
     if head not in known:
         return code

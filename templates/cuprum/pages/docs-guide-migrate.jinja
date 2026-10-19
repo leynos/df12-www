@@ -25,7 +25,7 @@
   <p>Then work through the checklist. A row that does not match the application can be skipped.</p>
   {% call ui.matrix('checklist-caption', 'Upgrade checklist for applications using Cuprum 0.1', ['Change', 'Affects code that…']) %}
   {% for anchor, change, affects in [
-    ('run-output-options', 'run(capture=, echo=) moved to RunOutputOptions', 'passes capture= or echo= to run() or run_sync()'),
+    ('run-output-options', 'run(capture=, echo=) moved to RunOutputOptions', 'passes capture= or echo= to run() or run_sync(), or uses IOOptions'),
     ('scope-config', 'Scopes take a ScopeConfig', 'calls scoped(allowlist=...) or CuprumContext.narrow(...)'),
     ('disjoint-scopes', 'Disjoint nested scopes deny', 'nests scopes whose allowlists share no program'),
     ('execution-options', 'Execution options are not child flags', 'passes cwd=, env=, timeout=, and similar to a builder'),
@@ -37,7 +37,7 @@
     ('exec-hook', 'ExecHook moved', 'imports ExecHook from cuprum.context'),
     ('echo', 'Echo is bounded and fails soft', 'echoes very long lines, or relied on UnicodeEncodeError'),
     ('live-overlays', 'Environment overlays resolve at spawn', 'relied on an overlay snapshotting os.environ'),
-    ('smaller', 'Smaller changes', 'uses visible_settings(), IOOptions, or internal module paths'),
+    ('smaller', 'Smaller changes', 'uses visible_settings(), internal module paths, or SafeCmdBuilder as a Callable'),
   ] %}
   <tr role="row">
     <th scope="row" role="rowheader"><a href="#{{ anchor }}">{{ change }}</a></th>
@@ -365,8 +365,8 @@ assert [outcome.value for outcome in outcomes] == ["exit_zero"]
     <code>exit</code> for terminal accounting. In <code>MetricsHook</code>,
     <code>cuprum_failures_total</code> and <code>cuprum_duration_seconds</code>
     are recorded from <code>settled</code>, so the failure counter now counts
-    every outcome except <code>exit_zero</code>, a timeout, a cancellation,
-    and a spawn failure included, where 0.1 counted only a non-zero exit.
+    every outcome except <code>exit_zero</code>. That includes a timeout, a
+    cancellation, and a spawn failure, where 0.1 counted only a non-zero exit.
     <code>cuprum_failures_total</code> and <code>cuprum_executions_total</code>
     also carry <code>env_mode</code> and <code>capture_mode</code> labels,
     and <code>TracingHook</code> closes its spans on <code>settled</code>.

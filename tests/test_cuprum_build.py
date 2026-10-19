@@ -60,6 +60,14 @@ def _soup(page: Path) -> BeautifulSoup:
     return BeautifulSoup(page.read_text(encoding="utf-8"), "html.parser")
 
 
+def _classes(element: Tag) -> set[str]:
+    """Return an element's class tokens as a set."""
+    value = element.get("class")
+    if isinstance(value, list):
+        return set(value)
+    return set(str(value or "").split())
+
+
 def _attr(tag: Tag, name: str) -> str:
     """Return a single-valued attribute as a string."""
     value = tag.get(name)
@@ -116,6 +124,29 @@ def test_code_regions_are_keyboard_reachable_and_labelled(built_site: Path) -> N
             assert region.get("aria-label") or region.get("aria-labelledby"), (
                 f"{page}: unlabelled scroll region {region.get('class')}"
             )
+
+
+@pytest.mark.timeout(300)
+def test_install_slips_take_the_paper_variant_only_where_asked(
+    built_site: Path,
+) -> None:
+    """The migration guide's slip sits on paper; the default slip stays dark.
+
+    ``ui.install_slip(..., paper=true)`` adds exactly ``cu-slip--paper``,
+    which the paper ground needs for its label contrast, and the default call
+    emits ``cu-slip`` alone.
+    """
+    assert built_site.is_dir()
+    migrate = _soup(PUBLIC_CUPRUM / "docs" / "guides" / "migrate" / "index.html")
+    paper = migrate.select(".cu-slip")
+    assert paper, "expected an install slip on the migration guide"
+    assert all(_classes(slip) == {"cu-slip", "cu-slip--paper"} for slip in paper)
+    started = _soup(PUBLIC_CUPRUM / "getting-started" / "index.html")
+    default = started.select(".cu-slip")
+    assert default, "expected install slips on the getting-started page"
+    assert all(_classes(slip) == {"cu-slip"} for slip in default)
+    for slip in (*paper, *default):
+        assert slip.select_one(".cu-slip__command"), "a slip without its command"
 
 
 @pytest.mark.timeout(300)

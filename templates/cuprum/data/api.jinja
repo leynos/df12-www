@@ -1601,7 +1601,7 @@
                 {
                   "name": "sink",
                   "type": "sinks.OutputSink | None, default=None",
-                  "description": "Optional presentation adapter (<code>sinks</code> protocol). When given, it may reframe the parent-facing output of this run (for example, a GitHub Actions group); the default <code>None</code> keeps the plain two-stream behaviour. An adapter is inactive for a run when it declines activation, in which case output is unchanged."
+                  "description": "Optional presentation adapter (<a href=\"/cuprum/docs/api/adapters/#cuprum.sinks\"><code>sinks</code></a> protocol). When given, it may reframe the parent-facing output of this run (for example, a GitHub Actions group); the default <code>None</code> keeps the plain two-stream behaviour. An adapter is inactive for a run when it declines activation, in which case output is unchanged."
                 },
                 {
                   "name": "group",
@@ -5865,7 +5865,7 @@
             "doc": {
               "summary": "Raised when an executable path or a binding for it cannot be built.",
               "body": [
-                "The error lives beside the rejection vocabulary rather than beside the binding type, because both <code>executable_path</code> here and <code>executable_binding</code> in <code>executable_binding</code> raise it, and the binding module already depends on this one."
+                "The error lives beside the rejection vocabulary rather than beside the binding type, because both <code>executable_path</code> here and <code>executable_binding</code> in <a href=\"/cuprum/docs/api/policy/#cuprum.executable_binding\"><code>executable_binding</code></a> raise it, and the binding module already depends on this one."
               ],
               "sections": [
                 {
@@ -5929,7 +5929,7 @@
             "doc": {
               "summary": "Report whether *raw_value* currently looks like a runnable executable.",
               "body": [
-                "This is an advisory probe, not a guarantee. It answers \"at the instant it was called, did this path exist as an executable file?\" and says nothing about what will be executed later; see the module docstring of <code>executable_binding</code> for the limits of that claim.",
+                "This is an advisory probe, not a guarantee. It answers \"at the instant it was called, did this path exist as an executable file?\" and says nothing about what will be executed later; see the module docstring of <a href=\"/cuprum/docs/api/policy/#cuprum.executable_binding\"><code>executable_binding</code></a> for the limits of that claim.",
                 "A bare name with no directory component is left unchecked, because the platform resolves it against <code>PATH</code> and Cuprum does not replicate that search. Only absolute paths and relative paths containing a separator are probed. The check is skipped entirely on Windows, where the execute bit is not part of the file's identity."
               ],
               "sections": [
@@ -6314,7 +6314,7 @@
                 {
                   "name": "phase",
                   "type": "",
-                  "description": "Event phase. See <code>ExecPhase</code>. Both <code>timeout</code> and <code>teardown_error</code> are ancillary diagnostics that never displace a lifecycle phase. <code>pipeline_fail_fast</code> reports the pipeline coordinator's decision before the failing stage's own <code>exit</code> event. <code>settled</code> is the single definitive terminal event for every execution that emitted <code>plan</code>. It carries <code>terminal_outcome</code>, an optional <code>pid</code>, and <code>exec_id</code>. <code>exit_code</code> is a real child status only when one is available; it stays <code>None</code> for spawn failure and cancellation paths that do not produce a command result. The event never carries an exception payload. Catalogue lookup failures raised as <code>UnknownProgramError</code> in <code>catalogue</code> and allowlist failures from <code>_enforce_allowlist</code> happen before <code>exec_id</code> is minted and are outside this terminal-event contract. <code>timeout</code> marks a run that exceeded its deadline, and is emitted before the existing <code>exit</code> event and the public <code>TimeoutExpired</code>, both of which are preserved. <code>teardown_error</code> marks a stream consumer that drained with an unexpected error during cleanup. <code>capture_eof_grace_expired</code> marks a capturing drain whose bounded EOF grace elapsed while one or two readers remained pending. Neither ancillary diagnostic carries an ordering guarantee. Cleanup also runs on external cancellation and on an unexpected stdin-writer failure, and on those paths the original exception propagates unchanged: no <code>exit</code> event follows and no <code>TimeoutExpired</code> is raised, so an ancillary diagnostic may be the last event a consumer sees for that execution. <code>stdio_error</code> is the best-effort counterpart to <code>stdin_error</code> for the standard-stream boundaries that fail *outside* the stdin writer's own pipe operations: the caller's producer, an invalid chunk, the encoder, opening a cuprum-owned target file, and flushing a caller's borrowed file object. It is emitted where the failing boundary is known, and never in place of the caller-visible exception — a producer failure still raises <code>StdinSourceError</code> with the producer's own exception chained, and a failed owned-path open still raises the <code>OSError</code> <code>_open_owned_path</code> builds. It carries <code>error_category</code> rather than an exception message, because several of these boundaries raise the same exception type and the category is what separates them."
+                  "description": "Event phase. See <code>ExecPhase</code>. Both <code>timeout</code> and <code>teardown_error</code> are ancillary diagnostics that never displace a lifecycle phase. <code>pipeline_fail_fast</code> reports the pipeline coordinator's decision before the failing stage's own <code>exit</code> event. <code>settled</code> is the single definitive terminal event for every execution that emitted <code>plan</code>. It carries <code>terminal_outcome</code>, an optional <code>pid</code>, and <code>exec_id</code>. <code>exit_code</code> is a real child status only when one is available; it stays <code>None</code> for spawn failure and cancellation paths that do not produce a command result. The event never carries an exception payload. Catalogue lookup failures raised as <code>UnknownProgramError</code> in <a href=\"/cuprum/docs/api/catalogues/#cuprum.catalogue\"><code>catalogue</code></a> and allowlist failures from <code>_enforce_allowlist</code> happen before <code>exec_id</code> is minted and are outside this terminal-event contract. <code>timeout</code> marks a run that exceeded its deadline, and is emitted before the existing <code>exit</code> event and the public <code>TimeoutExpired</code>, both of which are preserved. <code>teardown_error</code> marks a stream consumer that drained with an unexpected error during cleanup. <code>capture_eof_grace_expired</code> marks a capturing drain whose bounded EOF grace elapsed while one or two readers remained pending. Neither ancillary diagnostic carries an ordering guarantee. Cleanup also runs on external cancellation and on an unexpected stdin-writer failure, and on those paths the original exception propagates unchanged: no <code>exit</code> event follows and no <code>TimeoutExpired</code> is raised, so an ancillary diagnostic may be the last event a consumer sees for that execution. <code>stdio_error</code> is the best-effort counterpart to <code>stdin_error</code> for the standard-stream boundaries that fail *outside* the stdin writer's own pipe operations: the caller's producer, an invalid chunk, the encoder, opening a cuprum-owned target file, and flushing a caller's borrowed file object. It is emitted where the failing boundary is known, and never in place of the caller-visible exception — a producer failure still raises <code>StdinSourceError</code> with the producer's own exception chained, and a failed owned-path open still raises the <code>OSError</code> <code>_open_owned_path</code> builds. It carries <code>error_category</code> rather than an exception message, because several of these boundaries raise the same exception type and the category is what separates them."
                 },
                 {
                   "name": "program",
@@ -7155,6 +7155,16 @@
         },
         "bases": [
           "_IdentityTupleRegistration['ControlHook']"
+        ],
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Release the registration, exactly once."
+            }
+          }
         ]
       },
       {
@@ -7437,6 +7447,16 @@
         },
         "bases": [
           "_IdentityTupleRegistration['LineStreamHook']"
+        ],
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Release the registration, exactly once."
+            }
+          }
         ]
       },
       {
@@ -7701,6 +7721,16 @@
         },
         "bases": [
           "_TokenTupleRegistration['EchoHook']"
+        ],
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Release the registration, exactly once."
+            }
+          }
         ]
       },
       {
@@ -8076,6 +8106,16 @@
         },
         "bases": [
           "_TokenTupleRegistration['PumpHook']"
+        ],
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Release the registration, exactly once."
+            }
+          }
         ]
       },
       {
@@ -8291,6 +8331,16 @@
         },
         "bases": [
           "_TokenTupleRegistration['Tracer']"
+        ],
+        "members": [
+          {
+            "name": "detach",
+            "kind": "method",
+            "display": "def detach() -> None",
+            "doc": {
+              "summary": "Release the registration, exactly once."
+            }
+          }
         ]
       },
       {
@@ -8646,7 +8696,7 @@
             "doc": {
               "summary": "Reference in-memory span for testing and examples.",
               "body": [
-                "A mutable test double implementing the <code>Span</code> protocol from <code>tracing_adapter</code>. It records everything set on it so that tests can inspect the result. It performs no synchronization of its own; a span is expected to be mutated by a single thread at a time."
+                "A mutable test double implementing the <code>Span</code> protocol from <a href=\"/cuprum/docs/api/adapters/#cuprum.adapters.tracing_adapter\"><code>tracing_adapter</code></a>. It records everything set on it so that tests can inspect the result. It performs no synchronization of its own; a span is expected to be mutated by a single thread at a time."
               ],
               "sections": [
                 {

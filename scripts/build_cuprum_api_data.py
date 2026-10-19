@@ -445,6 +445,10 @@ def _reference(target: str, known: cabc.Mapping[str, str]) -> str:
         return f'<a href="/cuprum/docs/api/{known[full]}/#{full}">{code}</a>'
     head = label.split(".", 1)[0].removesuffix("()")
     if head not in known:
+        # `cuprum.builders.classify_path_string` labels itself by its last
+        # segment; when that is not an entry, link the module it is read from.
+        head = full.removeprefix("cuprum.").split(".", 1)[0].removesuffix("()")
+    if head not in known:
         return code
     return f'<a href="/cuprum/docs/api/{known[head]}/#{head}">{code}</a>'
 

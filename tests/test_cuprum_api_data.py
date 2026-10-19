@@ -464,6 +464,28 @@ def test_a_module_reference_links_by_its_dotted_name() -> None:
     )
 
 
+def test_a_qualified_reference_links_to_its_owner() -> None:
+    """A member links to its class, and a module-qualified name to its module.
+
+    The role regex drops a leading tilde, so ``~SafeCmd.run`` reaches the
+    renderer as ``SafeCmd.run`` and links by its head with the full label. A
+    package-qualified name is labelled by its last segment; when that is not
+    an entry, the link falls back to the module it is read from, and a name
+    whose module is not an entry either stays plain code.
+    """
+    html = builder.inline_html(
+        "Call :meth:`~SafeCmd.run`, see :func:`cuprum.builders.safe_path`, "
+        "not :func:`cuprum.other.thing`.",
+        {"SafeCmd": "commands", "builders": "commands"},
+    )
+    assert html == (
+        'Call <a href="/cuprum/docs/api/commands/#SafeCmd">'
+        "<code>SafeCmd.run</code></a>, "
+        'see <a href="/cuprum/docs/api/commands/#builders"><code>safe_path</code></a>, '
+        "not <code>thing</code>."
+    )
+
+
 def test_long_declarations_are_set_one_parameter_to_a_line() -> None:
     """Annotated defaults are spaced, and a long list wraps."""
     short = builder.display_line(

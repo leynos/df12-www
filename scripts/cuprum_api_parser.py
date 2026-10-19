@@ -45,6 +45,15 @@ class ApiSourceError(Exception):
     """Raised when a public name cannot be traced to its definition."""
 
 
+class NotInPackageError(ApiSourceError):
+    """A name is defined outside the package, or nowhere in it.
+
+    Raised by :meth:`_Resolver.find` so a caller that follows a class's bases
+    can tell an external or builtin base, which is simply not documented,
+    from a module the checkout cannot read, which is an error.
+    """
+
+
 @dc.dataclass(frozen=True, slots=True)
 class Field:
     """One entry of a Parameters, Returns, Raises, or Attributes section."""
@@ -344,7 +353,7 @@ class _Resolver:
                 target = self._absolute(module, node)
                 if target is None:
                     msg = f"{name!r} is imported into {module} from outside the package"
-                    raise ApiSourceError(msg)
+                    raise NotInPackageError(msg)
                 try:
                     return self.find(target, alias.name, seen | {key})
                 except ApiSourceError:
@@ -356,7 +365,7 @@ class _Resolver:
                         raise
                     return submodule, _module_stub(self.tree(submodule))
         msg = f"cannot find a definition of {name!r} in {module}"
-        raise ApiSourceError(msg)
+        raise NotInPackageError(msg)
 
 
 def _defines(node: ast.stmt, name: str) -> bool:
@@ -489,22 +498,19 @@ def _package_class(
     """Resolve ``base`` to a class defined in the package, or ``None``.
 
     A base that is not a plain or subscripted name, that is imported from
-    outside the package, or that resolves to something other than a class is
-    outside the documented source and is skipped. Any other failure to read
-    the package, such as a missing or unparsable module, is not a skip and
-    propagates as :class:`ApiSourceError`.
+    outside the package or defined nowhere in it (:class:`NotInPackageError`),
+    or that resolves to something other than a class is outside the
+    documented source and is skipped. Any other failure to read the package,
+    such as a missing or unparsable module, is not a skip and propagates as
+    :class:`ApiSourceError`.
     """
     name = _base_name(base)
     if name is None:
         return None
     try:
         owner, definition = resolver.find(module, name)
-    except ApiSourceError as error:
-        if "outside the package" in str(error) or "cannot find a definition" in str(
-            error
-        ):
-            return None
-        raise
+    except NotInPackageError:
+        return None
     if not isinstance(definition, ast.ClassDef):
         return None
     return owner, definition

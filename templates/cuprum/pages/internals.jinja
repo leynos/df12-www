@@ -206,11 +206,14 @@
             spans. They define protocols rather than importing a telemetry
             library, so Cuprum keeps its zero-dependency install.
           </p>
-          {% call ui.callout('caveat', 'Arguments are logged verbatim') %}
+          {% call ui.callout('caveat', 'Arguments are logged in full') %}
           <p>
-            The structured logging adapter and <code>logging_hook()</code>
-            record argv as supplied. Pass secrets through the environment or a
-            file, not on the command line.
+            The structured logging adapter, the tracing adapter, and
+            <code>logging_hook()</code> record argv as supplied. Pass secrets
+            through a file where possible; where not, give each exporting
+            adapter a <code>RedactionPolicy</code> from
+            <code>cuprum.redaction</code> (ADR-023), which masks configured
+            text in the export and leaves the run itself untouched.
           </p>
           {% endcall %}
           <h3>Presentation sinks</h3>
@@ -236,6 +239,7 @@
         {{ ui.card('ADR-019 · Control observation channel', 'Why what a stop request did to a child is reported on its own channel, and why refusal is an outcome.', number='Decision', href=src ~ 'docs/adr-019-control-observation-channel.md') }}
         {{ ui.card('ADR-020 · Typed argument contract', 'Why builders accept exactly ArgValue and refuse execution-option names.', number='Decision', href=src ~ 'docs/adr-020-typed-argument-contract-for-sh-make.md') }}
         {{ ui.card('ADR-021 · Process-group ownership', 'Why group ownership is an opt-in policy on the execution context, and what it cannot promise.', number='Decision', href=src ~ 'docs/adr-021-process-group-ownership.md') }}
+        {{ ui.card('ADR-023 · Opt-in telemetry redaction', 'Why redaction is a policy each exporting adapter is given, masks only configured text, and fails closed.', number='Decision', href=src ~ 'docs/adr-023-opt-in-telemetry-redaction.md') }}
       </div>
       {% endcall %}
 {% endblock %}

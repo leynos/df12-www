@@ -128,10 +128,73 @@ assert [span.name for span in tracer.spans] and tracer.spans[0].ended
     <code>capture_mode</code> labels, bounded by construction;
     <code>resolved_path</code> deliberately never becomes a label.
     <code>TracingHook</code> closes its span on <code>settled</code>. The
-    structured logging adapter records <code>argv</code> verbatim, so a
-    secret passed as an argument reaches the log: pass secrets through the
-    environment or a file. Never turn untrusted arguments into metric
-    labels.
+    structured logging adapter and the tracing adapter record
+    <code>argv</code> in full, so a secret passed as an argument reaches the
+    log unless a <a href="#redaction">redaction policy</a> masks it. Never
+    turn untrusted arguments into metric labels.
+  </p>
+</section>
+
+<section aria-labelledby="redaction">
+  <h2 id="redaction">Keep secrets out of telemetry</h2>
+  <p>
+    The adapters export what a run looked like, and that can include
+    secrets: structured logging and tracing record the full argument vector,
+    and events can carry environment values, output lines, notes, and tag
+    values. Passing a secret in a file, rather than as an argument or
+    environment value, keeps it out of these records. Where that is not
+    possible, a {{ api.ref('cuprum.redaction', 'RedactionPolicy') }} masks
+    the text it is told about before it is exported:
+  </p>
+{% call ui.code_panel('telemetry_redaction.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import logging
+import re
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+from cuprum.adapters.logging_adapter import structured_logging_hook
+from cuprum.adapters.tracing_adapter import InMemoryTracer, tracing_hook
+from cuprum.redaction import RedactionPolicy, redacting_hook
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="redaction")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+policy = RedactionPolicy(
+    literals=("token-value",),
+    patterns=(re.compile(r"session-[0-9]+"),),
+)
+tracer = InMemoryTracer()
+exports = []
+logger = logging.getLogger("myapp.telemetry")
+with (
+    sh.observe(structured_logging_hook(logger=logger, redaction=policy)),
+    sh.observe(tracing_hook(tracer, redaction=policy)),
+    sh.observe(redacting_hook(exports.append, policy)),
+):
+    result = python(
+        "-c", "import sys; print(sys.argv[1])", "token-value session-314"
+    ).run_sync()
+
+assert result.stdout == "token-value session-314\n"
+assert exports and tracer.spans
+assert "token-value" not in repr(exports) + repr(tracer.spans)
+assert "session-314" not in repr(exports) + repr(tracer.spans)
+{% endhighlight %}
+{% endcall %}
+  <ul>
+    <li><strong>It masks only what it is given.</strong> Rules are literal strings (<code>literals=</code>) and compiled regular expressions (<code>patterns=</code>); the policy does not guess at secrets. Each match becomes the mask, <code>[REDACTED]</code> by default or the <code>mask=</code> text, and overlapping matches become a single mask.</li>
+    <li><strong>It is opt-in at each destination.</strong> Pass <code>redaction=policy</code> to <code>structured_logging_hook()</code>, <code>tracing_hook()</code> or <code>TracingHook</code>, {{ api.ref('logging_hook') }}, and <code>GitHubActionsSink</code>, and wrap any other observer as <code>redacting_hook(observer, policy)</code>. A destination without a policy exports text unchanged, so configure every destination that leaves the process.</li>
+    <li><strong>It changes exports, not the run.</strong> The command's arguments and environment, the captured result, and events seen by other observers are untouched.</li>
+    <li><strong>It covers free text.</strong> Argument items, environment values, output lines, notes, and top-level string tag values are redacted. The program name, project, paths, tag keys, and numeric and enum fields are not.</li>
+    <li><strong>It fails closed.</strong> If a rule fails, <code>RedactionError</code> is raised and nothing is exported in raw form. Like any observe-hook failure, it fails the run.</li>
+  </ul>
+  <p>
+    Metrics need no policy: their labels never carry arguments, environment
+    values, output, or tags. The <code>GitHubActionsSink</code> accepts the
+    same <code>redaction=</code> argument for its group and annotation
+    titles; the <code>group</code> and <code>annotate_failure</code> flags
+    have no redaction setting, and redaction never alters the mirrored child
+    output.
   </p>
 </section>
 

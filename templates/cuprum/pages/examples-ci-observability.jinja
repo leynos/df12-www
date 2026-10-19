@@ -234,8 +234,10 @@ result: False 1 '1 failed, 41 passed\n'
   that runs commands elsewhere in the process is not observed by accident.
 </p>
 <p>
-  The logging hook records <code>argv</code> verbatim. Pass secrets through
-  the environment or a file, never as arguments, and never turn untrusted
-  arguments into metric labels.
+  The logging hook records <code>argv</code> in full. Pass secrets through
+  a file rather than as arguments, or give the hook a
+  <code>RedactionPolicy</code> as
+  <a href="/cuprum/docs/guides/observe/#redaction">Keep secrets out of telemetry</a>
+  shows, and never turn untrusted arguments into metric labels.
 </p>
 {% endblock %}

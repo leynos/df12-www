@@ -6,7 +6,7 @@
   after the documented release moves; `make check-cuprum-api-data` fails when
   this file no longer matches the source.
 
-  Source: leynos/cuprum 0.2.0-beta1 at b1b4769ec001cfd59314af0f63fcb2ed855262f4
+  Source: leynos/cuprum 0.2.0-beta2 at a40898789a80e1ead3537cdab070fa87a80afced
 #}
 {% set api_groups = [
   {
@@ -26,7 +26,7 @@
           "body": [
             "This package focuses on the typed core: building <code>SafeCmd</code> instances from curated <code>Program</code> values and providing a minimal async runtime for executing them with predictable semantics.",
             "The implementation is split across submodules by responsibility:",
-            "- <code>argv</code> builds argument vectors and publishes <code>ArgValue</code>. - <code>builder</code> holds the <code>SafeCmdBuilder</code> callable contract. - <code>execution</code> holds the execution context, stdin, and timeout types. - <code>results</code> holds <code>CommandResult</code>, <code>PipelineResult</code>, and their byte-exact counterparts <code>BytesCommandResult</code> and <code>BytesPipelineResult</code>. - <code>output</code> holds <code>RunOutputOptions</code> and <code>IOOptions</code>. - <code>safe_cmd</code> holds the <code>SafeCmd</code> execution primitive. - <code>pipeline</code> holds the <code>Pipeline</code> execution primitive. - <code>factory</code> holds the <code>make</code> builder factory.",
+            "- <code>argv</code> builds argument vectors and publishes <code>ArgValue</code>. - <code>builder</code> holds the <code>SafeCmdBuilder</code> callable contract. - <code>execution</code> holds the execution context, stdin, and timeout types. - <code>results</code> holds <code>CommandResult</code>, <code>PipelineResult</code>, and their byte-exact counterparts <code>BytesCommandResult</code> and <code>BytesPipelineResult</code>. - <code>output</code> holds <code>RunOutputOptions</code> and <code>IOOptions</code>. - <code>stdio</code> holds the <code>StdioTarget</code> standard-stream binding vocabulary. - <code>safe_cmd</code> holds the <code>SafeCmd</code> execution primitive. - <code>pipeline</code> holds the <code>Pipeline</code> composition primitive. - <code>factory</code> holds the <code>make</code> builder factory.",
             "Every name previously defined or imported by the former <code>cuprum/sh.py</code> module remains importable from <code>cuprum.sh</code> with the same object identity; the package is the stable public and internal entry point."
           ]
         },
@@ -135,13 +135,14 @@
         "kind": "class",
         "module": "cuprum.sh.safe_cmd",
         "path": "cuprum/sh/safe_cmd.py",
-        "line": 60,
+        "line": 66,
         "display": "class SafeCmd(\n    program: Program,\n    argv: tuple[str, ...],\n    project: ProjectSettings,\n    __weakref__: object = dc.field(init=False, repr=False, hash=False, compare=False),\n)",
         "doc": {
           "summary": "Typed representation of a curated command ready for execution."
         },
         "bases": [
-          "_OwnedStart"
+          "_OwnedStart",
+          "_BytesEntryPoints"
         ],
         "members": [
           {
@@ -191,7 +192,7 @@
           {
             "name": "run",
             "kind": "method",
-            "display": "async def run(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> CommandResult",
+            "display": "async def run(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinSource | None = None,\n) -> CommandResult",
             "doc": {
               "summary": "Execute the command asynchronously with predictable cancellation.",
               "sections": [
@@ -215,8 +216,8 @@
                     },
                     {
                       "name": "stdin",
-                      "type": "StdinInput | None, default=None",
-                      "description": "Optional bytes or text supplied to the child process's stdin."
+                      "type": "StdinInput | StdinStream | None, default=None",
+                      "description": "Optional stdin source. <code>StdinInput</code> supplies one complete bytes or text payload; <code>StdinStream</code> supplies an async producer whose chunks are pulled one at a time, written, and drained before the next is pulled. That backpressure limits how far *ahead* the producer runs — it does not stop the writer pulling ahead of the child's reads, because <code>drain()</code> returns at the transport's low-water mark rather than on an empty buffer, and the OS pipe holds bytes of its own. The payload is never held whole, and retained memory is roughly the chunk currently being written plus those buffers, so yield bounded-size chunks when that matters. <code>None</code> inherits the parent's stdin."
                     }
                   ]
                 },
@@ -247,150 +248,11 @@
                       "name": "UnicodeEncodeError",
                       "type": "",
                       "description": "If text stdin cannot be encoded by the execution context."
-                    }
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "name": "run_bytes",
-            "kind": "method",
-            "display": "async def run_bytes(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> BytesCommandResult",
-            "doc": {
-              "summary": "Execute the command, capturing its output as bytes.",
-              "body": [
-                "The run itself is the one <code>run()</code> performs; only what happens to the captured streams differs. Bytes are returned exactly as the child wrote them — no decoding, no replacement characters — so values that are not valid text survive the round trip.",
-                "Echoing, sink presentation, and idle reporting all behave as they do in text mode. A sink exposing a <code>buffer</code> receives the child's own bytes; a text-only sink decodes them for display only, and a mirror it cannot render is disabled without disturbing what was captured."
-              ],
-              "sections": [
-                {
-                  "title": "Parameters",
-                  "fields": [
-                    {
-                      "name": "output",
-                      "type": "RunOutputOptions | None, default=None",
-                      "description": "Capture and echo settings. <code>on_line</code> is rejected: bytes mode returns the child's own bytes, so a callback carrying decoded text would be a second, contradictory contract for the same stream. Use the text-mode entry point when lines are wanted."
                     },
                     {
-                      "name": "timeout",
-                      "type": "float | None, default=None",
-                      "description": "Maximum execution time in seconds. An explicit value overrides the timeout in <code>context</code>."
-                    },
-                    {
-                      "name": "context",
-                      "type": "ExecutionContext | None, default=None",
-                      "description": "Execution settings, including echo sinks and text encoding."
-                    },
-                    {
-                      "name": "stdin",
-                      "type": "StdinInput | None, default=None",
-                      "description": "Optional bytes or text supplied to the child process's stdin."
-                    }
-                  ]
-                },
-                {
-                  "title": "Returns",
-                  "fields": [
-                    {
-                      "name": "",
-                      "type": "BytesCommandResult",
-                      "description": "The command outcome, carrying <code>bytes</code> for each captured stream when <code>output.capture</code> is true and <code>None</code> for each stream that was not captured."
-                    }
-                  ]
-                },
-                {
-                  "title": "Raises",
-                  "fields": [
-                    {
-                      "name": "ValueError",
+                      "name": "StdinSourceError",
                       "type": "",
-                      "description": "If <code>output.on_line</code> is set."
-                    },
-                    {
-                      "name": "PermissionError",
-                      "type": "",
-                      "description": "If the command is not allowed by the active scope."
-                    },
-                    {
-                      "name": "TimeoutError",
-                      "type": "",
-                      "description": "If execution exceeds the effective timeout."
-                    },
-                    {
-                      "name": "UnicodeEncodeError",
-                      "type": "",
-                      "description": "If text stdin cannot be encoded by the execution context."
-                    }
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "name": "run_bytes_sync",
-            "kind": "method",
-            "display": "def run_bytes_sync(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> BytesCommandResult",
-            "doc": {
-              "summary": "Execute the command synchronously, capturing its output as bytes.",
-              "sections": [
-                {
-                  "title": "Parameters",
-                  "fields": [
-                    {
-                      "name": "output",
-                      "type": "RunOutputOptions | None, default=None",
-                      "description": "Capture and echo settings. <code>on_line</code> is rejected: bytes mode returns the child's own bytes, so a callback carrying decoded text would be a second, contradictory contract for the same stream. Use the text-mode entry point when lines are wanted."
-                    },
-                    {
-                      "name": "timeout",
-                      "type": "float | None, default=None",
-                      "description": "Maximum execution time in seconds."
-                    },
-                    {
-                      "name": "context",
-                      "type": "ExecutionContext | None, default=None",
-                      "description": "Execution settings, including echo sinks and text encoding."
-                    },
-                    {
-                      "name": "stdin",
-                      "type": "StdinInput | None, default=None",
-                      "description": "Optional bytes or text supplied to the child process's stdin."
-                    }
-                  ]
-                },
-                {
-                  "title": "Returns",
-                  "fields": [
-                    {
-                      "name": "",
-                      "type": "BytesCommandResult",
-                      "description": "The command outcome, carrying <code>bytes</code> for each captured stream when capture is enabled and <code>None</code> for each stream that was not captured."
-                    }
-                  ]
-                },
-                {
-                  "title": "Raises",
-                  "fields": [
-                    {
-                      "name": "ValueError",
-                      "type": "",
-                      "description": "If <code>output.on_line</code> is set."
-                    },
-                    {
-                      "name": "PermissionError",
-                      "type": "",
-                      "description": "If the command is not allowed by the active scope."
-                    },
-                    {
-                      "name": "TimeoutError",
-                      "type": "",
-                      "description": "If execution exceeds the effective timeout."
-                    },
-                    {
-                      "name": "UnicodeEncodeError",
-                      "type": "",
-                      "description": "If text stdin cannot be encoded by the execution context."
+                      "description": "If a <code>StdinStream</code> producer or its encoder fails. The child is terminated before this is raised."
                     }
                   ]
                 }
@@ -400,7 +262,7 @@
           {
             "name": "lines",
             "kind": "method",
-            "display": "def lines(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> LineStream",
+            "display": "def lines(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinSource | None = None,\n) -> LineStream",
             "doc": {
               "summary": "Iterate the command's output lines as they arrive.",
               "body": [
@@ -428,7 +290,7 @@
                     {
                       "name": "stdin",
                       "type": "",
-                      "description": "Optional <code>StdinInput</code> data to feed to the subprocess."
+                      "description": "Optional stdin source, as for <code>run</code>."
                     }
                   ]
                 },
@@ -459,6 +321,16 @@
                       "name": "UnicodeEncodeError",
                       "type": "",
                       "description": "If <code>stdin</code> text cannot be encoded with the context's encoding."
+                    },
+                    {
+                      "name": "StdinSourceError",
+                      "type": "",
+                      "description": "If a <code>StdinStream</code> producer or its encoder fails."
+                    },
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If *output* redirects stdout: line iteration reads stdout through a parent-side pipe, so a redirected stdout has nothing to iterate. Use <code>run</code> when stdout goes to a file or descriptor."
                     }
                   ]
                 }
@@ -468,7 +340,7 @@
           {
             "name": "run_sync",
             "kind": "method",
-            "display": "def run_sync(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinInput | None = None,\n) -> CommandResult",
+            "display": "def run_sync(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinSource | None = None,\n) -> CommandResult",
             "doc": {
               "summary": "Execute the command synchronously.",
               "sections": [
@@ -492,8 +364,8 @@
                     },
                     {
                       "name": "stdin",
-                      "type": "StdinInput | None, default=None",
-                      "description": "Optional bytes or text supplied to the child process's stdin."
+                      "type": "StdinInput | StdinStream | None, default=None",
+                      "description": "Optional stdin source, as for <code>run</code>."
                     }
                   ]
                 },
@@ -524,6 +396,11 @@
                       "name": "UnicodeEncodeError",
                       "type": "",
                       "description": "If text stdin cannot be encoded by the execution context."
+                    },
+                    {
+                      "name": "StdinSourceError",
+                      "type": "",
+                      "description": "If a <code>StdinStream</code> producer or its encoder fails."
                     }
                   ]
                 }
@@ -589,6 +466,160 @@
                       "name": "UnicodeEncodeError",
                       "type": "",
                       "description": "If text stdin cannot be encoded by the execution context."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "run_bytes",
+            "kind": "method",
+            "display": "async def run_bytes(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinSource | None = None,\n) -> BytesCommandResult",
+            "doc": {
+              "summary": "Execute the command, capturing its output as bytes.",
+              "body": [
+                "The run itself is the one <code>run()</code> performs; only what happens to the captured streams differs. Bytes are returned exactly as the child wrote them — no decoding, no replacement characters — so values that are not valid text survive the round trip.",
+                "Echoing, sink presentation, and idle reporting all behave as they do in text mode. A sink exposing a <code>buffer</code> receives the child's own bytes; a text-only sink decodes them for display only, and a mirror it cannot render is disabled without disturbing what was captured."
+              ],
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "output",
+                      "type": "RunOutputOptions | None, default=None",
+                      "description": "Capture and echo settings. <code>on_line</code> is rejected: bytes mode returns the child's own bytes, so a callback carrying decoded text would be a second, contradictory contract for the same stream. Use the text-mode entry point when lines are wanted."
+                    },
+                    {
+                      "name": "timeout",
+                      "type": "float | None, default=None",
+                      "description": "Maximum execution time in seconds. An explicit value overrides the timeout in <code>context</code>."
+                    },
+                    {
+                      "name": "context",
+                      "type": "ExecutionContext | None, default=None",
+                      "description": "Execution settings, including echo sinks and text encoding."
+                    },
+                    {
+                      "name": "stdin",
+                      "type": "StdinInput | StdinStream | None, default=None",
+                      "description": "Optional stdin source, as for <code>run</code>: a complete payload, a producer pulled one chunk at a time, or <code>None</code> to inherit the parent's stdin."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "BytesCommandResult",
+                      "description": "The command outcome, carrying <code>bytes</code> for each captured stream when <code>output.capture</code> is true and <code>None</code> for each stream that was not captured."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If <code>output.on_line</code> is set."
+                    },
+                    {
+                      "name": "PermissionError",
+                      "type": "",
+                      "description": "If the command is not allowed by the active scope."
+                    },
+                    {
+                      "name": "TimeoutError",
+                      "type": "",
+                      "description": "If execution exceeds the effective timeout."
+                    },
+                    {
+                      "name": "UnicodeEncodeError",
+                      "type": "",
+                      "description": "If text stdin cannot be encoded by the execution context."
+                    },
+                    {
+                      "name": "StdinSourceError",
+                      "type": "",
+                      "description": "If a <code>StdinStream</code> producer or its encoder fails."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "run_bytes_sync",
+            "kind": "method",
+            "display": "def run_bytes_sync(\n    *,\n    output: RunOutputOptions | None = None,\n    timeout: float | None = None,\n    context: ExecutionContext | None = None,\n    stdin: StdinSource | None = None,\n) -> BytesCommandResult",
+            "doc": {
+              "summary": "Execute the command synchronously, capturing its output as bytes.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "output",
+                      "type": "RunOutputOptions | None, default=None",
+                      "description": "Capture and echo settings. <code>on_line</code> is rejected: bytes mode returns the child's own bytes, so a callback carrying decoded text would be a second, contradictory contract for the same stream. Use the text-mode entry point when lines are wanted."
+                    },
+                    {
+                      "name": "timeout",
+                      "type": "float | None, default=None",
+                      "description": "Maximum execution time in seconds."
+                    },
+                    {
+                      "name": "context",
+                      "type": "ExecutionContext | None, default=None",
+                      "description": "Execution settings, including echo sinks and text encoding."
+                    },
+                    {
+                      "name": "stdin",
+                      "type": "StdinInput | StdinStream | None, default=None",
+                      "description": "Optional stdin source, as for <code>run</code>: a complete payload, a producer pulled one chunk at a time, or <code>None</code> to inherit the parent's stdin."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "BytesCommandResult",
+                      "description": "The command outcome, carrying <code>bytes</code> for each captured stream when capture is enabled and <code>None</code> for each stream that was not captured."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If <code>output.on_line</code> is set."
+                    },
+                    {
+                      "name": "PermissionError",
+                      "type": "",
+                      "description": "If the command is not allowed by the active scope."
+                    },
+                    {
+                      "name": "TimeoutError",
+                      "type": "",
+                      "description": "If execution exceeds the effective timeout."
+                    },
+                    {
+                      "name": "UnicodeEncodeError",
+                      "type": "",
+                      "description": "If text stdin cannot be encoded by the execution context."
+                    },
+                    {
+                      "name": "StdinSourceError",
+                      "type": "",
+                      "description": "If a <code>StdinStream</code> producer or its encoder fails."
                     }
                   ]
                 }
@@ -1272,7 +1303,7 @@
         "kind": "class",
         "module": "cuprum.sh.execution",
         "path": "cuprum/sh/execution.py",
-        "line": 99,
+        "line": 102,
         "display": "class ExecutionContext(\n    env: _EnvMapping = None,\n    cwd: _CwdType = None,\n    cancel_grace: float = _DEFAULT_CANCEL_GRACE,\n    native_pump_cleanup_grace: float = _DEFAULT_NATIVE_PUMP_CLEANUP_GRACE,\n    timeout: float | None = None,\n    stdout_sink: typ.IO[str] | None = None,\n    stderr_sink: typ.IO[str] | None = None,\n    encoding: str = _DEFAULT_ENCODING,\n    errors: str = _DEFAULT_ERROR_HANDLING,\n    tags: cabc.Mapping[str, object] | None = None,\n    env_mode: EnvMode = EnvMode.OVERLAY,\n    process_group: ProcessGroupPolicy | str = ProcessGroupPolicy.INHERIT,\n)",
         "doc": {
           "summary": "Execution parameters for SafeCmd runtime control.",
@@ -1471,7 +1502,7 @@
         "kind": "class",
         "module": "cuprum.sh.execution",
         "path": "cuprum/sh/execution.py",
-        "line": 39,
+        "line": 42,
         "display": "ProcessGroupPolicy",
         "doc": {
           "summary": "Choose whether a run owns the process group its child starts.",
@@ -1509,8 +1540,8 @@
         "kind": "class",
         "module": "cuprum.sh.output",
         "path": "cuprum/sh/output.py",
-        "line": 69,
-        "display": "class RunOutputOptions(\n    capture: bool = True,\n    echo: bool = False,\n    echo_stdout: bool | None = None,\n    echo_stderr: bool | None = None,\n    max_echo_line_bytes: int | None = DEFAULT_ECHO_MAX_LINE_BYTES,\n    broken_pipe_policy: BrokenPipePolicy | str = dc.field(default=BrokenPipePolicy.STRICT, kw_only=True),\n    on_line: LineHook | None = None,\n    idle_after: float | None = None,\n    on_idle: cabc.Callable[[float, float], None] | None = None,\n    sink: sinks.OutputSink | None = None,\n    group: bool = False,\n    annotate_failure: bool = False,\n    _synthesized_sink: sinks.OutputSink | None = dc.field(default=None, repr=False, compare=False, kw_only=True),\n)",
+        "line": 78,
+        "display": "class RunOutputOptions(\n    capture: bool = True,\n    echo: bool = False,\n    echo_stdout: bool | None = None,\n    echo_stderr: bool | None = None,\n    max_echo_line_bytes: int | None = DEFAULT_ECHO_MAX_LINE_BYTES,\n    broken_pipe_policy: BrokenPipePolicy | str = dc.field(default=BrokenPipePolicy.STRICT, kw_only=True),\n    on_line: LineHook | None = None,\n    idle_after: float | None = None,\n    on_idle: cabc.Callable[[float, float], None] | None = None,\n    sink: sinks.OutputSink | None = None,\n    group: bool = False,\n    annotate_failure: bool = False,\n    stdin: StdioTarget | None = None,\n    stdout: StdioTarget | None = None,\n    stderr: StdioTarget | None = None,\n    _synthesized_sink: sinks.OutputSink | None = dc.field(default=None, repr=False, compare=False, kw_only=True),\n)",
         "doc": {
           "summary": "Configure captured and mirrored command output.",
           "sections": [
@@ -1561,6 +1592,11 @@
                   "name": "on_idle",
                   "type": "cabc.Callable[[float, float], None] | None, default=None",
                   "description": "Synchronous <code>(elapsed_total, elapsed_idle)</code> callback, in seconds, invoked once per idle interval in place of the built-in stderr keepalive. It must not block for long: it runs on the run's own event loop. Requires <code>idle_after</code>."
+                },
+                {
+                  "name": "stdin",
+                  "type": "StdioTarget | None, default=None",
+                  "description": "Where the child's standard input is bound, for the two variants that describe the stream itself. <code>StdioTarget.pipe()</code> asks for a library-owned pipe that nothing writes to, so a child reading stdin sees EOF instead of the parent's terminal; <code>StdioTarget.inherit()</code> asks for the parent's stdin, which is the default. The actual input is supplied through <code>SafeCmd.run</code>'s <code>stdin=</code> argument --- a <code>StdinInput</code> payload or a <code>StdinStream</code> producer --- and either form implies a pipe. A <code>path</code> or <code>fd</code> target is rejected here: an input descriptor belongs to the source, not to these options."
                 },
                 {
                   "name": "sink",
@@ -1689,6 +1725,30 @@
             }
           },
           {
+            "name": "stdin",
+            "kind": "field",
+            "display": "stdin: StdioTarget | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stdout",
+            "kind": "field",
+            "display": "stdout: StdioTarget | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stderr",
+            "kind": "field",
+            "display": "stderr: StdioTarget | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
             "name": "resolved_broken_pipe_policy",
             "kind": "property",
             "display": "resolved_broken_pipe_policy: BrokenPipePolicy",
@@ -1767,7 +1827,7 @@
         "kind": "class",
         "module": "cuprum.sh.output",
         "path": "cuprum/sh/output.py",
-        "line": 326,
+        "line": 358,
         "display": "class IOOptions()",
         "doc": {
           "summary": "Deprecated alias for command output stream options."
@@ -1873,6 +1933,30 @@
             }
           },
           {
+            "name": "stdin",
+            "kind": "field",
+            "display": "stdin: StdioTarget | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stdout",
+            "kind": "field",
+            "display": "stdout: StdioTarget | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "stderr",
+            "kind": "field",
+            "display": "stderr: StdioTarget | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
             "name": "resolved_broken_pipe_policy",
             "kind": "property",
             "display": "resolved_broken_pipe_policy: BrokenPipePolicy",
@@ -1913,7 +1997,7 @@
         "kind": "class",
         "module": "cuprum.sh.execution",
         "path": "cuprum/sh/execution.py",
-        "line": 239,
+        "line": 242,
         "display": "class StdinInput(text: str | None = None, data: bytes | None = None)",
         "doc": {
           "summary": "Caller-provided data to write to a subprocess's stdin pipe.",
@@ -1972,6 +2056,247 @@
                       "name": "UnicodeEncodeError",
                       "type": "",
                       "description": "If <code>text</code> cannot be encoded with <code>ctx.encoding</code> under <code>ctx.errors</code> (for example, <code>errors=&quot;strict&quot;</code>)."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "StdinStream",
+        "kind": "class",
+        "module": "cuprum.sh.execution",
+        "path": "cuprum/sh/execution.py",
+        "line": 305,
+        "display": "class StdinStream(\n    chunks: cabc.AsyncIterable[str | bytes] | cabc.AsyncIterator[str | bytes],\n)",
+        "doc": {
+          "summary": "A library-owned, pull-after-drain producer for stdin.",
+          "body": [
+            "Cuprum pulls one chunk from *chunks*, writes it to the child's stdin pipe, and waits for that write to drain before pulling the next. That is what lets a caller feed a child more data than they would ever hold in one buffer: the payload is never materialized whole. What it bounds is how far *ahead* the producer runs, not the size of a single chunk. While <code>drain()</code> waits, the chunk just pulled and its encoded payload are still in memory alongside the transport's write buffer and the OS pipe, so retained memory is roughly the largest chunk the producer yields plus those buffers. A caller who cares about peak memory should yield bounded-size chunks.",
+            "The producer is advanced with <code>aiter()</code>, so *chunks* may be any async iterable. <code>str</code> chunks are encoded with the run's <a href=\"/cuprum/docs/api/commands/#ExecutionContext\"><code>ExecutionContext.encoding</code></a> and <a href=\"/cuprum/docs/api/commands/#ExecutionContext\"><code>ExecutionContext.errors</code></a>, incrementally, so a multi-byte character split across two chunks is still encoded correctly. <code>bytes</code> chunks are written verbatim.",
+            "Cuprum owns the producer for the duration of the run. On every exit path -- normal completion, producer failure, exceeding the timeout, and cancellation -- it closes the child's pipe and then calls the iterator's <code>aclose()</code> when the producer provides one. That order is deliberate: the pipe is cuprum's own resource and the child's EOF depends on the close reaching it, so releasing it first means a caller's cleanup, however slow, cannot hold the child's input open.",
+            "Both steps are bounded. Closing the pipe gives a graceful shutdown a short window and then releases the transport unconditionally, because a writer whose grandchild holds the read end open would otherwise wait forever. The producer's <code>aclose()</code> gets the same window: a finalizer that suspends longer than that is *cancelled*, not waited out, and one that absorbs cancellation keeps working in the background. So cuprum bounds its own wait rather than promising that a caller's cleanup has completed. A caller therefore does not need to finalize their own generator; a caller must not yield from a generator that something else is concurrently driving.",
+            "A child that closes its stdin early (<code>head</code> is the canonical example) is normal rather than an error: the resulting <code>BrokenPipeError</code> is recorded as a <code>stdin_error</code> observation and the run continues to its exit code. Only producer and encoder failures raise <a href=\"/cuprum/docs/api/errors/#StdinSourceError\"><code>StdinSourceError</code></a>."
+          ]
+        },
+        "members": [
+          {
+            "name": "chunks",
+            "kind": "field",
+            "display": "chunks: cabc.AsyncIterable[str | bytes] | cabc.AsyncIterator[str | bytes]",
+            "doc": {
+              "summary": "The async iterable or iterator whose chunks become the child's stdin."
+            }
+          }
+        ]
+      },
+      {
+        "name": "StdinSource",
+        "kind": "type alias",
+        "module": "cuprum.sh.execution",
+        "path": "cuprum/sh/execution.py",
+        "line": 300,
+        "display": "StdinSource = StdinInput | StdinStream",
+        "doc": {
+          "summary": "Either a complete payload or a streaming producer."
+        }
+      },
+      {
+        "name": "StdioTarget",
+        "kind": "class",
+        "module": "cuprum.sh.stdio",
+        "path": "cuprum/sh/stdio.py",
+        "line": 164,
+        "display": "class StdioTarget(\n    kind: _StdioKind = 'pipe',\n    value: Path | int | typ.IO[bytes] | typ.IO[str] | None = None,\n)",
+        "doc": {
+          "summary": "Where a child's standard stream is bound.",
+          "body": [
+            "The four variants differ in *ownership*, which is the whole contract:",
+            "- <code>pipe</code> — a library-owned pipe, the default for stdout and stderr whenever capture, echo, idle reporting, or line observation needs it. Cuprum creates it, consumes or writes it, and closes it. - <code>inherit</code> — the parent's stream, passed straight through. This is the default for stdin, and the explicit way to let an unobserved stdout or stderr through: an unset stdout or stderr whose pipe nobody reads resolves to <code>/dev/null</code> instead, so the child cannot write into the caller's terminal. Cuprum touches nothing either way. - <code>path</code> — a file **cuprum owns**. The file is opened immediately before the spawn, its descriptor is handed to the child, and cuprum's copy is closed in a <code>finally</code> right after the spawn returns, so the descriptor never outlives the run. The caller names a path and never manages a descriptor. Parent and child write at independent offsets because the descriptor starts at offset 0, so redirecting two streams to one path interleaves them and is rejected. - <code>fd</code> — a **borrowed** descriptor or open file object. The caller owns it: cuprum never closes it, and a borrowed file object is flushed before spawn so buffered caller-side bytes reach the child. A caller who reuses one descriptor across two runs shares a single file offset, so the second run writes wherever the first left off.",
+            "Instances are values: two targets built the same way compare equal, so <code>RunOutputOptions</code> stays value-like and <code>dataclasses.replace</code> behaves."
+          ]
+        },
+        "members": [
+          {
+            "name": "kind",
+            "kind": "field",
+            "display": "kind: _StdioKind",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "value",
+            "kind": "field",
+            "display": "value: Path | int | typ.IO[bytes] | typ.IO[str] | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
+            "name": "path_value",
+            "kind": "property",
+            "display": "path_value: Path",
+            "doc": {
+              "summary": "The path this target owns.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "Path",
+                      "description": "The file cuprum opens before spawn and closes immediately after."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If this target is not a <code>path</code> variant."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "fd_value",
+            "kind": "property",
+            "display": "fd_value: int | typ.IO[bytes] | typ.IO[str]",
+            "doc": {
+              "summary": "The borrowed descriptor or file object this target names.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "int | IO[bytes] | IO[str]",
+                      "description": "The caller-owned resource cuprum will never close."
+                    }
+                  ]
+                },
+                {
+                  "title": "Raises",
+                  "fields": [
+                    {
+                      "name": "ValueError",
+                      "type": "",
+                      "description": "If this target is not an <code>fd</code> variant."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "is_owned_path",
+            "kind": "property",
+            "display": "is_owned_path: bool",
+            "doc": {
+              "summary": "Whether this target names a file cuprum must open and close."
+            }
+          },
+          {
+            "name": "pipe",
+            "kind": "staticmethod",
+            "display": "def pipe() -> StdioTarget",
+            "doc": {
+              "summary": "Return the library-owned pipe variant.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "StdioTarget",
+                      "description": "A target selecting a pipe cuprum creates and owns."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "inherit",
+            "kind": "staticmethod",
+            "display": "def inherit() -> StdioTarget",
+            "doc": {
+              "summary": "Return the inherit-the-parent's-stream variant.",
+              "sections": [
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "StdioTarget",
+                      "description": "A target selecting the parent's own stream."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "path",
+            "kind": "staticmethod",
+            "display": "def path(path: str | Path) -> StdioTarget",
+            "doc": {
+              "summary": "Return the cuprum-owned file variant.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "path",
+                      "type": "str | Path",
+                      "description": "The file to open before spawn and close immediately afterwards. Cuprum does not create intermediate directories, so the parent must already exist."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "StdioTarget",
+                      "description": "A target naming the file cuprum will own for the run."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "fd",
+            "kind": "staticmethod",
+            "display": "def fd(fd: int | typ.IO[bytes] | typ.IO[str]) -> StdioTarget",
+            "doc": {
+              "summary": "Return the borrowed descriptor or file-object variant.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "fd",
+                      "type": "int | IO[bytes] | IO[str]",
+                      "description": "A descriptor or an open file object the *caller* owns. Cuprum never closes it; a file object is flushed immediately before the spawn so buffered caller-side bytes reach the child."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "StdioTarget",
+                      "description": "A target borrowing the caller's descriptor or file object."
                     }
                   ]
                 }
@@ -3053,7 +3378,7 @@
         "kind": "constant",
         "module": "cuprum._constants",
         "path": "cuprum/_constants.py",
-        "line": 5,
+        "line": 7,
         "display": "PACKAGE_NAME = 'cuprum'",
         "doc": {
           "summary": ""
@@ -3157,7 +3482,7 @@
         "kind": "class",
         "module": "cuprum.sh.pipeline",
         "path": "cuprum/sh/pipeline.py",
-        "line": 46,
+        "line": 56,
         "display": "class Pipeline(parts: 'tuple[SafeCmd, ...]')",
         "doc": {
           "summary": "A sequence of SafeCmd stages connected via stdout/stdin piping.",
@@ -3276,7 +3601,7 @@
                     {
                       "name": "ValueError",
                       "type": "",
-                      "description": "If <code>output</code> is combined with deprecated flags."
+                      "description": "If <code>output</code> is combined with deprecated flags, or if it names a <code>stdin</code>/<code>stdout</code>/<code>stderr</code> target, which pipeline stages do not honour."
                     },
                     {
                       "name": "PermissionError",
@@ -3341,7 +3666,7 @@
                     {
                       "name": "ValueError",
                       "type": "",
-                      "description": "If <code>output</code> is combined with deprecated flags."
+                      "description": "If <code>output</code> is combined with deprecated flags, or if it names a <code>stdin</code>/<code>stdout</code>/<code>stderr</code> target, which pipeline stages do not honour."
                     },
                     {
                       "name": "PermissionError",
@@ -5978,8 +6303,8 @@
         "kind": "class",
         "module": "cuprum.events",
         "path": "cuprum/events.py",
-        "line": 38,
-        "display": "class ExecEvent(\n    phase: ExecPhase,\n    program: Program,\n    argv: tuple[str, ...],\n    cwd: Path | None,\n    env: EnvOverlay | None,\n    pid: int | None,\n    timestamp: float,\n    line: str | None,\n    exit_code: int | None,\n    duration_s: float | None,\n    tags: cabc.Mapping[str, object],\n    note: str | None = None,\n    byte_count: int | None = None,\n    operation: str | None = None,\n    error_type: str | None = None,\n    exec_id: ExecId | None = None,\n    project: str | None = None,\n    timeout_s: float | None = None,\n    timeout_mode: TimeoutMode | None = None,\n    stage_index: int | None = None,\n    stage_count: int | None = None,\n    eof_grace_s: float | None = None,\n    pending_readers: int | None = None,\n    max_rss_bytes: int | None = None,\n    user_cpu_seconds: float | None = None,\n    system_cpu_seconds: float | None = None,\n    resource_usage_mode: ResourceUsageMode | None = None,\n    env_mode: EnvMode | None = None,\n    resolved_path: str | None = dc.field(default=None, kw_only=True),\n    capture_mode: CaptureMode | None = dc.field(default=None, kw_only=True),\n    owns_group: bool | None = dc.field(default=None, kw_only=True),\n    group_outcome: GroupTeardownOutcome | None = dc.field(default=None, kw_only=True),\n    settle_s: float | None = dc.field(default=None, kw_only=True),\n    terminal_outcome: TerminalOutcome | None = None,\n)",
+        "line": 39,
+        "display": "class ExecEvent(\n    phase: ExecPhase,\n    program: Program,\n    argv: tuple[str, ...],\n    cwd: Path | None,\n    env: EnvOverlay | None,\n    pid: int | None,\n    timestamp: float,\n    line: str | None,\n    exit_code: int | None,\n    duration_s: float | None,\n    tags: cabc.Mapping[str, object],\n    note: str | None = None,\n    byte_count: int | None = None,\n    operation: str | None = None,\n    error_type: str | None = None,\n    exec_id: ExecId | None = None,\n    project: str | None = None,\n    timeout_s: float | None = None,\n    timeout_mode: TimeoutMode | None = None,\n    stage_index: int | None = None,\n    stage_count: int | None = None,\n    eof_grace_s: float | None = None,\n    pending_readers: int | None = None,\n    max_rss_bytes: int | None = None,\n    user_cpu_seconds: float | None = None,\n    system_cpu_seconds: float | None = None,\n    resource_usage_mode: ResourceUsageMode | None = None,\n    env_mode: EnvMode | None = None,\n    resolved_path: str | None = dc.field(default=None, kw_only=True),\n    capture_mode: CaptureMode | None = dc.field(default=None, kw_only=True),\n    owns_group: bool | None = dc.field(default=None, kw_only=True),\n    error_category: StdioFailureCategory | None = dc.field(default=None, kw_only=True),\n    group_outcome: GroupTeardownOutcome | None = dc.field(default=None, kw_only=True),\n    settle_s: float | None = dc.field(default=None, kw_only=True),\n    terminal_outcome: TerminalOutcome | None = None,\n)",
         "doc": {
           "summary": "A structured execution event emitted by Cuprum.",
           "sections": [
@@ -5989,7 +6314,7 @@
                 {
                   "name": "phase",
                   "type": "",
-                  "description": "Event phase. See <code>ExecPhase</code>. Both <code>timeout</code> and <code>teardown_error</code> are ancillary diagnostics that never displace a lifecycle phase. <code>pipeline_fail_fast</code> reports the pipeline coordinator's decision before the failing stage's own <code>exit</code> event. <code>settled</code> is the single definitive terminal event for every execution that emitted <code>plan</code>. It carries <code>terminal_outcome</code>, an optional <code>pid</code>, and <code>exec_id</code>. <code>exit_code</code> is a real child status only when one is available; it stays <code>None</code> for spawn failure and cancellation paths that do not produce a command result. The event never carries an exception payload. Catalogue lookup failures raised as <code>UnknownProgramError</code> in <code>catalogue</code> and allowlist failures from <code>_enforce_allowlist</code> happen before <code>exec_id</code> is minted and are outside this terminal-event contract. <code>timeout</code> marks a run that exceeded its deadline, and is emitted before the existing <code>exit</code> event and the public <code>TimeoutExpired</code>, both of which are preserved. <code>teardown_error</code> marks a stream consumer that drained with an unexpected error during cleanup. <code>capture_eof_grace_expired</code> marks a capturing drain whose bounded EOF grace elapsed while one or two readers remained pending. Neither ancillary diagnostic carries an ordering guarantee. Cleanup also runs on external cancellation and on an unexpected stdin-writer failure, and on those paths the original exception propagates unchanged: no <code>exit</code> event follows and no <code>TimeoutExpired</code> is raised, so an ancillary diagnostic may be the last event a consumer sees for that execution."
+                  "description": "Event phase. See <code>ExecPhase</code>. Both <code>timeout</code> and <code>teardown_error</code> are ancillary diagnostics that never displace a lifecycle phase. <code>pipeline_fail_fast</code> reports the pipeline coordinator's decision before the failing stage's own <code>exit</code> event. <code>settled</code> is the single definitive terminal event for every execution that emitted <code>plan</code>. It carries <code>terminal_outcome</code>, an optional <code>pid</code>, and <code>exec_id</code>. <code>exit_code</code> is a real child status only when one is available; it stays <code>None</code> for spawn failure and cancellation paths that do not produce a command result. The event never carries an exception payload. Catalogue lookup failures raised as <code>UnknownProgramError</code> in <code>catalogue</code> and allowlist failures from <code>_enforce_allowlist</code> happen before <code>exec_id</code> is minted and are outside this terminal-event contract. <code>timeout</code> marks a run that exceeded its deadline, and is emitted before the existing <code>exit</code> event and the public <code>TimeoutExpired</code>, both of which are preserved. <code>teardown_error</code> marks a stream consumer that drained with an unexpected error during cleanup. <code>capture_eof_grace_expired</code> marks a capturing drain whose bounded EOF grace elapsed while one or two readers remained pending. Neither ancillary diagnostic carries an ordering guarantee. Cleanup also runs on external cancellation and on an unexpected stdin-writer failure, and on those paths the original exception propagates unchanged: no <code>exit</code> event follows and no <code>TimeoutExpired</code> is raised, so an ancillary diagnostic may be the last event a consumer sees for that execution. <code>stdio_error</code> is the best-effort counterpart to <code>stdin_error</code> for the standard-stream boundaries that fail *outside* the stdin writer's own pipe operations: the caller's producer, an invalid chunk, the encoder, opening a cuprum-owned target file, and flushing a caller's borrowed file object. It is emitted where the failing boundary is known, and never in place of the caller-visible exception — a producer failure still raises <code>StdinSourceError</code> with the producer's own exception chained, and a failed owned-path open still raises the <code>OSError</code> <code>_open_owned_path</code> builds. It carries <code>error_category</code> rather than an exception message, because several of these boundaries raise the same exception type and the category is what separates them."
                 },
                 {
                   "name": "program",
@@ -6149,7 +6474,12 @@
                 {
                   "name": "resolved_path",
                   "type": "",
-                  "description": "The executable this execution actually ran, when a scope bound the program's logical identity to a specific path. <code>None</code> when no binding applied, in which case the child ran under the name in <code>argv[0]</code>. It is the *executable*, not the command: <code>argv</code> still carries the arguments, and <code>program</code> still carries the catalogue identity that policy was checked against. Keeping all three means a consumer can see what was permitted, what was asked for, and what ran, without having to infer one from another. The path is a string rather than a resolved file identity, so a replaced binary is not detected; see the TOCTOU note in <code>cuprum.executable_binding</code>."
+                  "description": "The executable this execution actually ran, when a scope bound the program's logical identity to a specific path. <code>None</code> when no binding applied, in which case the child ran under the name in <code>argv[0]</code>."
+                },
+                {
+                  "name": "error_category",
+                  "type": "",
+                  "description": "Bounded category naming which failure boundary produced a diagnostic event. See <code>StdioFailureCategory</code>, also re-exported here. Carried on <code>stdio_error</code>; <code>None</code> for every other phase, including the pre-existing <code>stdin_error</code> events, whose <code>operation</code> already names its boundary. It is a typed field rather than part of <code>note</code> because <code>error_type</code> cannot carry it, and the value is low-cardinality, so it is the one failure attribute safe to attach to a metric series. It is the *executable*, not the command: <code>argv</code> still carries the arguments, and <code>program</code> still carries the catalogue identity that policy was checked against. Keeping all three means a consumer can see what was permitted, what was asked for, and what ran, without having to infer one from another. The path is a string rather than a resolved file identity, so a replaced binary is not detected; see the TOCTOU note in <code>cuprum.executable_binding</code>."
                 },
                 {
                   "name": "capture_mode",
@@ -6413,6 +6743,14 @@
             }
           },
           {
+            "name": "error_category",
+            "kind": "field",
+            "display": "error_category: StdioFailureCategory | None",
+            "doc": {
+              "summary": ""
+            }
+          },
+          {
             "name": "group_outcome",
             "kind": "field",
             "display": "group_outcome: GroupTeardownOutcome | None",
@@ -6443,7 +6781,7 @@
         "kind": "type alias",
         "module": "cuprum.events",
         "path": "cuprum/events.py",
-        "line": 317,
+        "line": 348,
         "display": "ExecHook = cabc.Callable[[ExecEvent], cabc.Awaitable[None] | None]",
         "doc": {
           "summary": ""
@@ -6485,7 +6823,7 @@
           {
             "name": "ExecPhase",
             "kind": "type alias",
-            "display": "ExecPhase = typ.Literal['plan', 'start', 'stdout', 'stderr', 'exit', 'settled', 'stdin', 'stdin_error', 'timeout', 'teardown_error', 'capture_eof_grace_expired', 'pipeline_fail_fast', 'group_teardown']",
+            "display": "ExecPhase = typ.Literal['plan', 'start', 'stdout', 'stderr', 'exit', 'settled', 'stdin', 'stdin_error', 'stdio_error', 'timeout', 'teardown_error', 'capture_eof_grace_expired', 'pipeline_fail_fast', 'group_teardown']",
             "doc": {
               "summary": ""
             }
@@ -6514,6 +6852,18 @@
                 "Members are <code>str</code>, so the observe event, the <code>cuprum_</code> log extras, the span attributes, and the metrics label all keep carrying plain strings — the constant this replaced was a <code>Literal</code> of exactly these three values, and a member formats as its own value."
               ],
               "examples": "The member value is the string consumers see::\n\n    assert ResourceUsageMode.WAIT4_CHILD == \"wait4_child\""
+            }
+          },
+          {
+            "name": "StdioFailureCategory",
+            "kind": "class",
+            "display": "StdioFailureCategory",
+            "doc": {
+              "summary": "Which standard-stream boundary produced a diagnostic failure.",
+              "body": [
+                "Members are <code>str</code>, so the observe event, the <code>cuprum_</code> log extras, the span attributes, and the metrics label all carry plain strings."
+              ],
+              "examples": "The member value is the string consumers see::\n\n    assert StdioFailureCategory.INVALID_CHUNK == \"invalid_chunk\""
             }
           },
           {
@@ -6562,8 +6912,8 @@
         "kind": "function",
         "module": "cuprum.logging_hooks",
         "path": "cuprum/logging_hooks.py",
-        "line": 46,
-        "display": "def logging_hook(\n    *,\n    logger: logging.Logger | None = None,\n    start_level: int = logging.INFO,\n    exit_level: int = logging.INFO,\n) -> LoggingHookRegistration",
+        "line": 47,
+        "display": "def logging_hook(\n    *,\n    logger: logging.Logger | None = None,\n    start_level: int = logging.INFO,\n    exit_level: int = logging.INFO,\n    redaction: RedactionPolicy | None = None,\n) -> LoggingHookRegistration",
         "doc": {
           "summary": "Register paired hooks that log start and exit events.",
           "sections": [
@@ -6584,6 +6934,11 @@
                   "name": "exit_level",
                   "type": "",
                   "description": "Logging level for the exit event (default <code>logging.INFO</code>)."
+                },
+                {
+                  "name": "redaction",
+                  "type": "",
+                  "description": "Optional policy applied to the logged argument vector. Defaults to <code>None</code>. Executed arguments and captured results remain unchanged."
                 }
               ]
             },
@@ -6605,7 +6960,7 @@
         "kind": "class",
         "module": "cuprum.logging_hooks",
         "path": "cuprum/logging_hooks.py",
-        "line": 23,
+        "line": 24,
         "display": "class LoggingHookRegistration(\n    start_registration: HookRegistration | None,\n    exit_registration: HookRegistration | None,\n    _detached: bool = False,\n)",
         "doc": {
           "summary": "Registration handle for paired logging hooks.",
@@ -7991,7 +8346,7 @@
   {
     "slug": "adapters",
     "title": "Adapters and sinks",
-    "lede": "Ready-made observe hooks for logging, metrics, and tracing; metrics for stream operations, line events, echo, control operations, and the Rust pump; and the output sink that frames a run for GitHub Actions.",
+    "lede": "Ready-made observe hooks for logging, metrics, and tracing; metrics for stream operations, line events, echo, control operations, and the Rust pump; the redaction policy that keeps secrets out of what they export; and the output sink that frames a run for GitHub Actions.",
     "entries": [
       {
         "name": "cuprum.adapters.logging_adapter",
@@ -8029,7 +8384,7 @@
           {
             "name": "LogLevels",
             "kind": "class",
-            "display": "class LogLevels(\n    plan_level: int = logging.DEBUG,\n    start_level: int = logging.INFO,\n    output_level: int = logging.DEBUG,\n    exit_level: int = logging.INFO,\n    fail_fast_level: int = logging.WARNING,\n    group_teardown_level: int = logging.WARNING,\n)",
+            "display": "class LogLevels(\n    plan_level: int = logging.DEBUG,\n    start_level: int = logging.INFO,\n    output_level: int = logging.DEBUG,\n    exit_level: int = logging.INFO,\n    fail_fast_level: int = logging.WARNING,\n    group_teardown_level: int = logging.WARNING,\n    stdio_error_level: int = logging.WARNING,\n)",
             "doc": {
               "summary": "Configuration for logging levels per execution event phase.",
               "sections": [
@@ -8065,6 +8420,11 @@
                       "name": "group_teardown_level",
                       "type": "",
                       "description": "Log level for <code>group_teardown</code> events (a teardown could not establish settlement). Default WARNING for the same reason as <code>fail_fast_level</code>: unlike the other phases this reports an abnormal outcome, and it would otherwise fall through to the unhandled-phase default of DEBUG and be invisible in a normal configuration."
+                    },
+                    {
+                      "name": "stdio_error_level",
+                      "type": "",
+                      "description": "Log level for <code>stdio_error</code> events (a standard-stream boundary failed). Default WARNING, for the same reason as <code>fail_fast_level</code>: it reports a failure, and a record nobody retains is not a diagnostic."
                     }
                   ]
                 }
@@ -8074,7 +8434,7 @@
           {
             "name": "structured_logging_hook",
             "kind": "function",
-            "display": "def structured_logging_hook(\n    *,\n    logger: logging.Logger | None = None,\n    levels: LogLevels | None = None,\n) -> ExecHook",
+            "display": "def structured_logging_hook(\n    *,\n    logger: logging.Logger | None = None,\n    levels: LogLevels | None = None,\n    redaction: RedactionPolicy | None = None,\n) -> ExecHook",
             "doc": {
               "summary": "Create an observe hook that logs execution events with structured data.",
               "sections": [
@@ -8090,6 +8450,11 @@
                       "name": "levels",
                       "type": "",
                       "description": "Log level configuration for different event phases. Defaults to <code>LogLevels()</code> with standard levels."
+                    },
+                    {
+                      "name": "redaction",
+                      "type": "",
+                      "description": "Optional projection policy applied before rendering messages and extras. Defaults to <code>None</code>; execution inputs and raw events remain unchanged."
                     }
                   ]
                 },
@@ -8365,7 +8730,7 @@
           {
             "name": "TracingHook",
             "kind": "class",
-            "display": "class TracingHook(tracer: Tracer, *, record_output: bool = True) -> None",
+            "display": "class TracingHook(\n    tracer: Tracer,\n    *,\n    record_output: bool = True,\n    redaction: RedactionPolicy | None = None,\n) -> None",
             "doc": {
               "summary": "Project correlated execution events onto backend spans.",
               "body": [
@@ -8384,6 +8749,11 @@
                       "name": "record_output",
                       "type": "",
                       "description": "If True, record stdout/stderr lines as span events. Default True."
+                    },
+                    {
+                      "name": "redaction",
+                      "type": "",
+                      "description": "Optional policy applied to event copies before span projection. Defaults to <code>None</code>; raw observations and execution remain unchanged."
                     }
                   ]
                 }
@@ -8423,7 +8793,7 @@
           {
             "name": "tracing_hook",
             "kind": "function",
-            "display": "def tracing_hook(\n    tracer: Tracer,\n    *,\n    record_output: bool = True,\n) -> ExecHook",
+            "display": "def tracing_hook(\n    tracer: Tracer,\n    *,\n    record_output: bool = True,\n    redaction: RedactionPolicy | None = None,\n) -> ExecHook",
             "doc": {
               "summary": "Create a tracing observe hook for the given tracer.",
               "body": [
@@ -8442,6 +8812,11 @@
                       "name": "record_output",
                       "type": "",
                       "description": "If True, record stdout/stderr lines as span events. Default True."
+                    },
+                    {
+                      "name": "redaction",
+                      "type": "",
+                      "description": "Optional policy applied before span projection. Defaults to <code>None</code>."
                     }
                   ]
                 },
@@ -8891,6 +9266,121 @@
         ]
       },
       {
+        "name": "cuprum.redaction",
+        "kind": "module",
+        "module": "cuprum.redaction",
+        "path": "cuprum/redaction.py",
+        "line": 1,
+        "display": "from cuprum import redaction",
+        "doc": {
+          "summary": "Opt-in redaction for execution-event projections.",
+          "body": [
+            "Redaction happens on copies at export boundaries. It never changes the arguments, environment, or captured output used by an execution."
+          ]
+        },
+        "members": [
+          {
+            "name": "RedactionError",
+            "kind": "exception",
+            "display": "class RedactionError(\n    *,\n    rule_kind: typ.Literal['literal', 'pattern'],\n    rule_index: int,\n    error_type: str,\n) -> None",
+            "doc": {
+              "summary": "A configured redaction rule failed before an export could be built.",
+              "sections": [
+                {
+                  "title": "Attributes",
+                  "fields": [
+                    {
+                      "name": "rule_kind",
+                      "type": "",
+                      "description": "Whether the failing rule was a literal or regular expression."
+                    },
+                    {
+                      "name": "rule_index",
+                      "type": "",
+                      "description": "Zero-based position of the rule in its configured tuple."
+                    },
+                    {
+                      "name": "error_type",
+                      "type": "",
+                      "description": "Name of the underlying exception class. The exception text and source value are omitted so diagnostics cannot echo the value being redacted."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "RedactionPolicy",
+            "kind": "class",
+            "display": "class RedactionPolicy(\n    literals: str | cabc.Iterable[str] = (),\n    patterns: re.Pattern[str] | cabc.Iterable[re.Pattern[str]] = (),\n    mask: str = _DEFAULT_MASK,\n) -> None",
+            "doc": {
+              "summary": "Apply configured literal and regular-expression masks to exports.",
+              "body": [
+                "The default policy is inert. Rules are supplied by the caller; this class does not attempt to identify secrets automatically."
+              ],
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "literals",
+                      "type": "",
+                      "description": "Literal strings to replace. A single string or any iterable of strings is coerced to an immutable tuple, ordered longest first. Empty strings are rejected because they would match every position in the input."
+                    },
+                    {
+                      "name": "patterns",
+                      "type": "",
+                      "description": "Compiled text regular expressions to replace. A single pattern or any iterable of patterns is coerced to an immutable tuple."
+                    },
+                    {
+                      "name": "mask",
+                      "type": "",
+                      "description": "Opaque text substituted for each merged match. Defaults to <code>&quot;[REDACTED]&quot;</code>."
+                    }
+                  ]
+                }
+              ],
+              "examples": ">>> policy = RedactionPolicy(literals=(\"token-123\",))\n>>> policy.apply_text(\"--token=token-123\")\n'--token=[REDACTED]'"
+            }
+          },
+          {
+            "name": "redacting_hook",
+            "kind": "function",
+            "display": "def redacting_hook(\n    consumer: ExecHook,\n    policy: RedactionPolicy,\n) -> ExecHook",
+            "doc": {
+              "summary": "Wrap an observation consumer so it receives sanitized event copies.",
+              "sections": [
+                {
+                  "title": "Parameters",
+                  "fields": [
+                    {
+                      "name": "consumer",
+                      "type": "",
+                      "description": "The hook that exports or stores execution observations."
+                    },
+                    {
+                      "name": "policy",
+                      "type": "",
+                      "description": "The explicit policy applied before the consumer receives an event."
+                    }
+                  ]
+                },
+                {
+                  "title": "Returns",
+                  "fields": [
+                    {
+                      "name": "",
+                      "type": "ExecHook",
+                      "description": "A hook suitable for registration with <code>observe()</code>. The wrapper returns the consumer's result unchanged, including an awaitable result."
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
         "name": "cuprum.sinks",
         "kind": "module",
         "module": "cuprum.sinks",
@@ -8920,7 +9410,7 @@
           {
             "name": "GitHubActionsSink",
             "kind": "class",
-            "display": "class GitHubActionsSink(\n    destination: typ.IO[str] | None = None,\n    *,\n    title: str | None = None,\n    force: bool = False,\n    emit_group: bool = True,\n    emit_annotation: bool = True,\n) -> None",
+            "display": "class GitHubActionsSink(\n    destination: typ.IO[str] | None = None,\n    **options: typ.Unpack[_GitHubActionsSinkOptionsKwargs],\n) -> None",
             "doc": {
               "summary": "Opt-in presentation sink for GitHub Actions CI callers.",
               "body": [
@@ -8939,7 +9429,7 @@
                     {
                       "name": "title",
                       "type": "",
-                      "description": "Optional display label overriding the derived <code>&quot;&lt;project&gt;: &lt;program&gt;&quot;</code> label, used for both the group title and a failure annotation's title."
+                      "description": "Optional explicit label for both the group and failure annotation. By default, argv titles the group and the bounded run label titles the annotation."
                     },
                     {
                       "name": "force",
@@ -8955,6 +9445,11 @@
                       "name": "emit_annotation",
                       "type": "",
                       "description": "Whether a failed outcome emits its <code>::error::</code> annotation. <code>False</code> keeps the framing and drops the annotation, which is what <code>RunOutputOptions(group=True)</code> asks for."
+                    },
+                    {
+                      "name": "redaction",
+                      "type": "",
+                      "description": "Optional policy for every emitted group and annotation title, including the bounded fallback label, applied before workflow-command escaping. Defaults to <code>None</code>. Mirrored child output is unchanged."
                     }
                   ]
                 },
@@ -9067,7 +9562,7 @@
   {
     "slug": "errors",
     "title": "Errors",
-    "lede": "The exceptions Cuprum raises when a program is unknown, forbidden, or too slow, or when a signal cannot reach a child.",
+    "lede": "The exceptions Cuprum raises when a program is unknown, forbidden, or too slow, when a stdin producer fails, or when a signal cannot reach a child.",
     "entries": [
       {
         "name": "UnknownProgramError",
@@ -9120,7 +9615,7 @@
         "kind": "exception",
         "module": "cuprum.sh.execution",
         "path": "cuprum/sh/execution.py",
-        "line": 207,
+        "line": 210,
         "display": "class TimeoutExpired(\n    *,\n    cmd: cabc.Sequence[str] | object,\n    timeout: float,\n    output: str | bytes | None = None,\n    stderr: str | bytes | None = None,\n) -> None",
         "doc": {
           "summary": "Raised when command execution exceeds the configured timeout."
@@ -9149,6 +9644,24 @@
               ]
             }
           }
+        ]
+      },
+      {
+        "name": "StdinSourceError",
+        "kind": "exception",
+        "module": "cuprum.sh.execution",
+        "path": "cuprum/sh/execution.py",
+        "line": 283,
+        "display": "StdinSourceError",
+        "doc": {
+          "summary": "Raised when a streaming stdin producer or its encoder fails.",
+          "body": [
+            "A caller who supplies a <a href=\"/cuprum/docs/api/commands/#StdinStream\"><code>StdinStream</code></a> sees failures from three sources wrapped in this type: the producer raising while being pulled, the producer yielding a value that is neither <code>str</code> nor <code>bytes</code>, and the incremental encoder rejecting a <code>str</code> chunk. The original exception is chained as <code>__cause__</code>, so the caller can still inspect it.",
+            "The child is terminated before this is raised, and the run's stdin writer and pipe are finalized, so catching this type is enough to know that no writer outlives the run. Cancellation is *not* wrapped: an <code>asyncio.CancelledError</code> propagates unchanged, because it is a control-flow signal rather than a source failure."
+          ]
+        },
+        "bases": [
+          "Exception"
         ]
       },
       {
@@ -9224,6 +9737,6 @@
   }
 ] %}
 {% set api_source = {
-  "version": "0.2.0-beta1",
-  "commit": "b1b4769ec001cfd59314af0f63fcb2ed855262f4"
+  "version": "0.2.0-beta2",
+  "commit": "a40898789a80e1ead3537cdab070fa87a80afced"
 } %}

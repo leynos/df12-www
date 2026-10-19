@@ -14,6 +14,7 @@
         pre
     p.cu-api__bases
       code
+      code
     p.cu-api__summary
     details.cu-api__members
       summary
@@ -87,73 +88,7 @@
                 code.cu-api__field-name
                 span.cu-api__field-type
               dd
-        div.cu-api__section
-          h5.cu-api__section-title
-          dl.cu-api__fields
-            div.cu-api__field
-              dt
-                span.cu-api__field-type
-              dd
                 code
-        div.cu-api__section
-          h5.cu-api__section-title
-          dl.cu-api__fields
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-      div.cu-api__member id='SafeCmd.run_bytes'
-        p.cu-api__member-head
-          span.cu-api__kind
-          code
-        div.cu-api__decl
-          div.cuprum-syntax
-            pre
-        p.cu-api__summary
-        p
-          code
-        p
-          code
-        div.cu-api__section
-          h5.cu-api__section-title
-          dl.cu-api__fields
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-                span.cu-api__field-type
-              dd
-                code
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-                span.cu-api__field-type
-              dd
-                code
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-                span.cu-api__field-type
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-                span.cu-api__field-type
-              dd
-        div.cu-api__section
-          h5.cu-api__section-title
-          dl.cu-api__fields
-            div.cu-api__field
-              dt
-                span.cu-api__field-type
-              dd
                 code
                 code
                 code
@@ -162,61 +97,8 @@
           dl.cu-api__fields
             div.cu-api__field
               dt
-                code.cu-api__field-name
-              dd
-                code
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-      div.cu-api__member id='SafeCmd.run_bytes_sync'
-        p.cu-api__member-head
-          span.cu-api__kind
-          code
-        div.cu-api__decl
-          div.cuprum-syntax
-            pre
-        p.cu-api__summary
-        div.cu-api__section
-          h5.cu-api__section-title
-          dl.cu-api__fields
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
                 span.cu-api__field-type
               dd
-                code
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-                span.cu-api__field-type
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-                span.cu-api__field-type
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-                span.cu-api__field-type
-              dd
-        div.cu-api__section
-          h5.cu-api__section-title
-          dl.cu-api__fields
-            div.cu-api__field
-              dt
-                span.cu-api__field-type
-              dd
-                code
                 code
         div.cu-api__section
           h5.cu-api__section-title
@@ -225,19 +107,19 @@
               dt
                 code.cu-api__field-name
               dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
                 code
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
-            div.cu-api__field
-              dt
-                code.cu-api__field-name
-              dd
       div.cu-api__member id='SafeCmd.lines'
         p.cu-api__member-head
           span.cu-api__kind
@@ -296,6 +178,16 @@
                 code.cu-api__field-name
               dd
                 code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
       div.cu-api__member id='SafeCmd.run_sync'
         p.cu-api__member-head
           span.cu-api__kind
@@ -328,6 +220,7 @@
                 code.cu-api__field-name
                 span.cu-api__field-type
               dd
+                code
         div.cu-api__section
           h5.cu-api__section-title
           dl.cu-api__fields
@@ -350,6 +243,11 @@
               dt
                 code.cu-api__field-name
               dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
       div.cu-api__member id='SafeCmd.start'
         p.cu-api__member-head
           span.cu-api__kind
@@ -419,6 +317,148 @@
               dt
                 code.cu-api__field-name
               dd
+      div.cu-api__member id='SafeCmd.run_bytes'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+        p.cu-api__summary
+        p
+          code
+        p
+          code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+                code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                span.cu-api__field-type
+              dd
+                code
+                code
+                code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+      div.cu-api__member id='SafeCmd.run_bytes_sync'
+        p.cu-api__member-head
+          span.cu-api__kind
+          code
+        div.cu-api__decl
+          div.cuprum-syntax
+            pre
+        p.cu-api__summary
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+                span.cu-api__field-type
+              dd
+                code
+                code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                span.cu-api__field-type
+              dd
+                code
+                code
+        div.cu-api__section
+          h5.cu-api__section-title
+          dl.cu-api__fields
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+            div.cu-api__field
+              dt
+                code.cu-api__field-name
+              dd
+                code
   
   '''
 # ---

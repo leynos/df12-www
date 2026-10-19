@@ -163,6 +163,79 @@ assert result.ok and result.stdout == "done\n"
 {% endcall %}
 </section>
 
+<section aria-labelledby="redirect">
+  <h2 id="redirect">Send a stream to a file or the parent</h2>
+  <p>
+    Capture keeps output in memory for the caller to read. When output should
+    land somewhere else, such as a log file or the parent's own terminal,
+    redirect the stream instead. {{ api.ref('RunOutputOptions') }}<code>.stdout</code>
+    and <code>.stderr</code> accept a {{ api.ref('StdioTarget') }}, and the
+    four kinds differ in who owns the destination.
+  </p>
+  {% call ui.matrix('stdio-targets-caption', 'Standard-stream targets', ['Target', 'The child\'s stream goes to', 'Owned by']) %}
+  {% for target, destination, owner in [
+    ('StdioTarget.pipe()', 'A pipe Cuprum reads, for capture, echo, line observation, or a heartbeat.', 'Cuprum'),
+    ('StdioTarget.inherit()', 'The parent\'s own stream, passed straight through.', 'Parent'),
+    ('StdioTarget.path(p)', 'The file at p, opened just before the spawn and closed just after.', 'Cuprum'),
+    ('StdioTarget.fd(f)', 'A descriptor or open file object; flushed before the spawn, never closed.', 'Caller'),
+  ] %}
+  <tr role="row">
+    <th scope="row" role="rowheader"><code>{{ target }}</code></th>
+    {% call ui.matrix_cell('The child\'s stream goes to') %}{{ destination }}{% endcall %}
+    {% call ui.matrix_cell('Owned by') %}{{ owner }}{% endcall %}
+  </tr>
+  {% endfor %}
+  {% endcall %}
+  <p>
+    When a stream is left unset, Cuprum uses a pipe if something needs to
+    read it and discards the output otherwise, so <code>inherit()</code> is
+    the way to let an unobserved stream reach the parent's terminal. Any
+    target other than <code>pipe()</code> counts as a redirect, and capture
+    is on by default, so pass <code>capture=False</code> when redirecting
+    stdout:
+  </p>
+{% call ui.code_panel('redirect_stdout.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+import tempfile
+from pathlib import Path
+
+from cuprum import Program, ProgramCatalogue, RunOutputOptions, StdioTarget, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="redirect")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+log = Path(tempfile.mkdtemp()) / "out.log"
+result = python("-c", "print('redirected')").run_sync(
+    output=RunOutputOptions(capture=False, stdout=StdioTarget.path(log)),
+)
+assert result.stdout is None, "a redirected stream is not captured"
+assert log.read_text(encoding="utf-8") == "redirected\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    A few combinations are contradictory, and Cuprum rejects them with
+    <code>ValueError</code> before the child starts rather than silently
+    choosing one side:
+  </p>
+  <ul>
+    <li><strong>Capture or echo with a redirected stream, including <code>inherit()</code>.</strong> Both read from a pipe, and a redirected stream has none. Line observation and the heartbeat are not rejected, but they see nothing from a redirected stream.</li>
+    <li><strong>One path for both stdout and stderr.</strong> Each open starts at offset 0, so the two streams would overwrite each other. Use two paths, or one <code>fd()</code> target the caller manages.</li>
+    <li><strong>A redirected stdout with <code>lines()</code>, or either stream with <code>start()</code>.</strong> Both read the child's output in the parent. Use <code>run()</code> or <code>run_sync()</code> instead.</li>
+    <li><strong>An inherited stdin alongside a stdin source.</strong> <code>RunOutputOptions(stdin=StdioTarget.inherit())</code> with <code>stdin=StdinInput(...)</code> or <code>stdin=StdinStream(...)</code> gives two answers to where the input comes from; this is checked when the run starts. A <code>pipe()</code> stdin target with a source is accepted, because the source is written through that pipe.</li>
+    <li><strong>Targets on a <code>Pipeline</code>.</strong> Redirect a single command instead.</li>
+    <li><strong><code>path()</code> or <code>fd()</code> on Windows.</strong> File and descriptor redirection needs POSIX descriptors; <code>pipe()</code> and <code>inherit()</code> work everywhere.</li>
+  </ul>
+  <p>
+    Reusing one <code>fd()</code> target across several runs shares its file
+    offset, so each run continues where the previous one stopped.
+    <code>RunOutputOptions.stdin</code> accepts only <code>pipe()</code> and
+    <code>inherit()</code>: the input itself is passed to the run call's
+    <code>stdin=</code> argument, as
+    <a href="/cuprum/docs/guides/input-and-deadlines/#stream">Stream input from a producer</a>
+    describes.
+  </p>
+</section>
+
 <section aria-labelledby="binary">
   <h2 id="binary">Binary output</h2>
   <p>

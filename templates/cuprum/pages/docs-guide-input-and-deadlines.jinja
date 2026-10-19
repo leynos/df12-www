@@ -9,7 +9,8 @@
   <p>
     {{ api.ref('StdinInput') }}<code>(text=...)</code> encodes text with the
     context's encoding; <code>StdinInput(data=...)</code> passes bytes. Give
-    one, not both. {{ api.ref('ExecutionContext') }}<code>.env</code>
+    one, not both, and for input too large to hold in memory
+    <a href="#stream">stream it instead</a>. {{ api.ref('ExecutionContext') }}<code>.env</code>
     overlays the live parent environment by default, so an empty mapping
     still inherits everything; <code>cwd</code> sets the child's working
     directory. Everything about <em>how</em> a command runs goes to
@@ -37,6 +38,55 @@ result = command.run_sync(
 assert result.stdout == "ready hello\n"
 {% endhighlight %}
 {% endcall %}
+</section>
+
+<section aria-labelledby="stream">
+  <h2 id="stream">Stream input from a producer</h2>
+  <p>
+    {{ api.ref('StdinInput') }} holds the whole payload in memory. For input
+    that is large, or that is produced as the run goes, pass
+    <code>stdin=</code>{{ api.ref('StdinStream') }}<code>(chunks=...)</code>
+    with an async iterable instead:
+  </p>
+{% call ui.code_panel('streaming_stdin.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+from collections.abc import AsyncIterator
+
+from cuprum import Program, ProgramCatalogue, StdinStream, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="stream-input")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+
+
+async def rows() -> AsyncIterator[str]:
+    for number in range(1, 1001):
+        yield f"row {number}\n"
+
+
+count_lines = python("-c", "import sys; print(sum(1 for _ in sys.stdin))")
+result = count_lines.run_sync(stdin=StdinStream(chunks=rows()))
+assert result.stdout == "1000\n"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Cuprum pulls one chunk, writes it, and waits for the write to drain
+    before pulling the next, so a slow reader slows the producer down rather
+    than letting input pile up in memory. A drained write is not proof that
+    the child has read the chunk: some bytes can still sit in the transport
+    buffer or the OS pipe. Each chunk is held in full while it is written, so
+    yield chunks of a bounded size when peak memory matters.
+  </p>
+  <ul>
+    <li><strong>Chunk types.</strong> A <code>str</code> chunk is encoded with the context's <code>encoding</code> and <code>errors</code>, and a character split across two chunks is still encoded correctly. A <code>bytes</code> chunk is written as it is.</li>
+    <li><strong>Producer failure.</strong> If the producer raises, or yields something that is neither <code>str</code> nor <code>bytes</code>, Cuprum terminates the child and raises {{ api.ref('StdinSourceError') }}, with the original exception as <code>__cause__</code>. Cancellation propagates unchanged.</li>
+    <li><strong>A child that stops reading.</strong> Closing stdin early, as <code>head</code> does, is not an error. The run continues to the child's exit code, and the cut-short write is reported as a <code>stdin_error</code> event.</li>
+    <li><strong>Clean-up.</strong> On every exit path, Cuprum closes the child's stdin and then calls the producer's <code>aclose()</code>, when it has one. Both waits are bounded: a producer whose <code>aclose()</code> takes longer is cancelled, and one that ignores the cancellation may still be cleaning up after the run returns. A generator needs no closing by the caller.</li>
+  </ul>
+  <p>
+    Where the child's output should go to a file rather than the parent, see
+    <a href="/cuprum/docs/guides/output/#redirect">Send a stream to a file or the parent</a>.
+  </p>
 </section>
 
 <section aria-labelledby="environment">

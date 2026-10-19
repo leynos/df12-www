@@ -60,6 +60,9 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "BrokenPipePolicy",
             "IOOptions",
             "StdinInput",
+            "StdinStream",
+            "StdinSource",
+            "StdioTarget",
             "LineStream",
             "LineEvent",
             "LineHook",
@@ -201,8 +204,9 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         "lede": (
             "Ready-made observe hooks for logging, metrics, and tracing; metrics "
             "for stream operations, line events, echo, control operations, and "
-            "the Rust pump; and the output sink that frames a run for GitHub "
-            "Actions."
+            "the Rust pump; the redaction policy that keeps secrets out of "
+            "what they export; and the output sink that frames a run for "
+            "GitHub Actions."
         ),
         "names": (
             "cuprum.adapters.logging_adapter",
@@ -213,6 +217,7 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "cuprum.adapters.echo_metrics",
             "cuprum.adapters.pump_metrics",
             "cuprum.adapters.control_metrics",
+            "cuprum.redaction",
             "cuprum.sinks",
         ),
     },
@@ -221,12 +226,14 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         "title": "Errors",
         "lede": (
             "The exceptions Cuprum raises when a program is unknown, forbidden, "
-            "or too slow, or when a signal cannot reach a child."
+            "or too slow, when a stdin producer fails, or when a signal cannot "
+            "reach a child."
         ),
         "names": (
             "UnknownProgramError",
             "ForbiddenProgramError",
             "TimeoutExpired",
+            "StdinSourceError",
             "SignalAfterExitError",
             "UnsupportedSignalError",
         ),
@@ -241,6 +248,7 @@ EXTRA_MODULES = (
     "cuprum.events",
     "cuprum.executable_binding",
     "cuprum.stream_observation",
+    "cuprum.redaction",
     "cuprum.sinks",
     "cuprum.adapters.logging_adapter",
     "cuprum.adapters.metrics_adapter",

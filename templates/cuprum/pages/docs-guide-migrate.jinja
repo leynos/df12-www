@@ -18,7 +18,8 @@
   <p>
     Cuprum 0.2.0 is published as a beta, and installers skip pre-releases
     unless asked. Name the release the application is tested against, and
-    pin it, so a later pre-release is a deliberate choice:
+    pin that exact beta, so that moving to a later pre-release, which may
+    bring further breaking changes, is a deliberate choice:
   </p>
   {{ ui.install_slip(install_pip, 'pip', paper=true) }}
   <p>Then work through the checklist. A row that does not match the application can be skipped.</p>
@@ -56,7 +57,8 @@
     <code>bytes</code> and other values outside <code>ArgValue</code> are rejected;
     <a href="#scoped-catalogue"><code>sh.make</code> resolves the scoped catalogue</a>;
     <a href="#phases">observe hooks see new event phases</a>, of which
-    <code>settled</code> and <code>group_teardown</code> are new since beta1;
+    <code>settled</code>, <code>group_teardown</code>, and
+    <code>stdio_error</code> are new since beta1;
     <a href="#settled-metrics">metrics count failures from the settled event</a>;
     and the reserved builder keywords include <code>env_mode</code> and
     <code>process_group</code>, two new {{ api.ref('ExecutionContext') }} fields.
@@ -70,7 +72,9 @@
     <a href="#process-group">process-group ownership</a>,
     <a href="#broken-pipe">the broken-pipe policy</a>,
     <a href="#control">control observation</a>,
-    <a href="#windows-handle">the Windows raw-handle outcome</a>, and the
+    <a href="#windows-handle">the Windows raw-handle outcome</a>,
+    <a href="#streams">streaming stdin and standard-stream redirection</a>,
+    <a href="#redaction">redaction for telemetry</a>, and the
     <code>py.typed</code> marker.
   </p>
 </section>
@@ -305,7 +309,7 @@ assert command.argv == ("-c", "print('two words')", argument)
     {{ api.ref('ExecEvent') }}. In 0.1 the phases were <code>plan</code>,
     <code>start</code>, <code>stdout</code>, <code>stderr</code>, and
     <code>exit</code>. 0.2.0 adds <code>stdin</code>,
-    <code>stdin_error</code>, <code>timeout</code>,
+    <code>stdin_error</code>, <code>stdio_error</code>, <code>timeout</code>,
     <code>teardown_error</code>, <code>capture_eof_grace_expired</code>,
     <code>pipeline_fail_fast</code>, <code>group_teardown</code>, and
     <code>settled</code>. A hook that matches exhaustively on
@@ -350,7 +354,9 @@ assert [outcome.value for outcome in outcomes] == ["exit_zero"]
     observation and produce no lifecycle events; <code>exit</code> remains
     the event for actual child status and resource data.
     <code>group_teardown</code> reports a teardown outcome Cuprum could not
-    resolve, such as a signal the kernel refused.
+    resolve, such as a signal the kernel refused. <code>stdio_error</code>
+    reports a failed standard-stream step, such as a stdin producer that
+    raised, alongside the exception the caller receives.
   </p>
 
   <h3 id="settled-metrics">Metrics count failures from the settled event</h3>
@@ -796,6 +802,44 @@ assert result.ok and result.stdout == "hello\n"
     rejection when a direct native-shim caller supplies a raw Windows handle;
     normal pipeline hops still fall back to the Python pump as before. Update
     dashboards and exhaustive outcome handling to include the new value.
+  </p>
+
+  <h3 id="streams">Streaming stdin and standard-stream redirection</h3>
+  <p>
+    Two additions cover input and output that should not pass through
+    memory. Both are opt-in: an application that uses neither sees no
+    change, and {{ api.ref('StdinInput') }} works as before.
+  </p>
+  <ul>
+    <li><strong>Streaming input.</strong> <code>stdin=</code>{{ api.ref('StdinStream') }}<code>(chunks=...)</code> feeds the child from an async iterable of <code>str</code> or <code>bytes</code> chunks, pulling the next chunk only after the previous write has drained. A producer failure terminates the child and raises {{ api.ref('StdinSourceError') }}, with the original exception chained. See <a href="/cuprum/docs/guides/input-and-deadlines/#stream">Stream input from a producer</a>.</li>
+    <li><strong>Redirection.</strong> {{ api.ref('RunOutputOptions') }}<code>(stdout=..., stderr=...)</code> takes a {{ api.ref('StdioTarget') }} to send a stream to a file (<code>path()</code>), a descriptor the caller owns (<code>fd()</code>), or the parent's own stream (<code>inherit()</code>), instead of capturing it. Contradictory combinations, such as capture with a redirected stream or an inherited stdin alongside a stdin source, raise <code>ValueError</code>, and file or descriptor targets need a POSIX platform. See <a href="/cuprum/docs/guides/output/#redirect">Send a stream to a file or the parent</a>.</li>
+  </ul>
+  <p>
+    <code>StdinStream</code>, {{ api.ref('StdinSource') }},
+    <code>StdinSourceError</code>, and <code>StdioTarget</code> are exported
+    from the package root. Exhaustive observe hooks also see the new
+    <code>stdio_error</code> phase; see
+    <a href="#phases">Observe hooks see new event phases</a>.
+  </p>
+
+  <h3 id="redaction">Opt-in redaction for telemetry projections</h3>
+  <p>
+    Structured logging and tracing export the argument vector, and events
+    can carry environment values and output. To keep known secrets out of
+    those exports, build a {{ api.ref('cuprum.redaction', 'RedactionPolicy') }}
+    with the literal strings and regular expressions to mask, and pass it as
+    <code>redaction=policy</code> to each exporting adapter:
+    <code>structured_logging_hook()</code>, <code>tracing_hook()</code>,
+    {{ api.ref('logging_hook') }}, and <code>GitHubActionsSink</code>. Wrap
+    any other observer with <code>redacting_hook(observer, policy)</code>.
+  </p>
+  <p>
+    Nothing changes for an application that does not opt in. Redaction
+    alters only what is exported, never the command, its environment, or the
+    captured result, and a failing rule raises <code>RedactionError</code>
+    rather than exporting raw text. See
+    <a href="/cuprum/docs/guides/observe/#redaction">Keep secrets out of telemetry</a>
+    for an example and the full rules.
   </p>
 </section>
 {% endblock %}

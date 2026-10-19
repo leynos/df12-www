@@ -5,7 +5,7 @@
   ('Needs', 'Python ' ~ python_floor ~ ' or later, and wc on PATH (any POSIX system)'),
   ('Install', 'Cuprum ' ~ cuprum_pypi ~ ' from PyPI; see Getting started'),
   ('Tested', cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi ~ ' on Linux, Python ' ~ python_floor),
-  ('Uses', 'ProgramCatalogue.from_programs, sh.make, StdinInput, scoped(catalogue=…)'),
+  ('Uses', 'ProgramCatalogue.from_programs, sh.make, StdinInput, scoped(catalogue=…), DEFAULT_CATALOGUE'),
 ] %}
 
 {% block problem %}
@@ -111,6 +111,7 @@ word-count
   {% call ui.code_panel('refusals.py', 'Failure path', foot=[verified], flat=true) %}
   {% highlight 'python', 'cuprum-syntax' %}
 from cuprum import (
+    DEFAULT_CATALOGUE,
     ECHO,
     ForbiddenProgramError,
     Program,
@@ -132,7 +133,7 @@ except UnknownProgramError as exc:
 # In a catalogue, but outside the active scope: refused when it runs.
 with scoped(catalogue=CATALOGUE):
     try:
-        sh.make(ECHO)("hello").run_sync()
+        sh.make(ECHO, catalogue=DEFAULT_CATALOGUE)("hello").run_sync()
     except ForbiddenProgramError as exc:
         print(f"ForbiddenProgramError: {exc}")
   {% endhighlight %}
@@ -157,6 +158,16 @@ Program echo denied by context allowlist restricted_state=True
     spawned in either case.
   </p>
   <p>
+    The second refusal names its catalogue on purpose. Inside
+    <code>scoped(catalogue=...)</code>, <code>sh.make</code> resolves a
+    program from the scope's catalogue, so a bare <code>sh.make(ECHO)</code>
+    there would be the first refusal again: <code>echo</code> is not in the
+    word-count catalogue, and the builder is never made. Passing
+    <code>catalogue=DEFAULT_CATALOGUE</code> builds the command from the
+    catalogue that does list <code>echo</code>, which is what lets the
+    scope's allowlist be the check that fails.
+  </p>
+  <p>
     A non-zero exit is not an exception. If <code>wc</code> itself failed,
     <code>result.ok</code> would be false and the script above raises its own
     <code>RuntimeError</code> with the exit code and stderr.
@@ -169,7 +180,10 @@ Program echo denied by context allowlist restricted_state=True
   Two independent checks let this run. The builder was made from a catalogue
   that lists <code>wc</code>, and the <code>scoped()</code> block takes its
   allowlist from that same catalogue, so <code>wc</code> is the one program
-  the block may run.
+  the block may run. The block also makes that catalogue the one
+  <code>sh.make</code> consults, so a builder made inside it could drop the
+  <code>catalogue=</code> argument; this script names it anyway, because the
+  builder is made before the block.
 </p>
 <p>
   The scope is what a reviewer reads. Remove the <code>with</code> block and

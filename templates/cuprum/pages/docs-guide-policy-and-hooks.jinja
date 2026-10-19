@@ -10,7 +10,9 @@
     A catalogue decides which commands can be built. A scope decides which
     may run inside a block of code, and a nested scope can only narrow its
     parent. {{ api.ref('scoped') }}<code>(catalogue=...)</code> takes its
-    allowlist straight from a catalogue. Registrations such as
+    allowlist straight from a catalogue, and also activates that catalogue
+    for {{ api.ref('sh.make') }}, so a builder made inside the block need not
+    name it again. Registrations such as
     {{ api.ref('env') }}, {{ api.ref('before') }}, {{ api.ref('after') }},
     and {{ api.ref('observe') }} are local to the current context and are
     removed when their block exits; none of them changes the process's own
@@ -31,8 +33,67 @@ assert result.stdout == "scoped\n"
 {% endcall %}
   <p>
     Use {{ api.ref('ScopeConfig') }} when a catalogue alone is not enough:
-    it takes an allowlist, hooks, a default timeout, and environment
-    settings.
+    it takes an allowlist, hooks, a default timeout, environment settings, a
+    catalogue, and executable bindings. A scope that supplies only an
+    allowlist leaves the active catalogue unchanged.
+  </p>
+</section>
+
+<section aria-labelledby="enforcement">
+  <h2 id="enforcement">Two enforcement points</h2>
+  <p>
+    Cuprum checks the catalogue when a builder is created and the allowlist
+    when a command runs, and the two answer different questions.
+    <code>sh.make()</code> checks <em>membership</em>: it resolves its
+    catalogue from an explicit <code>catalogue=</code> argument, then the
+    innermost active <code>scoped(catalogue=...)</code>, then
+    {{ api.ref('DEFAULT_CATALOGUE') }} outside any catalogue scope, and
+    raises {{ api.ref('UnknownProgramError') }} if that catalogue does not
+    list the program. Resolution happens once, so the builder keeps its
+    catalogue after the scope exits. The active scope checks
+    <em>permission</em>: when a command runs, the allowlist in force decides
+    whether the program may execute, and <code>run()</code> raises
+    {{ api.ref('ForbiddenProgramError') }} before a process starts if it
+    may not. A builder made from a catalogue the enclosing scope does not
+    allow therefore constructs successfully and fails only at run time:
+  </p>
+{% call ui.code_panel('enforcement_points.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import (
+    ForbiddenProgramError,
+    Program,
+    ProgramCatalogue,
+    current_context,
+    scoped,
+    sh,
+)
+
+allowed = ProgramCatalogue.from_programs(sys.executable, name="allowed")
+foreign = ProgramCatalogue.from_programs(Program("some-other-tool"), name="foreign")
+other = Program("some-other-tool")
+
+with scoped(catalogue=allowed):
+    # Construction consults the named catalogue, so this succeeds.
+    command = sh.make(other, catalogue=foreign)("--version")
+    # Execution consults the scope, which does not allow the program.
+    assert not current_context().is_allowed(other)
+    try:
+        command.run_sync()
+    except ForbiddenProgramError:
+        pass
+    else:
+        raise AssertionError("the scope should forbid the foreign program")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Naming a catalogue explicitly is how a caller opts out of the scope's
+    catalogue for construction; it never opts out of the scope's allowlist
+    for execution. The ready-made builders in
+    {{ api.ref('builders', 'cuprum.builders') }} resolve the active catalogue
+    the same way, so inside a catalogue scope that catalogue must list the
+    tool.
   </p>
 </section>
 
@@ -80,6 +141,68 @@ with scoped(ScopeConfig(allowlist=frozenset([OTHER]))):
     registration is detached or its block exits. Called in the default
     unrestricted context, it restricts that context to exactly the programs
     it names. Review every <code>allow()</code> as a policy change.
+  </p>
+</section>
+
+<section aria-labelledby="bind">
+  <h2 id="bind">Bind a program to the executable it should run</h2>
+  <p>
+    A {{ api.ref('Program') }} is the catalogue's name for a program, and by
+    default it is also the string the operating system executes. A build may
+    need a pinned absolute path, a virtual-environment interpreter, or a
+    controlled replacement during a test. {{ api.ref('bind_executable') }}
+    supplies the second without changing the first: inside the scope the
+    logical program runs the bound executable while the allowlist, project
+    metadata, and telemetry keep carrying the logical name, and
+    {{ api.ref('CommandResult') }}<code>.resolved_path</code> reports what
+    ran, or <code>None</code> when nothing was bound.
+  </p>
+{% call ui.code_panel('executable_bindings.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, ScopeConfig, bind_executable, scoped, sh
+
+PYTHON = Program("python")
+OTHER = Program("some-other-tool")
+catalogue = ProgramCatalogue.from_programs(PYTHON, OTHER, name="bindings")
+python = sh.make(PYTHON, catalogue=catalogue)
+
+with (
+    scoped(ScopeConfig(allowlist=frozenset([PYTHON]))),
+    bind_executable(PYTHON, sys.executable),
+):
+    result = python("-c", "import sys; sys.stdout.write(sys.executable)").run_sync()
+    assert result.program == PYTHON, "the logical identity is preserved"
+    assert result.resolved_path == sys.executable, "the bound path was executed"
+    assert (result.stdout or "").strip() == sys.executable, "the child agrees"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    A binding never widens the allowlist: binding an unlisted program and
+    running it still raises <code>ForbiddenProgramError</code>, and the
+    resolver is not called. Nested scopes override only the program they
+    name. The second argument is a path, any <code>str</code> or
+    <code>os.PathLike</code>, or a zero-argument resolver returning the
+    executable string, called once per execution at spawn time; anything else
+    is rejected with <code>TypeError</code> at once. A relative binding is
+    anchored at <code>ExecutionContext.cwd</code> when one is set, and
+    otherwise left to the platform, so prefer an absolute binding when the
+    same file must run wherever the execution starts.
+  </p>
+  <p>
+    A resolver must return a <code>str</code>, because <code>None</code>
+    means "no binding". At the execution boundary, whatever a resolver
+    raises or returns wrongly is reported as
+    {{ api.ref('cuprum.executable_binding', 'ExecutableResolutionError') }},
+    a <code>RuntimeError</code> naming the logical program with the original
+    exception as its <code>__cause__</code>. Construction rejects an empty
+    path, a relative path unless <code>allow_relative=True</code>, and NUL
+    or <code>..</code> segments with <code>InvalidExecutableBindingError</code>,
+    a <code>ValueError</code>. That validation is advisory: the file may
+    still be replaced between the check and the <code>exec</code>, so keeping
+    the bound path unwritable to the executing user is the operator's
+    responsibility.
   </p>
 </section>
 

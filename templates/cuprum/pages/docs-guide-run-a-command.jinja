@@ -80,12 +80,15 @@ assert result.exit_code == 7
 <section aria-labelledby="arguments">
   <h2 id="arguments">Build arguments deliberately</h2>
   <p>
-    The builder accepts strings, numbers, booleans, and paths as positional
-    arguments. Keyword arguments become <code>--name=value</code>, with
-    underscores turned into hyphens, which suits only tools that accept that
-    form: for a bare flag such as <code>--check</code>, pass it
-    positionally, since <code>check=True</code> would produce
-    <code>--check=True</code>. <code>None</code> raises
+    The builder accepts exactly {{ api.ref('ArgValue') }}: strings,
+    numbers, booleans, and paths, as positional or keyword values. Anything else, a
+    list, a dict, or <code>bytes</code>, raises <code>TypeError</code> naming
+    the type rather than reaching the child as its <code>repr</code>; decode
+    filesystem bytes with <code>os.fsdecode()</code> first. Keyword arguments
+    become <code>--name=value</code>, with underscores turned into hyphens,
+    which suits only tools that accept that form: for a bare flag such as
+    <code>--check</code>, pass it positionally, since <code>check=True</code>
+    would produce <code>--check=True</code>. <code>None</code> raises
     <code>TypeError</code> in either position, so decide before building
     whether an optional flag is omitted or replaced. An argument containing
     spaces stays one argument.
@@ -104,9 +107,187 @@ assert command.argv_with_program == (sys.executable, *command.argv)
 {% endhighlight %}
 {% endcall %}
   <p>
-    For Git, rsync, and tar, the typed builders in {{ api.ref('builders', 'cuprum.builders') }}
-    validate paths, refs, and options when the command is built; see
+    Names that configure <em>how</em> a command runs are reserved: every
+    {{ api.ref('ExecutionContext') }} field (<code>env</code>,
+    <code>env_mode</code>, <code>cwd</code>, <code>cancel_grace</code>,
+    <code>native_pump_cleanup_grace</code>, <code>timeout</code>,
+    <code>stdout_sink</code>, <code>stderr_sink</code>,
+    <code>encoding</code>, <code>errors</code>, <code>tags</code>, and
+    <code>process_group</code>) and the parameters of <code>run_sync</code>
+    (<code>output</code>, <code>timeout</code>, <code>context</code>, and
+    <code>stdin</code>). Passing one to the builder raises
+    <code>TypeError</code> naming the right place for it, instead of quietly
+    rendering <code>--cwd=&lt;path&gt;</code> for a tool that might ignore it
+    and run in the wrong directory:
+  </p>
+{% call ui.code_panel('reserved_options.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="reserved")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+try:
+    python("-c", "print('unused')", cwd="/tmp")
+except TypeError as exc:
+    assert str(exc) == (
+        "cwd is an execution option; pass ExecutionContext(cwd=...) to run_sync"
+    )
+else:
+    raise AssertionError("cwd should not become a child flag")
+try:
+    python("-c", "print('unused')", timeout=5)
+except TypeError as exc:
+    assert str(exc) == "timeout is an execution option; pass timeout=... to run_sync"
+else:
+    raise AssertionError("timeout should not become a child flag")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    A tool whose command line genuinely takes such a flag still receives it
+    positionally, as <code>"--cwd=&lt;dir&gt;"</code>, and names merely
+    resembling the reserved ones, such as <code>working_dir</code>, are
+    unaffected. For Git, rsync, and tar, the typed builders in
+    {{ api.ref('builders', 'cuprum.builders') }} validate paths, refs, and
+    options when the command is built; see
     <a href="/cuprum/docs/guides/catalogues-and-builders/">Catalogues and builders</a>.
+  </p>
+</section>
+
+<section aria-labelledby="hold">
+  <h2 id="hold">Hold a running child and decide when to stop it</h2>
+  <p>
+    <code>run()</code> owns its child from start to finish. When the caller
+    must decide when the child stops, {{ api.ref('SafeCmd.start') }} spawns
+    it and hands back an owned {{ api.ref('RunningCommand') }} instead of
+    awaiting it. Await the handle's <code>wait()</code> for the outcome, read
+    <code>result</code> once it has settled, or stop the child with
+    <code>terminate()</code>, which sends <code>SIGTERM</code>, waits the
+    cancel grace, then <code>SIGKILL</code>, or <code>kill()</code>, which
+    sends <code>SIGKILL</code> without asking. The <code>async with</code>
+    block is what guarantees teardown: leaving it stops a child still
+    running.
+  </p>
+{% call ui.code_panel('hold_a_handle.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import asyncio
+import sys
+
+from cuprum import ExecutionContext, Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="handle")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+command = python("-c", "import time; time.sleep(30)")
+
+
+async def stop_a_child() -> int | None:
+    async with await command.start(
+        context=ExecutionContext(cancel_grace=0.2),
+    ) as handle:
+        assert handle.pid is not None and handle.result is None
+        result = await handle.terminate()
+        assert result.exit_code == -15
+        return handle.result.exit_code if handle.result is not None else None
+
+
+assert asyncio.run(stop_a_child()) == -15
+{% endhighlight %}
+{% endcall %}
+  <p>
+    A spawn that cannot start belongs to <code>start()</code> itself: it
+    raises the spawn's own failure and returns no handle, so there is nothing
+    to clean up. <code>wait(timeout=...)</code> bounds one call; its expiry
+    stops the child the way a timed-out <code>run()</code> does, raises
+    {{ api.ref('TimeoutExpired') }} with what the child had written, and
+    records the outcome, so a later <code>wait()</code> or
+    <code>terminate()</code> on the same handle reports the exit code rather
+    than an error. Capture is always on for a handle, so a stopped child
+    still reports its output. The example's <code>-15</code> is the POSIX
+    convention for a child ended by <code>SIGTERM</code>; one that had to be
+    killed reports <code>-9</code>.
+  </p>
+  <p>
+    <code>signal()</code> delivers one POSIX signal without settling the run,
+    and has two refusals because the remedy differs:
+    {{ api.ref('SignalAfterExitError') }}, a <code>ProcessLookupError</code>,
+    means the child has gone, and {{ api.ref('UnsupportedSignalError') }}
+    means the platform has no route to a caller-named signal, so
+    <code>terminate()</code> or <code>kill()</code> is the only option
+    there. Stopping an already-exited child is not an error: both are no-ops
+    that report the recorded outcome, so they are safe to call twice or from
+    two places at once. What each control operation did to the child can be
+    observed; see
+    <a href="/cuprum/docs/guides/observe/#control">Observe production runs</a>.
+  </p>
+</section>
+
+<section aria-labelledby="subprocess">
+  <h2 id="subprocess">Migrate a <code>subprocess</code> call</h2>
+  <p>
+    Moving a <code>subprocess</code> call to Cuprum is mostly a matter of
+    moving each argument to its new home. Here is the same command before
+    and after:
+  </p>
+{% call ui.code_panel('from_subprocess.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+from cuprum import ExecutionContext, Program, ProgramCatalogue, sh
+
+script = "import os; print(os.path.basename(os.getcwd()))"
+workdir = tempfile.mkdtemp()
+
+# Before: subprocess, checking the exit status and capturing text.
+before = subprocess.run(
+    [sys.executable, "-c", script],
+    capture_output=True,
+    text=True,
+    check=True,
+    cwd=workdir,
+)
+
+# After: declare the program once, then build and run the command.
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="migrated")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+result = python("-c", script).run_sync(context=ExecutionContext(cwd=workdir))
+if not result.ok:
+    raise RuntimeError(f"exited with {result.exit_code}: {result.stderr}")
+
+assert result.stdout == before.stdout == f"{Path(workdir).name}\n"
+Path(workdir).rmdir()
+{% endhighlight %}
+{% endcall %}
+  {% call ui.matrix('subprocess-caption', 'Where each subprocess argument goes in Cuprum', ['subprocess', 'Cuprum']) %}
+  {% for before, after in [
+    ('"git status --short" with shell=True', 'sh.make(GIT)("status", "--short"): one Python argument per child argument'),
+    ('capture_output=True, text=True', 'The default: result.stdout and result.stderr hold decoded text'),
+    ('check=True', 'Test result.ok and raise according to the application’s error policy'),
+    ('cwd=...', 'context=ExecutionContext(cwd=...)'),
+    ('env=... (replaces the environment)', 'context=ExecutionContext(env=..., env_mode=EnvMode.REPLACE)'),
+    ('input=...', 'stdin=StdinInput(text=...) or StdinInput(data=...)'),
+    ('timeout=...', 'timeout=...; catch cuprum.TimeoutExpired, a TimeoutError'),
+    ('A shell pipe, a | b', '(a_cmd | b_cmd).run_sync()'),
+    ('stdout=None (inherit the terminal)', 'output=RunOutputOptions(capture=False, stdout=StdioTarget.inherit(), stderr=StdioTarget.inherit())'),
+    ('subprocess.Popen and .terminate()', 'await cmd.start(); see Hold a running child, above'),
+  ] %}
+  <tr role="row">
+    <th scope="row" role="rowheader"><code>{{ before }}</code></th>
+    {% call ui.matrix_cell('Cuprum') %}{{ after }}{% endcall %}
+  </tr>
+  {% endfor %}
+  {% endcall %}
+  <p>
+    Note the environment row: <code>subprocess</code> replaces the child's
+    environment with <code>env=</code>, whereas Cuprum layers
+    <code>ExecutionContext.env</code> over the parent's unless
+    <code>EnvMode.REPLACE</code> asks for a replacement; see
+    <a href="/cuprum/docs/guides/input-and-deadlines/#environment">Input, environment, and deadlines</a>.
+    An application upgrading from Cuprum 0.1 should read
+    <a href="/cuprum/docs/guides/migrate/">Migrate to 0.2.0</a> instead.
   </p>
 </section>
 {% endblock %}

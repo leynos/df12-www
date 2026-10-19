@@ -1,6 +1,6 @@
 {% extends "pages/_docs.jinja" %}
 {% import "components.jinja" as ui %}
-{% from "data/docs.jinja" import docs_guides, docs_api, docs_plates, docs_source as api_source %}
+{% from "data/docs.jinja" import docs_guides, docs_api, docs_plates %}
 {% set docs_current = '/cuprum/docs/' %}
 {% block title %}Documentation · Cuprum{% endblock %}
 {% block description %}Cuprum's documentation: task guides for running, piping, scoping, and observing commands, and a reference for every public name, read from the source.{% endblock %}
@@ -11,9 +11,8 @@
             <h1 class="cu-docs__title">Documentation</h1>
             <p class="cu-docs__lede">
               Guides walk through a task end to end. The API reference lists
-              every name Cuprum exports, read from the source of
-              {{ api_source.version }}, with each signature, parameter, and
-              failure.
+              every name Cuprum {{ cuprum_version }} exports, read from the
+              source, with each signature, parameter, and failure.
             </p>
             </div>
             <img

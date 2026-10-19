@@ -50,11 +50,19 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "sh",
             "SafeCmd",
             "SafeCmdBuilder",
+            "ArgValue",
             "CommandResult",
+            "BytesCommandResult",
+            "RunningCommand",
             "ExecutionContext",
+            "ProcessGroupPolicy",
             "RunOutputOptions",
+            "BrokenPipePolicy",
             "IOOptions",
             "StdinInput",
+            "StdinStream",
+            "StdinSource",
+            "StdioTarget",
             "LineStream",
             "LineEvent",
             "LineHook",
@@ -98,6 +106,7 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         "names": (
             "Pipeline",
             "PipelineResult",
+            "BytesPipelineResult",
             "run_concurrent",
             "run_concurrent_sync",
             "ConcurrentConfig",
@@ -108,8 +117,9 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         "slug": "policy",
         "title": "Scopes, policy, and hooks",
         "lede": (
-            "Narrowing what a block of code may run, overlaying its "
-            "environment, and running code around each command."
+            "Narrowing what a block of code may run, composing its "
+            "environment, binding programs to executables, and running code "
+            "around each command."
         ),
         "names": (
             "scoped",
@@ -123,6 +133,11 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "EnvRegistration",
             "merge_env_overlays",
             "resolve_env",
+            "cuprum.context",
+            "bind_executable",
+            "ExecutableBindingRegistration",
+            "merge_executable_bindings",
+            "cuprum.executable_binding",
             "before",
             "after",
             "BeforeHook",
@@ -138,8 +153,15 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "observe",
             "ExecEvent",
             "ExecHook",
+            "cuprum.events",
             "logging_hook",
             "LoggingHookRegistration",
+            "observe_control",
+            "ControlEvent",
+            "ControlHook",
+            "ControlHookRegistration",
+            "ControlOperation",
+            "ControlOutcome",
             "observe_line_stream",
             "LineStreamEvent",
             "LineStreamHook",
@@ -181,8 +203,10 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         "title": "Adapters and sinks",
         "lede": (
             "Ready-made observe hooks for logging, metrics, and tracing; metrics "
-            "for stream operations, line events, echo, and the Rust pump; and the "
-            "output sink that frames a run for GitHub Actions."
+            "for stream operations, line events, echo, control operations, and "
+            "the Rust pump; the redaction policy that keeps secrets out of "
+            "what they export; and the output sink that frames a run for "
+            "GitHub Actions."
         ),
         "names": (
             "cuprum.adapters.logging_adapter",
@@ -192,6 +216,8 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
             "cuprum.adapters.line_stream_metrics",
             "cuprum.adapters.echo_metrics",
             "cuprum.adapters.pump_metrics",
+            "cuprum.adapters.control_metrics",
+            "cuprum.redaction",
             "cuprum.sinks",
         ),
     },
@@ -200,9 +226,17 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
         "title": "Errors",
         "lede": (
             "The exceptions Cuprum raises when a program is unknown, forbidden, "
-            "or too slow."
+            "or too slow, when a stdin producer fails, or when a signal cannot "
+            "reach a child."
         ),
-        "names": ("UnknownProgramError", "ForbiddenProgramError", "TimeoutExpired"),
+        "names": (
+            "UnknownProgramError",
+            "ForbiddenProgramError",
+            "TimeoutExpired",
+            "StdinSourceError",
+            "SignalAfterExitError",
+            "UnsupportedSignalError",
+        ),
     },
 )
 
@@ -210,7 +244,11 @@ GROUPS: tuple[dict[str, typ.Any], ...] = (
 #: entries alongside ``__all__``: the guide's recipes import from them.
 EXTRA_MODULES = (
     "cuprum.catalogue",
+    "cuprum.context",
+    "cuprum.events",
+    "cuprum.executable_binding",
     "cuprum.stream_observation",
+    "cuprum.redaction",
     "cuprum.sinks",
     "cuprum.adapters.logging_adapter",
     "cuprum.adapters.metrics_adapter",
@@ -219,6 +257,7 @@ EXTRA_MODULES = (
     "cuprum.adapters.line_stream_metrics",
     "cuprum.adapters.echo_metrics",
     "cuprum.adapters.pump_metrics",
+    "cuprum.adapters.control_metrics",
 )
 
 BANNER = """{#
@@ -354,7 +393,7 @@ class PagesConfigError(Exception):
     """Raised when the site configuration cannot be read or parsed."""
 
 
-def inline_html(text: str, known: frozenset[str]) -> str:
+def inline_html(text: str, known: cabc.Mapping[str, str]) -> str:
     """Render reStructuredText inline markup in ``text`` as escaped HTML.
 
     Parameters
@@ -362,8 +401,9 @@ def inline_html(text: str, known: frozenset[str]) -> str:
     text : str
         Docstring prose, with ````literal````, ```reference```, and
         ``:role:`target``` markup.
-    known : frozenset[str]
-        Exported names; a role naming one becomes a link to its entry.
+    known : collections.abc.Mapping[str, str]
+        Each exported name and the slug of the reference page that holds its
+        entry; a role naming one becomes a link to that entry.
 
     Returns
     -------
@@ -373,9 +413,10 @@ def inline_html(text: str, known: frozenset[str]) -> str:
 
     Examples
     --------
-    >>> known = frozenset({"SafeCmd"})
-    >>> inline_html("Returns ``int`` from :class:`SafeCmd`.", known)
-    'Returns <code>int</code> from <a href="#SafeCmd"><code>SafeCmd</code></a>.'
+    >>> inline_html("Returns ``int``.", {})
+    'Returns <code>int</code>.'
+    >>> inline_html(":class:`SafeCmd`", {"SafeCmd": "commands"})
+    '<a href="/cuprum/docs/api/commands/#SafeCmd"><code>SafeCmd</code></a>'
     """
     parts: list[str] = []
     for index, piece in enumerate(_LITERAL.split(text)):
@@ -389,15 +430,30 @@ def inline_html(text: str, known: frozenset[str]) -> str:
     return "".join(parts)
 
 
-def _reference(target: str, known: frozenset[str]) -> str:
-    """Render a cross-reference, linking it when it names an exported entry."""
-    label = target.rsplit(".", 1)[-1] if target.startswith(("cuprum.", "~")) else target
+def _reference(target: str, known: cabc.Mapping[str, str]) -> str:
+    """Render a cross-reference, linking it when it names an exported entry.
+
+    The link names the entry's own page, so a reference from one group to a
+    name on another, such as an adapter's docstring naming ``ExecEvent``,
+    resolves instead of pointing at a fragment the current page lacks.
+    """
+    full = target.removeprefix("~")
+    label = full.rsplit(".", 1)[-1] if target.startswith(("cuprum.", "~")) else full
     code = f"<code>{label}</code>"
+    if full in known:
+        # A module entry is known by its dotted name, as `cuprum.events`.
+        return f'<a href="/cuprum/docs/api/{known[full]}/#{full}">{code}</a>'
     head = label.split(".", 1)[0].removesuffix("()")
-    return f'<a href="#{head}">{code}</a>' if head in known else code
+    if head not in known:
+        # `cuprum.builders.classify_path_string` labels itself by its last
+        # segment; when that is not an entry, link the module it is read from.
+        head = full.removeprefix("cuprum.").split(".", 1)[0].removesuffix("()")
+    if head not in known:
+        return code
+    return f'<a href="/cuprum/docs/api/{known[head]}/#{head}">{code}</a>'
 
 
-def _doc_payload(doc: Docstring, known: frozenset[str]) -> dict[str, typ.Any]:
+def _doc_payload(doc: Docstring, known: cabc.Mapping[str, str]) -> dict[str, typ.Any]:
     """Project a parsed docstring into template-ready HTML fragments."""
     payload: dict[str, typ.Any] = {"summary": inline_html(doc.summary, known)}
     if doc.body:
@@ -425,7 +481,9 @@ def _doc_payload(doc: Docstring, known: frozenset[str]) -> dict[str, typ.Any]:
     return payload
 
 
-def _member_payload(member: Member, known: frozenset[str]) -> dict[str, typ.Any]:
+def _member_payload(
+    member: Member, known: cabc.Mapping[str, str]
+) -> dict[str, typ.Any]:
     """Project a class or module member for the templates."""
     return {
         "name": member.name,
@@ -435,7 +493,9 @@ def _member_payload(member: Member, known: frozenset[str]) -> dict[str, typ.Any]
     }
 
 
-def _entry_payload(entry: ApiEntry, known: frozenset[str]) -> dict[str, typ.Any]:
+def _entry_payload(
+    entry: ApiEntry, known: cabc.Mapping[str, str]
+) -> dict[str, typ.Any]:
     """Project one exported name for the templates."""
     payload: dict[str, typ.Any] = {
         "name": entry.name,
@@ -473,17 +533,17 @@ def group_entries(entries: list[ApiEntry]) -> list[dict[str, typ.Any]]:
         no longer exported.
     """
     by_name = {entry.name: entry for entry in entries}
-    known = frozenset(by_name)
     placed = [name for group in GROUPS for name in group["names"]]
     duplicates = sorted({name for name in placed if placed.count(name) > 1})
-    missing = sorted(known - set(placed))
-    stale = sorted(set(placed) - known)
+    missing = sorted(set(by_name) - set(placed))
+    stale = sorted(set(placed) - set(by_name))
     if duplicates or missing or stale:
         msg = (
             f"API grouping is out of date: unplaced {missing}, "
             f"placed twice {duplicates}, no longer exported {stale}"
         )
         raise GroupingError(msg)
+    known = {name: group["slug"] for group in GROUPS for name in group["names"]}
     return [
         {
             "slug": group["slug"],

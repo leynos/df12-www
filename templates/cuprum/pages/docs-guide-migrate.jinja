@@ -3,46 +3,439 @@
 {% import "_api.jinja" as api %}
 {% from "data/docs.jinja" import docs_tested %}
 {% set guide_slug = 'migrate' %}
+{% set install_pip = 'pip install cuprum==' ~ cuprum_pypi %}
 {% block guide_body %}
-<section aria-labelledby="overview">
-  <h2 id="overview">What changes</h2>
+<section aria-labelledby="before">
+  <h2 id="before">Before you upgrade</h2>
   <p>
-    Everything below is opt-in unless a section says otherwise: an
-    application using 0.1.0 runs unchanged. Each part can be adopted on its
-    own.
+    This guide is for an application that already uses Cuprum 0.1. Most of
+    0.2.0 is new, opt-in capability, but some changes need an edit before an
+    existing application works again. Those come first, each with its fix,
+    so an upgrade can stop as soon as the application works and come back
+    for the rest later. Readers new to Cuprum need none of this: start with
+    <a href="/cuprum/docs/guides/run-a-command/">Run a command</a>.
+  </p>
+  <p>
+    Cuprum 0.2.0 is published as a beta, and installers skip pre-releases
+    unless asked. Name the release the application is tested against, and
+    pin that exact beta, so that moving to a later pre-release, which may
+    bring further breaking changes, is a deliberate choice:
+  </p>
+  {{ ui.install_slip(install_pip, 'pip', paper=true) }}
+  <p>Then work through the checklist. A row that does not match the application can be skipped.</p>
+  {% call ui.matrix('checklist-caption', 'Upgrade checklist for applications using Cuprum 0.1', ['Change', 'Affects code that…']) %}
+  {% for anchor, change, affects in [
+    ('run-output-options', 'run(capture=, echo=) moved to RunOutputOptions', 'passes capture= or echo= to run() or run_sync(), or uses IOOptions'),
+    ('scope-config', 'Scopes take a ScopeConfig', 'calls scoped(allowlist=...) or CuprumContext.narrow(...)'),
+    ('disjoint-scopes', 'Disjoint nested scopes deny', 'nests scopes whose allowlists share no program'),
+    ('execution-options', 'Execution options are not child flags', 'passes cwd=, env=, timeout=, and similar to a builder'),
+    ('typed-arguments', 'Builder arguments are typed', 'passes bytes, lists, or other objects to a builder'),
+    ('scoped-catalogue', 'sh.make uses the scoped catalogue', 'calls sh.make() inside scoped(catalogue=...)'),
+    ('keyword-context', 'Construct ExecutionContext by keyword', 'passes four or more positional arguments to ExecutionContext'),
+    ('phases', 'New execution event phases', 'has an observe hook that rejects unknown ExecEvent.phase values'),
+    ('settled-metrics', 'Metrics move to the settled event', 'builds dashboards on cuprum_failures_total or durations'),
+    ('exec-hook', 'ExecHook moved', 'imports ExecHook from cuprum.context'),
+    ('echo', 'Echo is bounded and fails soft', 'echoes very long lines, or relied on UnicodeEncodeError'),
+    ('live-overlays', 'Environment overlays resolve at spawn', 'relied on an overlay snapshotting os.environ'),
+    ('smaller', 'Smaller changes', 'uses visible_settings(), internal module paths, or SafeCmdBuilder as a Callable'),
+  ] %}
+  <tr role="row">
+    <th scope="row" role="rowheader"><a href="#{{ anchor }}">{{ change }}</a></th>
+    {% call ui.matrix_cell('Affects code that…') %}{{ affects }}{% endcall %}
+  </tr>
+  {% endfor %}
+  {% endcall %}
+</section>
+
+<section aria-labelledby="beta1">
+  <h2 id="beta1">Upgrading from 0.2.0-beta1</h2>
+  <p>
+    Beta testers already have most of 0.2.0. These changes arrived after
+    beta1, and the first six can need an edit:
+    <a href="#execution-options">execution options are no longer child flags</a>;
+    <a href="#typed-arguments">builder arguments are a typed contract</a>, so
+    <code>bytes</code> and other values outside <code>ArgValue</code> are rejected;
+    <a href="#scoped-catalogue"><code>sh.make</code> resolves the scoped catalogue</a>;
+    <a href="#phases">observe hooks see new event phases</a>, of which
+    <code>settled</code>, <code>group_teardown</code>, and
+    <code>stdio_error</code> are new since beta1;
+    <a href="#settled-metrics">metrics count failures from the settled event</a>;
+    and the reserved builder keywords include <code>env_mode</code> and
+    <code>process_group</code>, two new {{ api.ref('ExecutionContext') }} fields.
+  </p>
+  <p>
+    The rest is additive:
+    <a href="#env-policies">environment policies</a>,
+    <a href="#bindings">executable bindings</a>,
+    <a href="#bytes">byte-exact capture</a>,
+    <a href="#handle">the owned running-command handle</a>,
+    <a href="#process-group">process-group ownership</a>,
+    <a href="#broken-pipe">the broken-pipe policy</a>,
+    <a href="#control">control observation</a>,
+    <a href="#windows-handle">the Windows raw-handle outcome</a>,
+    <a href="#streams">streaming stdin and standard-stream redirection</a>,
+    <a href="#redaction">redaction for telemetry</a>, and the
+    <code>py.typed</code> marker.
   </p>
 </section>
 
-<section aria-labelledby="scopes">
-  <h2 id="scopes">Scopes from a catalogue</h2>
+<section aria-labelledby="breaking">
+  <h2 id="breaking">Breaking changes</h2>
+  <p>Each change below was verified against 0.1.0 and {{ cuprum_version }} before it was written down.</p>
+
+  <h3 id="run-output-options">Capture and echo moved to <code>RunOutputOptions</code></h3>
   <p>
-    When a scope's allowlist should match a {{ api.ref('ProgramCatalogue') }},
-    pass the catalogue itself: {{ api.ref('scoped') }}<code>(catalogue=catalogue)</code>
-    takes the allowlist from its programs. Keep
-    <code>scoped(ScopeConfig(...))</code> when the scope also needs hooks or
-    other policy. <a href="/cuprum/docs/guides/policy-and-hooks/">Scopes, policy, and hooks</a>
-    shows both.
+    In 0.1, <code>run()</code> and <code>run_sync()</code> took
+    <code>capture=</code> and <code>echo=</code> keywords. Those keywords are
+    gone, and passing them raises <code>TypeError</code>. Output settings now
+    travel together in one {{ api.ref('RunOutputOptions') }}, passed as
+    <code>output=</code>:
   </p>
+{% call ui.code_panel('run_output_options.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import io
+import sys
+
+from cuprum import ExecutionContext, Program, ProgramCatalogue, RunOutputOptions, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="output-options")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hi')")
+
+# 0.1: command.run_sync(capture=False, echo=True)
+terminal = io.StringIO()
+result = command.run_sync(
+    output=RunOutputOptions(capture=False, echo=True),
+    context=ExecutionContext(stdout_sink=terminal),
+)
+assert result.stdout is None and terminal.getvalue() == "hi\n"
+
+try:
+    command.run_sync(capture=False)
+except TypeError:
+    pass
+else:
+    raise AssertionError("the 0.1 keyword should be rejected")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    <code>Pipeline.run()</code> and <code>run_sync()</code> still accept the
+    old keywords for now, but emit a <code>DeprecationWarning</code>; move
+    them to <code>output=</code> as well. {{ api.ref('IOOptions') }} is a
+    deprecated alias of <code>RunOutputOptions</code> and also warns.
+  </p>
+
+  <h3 id="scope-config">Scopes take a <code>ScopeConfig</code></h3>
+  <p>
+    In 0.1, {{ api.ref('scoped') }} and <code>CuprumContext.narrow()</code>
+    took keyword arguments such as <code>allowlist=</code> and
+    <code>before_hooks=</code>. Both now take a single
+    {{ api.ref('ScopeConfig') }}, which gathers the allowlist, hooks, a
+    default timeout, environment settings, a catalogue, and executable
+    bindings in one value. The old keywords raise <code>TypeError</code>.
+  </p>
+{% call ui.code_panel('scope_config.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ScopeConfig, current_context, scoped
+
+PYTHON = Program(sys.executable)
+started = []
+
+# 0.1: with scoped(allowlist=frozenset([PYTHON]), before_hooks=(hook,)):
+with scoped(ScopeConfig(allowlist=frozenset([PYTHON]), before_hooks=(started.append,))):
+    assert current_context().is_allowed(PYTHON)
+    assert not current_context().is_allowed(Program("rm"))
+{% endhighlight %}
+{% endcall %}
+  <p>
+    When the scope only needs the programs of a catalogue,
+    <code>scoped(catalogue=...)</code> is shorter; see
+    <a href="#scoped-catalogue"><code>sh.make</code> resolves the scoped catalogue</a>.
+  </p>
+
+  <h3 id="disjoint-scopes">Disjoint nested scopes now deny everything</h3>
+  <p>
+    In 0.1, an empty allowlist meant "allow everything", including the empty
+    intersection produced when a nested scope allowed only programs its
+    parent did not, so a nested scope could widen its parent by accident. A
+    nested scope now always narrows: when the intersection is empty, nothing
+    may run.
+  </p>
+{% call ui.code_panel('disjoint_scopes.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+from cuprum import Program, ScopeConfig, current_context, scoped
+
+GIT, TAR = Program("git"), Program("tar")
+with scoped(ScopeConfig(allowlist=frozenset([GIT]))):
+    with scoped(ScopeConfig(allowlist=frozenset([TAR]))):
+        # 0.1 allowed both here; 0.2.0 allows neither.
+        assert not current_context().is_allowed(GIT)
+        assert not current_context().is_allowed(TAR)
+{% endhighlight %}
+{% endcall %}
+  <p>
+    The default context, outside any scope, still permits every program.
+    Code that genuinely needs to widen a scope must say so with
+    {{ api.ref('allow') }}; see
+    <a href="/cuprum/docs/guides/policy-and-hooks/">Scopes, policy, and hooks</a>.
+  </p>
+
+  <h3 id="execution-options">Execution options are no longer child flags</h3>
+  <p>
+    Every builder keyword used to become a child <code>--name=value</code>
+    argument, so <code>python("-c", script, cwd=repo_dir)</code> built
+    <code>--cwd=&lt;path&gt;</code> rather than changing the child's working
+    directory, and a tool that ignores unknown flags ran in the wrong place
+    with no error at all. The builder now rejects every
+    {{ api.ref('ExecutionContext') }} field name and every
+    <code>run_sync</code> parameter with a <code>TypeError</code> that names
+    the right call:
+  </p>
+{% call ui.code_panel('reserved_options.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="reserved")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+try:
+    python("-c", "print('unused')", cwd="/tmp")
+except TypeError as exc:
+    assert str(exc) == (
+        "cwd is an execution option; pass ExecutionContext(cwd=...) to run_sync"
+    )
+else:
+    raise AssertionError("cwd should not become a child flag")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Move the value to <code>run_sync</code>, passing
+    <code>context=ExecutionContext(cwd=...)</code>, <code>timeout=...</code>,
+    or <code>stdin=...</code>. A command line that genuinely takes such a
+    flag still gets it positionally: <code>python("--cwd=&lt;dir&gt;")</code>.
+    Only the exact names are reserved, so <code>working_dir=...</code> and
+    <code>stdin_file=...</code> continue to render as flags.
+    <a href="/cuprum/docs/guides/run-a-command/#arguments">Run a command</a>
+    lists every reserved name.
+  </p>
+
+  <h3 id="typed-arguments">Builder arguments are a typed contract</h3>
+  <p>
+    Builders and <code>build_argv</code> now accept exactly
+    <code>str | int | float | bool | pathlib.Path | os.PathLike[str]</code>,
+    published as {{ api.ref('ArgValue') }}. {{ api.ref('sh.make') }} returns
+    a {{ api.ref('SafeCmdBuilder') }} whose signature states that domain, so
+    a call passing anything else is rejected by a static checker as well as
+    at run time. Previously the builder stringified any object, so a list or
+    a dict reached the command line as its <code>repr</code>, and
+    <code>b"release"</code> was passed as the literal text
+    <code>b'release'</code>. Values outside <code>ArgValue</code> now raise
+    <code>TypeError</code> naming the offending type or value. Pass text, or
+    a path, yourself:
+  </p>
+{% call ui.code_panel('typed_arguments.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs("echo", name="typed-arguments")
+builder = sh.make(Program("echo"), catalogue=catalogue)
+
+# A list used to become "['a', 'b']"; join it into the text you meant.
+tags = ["a", "b"]
+command = builder("--tags", ",".join(tags))
+assert command.argv == ("--tags", "a,b")
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Decode caller-held filesystem bytes with <code>os.fsdecode()</code>
+    before building the command:
+  </p>
+{% call ui.code_panel('bytes_arguments.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import os
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="bytes-arguments")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+argument = os.fsdecode(b"v\xc3\xbf")
+command = python("-c", "print('two words')", argument)
+assert command.argv == ("-c", "print('two words')", argument)
+{% endhighlight %}
+{% endcall %}
+  <p>
+    <code>os.fsdecode()</code> uses the configured filesystem encoding and
+    error handler, which differ between POSIX and Windows. Custom path-like
+    objects are accepted: a class whose <code>__fspath__</code> returns text
+    behaves exactly as a <code>pathlib.Path</code> does, and only a
+    <code>__fspath__</code> returning <code>bytes</code> is rejected.
+  </p>
+
+  <h3 id="scoped-catalogue"><code>sh.make</code> resolves the scoped catalogue</h3>
+  <p>
+    <code>scoped(catalogue=catalogue)</code> derives the scope's allowlist
+    from the catalogue's programs, and also activates the catalogue for
+    {{ api.ref('sh.make') }}, so call sites inside the block may drop the
+    repeated <code>catalogue=</code> argument. Review call sites that build
+    inside a catalogue scope for a different catalogue, or that rely on
+    {{ api.ref('DEFAULT_CATALOGUE') }} while a catalogue scope is active:
+    <code>sh.make()</code> now resolves the scoped catalogue and raises
+    {{ api.ref('UnknownProgramError') }} at construction when it does not
+    list the program. The ready-made builders in
+    {{ api.ref('builders', 'cuprum.builders') }} resolve the same way, so
+    inside a catalogue scope that catalogue must list the tool. Pass an
+    explicit <code>catalogue=</code> where a different catalogue is the
+    intent; the two checks are described under
+    <a href="/cuprum/docs/guides/policy-and-hooks/#enforcement">two enforcement points</a>.
+  </p>
+
+  <h3 id="keyword-context">Construct <code>ExecutionContext</code> by keyword</h3>
+  <p>
+    {{ api.ref('ExecutionContext') }} gained fields, and two of them,
+    <code>native_pump_cleanup_grace</code> and <code>timeout</code>, sit
+    straight after <code>cancel_grace</code>. A call that passed four or
+    more positional arguments, such as
+    <code>ExecutionContext(env, cwd, 0.5, sink)</code>, now puts the fourth
+    into a different field. Name every argument instead:
+    <code>ExecutionContext(env=env, cwd=cwd, cancel_grace=0.5, stdout_sink=sink)</code>.
+  </p>
+
+  <h3 id="phases">Observe hooks see new event phases</h3>
+  <p>
+    An observe hook registered with {{ api.ref('observe') }} receives every
+    {{ api.ref('ExecEvent') }}. In 0.1 the phases were <code>plan</code>,
+    <code>start</code>, <code>stdout</code>, <code>stderr</code>, and
+    <code>exit</code>. 0.2.0 adds <code>stdin</code>,
+    <code>stdin_error</code>, <code>stdio_error</code>, <code>timeout</code>,
+    <code>teardown_error</code>, <code>capture_eof_grace_expired</code>,
+    <code>pipeline_fail_fast</code>, <code>group_teardown</code>, and
+    <code>settled</code>. A hook that matches exhaustively on
+    <code>ExecEvent.phase</code> and raises on an unknown value now fails
+    the run, because Cuprum re-raises observe-hook failures. Give such hooks
+    a default arm:
+  </p>
+{% call ui.code_panel('exhaustive_hook.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import ExecEvent, Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="phases")
+python = sh.make(Program(sys.executable), catalogue=catalogue)
+outcomes = []
+
+
+def hook(event: ExecEvent) -> None:
+    match event.phase:
+        case "settled":
+            outcomes.append(event.terminal_outcome)
+        case _:
+            pass  # Phases this hook does not track, including future ones.
+
+
+with sh.observe(hook):
+    python("-c", "pass").run_sync()
+assert [outcome.value for outcome in outcomes] == ["exit_zero"]
+{% endhighlight %}
+{% endcall %}
+  <p>
+    <code>settled</code> is the one most hooks will want. It is emitted once
+    for each execution whose <code>plan</code> event began observation,
+    including spawn failure, timeout, cancellation, and other errors, and its
+    {{ api.ref('cuprum.events', 'TerminalOutcome') }} is one of
+    <code>exit_zero</code>, <code>exit_nonzero</code>, <code>timeout</code>,
+    <code>cancelled</code>, or <code>error</code>. It reuses the plan's
+    <code>exec_id</code>, carries a <code>pid</code> and
+    <code>exit_code</code> only when those are known, and never includes
+    exception text. Catalogue and allowlist validation still happen before
+    observation and produce no lifecycle events; <code>exit</code> remains
+    the event for actual child status and resource data.
+    <code>group_teardown</code> reports a teardown outcome Cuprum could not
+    resolve, such as a signal the kernel refused. <code>stdio_error</code>
+    reports a failed standard-stream step, such as a stdin producer that
+    raised, alongside the exception the caller receives.
+  </p>
+
+  <h3 id="settled-metrics">Metrics count failures from the settled event</h3>
+  <p>
+    The bundled adapters now use <code>settled</code> rather than
+    <code>exit</code> for terminal accounting. In <code>MetricsHook</code>,
+    <code>cuprum_failures_total</code> and <code>cuprum_duration_seconds</code>
+    are recorded from <code>settled</code>, so the failure counter now counts
+    every outcome except <code>exit_zero</code>. That includes a timeout, a
+    cancellation, and a spawn failure, where 0.1 counted only a non-zero exit.
+    <code>cuprum_failures_total</code> and <code>cuprum_executions_total</code>
+    also carry <code>env_mode</code> and <code>capture_mode</code> labels,
+    and <code>TracingHook</code> closes its spans on <code>settled</code>.
+    Review dashboards and alerts built on these series.
+  </p>
+
+  <h3 id="exec-hook">Import <code>ExecHook</code> from <code>cuprum</code></h3>
+  <p>
+    The <code>cuprum.context.ExecHook</code> re-export has been removed.
+    Import {{ api.ref('ExecHook') }} from <code>cuprum</code> or from its
+    definition site, {{ api.ref('cuprum.events') }}. Only the import path
+    changes, not the hook signature or registration behaviour.
+  </p>
+
+  <h3 id="echo">Echo is bounded and no longer fails on encoding</h3>
+  <p>
+    Two echo behaviours changed; captured output is unaffected by either.
+    Each echoed line is limited to 64 KiB by default, and longer lines are
+    cut with a truncation marker: pass
+    <code>RunOutputOptions(max_echo_line_bytes=None)</code> for the 0.1
+    unbounded echo. And a text-only sink that cannot encode the child's
+    output, such as a Windows CP1252 console receiving UTF-8, no longer
+    raises <code>UnicodeEncodeError</code> out of the run: echo stops for
+    that stream, capture completes, a warning is logged, and the result
+    records the fallback; see
+    <a href="#fallbacks">echo-fallback diagnostics</a>.
+  </p>
+
+  <h3 id="live-overlays">Environment overlays resolve at spawn</h3>
+  <p>
+    Scoped {{ api.ref('env') }} overlays resolve against the live
+    <code>os.environ</code> when each child is spawned, not against a
+    snapshot taken when the scope began. Code that relied on a snapshot
+    should pass explicit values through the overlay or
+    <code>ExecutionContext.env</code> instead.
+  </p>
+
+  <h3 id="smaller">Smaller changes</h3>
+  <ul>
+    <li><code>ProgramCatalogue.visible_settings</code> is now a property. The callable spelling still works during the migration period, but prefer attribute access.</li>
+    <li>{{ api.ref('CommandResult') }} now lives in <code>cuprum.sh.results</code> and {{ api.ref('Pipeline') }} in <code>cuprum.sh.pipeline</code>. Both remain importable from <code>cuprum</code> and <code>cuprum.sh</code>, which are the supported paths.</li>
+    <li>{{ api.ref('SafeCmdBuilder') }} is now a protocol rather than a <code>Callable[..., SafeCmd]</code> alias.</li>
+    <li>Cuprum now ships a <code>py.typed</code> marker, so type checkers read its annotations. A downstream type check may report errors it could not see before.</li>
+  </ul>
 </section>
 
-<section aria-labelledby="lines">
-  <h2 id="lines">Line-level output</h2>
+<section aria-labelledby="new">
+  <h2 id="new">New in 0.2.0</h2>
   <p>
-    {{ api.ref('SafeCmd.lines') }} and {{ api.ref('RunOutputOptions') }}<code>.on_line</code>
-    observe decoded lines as they arrive. They are additive: callers of
-    <code>run()</code> and pipelines need no change. See
-    <a href="/cuprum/docs/guides/output/">Control output</a>.
+    Everything below is opt-in: an application that does not use it behaves
+    as it did. Several additions are large enough that the guides teach them
+    from the start: deadlines and input in
+    <a href="/cuprum/docs/guides/input-and-deadlines/">Input, environment, and deadlines</a>,
+    <code>run_concurrent()</code> in
+    <a href="/cuprum/docs/guides/pipelines-and-concurrency/">Pipelines and concurrency</a>,
+    and the validated builders in
+    <a href="/cuprum/docs/guides/catalogues-and-builders/">Catalogues and builders</a>.
+    The sections that follow cover the remaining additions.
   </p>
-</section>
 
-<section aria-labelledby="catalogue">
-  <h2 id="catalogue">Shorter single-project catalogues</h2>
+  <h3 id="catalogue">Shorter single-project catalogues</h3>
   <p>
     {{ api.ref('ProjectSettings') }}<code>.documentation_locations</code> and
     <code>noise_rules</code> now default to empty tuples, and
     <code>ProgramCatalogue.from_project()</code> removes the
     <code>ProgramCatalogue(projects=(settings,))</code> wrapper. Existing
-    construction still works.
+    construction still works, and
+    <code>ProgramCatalogue.from_programs()</code> builds a single-project
+    catalogue straight from programs, as every example here does.
   </p>
 {% call ui.code_panel('catalogue.py', 'Tested', foot=[docs_tested]) %}
 {% highlight 'python', 'cuprum-syntax' %}
@@ -54,10 +447,127 @@ catalogue = ProgramCatalogue.from_project(settings)
 assert catalogue.lookup(Program("cargo")).project_name == "rust-test-gates"
 {% endhighlight %}
 {% endcall %}
-</section>
 
-<section aria-labelledby="measurements">
-  <h2 id="measurements">Execution measurements</h2>
+  <h3 id="lines">Line-level output</h3>
+  <p>
+    {{ api.ref('SafeCmd.lines') }} and {{ api.ref('RunOutputOptions') }}<code>.on_line</code>
+    observe decoded lines as they arrive. They are additive: callers of
+    <code>run()</code> and pipelines need no change. For pipelines, line
+    observation covers the final stage's stdout and every stage's stderr.
+    See <a href="/cuprum/docs/guides/output/">Control output</a>.
+  </p>
+
+  <h3 id="handle">An owned running-command handle</h3>
+  <p>
+    {{ api.ref('SafeCmd.start') }} returns a {{ api.ref('RunningCommand') }}
+    rather than a <code>CommandResult</code>; <code>run()</code>,
+    <code>run_sync()</code>, and <code>lines()</code> keep owning their child
+    from start to finish. The handle owns the child's lifetime: leaving its
+    <code>async with</code> block settles the run on every exit, and stops a
+    still-running child down the same <code>SIGTERM</code>, cancel-grace,
+    <code>SIGKILL</code> path a cancelled <code>run()</code> takes. Capture is
+    always on for a handle, so a stopped child still reports the output it
+    produced. It exposes <code>wait()</code>, <code>signal()</code>,
+    <code>terminate()</code>, and <code>kill()</code>; <code>signal()</code>
+    has two refusals, because the remedy differs:
+    {{ api.ref('SignalAfterExitError') }} means the child has already exited,
+    and {{ api.ref('UnsupportedSignalError') }} means the platform has no
+    route to a caller-named signal, so use <code>terminate()</code> or
+    <code>kill()</code>. The worked example is in
+    <a href="/cuprum/docs/guides/run-a-command/#hold">Run a command</a>.
+  </p>
+
+  <h3 id="control">Control observation</h3>
+  <p>
+    Control actions on a running child can be observed separately from the
+    command lifecycle. Register a hook with {{ api.ref('observe_control') }}
+    to receive a {{ api.ref('ControlEvent') }} for each one, recording
+    whether the child complied, had to be killed, or the request was refused;
+    nothing is observed unless a hook is registered, and
+    {{ api.ref('cuprum.adapters.control_metrics', 'control_metrics') }}
+    counts the events. See
+    <a href="/cuprum/docs/guides/observe/#control">Observe production runs</a>.
+  </p>
+
+  <h3 id="bytes">Byte-exact capture</h3>
+  <p>
+    {{ api.ref('SafeCmd.run_bytes') }} and <code>Pipeline.run_bytes()</code>,
+    with <code>run_bytes_sync()</code> counterparts, return the child's
+    output undecoded through {{ api.ref('BytesCommandResult') }} and
+    {{ api.ref('BytesPipelineResult') }}, whose output fields are
+    <code>bytes | None</code>. A byte run is the same run in a different
+    result mode: it takes the same <code>output</code>, <code>timeout</code>,
+    and <code>context</code> arguments, keeps every measurement, still carries
+    a timeout's partial output in the same field, and still re-raises an
+    external cancellation rather than reporting a timeout. A caller-supplied
+    <code>on_line</code> is rejected with <code>ValueError</code> before the
+    child spawns, because a decoded-text callback would contradict a
+    byte-exact capture; observation registered with <code>sh.observe()</code>
+    still receives decoded lines. Callers who round-tripped output through a
+    surrogate encoding can drop that and request the byte mode directly; see
+    <a href="/cuprum/docs/guides/output/#binary">Control output</a>.
+  </p>
+
+  <h3 id="bindings">Executable bindings</h3>
+  <p>
+    {{ api.ref('bind_executable') }} separates a program's catalogue identity
+    from the file that runs. Before, the only way to run a pinned path was to
+    register the path <em>as</em> the program, which made that path the
+    catalogue identity, the policy key, and the telemetry label. Now the
+    binding is a scope and the identity is untouched; a caller that binds
+    nothing keeps running each program under its own name, and the new
+    <code>resolved_path</code> field is <code>None</code> on every event and
+    result.
+  </p>
+{% call ui.code_panel('executable_bindings.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, ScopeConfig, bind_executable, scoped, sh
+
+PYTHON = Program("python")
+catalogue = ProgramCatalogue.from_programs(PYTHON, name="migration-bindings")
+python = sh.make(PYTHON, catalogue=catalogue)
+
+with (
+    scoped(ScopeConfig(allowlist=frozenset([PYTHON]))),
+    bind_executable(PYTHON, sys.executable),
+):
+    result = python("-c", "import sys; sys.stdout.write(sys.executable)").run_sync()
+    assert result.program == PYTHON, "the catalogue identity is preserved"
+    assert result.resolved_path == sys.executable, "the bound path ran instead"
+{% endhighlight %}
+{% endcall %}
+  <p>
+    A binding does not grant permission: a program outside the allowlist is
+    refused with {{ api.ref('ForbiddenProgramError') }}, and its resolver is
+    never called. A resolver must return a <code>str</code>; at an execution
+    boundary any resolver failure surfaces as
+    {{ api.ref('cuprum.executable_binding', 'ExecutableResolutionError') }},
+    a <code>RuntimeError</code> naming the logical program with the original
+    exception chained, so a <code>FileNotFoundError</code> raised inside a
+    hand-rolled resolver no longer escapes as itself. A malformed path is
+    rejected when the binding is made, with
+    <code>InvalidExecutableBindingError</code>. Path validation is advisory,
+    and <code>resolved_path</code> names the executable that started without
+    attesting to the bytes at that path; see
+    <a href="/cuprum/docs/guides/policy-and-hooks/#bind">Scopes, policy, and hooks</a>.
+  </p>
+
+  <h3 id="env-policies">Environment policies</h3>
+  <p>
+    {{ api.ref('cuprum.context', 'EnvMode') }}, <code>UNSET</code>, and the
+    <code>env_mode</code> fields on {{ api.ref('ScopeConfig') }},
+    {{ api.ref('CuprumContext') }}, and {{ api.ref('ExecutionContext') }}
+    are opt-in; import <code>EnvMode</code> and <code>UNSET</code> from
+    <code>cuprum.context</code>. Existing callers keep the overlay behaviour.
+    Use <code>EnvMode.REPLACE</code> only where a child must receive an
+    explicitly supplied environment, and <code>UNSET</code> to remove an
+    inherited variable from an overlay; see
+    <a href="/cuprum/docs/guides/input-and-deadlines/#environment">Input, environment, and deadlines</a>.
+  </p>
+
+  <h3 id="measurements">Execution measurements</h3>
   <p>
     {{ api.ref('CommandResult') }} now carries <code>started_at</code>, a
     wall-clock timestamp, and <code>duration</code>, in monotonic seconds.
@@ -66,49 +576,57 @@ assert catalogue.lookup(Program("cargo")).project_name == "rust-test-gates"
     also reports its own user and system CPU time and maximum RSS. Those
     three fields are <code>None</code> on Windows, and for pipeline stages,
     whose usage cannot be attributed safely; keep <code>None</code> as
-    unavailable when serializing them. On platforms without the per-child
-    wait interface, the CPU figures are approximate when commands run
-    concurrently.
+    unavailable when serializing them.
   </p>
-</section>
 
-<section aria-labelledby="stream-metrics">
-  <h2 id="stream-metrics">Stream-operation observation</h2>
+  <h3 id="fallbacks">Echo-fallback diagnostics</h3>
   <p>
-    A new opt-in channel reports each completed stream drain or pipeline
-    transfer. Nothing is installed until a hook is registered.
+    <code>CommandResult.relay_fallbacks</code> records handled echo failures
+    by stream and closed category, <code>unicode_encode</code> or
+    <code>broken_pipe</code>, without output or arguments. The field is
+    trailing and defaults to <code>()</code>, so existing construction is
+    unaffected.
   </p>
-{% call ui.code_panel('stream_metrics.py', 'Tested', foot=[docs_tested]) %}
+
+  <h3 id="broken-pipe">An opt-in broken-pipe policy for echoed output</h3>
+  <p>
+    A presentation sink whose destination closes under the run raises
+    <code>BrokenPipeError</code> from the echo drain.
+    <code>RunOutputOptions.broken_pipe_policy</code> defaults to
+    {{ api.ref('BrokenPipePolicy') }}<code>.STRICT</code>, which propagates
+    the error and aborts the run, so an application that does not opt in
+    behaves as before:
+  </p>
+{% call ui.code_panel('broken_pipe.py', 'Tested', foot=[docs_tested]) %}
 {% highlight 'python', 'cuprum-syntax' %}
 import sys
 
-from cuprum import Program, ProgramCatalogue, sh
-from cuprum.adapters.metrics_adapter import InMemoryMetrics
-from cuprum.adapters.stream_metrics import stream_operation_metrics_hook
-from cuprum.stream_observation import observe_stream_operation
+from cuprum import (
+    BrokenPipePolicy,
+    Program,
+    ProgramCatalogue,
+    RunOutputOptions,
+    sh,
+)
 
-metrics = InMemoryMetrics()
-catalogue = ProgramCatalogue.from_programs(sys.executable, name="metrics")
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="broken-pipe")
 command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hello')")
-with observe_stream_operation(stream_operation_metrics_hook(metrics)):
-    result = command.run_sync()
+options = RunOutputOptions(broken_pipe_policy=BrokenPipePolicy.BEST_EFFORT)
+assert options.broken_pipe_policy is BrokenPipePolicy.BEST_EFFORT
+result = command.run_sync(output=options)
 assert result.ok and result.stdout == "hello\n"
 {% endhighlight %}
 {% endcall %}
-</section>
-
-<section aria-labelledby="fallbacks">
-  <h2 id="fallbacks">Echo-fallback diagnostics</h2>
   <p>
-    <code>CommandResult.relay_fallbacks</code> records handled failures to
-    encode echoed text, by stream and closed category, without output or
-    arguments. The field is trailing and defaults to <code>()</code>, so
-    existing construction is unaffected.
+    Under best-effort, a <code>BrokenPipeError</code> from a sink disables
+    echo for the affected stream only, while capture, line observation, child
+    reaping, and result diagnostics continue, and the result's
+    <code>relay_fallbacks</code> names the <code>broken_pipe</code> category.
+    Only <code>BrokenPipeError</code> is affected; any other sink
+    <code>OSError</code> still propagates under both policies.
   </p>
-</section>
 
-<section aria-labelledby="heartbeat">
-  <h2 id="heartbeat">A heartbeat for quiet children</h2>
+  <h3 id="heartbeat">A heartbeat for quiet children</h3>
   <p>
     <code>RunOutputOptions.idle_after</code> defaults to <code>None</code>,
     so the heartbeat is off until set. When set, the built-in notice goes to
@@ -158,10 +676,8 @@ sink.flush()
 assert pending.get_nowait() == "ready"
 {% endhighlight %}
 {% endcall %}
-</section>
 
-<section aria-labelledby="sink">
-  <h2 id="sink">An opt-in presentation sink</h2>
+  <h3 id="sink">An opt-in presentation sink</h3>
   <p>
     {{ api.ref('cuprum.sinks', 'GitHubActionsSink') }} frames a run's echoed
     output as a collapsible group on GitHub Actions and turns a failure into
@@ -182,10 +698,8 @@ result = command.run_sync(
 assert result.ok and result.stdout == "hello\n"
 {% endhighlight %}
 {% endcall %}
-</section>
 
-<section aria-labelledby="flags">
-  <h2 id="flags">Group and annotate flags</h2>
+  <h3 id="flags">Group and annotate flags</h3>
   <p>
     Two additive flags on {{ api.ref('RunOutputOptions') }},
     <code>group</code> and <code>annotate_failure</code>, reach the same
@@ -213,6 +727,119 @@ assert result.ok and result.stdout == "hello\n"
     when <code>GITHUB_ACTIONS</code> is <code>true</code>, and an explicit
     <code>sink=</code> makes them no-ops. Anything but a <code>bool</code>
     raises <code>ValueError</code>.
+  </p>
+
+  <h3 id="process-group">Opt-in process-group ownership</h3>
+  <p>
+    Cuprum terminates the process it spawns, but only that process. When the
+    child spawns descendants of its own, they are not signalled, and they can
+    hold inherited pipes open after the child is reaped, which is the case a
+    timeout most often creates. <code>ExecutionContext(process_group=…)</code>
+    takes a {{ api.ref('ProcessGroupPolicy') }}; it defaults to
+    <code>INHERIT</code>, which tears down only the direct child, so a run
+    that does not opt in behaves as before:
+  </p>
+{% call ui.code_panel('process_group.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import ExecutionContext, ProcessGroupPolicy, Program, ProgramCatalogue, sh
+
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="process-group")
+command = sh.make(Program(sys.executable), catalogue=catalogue)(
+    "-c", "import os, sys; print(os.getpgrp() == os.getpid())"
+)
+owned = ExecutionContext(process_group=ProcessGroupPolicy.OWN_GROUP)
+assert owned.process_group is ProcessGroupPolicy.OWN_GROUP
+assert command.run_sync(context=owned).stdout == "True\n"
+# The default is unchanged: a run that says nothing keeps the caller's group.
+assert ExecutionContext().process_group is ProcessGroupPolicy.INHERIT
+{% endhighlight %}
+{% endcall %}
+  <p>
+    Under <code>OWN_GROUP</code> the child leads a new session and process
+    group, so teardown signals the group and reaches its descendants. Session
+    leadership also detaches the child from the controlling terminal, so a
+    terminal <code>SIGINT</code> or <code>SIGHUP</code> stops at the run, and
+    a child that opens <code>/dev/tty</code> fails for want of one. The
+    guarantee is bounded: a descendant that calls <code>setsid()</code> or
+    <code>setpgid()</code> leaves the group and is out of reach, as are
+    ancestors and siblings. <code>OWN_GROUP</code> raises
+    <code>ValueError</code> at spawn on Windows, which has no POSIX process
+    groups; <code>INHERIT</code> works everywhere. See
+    <a href="/cuprum/docs/guides/input-and-deadlines/#descendants">Input, environment, and deadlines</a>.
+  </p>
+
+  <h3 id="stream-metrics">Stream-operation observation</h3>
+  <p>
+    A new opt-in channel reports each completed stream drain or pipeline
+    transfer. Nothing is installed until a hook is registered.
+  </p>
+{% call ui.code_panel('stream_metrics.py', 'Tested', foot=[docs_tested]) %}
+{% highlight 'python', 'cuprum-syntax' %}
+import sys
+
+from cuprum import Program, ProgramCatalogue, sh
+from cuprum.adapters.metrics_adapter import InMemoryMetrics
+from cuprum.adapters.stream_metrics import stream_operation_metrics_hook
+from cuprum.stream_observation import observe_stream_operation
+
+metrics = InMemoryMetrics()
+catalogue = ProgramCatalogue.from_programs(sys.executable, name="metrics")
+command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('hello')")
+with observe_stream_operation(stream_operation_metrics_hook(metrics)):
+    result = command.run_sync()
+assert result.ok and result.stdout == "hello\n"
+{% endhighlight %}
+{% endcall %}
+
+  <h3 id="windows-handle">The Windows raw-handle hand-off outcome</h3>
+  <p>
+    {{ api.ref('RustPumpHandoffOutcome') }} gains
+    <code>WINDOWS_RAW_HANDLE_REJECTED</code>, recorded as
+    <code>windows_raw_handle_rejected</code> in
+    <code>cuprum_rust_pump_handoff_total</code>. It identifies the deliberate
+    rejection when a direct native-shim caller supplies a raw Windows handle;
+    normal pipeline hops still fall back to the Python pump as before. Update
+    dashboards and exhaustive outcome handling to include the new value.
+  </p>
+
+  <h3 id="streams">Streaming stdin and standard-stream redirection</h3>
+  <p>
+    Two additions cover input and output that should not pass through
+    memory. Both are opt-in: an application that uses neither sees no
+    change, and {{ api.ref('StdinInput') }} works as before.
+  </p>
+  <ul>
+    <li><strong>Streaming input.</strong> <code>stdin=</code>{{ api.ref('StdinStream') }}<code>(chunks=...)</code> feeds the child from an async iterable of <code>str</code> or <code>bytes</code> chunks, pulling the next chunk only after the previous write has drained. A producer failure terminates the child and raises {{ api.ref('StdinSourceError') }}, with the original exception chained. See <a href="/cuprum/docs/guides/input-and-deadlines/#stream">Stream input from a producer</a>.</li>
+    <li><strong>Redirection.</strong> {{ api.ref('RunOutputOptions') }}<code>(stdout=..., stderr=...)</code> takes a {{ api.ref('StdioTarget') }} to send a stream to a file (<code>path()</code>), a descriptor the caller owns (<code>fd()</code>), or the parent's own stream (<code>inherit()</code>), instead of capturing it. Contradictory combinations, such as capture with a redirected stream or an inherited stdin alongside a stdin source, raise <code>ValueError</code>, and file or descriptor targets need a POSIX platform. See <a href="/cuprum/docs/guides/output/#redirect">Send a stream to a file or the parent</a>.</li>
+  </ul>
+  <p>
+    <code>StdinStream</code>, {{ api.ref('StdinSource') }},
+    <code>StdinSourceError</code>, and <code>StdioTarget</code> are exported
+    from the package root. Exhaustive observe hooks also see the new
+    <code>stdio_error</code> phase; see
+    <a href="#phases">Observe hooks see new event phases</a>.
+  </p>
+
+  <h3 id="redaction">Opt-in redaction for telemetry projections</h3>
+  <p>
+    Structured logging and tracing export the argument vector, and events
+    can carry environment values and output. To keep known secrets out of
+    those exports, build a {{ api.ref('cuprum.redaction', 'RedactionPolicy') }}
+    with the literal strings and regular expressions to mask, and pass it as
+    <code>redaction=policy</code> to each exporting adapter:
+    <code>structured_logging_hook()</code>, <code>tracing_hook()</code>,
+    {{ api.ref('logging_hook') }}, and <code>GitHubActionsSink</code>. Wrap
+    any other observer with <code>redacting_hook(observer, policy)</code>.
+  </p>
+  <p>
+    Nothing changes for an application that does not opt in. Redaction
+    alters only what is exported, never the command, its environment, or the
+    captured result, and a failing rule raises <code>RedactionError</code>
+    rather than exporting raw text. See
+    <a href="/cuprum/docs/guides/observe/#redaction">Keep secrets out of telemetry</a>
+    for an example and the full rules.
   </p>
 </section>
 {% endblock %}

@@ -236,9 +236,10 @@ ValueError: ambiguous first echo operand '-n'; the selected profile has no verif
         {% call ui.callout('caveat', 'Secrets stay out of argv') %}
         <p>
           A type annotation does not make a process argument confidential:
-          argv is visible to other processes and reaches logs and traces.
-          Password, token, and key parameters are excluded from the default
-          surface until a sensitivity and redaction policy exists.
+          argv is visible to other processes, and Cuprum's telemetry
+          redaction masks only the exports it is told about. Password, token,
+          and key parameters are excluded from the default surface until a
+          sensitivity policy exists for the generated builders.
         </p>
         {% endcall %}
         {% call ui.callout('note', 'Not a shell, not a runtime') %}

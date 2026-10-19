@@ -29,13 +29,13 @@
   'title': 'Who constructs, who authorizes, who runs, and who reports?',
   'steps': [
     {'kind': 'builder', 'kind_label': 'Catalogue', 'name': 'ProgramCatalogue', 'detail': 'Which programs exist, grouped by project, with noise rules and documentation links.', 'edge': 'Program'},
-    {'kind': 'builder', 'name': 'sh.make → SafeCmd', 'detail': 'An immutable command: program, argv tuple, project metadata.', 'edge': 'SafeCmd'},
-    {'kind': 'policy', 'name': 'CuprumContext scope', 'detail': 'The allowlist in force for this thread or task, plus hooks and defaults.', 'edge': 'authorized SafeCmd'},
+    {'kind': 'builder', 'name': 'sh.make → SafeCmd', 'detail': 'An immutable command: program, argv tuple, project metadata. The catalogue is the one named, else the scope’s, else the default.', 'edge': 'SafeCmd'},
+    {'kind': 'policy', 'name': 'CuprumContext scope', 'detail': 'The allowlist in force for this thread or task, plus hooks, environment policy, executable bindings, and defaults.', 'edge': 'authorized SafeCmd'},
     {'kind': 'process', 'kind_label': 'Runtime', 'name': 'run() / run_sync()', 'detail': 'Spawns without a shell, pumps streams, enforces timeouts, tears down.', 'edge': 'status, bytes'},
-    {'kind': 'result', 'name': 'CommandResult', 'detail': 'ok, exit code, captured output, pid, timing, resource use.'},
+    {'kind': 'result', 'name': 'CommandResult', 'detail': 'ok, exit code, captured output, pid, timing, resource use, and the path that ran if a binding chose it.'},
   ],
   'branches': [
-    {'when': 'Observers, throughout', 'then': 'Before and after hooks, sh.observe event hooks, telemetry adapters, and presentation sinks receive events from the runtime. They report; they do not route.'},
+    {'when': 'Observers, throughout', 'then': 'Before and after hooks, sh.observe event hooks, control and echo observers, telemetry adapters, and presentation sinks receive events from the runtime. They report; they do not route.'},
   ],
   'takeaway': 'Construction and authorization are separate: the catalogue decides what can be built, and the scope in force decides what may run here.',
   'source': 'Source: docs/cuprum-design.md §§4–6 at ' ~ cuprum_tag,
@@ -44,16 +44,17 @@
   'id': 'fig-lifecycle', 'num': 'Fig. 02', 'horizontal': false,
   'title': 'What happens between a builder call and a result?',
   'steps': [
-    {'kind': 'builder', 'kind_label': '1 · Construction', 'name': 'sh.make(PROGRAM)(*args, **flags)', 'detail': 'UnknownProgramError if the program is not catalogued. Positional arguments are stringified; keywords become --flag=value; None is rejected.', 'edge': 'SafeCmd'},
+    {'kind': 'builder', 'kind_label': '1 · Construction', 'name': 'sh.make(PROGRAM)(*args, **flags)', 'detail': 'UnknownProgramError if the resolved catalogue does not list the program. Arguments must be ArgValue: str, int, float, bool, or a path; keywords become --flag=value; None, bytes, and a keyword naming an execution option are rejected.', 'edge': 'SafeCmd'},
     {'kind': 'policy', 'kind_label': '2 · Authorization', 'name': 'scope check', 'detail': 'ForbiddenProgramError if the allowlist in force excludes the program. Nothing has been spawned and no hook has run.', 'edge': 'authorized'},
-    {'kind': 'observer', 'kind_label': '3 · Plan', 'name': 'plan event, then before hooks', 'detail': 'Observers see the resolved argv, cwd, and environment; before hooks then run in registration order. Overlays apply over the live os.environ, and an explicit timeout beats ExecutionContext, which beats the scope default.', 'edge': 'argv, env, cwd'},
-    {'kind': 'process', 'kind_label': '4 · Spawn', 'name': 'exec, no shell', 'detail': 'The argv tuple goes straight to the operating system. On Linux and macOS Cuprum owns the child’s reap so it can report its CPU time and peak memory.', 'edge': 'start event, pid'},
+    {'kind': 'observer', 'kind_label': '3 · Plan', 'name': 'plan event, then before hooks', 'detail': 'Observers see the resolved argv, cwd, environment, and environment mode; before hooks then run in registration order. Overlays apply over the live os.environ unless the mode is REPLACE, and an explicit timeout beats ExecutionContext, which beats the scope default.', 'edge': 'argv, env, cwd'},
+    {'kind': 'process', 'kind_label': '4 · Spawn', 'name': 'exec, no shell', 'detail': 'The argv tuple goes straight to the operating system, with the executable an active binding resolved for the program, if any. On Linux and macOS Cuprum owns the child’s reap so it can report its CPU time and peak memory; under OWN_GROUP the child leads its own session and process group.', 'edge': 'start event, pid'},
     {'kind': 'process', 'kind_label': '5 · Streams', 'name': 'capture, echo, line events', 'detail': 'stdout and stderr are drained by independent tasks. Echo mirrors bytes to sinks; capture keeps everything; line events are decoded once.', 'edge': 'stdout / stderr events'},
-    {'kind': 'result', 'kind_label': '6 · Completion', 'name': 'exit event, after hooks, result', 'detail': 'After hooks run in reverse registration order, so the innermost cleans up first.'},
+    {'kind': 'result', 'kind_label': '6 · Completion', 'name': 'exit event, after hooks, settled, result', 'detail': 'After hooks run in reverse registration order, so the innermost cleans up first. One settled event then closes the execution with its terminal outcome, whatever happened.'},
   ],
   'branches': [
+    {'when': 'start() instead of run()', 'then': 'The caller holds a RunningCommand after step 4 and decides when to wait, signal, terminate, or kill. The handle settles once, and leaving its async with block tears a live child down the same way.'},
     {'when': 'Task cancelled', 'then': 'SIGTERM, a grace period (cancel_grace, 0.5 s by default), then SIGKILL and reap. Repeated cancellation does not interrupt teardown; the first cancellation is re-raised afterwards.'},
-    {'when': 'Timeout expires', 'then': 'The same teardown, then TimeoutExpired carrying whatever output was captured, a timeout event, and a WARNING on the cuprum.timeout logger.'},
+    {'when': 'Timeout expires', 'then': 'The same teardown, then TimeoutExpired carrying whatever output was captured, a timeout event, and a WARNING on the cuprum.timeout logger. With process-group ownership the group is signalled, so a descendant holding a pipe open is reclaimed too.'},
     {'when': 'An observe hook raises', 'then': 'The run fails with the hook’s own exception type. A hook that must never affect a run catches its own errors.'},
   ],
   'takeaway': 'A command that was never authorized is never spawned, and a spawned command is always reaped, however the run ends.',
@@ -100,10 +101,11 @@
         </div>
         <ol class="cu-invariants">
           <li><strong>Nothing reaches a shell.</strong> Every spawn passes an argv tuple with <code>shell=False</code>. <span class="cu-invariants__src">cuprum/_wait4_process.py, cuprum/_pipeline_spawn.py</span></li>
-          <li><strong>A command exists only for a catalogued program.</strong> <code>sh.make</code> raises <code>UnknownProgramError</code> otherwise. <span class="cu-invariants__src">cuprum/sh.py, cuprum/catalogue.py</span></li>
+          <li><strong>A command exists only for a catalogued program.</strong> <code>sh.make</code> resolves an explicit catalogue, else the scope’s, else the default, and raises <code>UnknownProgramError</code> when it does not list the program. <span class="cu-invariants__src">cuprum/sh/factory.py, cuprum/catalogue.py</span></li>
           <li><strong>Authorization happens at run time, before any spawn.</strong> The scope in force is checked for a command, and for every stage of a pipeline before the first stage starts. <span class="cu-invariants__src">cuprum/context/, cuprum/_pipeline_internals.py</span></li>
           <li><strong>Scopes only narrow.</strong> A nested <code>scoped()</code> intersects its allowlist with its parent’s. Widening is a separate, explicit call to <code>allow()</code>. <span class="cu-invariants__src">cuprum/context/</span></li>
-          <li><strong>Every spawned child is reaped.</strong> Cancellation and timeouts escalate from <code>SIGTERM</code> to <code>SIGKILL</code> and wait for the exit, even under repeated cancellation. <span class="cu-invariants__src">cuprum/_process_lifecycle.py</span></li>
+          <li><strong>A binding never widens the allowlist.</strong> <code>bind_executable</code> decides only what a permitted program executes; resolution happens after the allowlist check, and a refused program never calls its resolver. <span class="cu-invariants__src">cuprum/context/, cuprum/executable_binding.py</span></li>
+          <li><strong>Every spawned child is reaped.</strong> Cancellation, timeouts, and <code>terminate()</code> on a handle escalate from <code>SIGTERM</code> to <code>SIGKILL</code> and wait for the exit, even under repeated cancellation. Only a run that opts into <code>OWN_GROUP</code> signals a process group, and only the group its spawn created. <span class="cu-invariants__src">cuprum/_process_lifecycle.py, cuprum/_group_teardown.py</span></li>
           <li><strong>Capture is complete.</strong> Truncating an echoed line, or disabling echo for a sink that cannot encode the text, never removes bytes from the result. <span class="cu-invariants__src">cuprum/_stream_echo.py</span></li>
           <li><strong>Python is the behavioural reference.</strong> The optional Rust pump must produce identical bytes, and a hop it cannot take runs on the Python pump instead. <span class="cu-invariants__src">cuprum/_pipeline_streams.py</span></li>
         </ol>
@@ -167,7 +169,16 @@
             At the root, with no scope established, every catalogued program
             may run. That permissive default eases adoption; narrowing it is
             how code states its policy. An explicitly empty allowlist inside a
-            restricted scope permits nothing.
+            restricted scope permits nothing. A scope made from a catalogue
+            also makes that catalogue the one <code>sh.make</code> consults,
+            while a scope that only narrows the allowlist leaves it alone.
+          </p>
+          <p>
+            Two more policies ride on the same context. <code>EnvMode</code>
+            decides whether a child inherits, overlays, or replaces the
+            parent's environment, and an executable binding decides which
+            file a permitted program runs, without changing the name the
+            allowlist, metadata, and telemetry carry.
           </p>
           <h3>Hooks</h3>
           <p>
@@ -181,9 +192,13 @@
           <h3>Observation</h3>
           <p>
             <code>sh.observe()</code> delivers structured <code>ExecEvent</code>
-            values — plan, start, stdout, stderr, exit, and the ancillary
-            timeout and teardown events — each correlated by an
+            values — plan, start, stdout, stderr, exit, one settled event with
+            the bounded terminal outcome, and the ancillary timeout, teardown,
+            and group-teardown events — each correlated by an
             <code>exec_id</code> rather than a pid the system may recycle.
+            Narrower facts travel on channels of their own: what a control
+            operation did to a child, an echo that fell back, a line stream's
+            lifecycle, and the Rust pump's routing decisions.
           </p>
           <p>
             The adapters in <code>cuprum.adapters</code> turn those events into
@@ -191,11 +206,14 @@
             spans. They define protocols rather than importing a telemetry
             library, so Cuprum keeps its zero-dependency install.
           </p>
-          {% call ui.callout('caveat', 'Arguments are logged verbatim') %}
+          {% call ui.callout('caveat', 'Arguments are logged in full') %}
           <p>
-            The structured logging adapter and <code>logging_hook()</code>
-            record argv as supplied. Pass secrets through the environment or a
-            file, not on the command line.
+            The structured logging adapter, the tracing adapter, and
+            <code>logging_hook()</code> record argv as supplied. Pass secrets
+            through a file where possible; where not, give each exporting
+            adapter a <code>RedactionPolicy</code> from
+            <code>cuprum.redaction</code> (ADR-023), which masks configured
+            text in the export and leaves the run itself untouched.
           </p>
           {% endcall %}
           <h3>Presentation sinks</h3>
@@ -217,6 +235,11 @@
         {{ ui.card('ADR-006 · Context package split', 'Why the scope, hooks, and registrations live where they do.', number='Decision', href=src ~ 'docs/adr-006-context-package-split.md') }}
         {{ ui.card('ADR-007 · Execution module boundaries', 'How single-command execution is divided between modules.', number='Decision', href=src ~ 'docs/adr-007-subprocess-execution-module-boundaries.md') }}
         {{ ui.card('ADR-013 · GitHub Actions sink', 'Why presentation is an opt-in sink rather than a change to echo.', number='Decision', href=src ~ 'docs/adr-013-opt-in-github-actions-presentation-sink.md') }}
+        {{ ui.card('ADR-018 · Typed environment policies', 'Why inherit, overlay, and replace are a closed enum on the context, and why UNSET is a value.', number='Decision', href=src ~ 'docs/adr-018-typed-environment-policies.md') }}
+        {{ ui.card('ADR-019 · Control observation channel', 'Why what a stop request did to a child is reported on its own channel, and why refusal is an outcome.', number='Decision', href=src ~ 'docs/adr-019-control-observation-channel.md') }}
+        {{ ui.card('ADR-020 · Typed argument contract', 'Why builders accept exactly ArgValue and refuse execution-option names.', number='Decision', href=src ~ 'docs/adr-020-typed-argument-contract-for-sh-make.md') }}
+        {{ ui.card('ADR-021 · Process-group ownership', 'Why group ownership is an opt-in policy on the execution context, and what it cannot promise.', number='Decision', href=src ~ 'docs/adr-021-process-group-ownership.md') }}
+        {{ ui.card('ADR-023 · Opt-in telemetry redaction', 'Why redaction is a policy each exporting adapter is given, masks only configured text, and fails closed.', number='Decision', href=src ~ 'docs/adr-023-opt-in-telemetry-redaction.md') }}
       </div>
       {% endcall %}
 {% endblock %}

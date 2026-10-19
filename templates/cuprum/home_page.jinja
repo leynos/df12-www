@@ -18,7 +18,7 @@
    'body': 'Await a command or a pipeline, or call run_sync() in a small script. Both return the same structured result.',
    'code': 'await cmd.run()'},
   {'icon': 'wrench', 'tone': 'ink', 'title': 'No cowboy shutdowns',
-   'body': 'Cancellation and timeouts send SIGTERM, wait out a grace period (0.5 s by default), then send SIGKILL and reap the child.',
+   'body': 'Cancellation and timeouts send SIGTERM, wait out a grace period (0.5 s by default), then send SIGKILL and reap the child. Opt in to owning its process group and the descendants go too.',
    'code': 'SIGTERM → grace → SIGKILL'},
 ] %}
 {#- The receipt: fields a CommandResult carries, by their real names. -#}

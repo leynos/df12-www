@@ -8,13 +8,24 @@
   <h2 id="first-checks">First checks</h2>
   {% call ui.matrix('troubleshoot-caption', 'First checks for common outcomes', ['Symptom', 'Check']) %}
   {% for symptom, check in [
-    ('UnknownProgramError', 'Register the exact program in the catalogue the builder was made from.'),
-    ('ForbiddenProgramError', 'Inspect the active scope and its parent’s allowlist.'),
-    ('FileNotFoundError', 'Confirm the executable’s path, or the PATH the child inherits.'),
+    ('ImportError or AttributeError for a documented name', 'An older Cuprum may be installed: pip and uv skip a pre-release unless it is named, so pin cuprum==' ~ cuprum_pypi ~ '.'),
+    ('UnknownProgramError', 'Register the exact program in the builder’s catalogue, or in the active scoped(catalogue=...), which sh.make now resolves.'),
+    ('ForbiddenProgramError', 'Inspect the active scope and its parent’s allowlist; a builder can be made from a catalogue the scope does not allow.'),
+    ('TypeError while building a command', 'The message names the problem: an unsupported value type, None, or a reserved execution option such as cwd=, which belongs on run_sync.'),
+    ('FileNotFoundError', 'Confirm the executable’s path, or the PATH the child inherits; a replacement environment without PATH cannot resolve a bare name.'),
+    ('ExecutableResolutionError', 'An executable-binding resolver failed or returned the wrong type; its own exception is chained as __cause__.'),
     ('TimeoutExpired', 'Set a deadline that fits the work, and look for slow or blocked work in the child.'),
+    ('ValueError naming a redirected stream', 'Capture or echo with a redirected stream, one path for both streams, or a redirect with lines() or start() is contradictory; see the rejected combinations under Control output.'),
+    ('StdinSourceError', 'The stdin producer failed or yielded something that is neither str nor bytes; its own exception is chained as __cause__.'),
+    ('RedactionError', 'A redaction rule failed and nothing was exported unredacted. Check the rule the message names.'),
+    ('SignalAfterExitError', 'The child has already exited; treat the recorded outcome as the command’s ending.'),
+    ('UnsupportedSignalError', 'Use terminate() or kill(), which use the platform’s own signals.'),
+    ('ValueError from run_bytes()', 'A byte-exact run refuses on_line; observe lines with sh.observe() instead, or run in text mode.'),
+    ('ValueError at spawn with OWN_GROUP', 'Windows has no POSIX process groups; keep ProcessGroupPolicy.INHERIT there.'),
     ('A non-zero exit_code', 'Read the captured stderr and the tool’s documented exit codes.'),
     ('No visible output', 'Capture is silent by default: pass RunOutputOptions(echo=True), or read result.stdout.'),
     ('No heartbeat', 'Supply a positive idle_after; any output resets its clock.'),
+    ('Descendants outlive a timeout', 'Opt in to process-group ownership on POSIX, so teardown signals the group the child leads.'),
     ('No native speed-up', 'The extension may be missing, or this operation may use the Python path.'),
   ] %}
   <tr role="row">

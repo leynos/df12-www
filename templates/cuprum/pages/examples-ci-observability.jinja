@@ -78,7 +78,7 @@ print(workflow_log.getvalue(), end="")
 <div class="cu-pair">
   {% call ui.output('Expected output', 'stdout') %}
 result: True '42 passed\n'
-phases: ['plan', 'start', 'stdout', 'exit']
+phases: ['plan', 'start', 'stdout', 'exit', 'settled']
 workflow log:
 ::group::Unit tests
 ::stop-commands::949162b00dd838c9
@@ -88,10 +88,14 @@ workflow log:
   {% endcall %}
   <div class="cu-prose">
     <p>
-      The hook saw four {{ api.ref('ExecEvent') }} phases: the plan, the
-      start, the output, and the exit. Each event also carries the program,
-      the argument vector, the process ID, timings, and an
-      <code>exec_id</code> that ties one run's events together.
+      The hook saw five {{ api.ref('ExecEvent') }} phases: the plan, the
+      start, the output, the exit, and <code>settled</code>, which closes
+      every observed execution exactly once with a bounded
+      <code>terminal_outcome</code> (here <code>exit_zero</code>), even when
+      no child ever started. Each event also carries the program, the
+      argument vector, and an <code>exec_id</code> that ties one run's events
+      together, plus the process ID and timings where the phase has them: the
+      plan has no process yet, and a spawn failure settles without one.
     </p>
     <p>
       The workflow log is what GitHub Actions reads: the output inside a
@@ -231,8 +235,10 @@ result: False 1 '1 failed, 41 passed\n'
   that runs commands elsewhere in the process is not observed by accident.
 </p>
 <p>
-  The logging hook records <code>argv</code> verbatim. Pass secrets through
-  the environment or a file, never as arguments, and never turn untrusted
-  arguments into metric labels.
+  The logging hook records <code>argv</code> in full. Pass secrets through
+  a file rather than as arguments, or give the hook a
+  <code>RedactionPolicy</code> as
+  <a href="/cuprum/docs/guides/observe/#redaction">Keep secrets out of telemetry</a>
+  shows, and never turn untrusted arguments into metric labels.
 </p>
 {% endblock %}

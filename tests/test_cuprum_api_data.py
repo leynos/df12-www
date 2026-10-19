@@ -320,6 +320,121 @@ def test_an_unreadable_base_module_fails_the_build(tmp_path: PathType) -> None:
         load_api(root, "pkg")
 
 
+def _single_module_package(root: PathType, source: str) -> dict[str, typ.Any]:
+    """Write ``source`` as a one-module package under ``root`` and load it."""
+    package = root / "pkg"
+    package.mkdir()
+    (package / "__init__.py").write_text(textwrap.dedent(source), encoding="utf-8")
+    return {entry.name: entry for entry in load_api(root, "pkg")}
+
+
+def test_an_inconsistent_hierarchy_falls_back_to_depth_first_order(
+    tmp_path: PathType,
+) -> None:
+    """A hierarchy C3 cannot order is still documented, each name once.
+
+    ``A(X, Y)`` and ``B(Y, X)`` disagree about ``X`` and ``Y``, so Python
+    would refuse ``C(A, B)``. The parser keeps the part C3 did order, ``A``
+    then ``B``, and appends the rest depth-first in base order, so ``X``
+    precedes ``Y`` and a name both define is taken from ``X``.
+    """
+    api = _single_module_package(
+        tmp_path,
+        '''
+        __all__ = ["C"]
+
+
+        class X:
+            def shared(self) -> None:
+                """shared on X."""
+
+            def x_only(self) -> None:
+                """Only X."""
+
+
+        class Y:
+            def shared(self) -> None:
+                """shared on Y."""
+
+            def y_only(self) -> None:
+                """Only Y."""
+
+
+        class A(X, Y):
+            def a_only(self) -> None:
+                """Only A."""
+
+
+        class B(Y, X):
+            def b_only(self) -> None:
+                """Only B."""
+
+
+        class C(A, B):
+            """The class Python would refuse."""
+
+            def own(self) -> None:
+                """Own."""
+        ''',
+    )
+    members = api["C"].members
+    assert [m.name for m in members] == [
+        "own",
+        "a_only",
+        "b_only",
+        "shared",
+        "x_only",
+        "y_only",
+    ]
+    assert next(m for m in members if m.name == "shared").doc.summary == "shared on X."
+
+
+@pytest.mark.parametrize(
+    ("base", "preamble"),
+    [
+        pytest.param("Missing", "", id="unresolved-name"),
+        pytest.param("other.Thing", "import other", id="dotted-expression"),
+        pytest.param("make_base()", "", id="call-expression"),
+        pytest.param("Alias", "Alias = _Mixin", id="non-class-alias"),
+        pytest.param("make_base", "", id="function"),
+    ],
+)
+def test_a_base_the_parser_cannot_follow_is_skipped(
+    tmp_path: PathType, base: str, preamble: str
+) -> None:
+    """A base that is not an in-package class contributes nothing.
+
+    An undefined name, a dotted or call expression, an alias assignment, and
+    a function are all skipped without failing the build, while the public
+    members of the in-package mixin beside them are still listed.
+    """
+    api = _single_module_package(
+        tmp_path,
+        f'''
+        __all__ = ["Child"]
+        {preamble}
+
+
+        def make_base() -> type:
+            """Build a base."""
+            return object
+
+
+        class _Mixin:
+            def mixed(self) -> None:
+                """From the mixin."""
+
+
+        class Child({base}, _Mixin):
+            """Inherits from something the parser cannot follow."""
+
+            def own(self) -> None:
+                """Own."""
+        ''',
+    )
+    assert [m.name for m in api["Child"].members] == ["own", "mixed"]
+
+
 _METHOD_NAMES = ("alpha", "beta", "gamma")
 
 

@@ -385,8 +385,10 @@ def test_an_inconsistent_hierarchy_falls_back_to_depth_first_order(
         "shared",
         "x_only",
         "y_only",
-    ]
-    assert next(m for m in members if m.name == "shared").doc.summary == "shared on X."
+    ], "members must follow the C3 prefix, then depth-first base order, each once"
+    assert (
+        next(m for m in members if m.name == "shared").doc.summary == "shared on X."
+    ), "a name both X and Y define must be taken from X, the earlier base"
 
 
 @pytest.mark.parametrize(
@@ -432,7 +434,9 @@ def test_a_base_the_parser_cannot_follow_is_skipped(
                 """Own."""
         ''',
     )
-    assert [m.name for m in api["Child"].members] == ["own", "mixed"]
+    assert [m.name for m in api["Child"].members] == ["own", "mixed"], (
+        f"base {base!r} must be skipped while the in-package mixin is still listed"
+    )
 
 
 _METHOD_NAMES = ("alpha", "beta", "gamma")

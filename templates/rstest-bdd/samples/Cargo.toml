@@ -13,3 +13,7 @@ rstest-bdd-macros = "0.6.0"
 rstest-bdd-harness = "0.6.0"
 rstest-bdd-harness-tokio = "0.6.0"
 tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }
+
+[profile.dev]
+incremental = false
+debug = 0

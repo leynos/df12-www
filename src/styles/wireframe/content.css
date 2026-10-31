@@ -516,7 +516,7 @@
 }
 
 /* The field guide's marks and plates. */
-.wf-yard__marks {
+.wf-field__marks {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
@@ -527,44 +527,44 @@
   background: var(--color-night);
 }
 
-.wf-yard__marks img:first-child {
+.wf-field__marks img:first-child {
   width: min(100%, 32rem);
   height: auto;
 }
 
-.wf-yard__marks img:last-child {
+.wf-field__marks img:last-child {
   width: 6rem;
   height: auto;
 }
 
-.wf-yard__plates {
+.wf-field__plates {
   display: grid;
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
 
 @media (width >= 768px) {
-  .wf-yard__plates {
+  .wf-field__plates {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.wf-yard table {
+.wf-field table {
   width: 100%;
   margin-top: 1.5rem;
   border-collapse: collapse;
   font-size: 0.9375rem;
 }
 
-.wf-yard th,
-.wf-yard td {
+.wf-field th,
+.wf-field td {
   padding: 0.65rem 0.9rem 0.65rem 0;
   border-bottom: 1px solid var(--color-rule);
   text-align: left;
   vertical-align: top;
 }
 
-.wf-yard th {
+.wf-field th {
   color: var(--color-ink-muted);
   font-size: 0.8125rem;
   letter-spacing: var(--tracking-label);

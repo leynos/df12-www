@@ -1,0 +1,72 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% block title %}The scope · wireframe{% endblock %}
+{% block description %}How the wireframe site is drawn: a vector display driven hard, the beam colours and their contrast, the typefaces, the logotype, and where the illustrations came from.{% endblock %}
+{% block content %}
+{% set metaphor = [
+  ('The beam', 'One request’s path', 'A bright line drawn from point to point'),
+  ('The display list', 'The incoming byte stream', 'Cyan bits marching into a funnel'),
+  ('A stroke', 'A frame, cut by the FrameCodec', 'A cyan wireframe box'),
+  ('Deflection', 'The router choosing one route by message ID', 'One lit route; the others stay dark and dashed'),
+  ('Modulation', 'Middleware around the handler', 'Amber gates the beam crosses, in and out'),
+  ('Dwell', 'A handler', 'Where the beam stops and the trace burns brightest'),
+  ('Blanking', 'A fragmented message', 'One stroke drawn in pieces, with dark gaps between'),
+  ('Retrace', 'The reply, encoded and framed', 'A dashed path back along the floor'),
+  ('Persistence', 'State that outlives a frame: sessions, connection state', 'The afterglow a trace leaves behind'),
+] %}
+{% set beams = [
+  ('night', 'Night', '#030e0c', 'The field every page is drawn on', 'Ground'),
+  ('surface', 'Surface', '#091a16', 'Panels and code', 'Ground'),
+  ('raised', 'Raised', '#102720', 'A panel inside a panel', 'Ground'),
+  ('text', 'Text', '#f1fff8', 'Body and interface copy', '19.03:1 on night'),
+  ('muted', 'Muted text', '#b8d5ca', 'Secondary descriptions', '12.51:1 on night'),
+  ('mint', 'Vector mint', '#7cffb3', 'Identity, the route in use, the primary action', '15.68:1 on night'),
+  ('cyan', 'Cyan', '#00ffff', 'Frames and decoded data', '15.62:1 on night'),
+  ('amber', 'Amber', '#ffb347', 'Traffic on the move; warnings', '11.00:1 on night'),
+  ('magenta', 'Magenta', '#ff6ad5', 'The one selected or correlated object', '7.72:1 on night'),
+  ('error', 'Error', '#ff687a', 'Errors only, never decoration', '7.01:1 on night'),
+] %}
+{{ ui.page_head([], 'The scope', 'How this site is drawn, and why a frame router looks like a vector display driven hard.') }}
+<div class="wf-shell wf-landing wf-field">
+  <section aria-labelledby="metaphor">
+    <h2 id="metaphor">Every frame is a stroke</h2>
+    <p class="wf-landing__lede">Every df12 tool comes with a world. wireframe&rsquo;s is an X-Y vector display: no raster and no pixels, only a beam steered from point to point, lit where it means something and blanked where it doesn&rsquo;t. A frame router does the same job with messages, and the metaphor is held to the library&rsquo;s real structure. Where it would mislead, it stops.</p>
+    <div class="wf-table-scroll" tabindex="0" role="region" aria-label="The scope and what it stands for"><table class="wf-field__table">
+      <thead><tr><th scope="col">On the scope</th><th scope="col">In wireframe</th><th scope="col">As drawn</th></tr></thead>
+      <tbody>{% for scope, lib, drawn in metaphor %}<tr><td>{{ scope }}</td><td>{{ lib }}</td><td>{{ drawn }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+    <p>A routed message selects one handler. No drawing shows one beam splitting between handlers, because wireframe does not broadcast.</p>
+  </section>
+
+  <section aria-labelledby="beam">
+    <h2 id="beam">The beam</h2>
+    <p>The hero scene on the home page is drawn twice. At build time a script lays the scene out in three dimensions and projects it to labelled SVG, which is the whole picture without script, with reduced motion, or with more contrast. In the browser, a canvas redraws the same strokes the way a vector monitor does: it is never cleared, so moving light leaves phosphor trails; glow adds up where lines cross and where the beam dwells at a corner; a faint flyback line betrays where the beam travelled while blanked; and the deflection drifts by a fraction of a pixel. Every few seconds a deflection glitch throws a ghost of the picture sideways. The pulses on the lit route move at the picture&rsquo;s pace, not the protocol&rsquo;s.</p>
+  </section>
+
+  <section aria-labelledby="beams">
+    <h2 id="beams">The beam system</h2>
+    <p>Flat colour is authoritative; glow is optional emphasis. Each colour has one job, and hue is never the only cue: every coloured mark also has a shape, a line style, or a label. The contrast figures are for the flat colour as text on the night field.</p>
+    <ul class="wf-swatches">{% for key, name, hex, role, contrast in beams %}<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--{{ key }}"></div><div class="wf-swatch__body"><strong>{{ name }}</strong><code>{{ hex }}</code><span>{{ role }}</span><span>{{ contrast }}</span></div></li>{% endfor %}</ul>
+    <p>Under <code>prefers-contrast: more</code> every halo is removed and the flat cores remain. Under <code>prefers-reduced-motion</code> the beam stays off, the glitch never fires, and the journey rail is lit from the start.</p>
+  </section>
+
+  <section aria-labelledby="type">
+    <h2 id="type">Type and logotype</h2>
+    <p><strong>Sintony</strong> sets every word of interface and prose, at its two distributed weights. <strong>Monaspace Krypton</strong> sets code and byte sequences, with ligatures off so that <code>-&gt;</code>, <code>=&gt;</code>, and <code>::</code> stay distinct. Both are SIL Open Font License faces, served from this site.</p>
+    <p>The logotype is the approved artwork, published as it was drawn rather than retyped or redrawn: lower-case letters built from beam lattices, beside a faceted rhombus. Its near-black ground is keyed to transparency, treating the art as light emitted over black, so its own glow carries it on every surface. The favicon is the rhombus alone.</p>
+    <div class="wf-field__marks">
+      <img src="/wireframe/assets/logos/wordmark-1400.webp" alt="The wireframe wordmark" width="1400" height="357">
+      <img src="/wireframe/assets/logos/symbol-192.webp" alt="The wireframe symbol, a faceted rhombus" width="192" height="192">
+    </div>
+  </section>
+
+  <section aria-labelledby="plates">
+    <h2 id="plates">The plates</h2>
+    <p>The illustrations were generated with gpt-image-2 on 31 October 2026 and checked by eye. Every prompt asked for the same thing: thin beam lines on a green-black field, hot vertices, phosphor trails, one lit route, and nothing a raster would make &ndash; no scanlines, pixels, dithering, or colour fringing &ndash; and no text, numbers, people, or vehicles. Anything that has to be read is in the HTML beside a plate, never in it.</p>
+    <div class="wf-field__plates">
+      {% for key in ['queues', 'fragments', 'outbound', 'calibration'] %}{{ ui.plate(key, sizes='(width < 768px) 100vw, 50vw') }}{% endfor %}
+    </div>
+    <p>Legal pages carry no plates and no glow.</p>
+  </section>
+</div>
+{% endblock %}

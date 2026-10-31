@@ -4,7 +4,7 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-testing'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = 'proving-loop' %}
+{% set plate_key = 'calibration' %}
 {% block article_body %}
 <section aria-labelledby="testkit"><h2 id="testkit">Enable the testkit</h2>
 <p>The <code>testkit</code> feature adds <code>wireframe::testkit</code>: drivers that run a real <code>WireframeApp</code> over an in-memory duplex stream, with no socket and no server. A driver encodes requests with a codec, feeds the bytes in, and returns the decoded replies. Turn the feature on for tests only, through a dev-dependency or a feature of the crate under test.</p>

@@ -1,25 +1,25 @@
 {#- The plate catalogue: every generated illustration on the sub-site, once.
-    Each raster was drawn with gpt-image-2 on 31 October 2026 in the
-    identity's X-Y vector-beam style and carries no text: the label and the
-    caption are HTML. Every image has a `-half` file at half its linear size
-    for `srcset`. Provenance is in docs/wireframe-site.md. -#}
+    Each raster was drawn with gpt-image-2 on 31 October 2026 as X-Y
+    vector-scan display art and carries no text: the label and the caption
+    are HTML. Every image has a `-half` file at half its linear size for
+    `srcset`. Provenance is in docs/wireframe-site.md. -#}
 {% set plates = {
-  'night-yard': {'file': 'night-yard', 'width': 1600, 'height': 898, 'label': 'The night yard',
-    'alt': 'A railway yard at night drawn in glowing vector lines: a train of cyan wagons arrives from the left, passes an empty lattice signal tower, and follows the single lit mint route with amber direction marks, which carries one magenta wagon towards an empty weighbridge; the other sidings and sheds are faint outlines.',
-    'caption': 'One wagon, one lit route. The other sidings stay dark until a waybill names them.'},
-  'long-load': {'file': 'long-load', 'width': 1536, 'height': 1024, 'label': 'A long load',
-    'alt': 'A long cyan load is split into four segments on a rake of coupled flat wagons with amber couplings, rolling along a mint track into an open shed, where the load sits whole on one long flat wagon.',
-    'caption': 'Too long for one wagon, so it travels on several and is rejoined in the shed.'},
-  'two-lines': {'file': 'two-lines', 'width': 1536, 'height': 1024, 'label': 'Two lines',
-    'alt': 'An express line carrying three closely spaced cyan wagons merges under a lattice signal gantry with a slower line carrying two widely spaced wagons, and one slow-line wagon is let through between them.',
-    'caption': 'Express and slow traffic share one junction, and the slow line still gets its turn.'},
+  'scope': {'file': 'scope', 'width': 1600, 'height': 900, 'label': 'The scope',
+    'alt': 'A perspective grid floor drawn in glowing vector lines. A stream of cyan wireframe cubes flows in from the left through a tall mint rhombus gateway; beyond it, dim dashed paths lead to two distant terminal frames, while one amber path with travelling pulses of light carries the cubes, one of them magenta, to a third terminal that glows mint. A dashed return line curves back along the floor.',
+    'caption': 'One frame followed, one route lit. The other paths stay dark until a message ID names them.'},
+  'fragments': {'file': 'fragments', 'width': 1536, 'height': 1024, 'label': 'Fragments',
+    'alt': 'A long cyan wireframe slab, divided into four sections, separates into four short boxes that travel along a faint amber arc with blank gaps between them, and arrive inside a mint frame on the right, where they sit joined again as one long slab with glowing joints.',
+    'caption': 'Too long for one frame, so it crosses in pieces and is rejoined before any handler sees it.'},
+  'queues': {'file': 'queues', 'width': 1536, 'height': 1024, 'label': 'Two queues',
+    'alt': 'Two cyan beam tracks meet at a mint faceted rhombus. The upper track carries three closely spaced cubes, the lower two widely spaced ones; a single amber beam leaves the junction carrying three amber cubes with one cyan cube from the slow track let in between them.',
+    'caption': 'High and low priority share one connection, and the low queue still gets its turn.'},
   'outbound': {'file': 'outbound', 'width': 1536, 'height': 1024, 'label': 'Outbound',
-    'alt': 'A small mint locomotive with one headlamp pulls two cyan wagons out of a faintly drawn yard along a single lit track, with amber marks pointing ahead into open dark space.',
-    'caption': 'The client leaves on the same rails the server arrives on.'},
-  'proving-loop': {'file': 'proving-loop', 'width': 1536, 'height': 1024, 'label': 'The proving loop',
-    'alt': 'An oval test track carries one load split into four segments on separate bogies along the far side and the same load whole on the near side, around a small instrument hut with a dial.',
-    'caption': 'A load fed round in pieces on the far side, checked whole on the near side.'},
-  'yard-under-construction': {'file': 'yard-under-construction', 'width': 1536, 'height': 1024, 'label': 'Still being laid',
-    'alt': 'A finished track and an empty signal tower on the left lead to a short amber stretch where a crane lowers a cyan rail section; to the right, planned sidings and a shed appear only as dashed outlines.',
-    'caption': 'Built track on the left. Dashed lines are plans, not promises.'},
+    'alt': 'A mint wireframe stack of three planes on the left sends an amber beam carrying two cyan cubes and a small magenta rhombus to a tall mint terminal frame on the right; below it a dashed return line carries a matching magenta rhombus back.',
+    'caption': 'The client leaves with a mark and accepts only the reply that carries it back.'},
+  'calibration': {'file': 'calibration', 'width': 1536, 'height': 1024, 'label': 'Calibration',
+    'alt': 'On the left, an oscilloscope graticule holds a bright mint three-lobed Lissajous figure with a faint afterglow of the previous trace. On the right, an oval loop carries a cyan slab in several separate pieces along its far side and whole along its near side, with a small amber pulse where the pieces rejoin.',
+    'caption': 'Feed it round in pieces on the far side; check it arrives whole on the near side.'},
+  'construction': {'file': 'construction', 'width': 1536, 'height': 1024, 'label': 'Still being drawn',
+    'alt': 'A large mint wireframe structure in perspective: the left part is fully lit, with a faceted junction at its centre; in the middle an amber beam tip is tracing a new edge; to the right, further frames exist only as faint dashed construction lines with calibration ticks.',
+    'caption': 'Lit lines are shipped. Dashed lines are plans, not promises.'},
 } %}

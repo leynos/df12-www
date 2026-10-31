@@ -9,8 +9,8 @@ runs.
 The accessibility bar is the one AGENTS.md sets: zero axe violations against
 WCAG 2.0 A and AA, at a phone width and a desktop width. Both are checked
 because a code region only reports as an unreachable scroller once it
-actually scrolls, and because the hero's signal-path diagram appears only
-from 768px. The sub-site carries no waivers, so any failure is a failure.
+actually scrolls, and because the hero scene drops its labels below 640px.
+The sub-site carries no waivers, so any failure is a failure.
 """
 
 from __future__ import annotations

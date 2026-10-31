@@ -1,0 +1,44 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['guide-codecs'] %}
+{% set crumbs = [('Guides', '/wireframe/guides/')] %}
+{% set plate_key = none %}
+{% block article_body %}
+<section aria-labelledby="defaults"><h2 id="defaults">The defaults</h2>
+<p>A new application frames with <code>LengthDelimitedFrameCodec</code>: a 4-byte big-endian length prefix, then the payload, with frames over 1,024 bytes refused. Everything inside the frame is bincode, and the connection loop wakes every 100&nbsp;ms to clear stale partial messages.</p>
+<p><code>buffer_capacity</code> raises or lowers the frame limit for the length-delimited codec. <code>codec()</code> returns the installed codec, which is how the sample checks the change took effect:</p>
+{{ code.code('tests/codec.rs', 'defaults', title='codec.rs · the defaults') }}
+{% call ui.callout('note', 'Changing the codec resets fragmentation') %}<p><code>buffer_capacity</code> and <code>with_codec</code> both clear any fragmentation settings, because the fragment size depends on the frame limit. Call <code>enable_fragmentation()</code> after them, not before.</p>{% endcall %}
+</section>
+
+<section aria-labelledby="framecodec"><h2 id="framecodec">Write a FrameCodec</h2>
+<p>A protocol with its own framing implements <code>FrameCodec</code>. The trait owns a Tokio <code>Decoder</code> and <code>Encoder</code> for its frame type and tells wireframe four things about a frame: where its payload is, how to wrap an outgoing payload, where a correlation ID lives if the header carries one, and how large a frame may be.</p>
+<p>The example below is a small invented protocol: two bytes of length, four bytes of ticket, then the payload. The decoder waits until a whole frame has arrived, refuses one that exceeds the limit, and splits the payload off without copying it.</p>
+{{ code.code('tests/codec.rs', 'codec-types', title='codec.rs · frame, decoder, encoder') }}
+{{ code.code('tests/codec.rs', 'codec-impl', title='codec.rs · the FrameCodec') }}
+<p><code>frame_payload_bytes</code> is optional. Its default copies the payload slice; overriding it to clone a <code>Bytes</code> hands the payload on with a reference-count increment instead. <code>correlation_id</code> is consulted only when the decoded envelope has none of its own.</p>
+</section>
+
+<section aria-labelledby="install"><h2 id="install">Install it</h2>
+<p><code>with_codec</code> swaps the codec and changes the application&rsquo;s type. wireframe clones the codec for each connection, so a codec that keeps state, such as a sequence counter, should make sure a clone starts fresh.</p>
+{{ code.code('tests/codec.rs', 'install', title='codec.rs · with_codec') }}
+<p>The sample then feeds an encoded request through the testkit one byte at a time. The decoder returns nothing until a whole frame has arrived, and the reply comes back intact.</p>
+<p>wireframe ships three worked codecs in its repository, for Hotline, MySQL, and the Redis serialization protocol (RESP). They are listed on <a href="/wireframe/examples/">the examples page</a>. The Hotline codec is also reachable as <code>wireframe::codec::examples::HotlineFrameCodec</code>, though that module is hidden from the API reference.</p>
+</section>
+
+<section aria-labelledby="preamble"><h2 id="preamble">Read a preamble first</h2>
+<p>Some protocols open with a handshake before any frame: a magic number, a version, a client name. The server reads it with <code>with_preamble::&lt;T&gt;()</code>, where <code>T</code> is any bincode type, decoding at most 1&nbsp;KiB. Bytes read past the preamble are replayed into the framing layer, so nothing is lost.</p>
+{{ code.code('tests/preamble.rs', 'hello', title='preamble.rs · the handshake') }}
+{{ code.code('tests/preamble.rs', 'server', title='preamble.rs · the server') }}
+<p>The success handler receives the decoded preamble and the raw TCP stream, so it can reply before framing starts. The client sends its preamble with <code>with_preamble</code> as soon as it connects:</p>
+{{ code.code('tests/preamble.rs', 'client', title='preamble.rs · the client') }}
+{% call ui.callout('fact', 'A success handler cannot reject the connection') %}<p>An error returned from <code>on_preamble_decode_success</code> is logged, and the connection carries on to the application. A preamble that fails to decode, or does not arrive within <code>preamble_timeout</code>, goes to <code>on_preamble_decode_failure</code> instead, and the connection closes after it runs. Validate fields that matter, such as a magic number, in a type that fails to decode when they are wrong, or close the stream from the handler.</p>{% endcall %}
+</section>
+
+<section aria-labelledby="errors"><h2 id="errors">Codec errors</h2>
+<p>In {{ wireframe_version }} the connection loop treats a decoder error as fatal: the connection closes. For the default codec that includes a frame over the limit. A frame that decodes but whose payload is not a valid envelope is different: it counts towards the limit of ten consecutive deserialization failures described in <a href="/wireframe/guides/routing/#unrouted">the routing guide</a>.</p>
+{% call ui.callout('fact', 'Recovery policies are defined but not consulted') %}<p>The <code>wireframe::codec</code> module defines a richer taxonomy (<code>CodecError</code>, with framing, protocol, I/O, and end-of-stream variants), a <code>RecoveryPolicy</code> of drop, quarantine, or disconnect, a <code>RecoveryPolicyHook</code> trait, and an <code>on_eof</code> protocol hook. The {{ wireframe_version }} server does not call any of them, so implementing one changes nothing yet.</p>{% endcall %}
+</section>
+{% endblock %}

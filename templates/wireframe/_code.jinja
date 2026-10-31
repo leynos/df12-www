@@ -1,0 +1,49 @@
+{#- Code panels, kept apart from components.jinja because they use the
+    build-time highlight tag, which the shared legal-page renderer does not
+    load. Import this only from pages that show code. -#}
+{#- The lines of a sample file between `ANCHOR: name` and `ANCHOR_END: name`
+    (in `//` or `#` comments), with any other anchor lines dropped. Without
+    an anchor, the whole file. Samples live under samples/ and are compiled
+    and run by `make wireframe-samples`. -#}
+{% macro excerpt(file, anchor=none) -%}
+{%- set source %}{% include 'samples/' ~ file %}{% endset -%}
+{%- set ns = namespace(on=anchor is none, out=[]) -%}
+{%- for line in source.split('\n') -%}
+  {%- set bare = line.strip().lstrip('/#').strip() -%}
+  {%- if anchor is not none and bare == 'ANCHOR: ' ~ anchor -%}{% set ns.on = true %}
+  {%- elif anchor is not none and bare == 'ANCHOR_END: ' ~ anchor -%}{% set ns.on = false %}
+  {%- elif ns.on and not bare.startswith('ANCHOR') -%}{% set ns.out = ns.out + [line] %}
+  {%- endif -%}
+{%- endfor -%}
+{{ ns.out | join('\n') }}
+{%- endmacro %}
+
+{#- A working example: an excerpt of a sample file, highlighted at build
+    time, in a keyboard-reachable scroll region with a copy control slot.
+    `data-wf-sample` names the file the build test holds the panel to. -#}
+{% macro code(file, anchor=none, title=none, lexer='rust') -%}
+{%- set name = title or file.split('/')[-1] -%}
+<figure class="wf-code" data-wf-sample="{{ file }}"{% if anchor %} data-wf-anchor="{{ anchor }}"{% endif %} data-wf-copy="code" data-wf-copy-label="{{ name }}">
+  <figcaption class="wf-code__bar"><span class="wf-code__name">{{ name }}</span><span class="wf-code__kind">Working example</span><span class="wf-code__slot" data-wf-copy-slot></span></figcaption>
+  <div class="wf-code__scroll" tabindex="0" role="region" aria-label="{{ name }}, working example">{% highlight lexer, 'wf-syntax' %}{{ excerpt(file, anchor) }}{% endhighlight %}</div>
+</figure>
+{%- endmacro %}
+
+{#- A shell command panel. The prompt is drawn in CSS, so a copy takes the
+    command alone. -#}
+{% macro command(label='Shell') -%}
+<figure class="wf-code wf-code--command" data-wf-copy="console" data-wf-copy-label="{{ label }}">
+  <figcaption class="wf-code__bar"><span class="wf-code__name">{{ label }}</span><span class="wf-code__slot" data-wf-copy-slot></span></figcaption>
+  <div class="wf-code__scroll" tabindex="0" role="region" aria-label="{{ label }}"><pre><code>{{ caller() }}</code></pre></div>
+</figure>
+{%- endmacro %}
+
+{#- An API-shape illustration: code that names real API but is not
+    compiled on its own. The specification asks for the label in words. -#}
+{% macro illustration(title, lexer='rust') -%}
+<figure class="wf-code wf-code--illustration">
+  <figcaption class="wf-code__bar"><span class="wf-code__name">{{ title }}</span><span class="wf-code__kind">API-shape illustration</span></figcaption>
+  <div class="wf-code__scroll" tabindex="0" role="region" aria-label="{{ title }}, API-shape illustration">{% highlight lexer, 'wf-syntax' %}{{ caller() }}{% endhighlight %}</div>
+</figure>
+{%- endmacro %}
+

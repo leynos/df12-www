@@ -1,0 +1,749 @@
+/* Article pages and the components they share with the home page: the page
+ * head, the side rail, prose, code panels, callouts, route lists, and the
+ * examples, roadmap, and field-guide pages. */
+
+/* The page head. */
+.wf-page-head {
+  padding-block: 2.5rem 3rem;
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-panel);
+}
+
+.wf-page-head__grid {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (width >= 1024px) {
+  .wf-page-head {
+    padding-block: 3.5rem 4rem;
+  }
+
+  .wf-page-head__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 32rem);
+    gap: 3rem;
+  }
+}
+
+.wf-page-head h1 {
+  max-width: 24ch;
+  margin: 1rem 0 0;
+  font-size: clamp(2.125rem, 1.5rem + 2.4vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.wf-deck {
+  max-width: 40rem;
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+  font-size: 1.1875rem;
+}
+
+.wf-version {
+  margin: 1.25rem 0 0;
+  color: var(--color-ink-dim);
+  font-size: 0.875rem;
+}
+
+.wf-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  margin: 0;
+  padding: 0;
+  color: var(--color-ink-dim);
+  font-size: 0.875rem;
+  list-style: none;
+}
+
+.wf-crumbs li + li::before {
+  margin-right: 0.6rem;
+  color: var(--color-tick);
+  content: "/";
+}
+
+.wf-crumbs a {
+  color: var(--color-ink-muted);
+}
+
+/* The article grid: a side rail beside a reading column. */
+.wf-article-grid {
+  display: grid;
+  gap: 2rem;
+  padding-block: 3rem 0;
+}
+
+@media (width >= 1024px) {
+  .wf-article-grid {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 4rem;
+  }
+}
+
+.wf-aside {
+  min-width: 0;
+}
+
+.wf-aside__rail {
+  display: none;
+}
+
+@media (width >= 1024px) {
+  .wf-aside__rail {
+    position: sticky;
+    top: 6rem;
+    display: grid;
+    gap: 2rem;
+    max-height: calc(100dvh - 7rem);
+    overflow-y: auto;
+  }
+
+  .wf-aside__menu {
+    display: none;
+  }
+}
+
+.wf-aside__menu {
+  border: 1px solid var(--color-rule);
+  background: var(--color-panel);
+}
+
+.wf-aside__menu summary {
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wf-aside__menu > nav {
+  padding: 0 1rem 1rem;
+}
+
+.wf-toc {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-toc a {
+  display: block;
+  padding: 0.3rem 0 0.3rem 0.75rem;
+  border-left: 1px solid var(--color-rule);
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.wf-toc a:hover {
+  border-left-color: var(--color-mint);
+  color: var(--color-ink);
+}
+
+.wf-toc a[aria-current="page"] {
+  border-left: 2px solid var(--color-magenta);
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+/* Prose. The reading column holds a 68 to 82 character measure; code
+   panels and tables may run to the column's full width. */
+.wf-article {
+  min-width: 0;
+}
+
+.wf-article > section {
+  margin-top: 3.5rem;
+}
+
+.wf-article > section:first-of-type {
+  margin-top: 2rem;
+}
+
+.wf-article h2 {
+  margin: 0;
+  font-size: clamp(1.625rem, 1.4rem + 0.8vw, 2rem);
+}
+
+.wf-article h3 {
+  margin: 2rem 0 0;
+  font-size: 1.3125rem;
+}
+
+.wf-article p,
+.wf-article ul,
+.wf-article ol,
+.wf-article dl {
+  max-width: 72ch;
+}
+
+.wf-article p {
+  margin: 1rem 0 0;
+}
+
+.wf-article ul,
+.wf-article ol {
+  margin: 1rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.wf-article ul {
+  list-style: square;
+}
+
+.wf-article ol {
+  list-style: decimal;
+}
+
+.wf-article li + li {
+  margin-top: 0.4rem;
+}
+
+.wf-article li::marker {
+  color: var(--color-mint);
+}
+
+.wf-lede {
+  color: var(--color-ink-muted);
+  font-size: 1.125rem;
+}
+
+.wf-article > .wf-code,
+.wf-article section > .wf-code,
+.wf-article .wf-callout,
+.wf-article .wf-table-scroll,
+.wf-article .wf-plate {
+  margin-top: 1.5rem;
+}
+
+.wf-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.wf-article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.wf-article th,
+.wf-article td {
+  padding: 0.65rem 0.9rem 0.65rem 0;
+  border-bottom: 1px solid var(--color-rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.wf-article th {
+  color: var(--color-ink-muted);
+  font-size: 0.8125rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-article__foot {
+  margin-top: 4rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-rule);
+  color: var(--color-ink-dim);
+  font-size: 0.875rem;
+}
+
+.wf-next li a {
+  font-weight: 700;
+}
+
+/* Code panels. Flat green-black, Monaspace Krypton, no bloom on tokens.
+   The bar names the file and states, in words, what kind of code it is:
+   a working example, a command, or an API-shape illustration. */
+.wf-code {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--color-rule);
+  background: var(--color-panel);
+}
+
+.wf-code__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.5rem 0.35rem 1rem;
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}
+
+.wf-code__name {
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.wf-code__kind {
+  color: var(--color-mint);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.wf-code--illustration .wf-code__kind {
+  color: var(--color-amber);
+}
+
+.wf-code__slot {
+  margin-left: auto;
+}
+
+.wf-code__scroll {
+  overflow-x: auto;
+}
+
+.wf-code pre {
+  margin: 0;
+  padding: 1rem 1.25rem 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  tab-size: 4;
+}
+
+.wf-code .wf-syntax {
+  background: transparent;
+}
+
+.wf-code--command pre code::before {
+  color: var(--color-ink-dim);
+  content: "$ ";
+  user-select: none;
+}
+
+/* The copy control, added by copy-code.js. It says what happened in words. */
+.wf-copy {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--color-tick);
+  background: transparent;
+  color: var(--color-ink);
+  font: 700 0.8125rem / 1.2 var(--font-sans);
+  cursor: pointer;
+}
+
+.wf-copy:hover {
+  border-color: var(--color-mint);
+  color: var(--color-mint);
+}
+
+/* Callouts: text first, a left rule, and the kind in words. */
+.wf-callout {
+  max-width: 72ch;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-rule);
+  border-left: 3px solid var(--color-cyan);
+  background: var(--color-panel);
+}
+
+.wf-callout--warning {
+  border-left-color: var(--color-amber);
+}
+
+.wf-callout--fact {
+  border-left-color: var(--color-mint);
+}
+
+.wf-callout__kind {
+  margin: 0;
+  color: var(--color-cyan);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-callout--warning .wf-callout__kind {
+  color: var(--color-amber);
+}
+
+.wf-callout--fact .wf-callout__kind {
+  color: var(--color-mint);
+}
+
+.wf-callout__title {
+  margin: 0.25rem 0 0;
+  font-weight: 700;
+}
+
+.wf-callout p:not(.wf-callout__kind, .wf-callout__title) {
+  margin: 0.5rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-install .wf-callout {
+  margin-top: 1.5rem;
+}
+
+/* A list of routes: the guide index and section landing pages. */
+.wf-route-list {
+  display: grid;
+  gap: 0;
+  margin: 2rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--color-rule);
+  list-style: none;
+}
+
+@media (width >= 768px) {
+  .wf-route-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
+  }
+}
+
+.wf-route-list a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.wf-route-list a > .wf-icon:first-child {
+  margin-top: 0.15rem;
+  color: var(--color-mint);
+  font-size: 1.5rem;
+}
+
+.wf-route-list a > .wf-icon:last-child {
+  margin-top: 0.3rem;
+  color: var(--color-ink-dim);
+}
+
+.wf-route-list a:hover > .wf-icon:last-child {
+  color: var(--color-mint);
+}
+
+.wf-route-list strong {
+  display: block;
+  font-size: 1.125rem;
+}
+
+.wf-route-list strong + span {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+/* The guides landing page, without a side rail. */
+.wf-landing {
+  padding-block: 3rem 0;
+}
+
+.wf-landing__lede {
+  max-width: 44rem;
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: 1.0625rem;
+}
+
+/* Landing-page sections: the examples setup, the mxd case, and the field
+   guide's sections. */
+.wf-landing > section,
+.wf-landing__setup,
+.wf-mxd-case {
+  margin-top: 3rem;
+}
+
+.wf-landing h2 {
+  margin: 0;
+  font-size: clamp(1.625rem, 1.4rem + 0.8vw, 2rem);
+}
+
+.wf-landing section > p,
+.wf-mxd-case p {
+  max-width: 72ch;
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-landing__setup {
+  max-width: 44rem;
+}
+
+.wf-mxd-case {
+  padding: 2rem;
+  border: 1px solid var(--color-rule);
+  border-left: 3px solid var(--color-mint);
+  background: var(--color-raised);
+}
+
+/* Definition lists and numbered steps in articles. */
+.wf-defs {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+}
+
+.wf-defs > div {
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-cyan);
+}
+
+.wf-defs dt {
+  font-weight: 700;
+}
+
+.wf-defs dd {
+  margin: 0.25rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-article .wf-steps {
+  padding-left: 1.75rem;
+}
+
+.wf-steps li::marker {
+  color: var(--color-mint);
+  font-weight: 700;
+}
+
+/* The field guide's marks and plates. */
+.wf-yard__marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding: 2rem;
+  border: 1px solid var(--color-rule);
+  background: var(--color-night);
+}
+
+.wf-yard__marks img:first-child {
+  width: min(100%, 32rem);
+  height: auto;
+}
+
+.wf-yard__marks img:last-child {
+  width: 6rem;
+  height: auto;
+}
+
+.wf-yard__plates {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (width >= 768px) {
+  .wf-yard__plates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wf-yard table {
+  width: 100%;
+  margin-top: 1.5rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.wf-yard th,
+.wf-yard td {
+  padding: 0.65rem 0.9rem 0.65rem 0;
+  border-bottom: 1px solid var(--color-rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.wf-yard th {
+  color: var(--color-ink-muted);
+  font-size: 0.8125rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* The examples catalogue. */
+.wf-examples {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width >= 768px) {
+  .wf-examples {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wf-example {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid var(--color-rule);
+  background: var(--color-panel);
+}
+
+.wf-example h2 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 1.0625rem;
+}
+
+.wf-example p {
+  margin: 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-example .wf-code {
+  margin-top: auto;
+}
+
+.wf-example__layer {
+  color: var(--color-mint);
+}
+
+/* The roadmap: three horizons, the built, the in progress, and the planned,
+   told apart by line style as well as colour. */
+.wf-horizons {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.wf-horizon {
+  padding: 1.5rem;
+  border: 1px solid var(--color-rule);
+  border-left: 3px solid var(--color-mint);
+  background: var(--color-panel);
+}
+
+.wf-horizon--next {
+  border-left: 3px dashed var(--color-amber);
+}
+
+.wf-horizon--later {
+  border-left: 3px dotted var(--color-cyan);
+}
+
+.wf-horizon h3 {
+  margin: 0.3rem 0 0;
+}
+
+.wf-horizon ul {
+  max-width: none;
+}
+
+/* The field guide: beam swatches. */
+.wf-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-swatch {
+  border: 1px solid var(--color-rule);
+  background: var(--color-panel);
+}
+
+.wf-swatch__chip {
+  height: 4.5rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.wf-swatch__chip--night {
+  background: var(--color-night);
+}
+
+.wf-swatch__chip--surface {
+  background: var(--color-panel);
+}
+
+.wf-swatch__chip--raised {
+  background: var(--color-raised);
+}
+
+.wf-swatch__chip--text {
+  background: var(--color-ink);
+}
+
+.wf-swatch__chip--muted {
+  background: var(--color-ink-muted);
+}
+
+.wf-swatch__chip--mint {
+  background: var(--color-mint);
+}
+
+.wf-swatch__chip--cyan {
+  background: var(--color-cyan);
+}
+
+.wf-swatch__chip--amber {
+  background: var(--color-amber);
+}
+
+.wf-swatch__chip--magenta {
+  background: var(--color-magenta);
+}
+
+.wf-swatch__chip--error {
+  background: var(--color-error);
+}
+
+.wf-swatch__body {
+  padding: 0.75rem 1rem 1rem;
+}
+
+.wf-swatch__body strong {
+  display: block;
+}
+
+.wf-swatch__body code {
+  font-size: 0.8125rem;
+}
+
+.wf-swatch__body span {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}
+
+.wf-article .wf-swatches li + li {
+  margin-top: 0;
+}
+
+/* High contrast and low glow: the specification asks for a mode without
+   bloom. Every halo is decoration, so it goes, and the cores stay. */
+@media (prefers-contrast: more), (forced-colors: active) {
+  .wf-brand img,
+  .wf-signal__router,
+  .wf-signal__handler,
+  .wf-signal__beam,
+  .wf-track::after,
+  .wf-nav a[aria-current="page"]::after {
+    filter: none;
+    box-shadow: none;
+  }
+
+  .wf-btn:hover,
+  :focus-visible {
+    box-shadow: none;
+  }
+}

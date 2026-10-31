@@ -1,0 +1,196 @@
+/*
+ * Legal pages: the shared privacy, terms, and conduct copy, laid out as the
+ * Netsuke legal pages are: a breadcrumb, then one reading panel with an
+ * eyebrow, the title, a summary, and the body. The body is Markdown rendered
+ * by the shared-content generator, so element selectors style it, along with
+ * the contents list, sections, and badge cards it is wrapped in. No beam
+ * art and no glow: a legal notice is plain text on a quiet panel.
+ */
+
+.wf-legal-page {
+  width: min(56rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 3rem 0;
+}
+
+.wf-legal-page .wf-crumbs {
+  margin-bottom: 1.75rem;
+}
+
+.wf-legal-page__panel {
+  padding: clamp(1.25rem, 5vw, 3rem);
+  border: 1px solid var(--color-rule);
+  background: var(--color-panel);
+}
+
+.wf-legal-page__eyebrow {
+  margin: 0;
+  color: var(--color-mint);
+  font: 700 0.8125rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-legal-page h1 {
+  margin: 1rem 0 0;
+  font-size: clamp(2.125rem, 5vw, 3rem);
+}
+
+.wf-legal-page__summary {
+  max-width: 40rem;
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+  font-size: 1.125rem;
+}
+
+.wf-legal {
+  max-width: 72ch;
+  margin-top: 2.5rem;
+  line-height: 1.75;
+}
+
+.wf-legal > * + *,
+.wf-legal .content-section > * + * {
+  margin-top: 1rem;
+}
+
+.wf-legal > :first-child {
+  margin-top: 0;
+}
+
+.wf-legal h2 {
+  font-size: 1.625rem;
+}
+
+.wf-legal h3 {
+  margin-top: 1.75rem;
+  font-size: 1.25rem;
+}
+
+.wf-legal h4 {
+  margin-top: 1.5rem;
+  font-size: 1.0625rem;
+}
+
+.wf-legal ul,
+.wf-legal ol {
+  padding-left: 1.5rem;
+}
+
+.wf-legal ul {
+  list-style: square;
+}
+
+.wf-legal ol {
+  list-style: decimal;
+}
+
+.wf-legal li + li,
+.wf-legal li > ul,
+.wf-legal li > ol {
+  margin-top: 0.5rem;
+}
+
+.wf-legal li::marker {
+  color: var(--color-mint);
+}
+
+.wf-legal blockquote {
+  margin-inline: 0;
+  padding-left: 1.25rem;
+  border-left: 3px solid var(--color-mint);
+  color: var(--color-ink-muted);
+}
+
+.wf-legal hr {
+  margin-block: 2.5rem;
+  border: 0;
+  border-top: 1px solid var(--color-rule);
+}
+
+.wf-legal table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.wf-legal th,
+.wf-legal td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--color-rule);
+  text-align: left;
+}
+
+.wf-legal .content-toc {
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-rule);
+  background: var(--color-night);
+}
+
+.wf-legal .content-toc ul {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  list-style: none;
+}
+
+.wf-legal .content-toc li + li {
+  margin-top: 0;
+}
+
+.wf-legal .content-section {
+  margin-top: 2.75rem;
+}
+
+.wf-legal .content-section--divider {
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+.wf-legal .content-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-rule);
+  background: var(--color-night);
+}
+
+.wf-legal .content-card__badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-top: 0.125rem;
+  border: 1px solid var(--color-mint);
+  color: var(--color-mint);
+  font: 700 0.8125rem / 1 var(--font-sans);
+  text-transform: uppercase;
+}
+
+.wf-legal .content-card--accent .content-card__badge {
+  border-color: var(--color-amber);
+  color: var(--color-amber);
+}
+
+.wf-legal .content-card__body {
+  min-width: 0;
+}
+
+.wf-legal .content-card__body > * + * {
+  margin-top: 0.5rem;
+}
+
+.wf-legal .content-card__body h3 {
+  margin-top: 0;
+}
+
+@media (width < 768px) {
+  .wf-legal .content-card {
+    flex-direction: column;
+  }
+}

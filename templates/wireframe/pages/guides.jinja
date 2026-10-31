@@ -1,0 +1,13 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% from 'data/pages.jinja' import catalogue, guides %}
+{% block title %}Guides · wireframe{% endblock %}
+{% block description %}Task guides for wireframe {{ wireframe_version }}: routing, codecs, middleware, streaming, large messages, the client, testing, and production.{% endblock %}
+{% block content %}
+{{ ui.page_head([], 'Guides', 'Eight tasks, each built on code that compiles and runs against wireframe ' ~ wireframe_version ~ '. Start with routing; the rest can be read in any order.') }}
+<div class="wf-shell wf-landing">
+  <p class="wf-landing__lede">New to wireframe? <a href="/wireframe/getting-started/">Getting started</a> builds a whole server and client first. The <a href="{{ docs_url }}">API reference on docs.rs</a> is generated from the same release.</p>
+  {% set items = [] %}{% for key in guides %}{% set _ = items.append(catalogue[key]) %}{% endfor %}
+  {{ ui.route_list(items) }}
+</div>
+{% endblock %}

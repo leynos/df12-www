@@ -1,0 +1,45 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% block title %}Roadmap · wireframe{% endblock %}
+{% block description %}What wireframe {{ wireframe_version }} provides, what the unreleased 0.4.0 changes, and what the road to 1.0 holds.{% endblock %}
+{% block content %}
+{{ ui.page_head([], 'Released, next, and further out', wireframe_version ~ ' is the release. 0.4.0 is in progress on the default branch and breaks things on purpose. Beyond that, the upstream roadmap is a plan, not a promise.', 'yard-under-construction') }}
+<div class="wf-shell wf-landing">
+  <div class="wf-horizons">
+    <section class="wf-horizon" aria-labelledby="now">
+      <p class="wf-label">Released {{ wireframe_released }}</p>
+      <h2 id="now">In {{ wireframe_version }}</h2>
+      <ul>
+        <li>Routing by message ID, the bundled <code>Envelope</code> and custom <code>Packet</code> types, and correlation IDs.</li>
+        <li>Pluggable framing through <code>FrameCodec</code>, with length-delimited framing by default; preambles.</li>
+        <li><code>Transform</code> middleware and connection setup and teardown hooks.</li>
+        <li>Transport fragmentation, protocol message assembly, and three-tier memory budgets.</li>
+        <li>Streaming responses, priority push queues, a fair connection actor, and a session registry, as building blocks.</li>
+        <li>A client with correlated calls, streamed replies, hooks, tracing, and pools.</li>
+        <li>The <code>testkit</code> feature and the <code>wireframe_testing</code> crate.</li>
+      </ul>
+    </section>
+    <section class="wf-horizon wf-horizon--next" aria-labelledby="next">
+      <p class="wf-label">Unreleased · on the default branch</p>
+      <h2 id="next">Coming in 0.4.0</h2>
+      <p>The upstream changelog and the 0.3.0 to 0.4.0 migration guide list these, among others. They are breaking changes, so code written against {{ wireframe_version }} will need updates.</p>
+      <ul>
+        <li><strong>A prepared application.</strong> <code>WireframeServer::new</code> will call its factory once per server run and share the prepared application across connections, rather than building one per connection. Per-connection state moves to <code>on_connection_setup</code>; <code>WireframeServer::from_app</code> takes an application that is already built.</li>
+        <li><strong>Non-exhaustive errors.</strong> <code>ServerError</code> and <code>ClientError</code> become <code>#[non_exhaustive]</code>, and a saturated pool returns <code>ClientError::PoolSaturated</code>.</li>
+        <li><strong>Bounded decoding.</strong> The bundled bincode decoders cap the container lengths a peer can declare, at 16&nbsp;MiB for messages and 1&nbsp;KiB for preambles.</li>
+        <li><strong>No linger.</strong> <code>SocketOptions::linger</code> and the builder&rsquo;s <code>linger</code> go; <code>close().await</code> is the graceful path.</li>
+      </ul>
+    </section>
+    <section class="wf-horizon wf-horizon--later" aria-labelledby="later">
+      <p class="wf-label">Planned · upstream roadmap</p>
+      <h2 id="later">Toward 1.0</h2>
+      <ul>
+        <li>Zero-copy payloads through the public byte APIs, replacing <code>Vec&lt;u8&gt;</code> where a frame can be shared.</li>
+        <li>Formal verification of message assembly and dispatch: bounded model checks with Kani, model checks with Stateright, and proofs with Verus.</li>
+        <li>Further client ergonomics, middleware, and streaming helpers.</li>
+      </ul>
+      <p>Track the detail in the <a href="{{ repository_url }}/blob/main/docs/roadmap.md">upstream roadmap</a> and the <a href="{{ repository_url }}/blob/main/CHANGELOG.md">changelog</a>.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

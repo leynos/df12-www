@@ -1,0 +1,142 @@
+/* wireframe sub-site stylesheet: the Tailwind 4 + daisyUI 5 entry.
+ *
+ * Compiled by the shared df12 build into
+ * public/wireframe/assets/styles/wireframe.css.
+ *
+ * The site follows "Wireframe | Visual identity and design language" (v0.1,
+ * 31 October 2026): X-Y vector-display beam art on a green-black field, a
+ * drawn vector wordmark, Sintony for words, and Monaspace Krypton for code.
+ * Its playful world is the night yard, a marshalling yard drawn in beams. It is declared
+ * once, as the daisyUI "wireframe" theme plus the tokens under @theme, and
+ * the partials read those variables rather than restating a colour.
+ *
+ * Every class the partials define carries a `wf-` prefix. daisyUI emits each
+ * component it knows into the utilities layer, so an unprefixed `.btn` or
+ * `.card` in the markup would be restyled by daisyUI and would outrank the
+ * components layer below.
+ */
+
+@import "tailwindcss";
+
+/* @font-face rules belong to no layer: an at-rule that declares a font
+ * rather than styling an element cannot lose a cascade argument. */
+@import "./wireframe/fonts.css";
+
+/* The layering is load-bearing. Compiled Tailwind puts utilities in
+ * @layer utilities, and an unlayered declaration beats every layered one
+ * regardless of specificity. Element defaults sit in the base layer beside
+ * the preflight; everything else sits in components, where a utility in the
+ * markup still wins. */
+@import "./wireframe/base.css" layer(base);
+@import "./wireframe/chrome.css" layer(components);
+@import "./wireframe/content.css" layer(components);
+@import "./wireframe/home.css" layer(components);
+@import "./wireframe/legal.css" layer(components);
+@import "./wireframe/syntax.css" layer(components);
+
+@source "../../templates/wireframe/**/*.jinja";
+
+@plugin "daisyui" {
+  themes: wireframe --default;
+  logs: false;
+}
+
+/* The identity's colour tokens as a daisyUI theme.
+ *
+ * One theme, dark only: the brand is signal emerging from a dark field. The
+ * values are the specification's section 14 tokens. Every beam meets WCAG
+ * 2.2 AA as text on every ground the site uses. On the page: text 19.03:1,
+ * muted text 12.51:1, mint 15.68:1, cyan 15.62:1, amber 11.00:1, magenta
+ * 7.72:1, error 7.01:1. On the raised surface, the lightest ground, the
+ * lowest is error at 5.64:1.
+ */
+@plugin "daisyui/theme" {
+  name: "wireframe";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #030e0c; /* night: the page */
+  --color-base-200: #091a16; /* panel: code, cards */
+  --color-base-300: #102720; /* raised: a panel inside a panel */
+  --color-base-content: #f1fff8; /* ink */
+  --color-primary: #7cffb3; /* vector mint: signal and primary action */
+  --color-primary-content: #030e0c;
+  --color-secondary: #0ff; /* cyan: frames and data */
+  --color-secondary-content: #030e0c;
+  --color-accent: #ffb347; /* amber: the active path */
+  --color-accent-content: #030e0c;
+  --color-neutral: #091a16;
+  --color-neutral-content: #f1fff8;
+  --color-info: #0ff;
+  --color-info-content: #030e0c;
+  --color-success: #7cffb3;
+  --color-success-content: #030e0c;
+  --color-warning: #ffb347;
+  --color-warning-content: #030e0c;
+  --color-error: #ff687a; /* errors only: not magenta */
+  --color-error-content: #030e0c;
+
+  /* Drawn, not moulded: square corners, hairline edges, no depth. The
+     specification allows none or 2 to 4px; the site takes none. */
+  --radius-selector: 0;
+  --radius-field: 0;
+  --radius-box: 0;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  /* Sintony for every word of interface and prose; Monaspace Krypton for
+     code. The fallbacks are the specification's. */
+  --font-sans: "Sintony", arial, sans-serif;
+  --font-display: "Sintony", arial, sans-serif;
+  --font-mono: "Monaspace Krypton", consolas, monospace;
+
+  /* The design-language names for the daisyUI slots above, so partials and
+     templates speak the yard while the values live in one place. */
+  --color-night: var(--color-base-100);
+  --color-panel: var(--color-base-200);
+  --color-raised: var(--color-base-300);
+  --color-ink: var(--color-base-content);
+  --color-mint: var(--color-primary);
+  --color-cyan: var(--color-secondary);
+  --color-amber: var(--color-accent);
+  --color-error: var(--color-error);
+
+  /* Magenta marks the selected or correlated object, sparingly: 7.72:1. */
+  --color-magenta: #ff6ad5;
+
+  /* Secondary descriptions (--wf-text-muted): 12.51:1 on the page,
+     10.06:1 on raised. */
+  --color-ink-muted: #b8d5ca;
+
+  /* Tertiary type, for captions and metadata: 7.06:1 on the page, 5.68:1
+     on raised. Not in the specification; it extends the muted ramp. */
+  --color-ink-dim: #7fa394;
+
+  /* The low-contrast coordinate grid (--wf-grid). Ornament only, and never
+     behind blocks of small body text. */
+  --color-structure: #14362f;
+
+  /* Quiet outlines and dividers (--wf-border). */
+  --color-rule: #1d5a4c;
+
+  /* A boundary that identifies a control or a panel edge, held to the 3:1
+     non-text floor: 3.90:1 on the page, 3.13:1 on raised. */
+  --color-tick: #3f7a64;
+  --text-2xs: 0.6875rem; /* 11px */
+  --tracking-label: 0.08em;
+
+  /* The halo. Glow is emphasis, never meaning: the flat colour under it
+     passes contrast on its own. */
+  --shadow-halo:
+    0 0 0 1px color-mix(in oklab, var(--color-mint) 70%, transparent),
+    0 0 18px -2px color-mix(in oklab, var(--color-mint) 45%, transparent);
+  --shadow-halo-amber:
+    0 0 0 1px color-mix(in oklab, var(--color-amber) 70%, transparent),
+    0 0 18px -2px color-mix(in oklab, var(--color-amber) 45%, transparent);
+}

@@ -1,0 +1,46 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% block title %}Worked examples · wireframe{% endblock %}
+{% block description %}The runnable examples in the wireframe {{ wireframe_version }} repository, what each demonstrates, and how to run it, plus mxd, a full server built on wireframe.{% endblock %}
+{% block content %}
+{#- The upstream examples at the release tag, described from each file's own
+    header comment. Commands run from a checkout of the tag. -#}
+{% set examples = [
+  {'name': 'echo', 'layer': 'Routing', 'note': 'The smallest server: one route, and the default reply echoes each envelope back. It listens on 127.0.0.1:7878 and stops on Ctrl+C.'},
+  {'name': 'client_echo_login', 'layer': 'Client', 'note': 'Sends a typed login request inside an Envelope to the echo server and decodes the acknowledgement. Start echo first.'},
+  {'name': 'ping_pong', 'layer': 'Middleware', 'note': 'Typed Ping and Pong messages, with a Transform that maps one to the other and a logging layer around it. The pattern this site’s samples follow.'},
+  {'name': 'packet_enum', 'layer': 'Routing', 'note': 'An enum of packet variants, with handlers dispatched on the variant received and containers such as HashMap in the payload.'},
+  {'name': 'metadata_routing', 'layer': 'Routing', 'note': 'Routing from a small frame header that carries the message ID and flags.'},
+  {'name': 'hotline_codec', 'layer': 'Codec', 'note': 'Hotline framing: a 20-byte header with big-endian lengths and a transaction ID. The protocol mxd speaks.'},
+  {'name': 'mysql_codec', 'layer': 'Codec', 'note': 'MySQL framing: a 3-byte little-endian payload length and a 1-byte sequence number.'},
+  {'name': 'resp_codec', 'layer': 'Codec', 'note': 'A minimal parser and encoder for a subset of the Redis serialization protocol: simple strings, integers, and bulk strings.'},
+  {'name': 'async_stream', 'layer': 'Streaming', 'note': 'Builds a Response::Stream of five frames with the async-stream crate, ready for a ConnectionActor to consume.'},
+  {'name': 'multi_packet', 'layer': 'Streaming', 'note': 'Splits a transcript across frames sent through a bounded channel by two producer tasks, with back-pressure keeping them in step with the consumer.'},
+] %}
+{{ ui.page_head([], 'Worked examples', 'The wireframe repository ships ten runnable examples at ' ~ wireframe_tag ~ '. mxd, a complete Hotline server, is the full-size one.') }}
+<div class="wf-shell wf-landing">
+  <p class="wf-landing__lede">Run them from a checkout of the release tag. Its lockfile pins dependencies that build, and its toolchain file names the nightly Rust it was tested with, which rustup installs on first use. Each example needs the <code>examples</code> feature.</p>
+  <div class="wf-landing__setup">
+    {% call code.command('Check out the release') %}git clone https://github.com/leynos/wireframe.git
+cd wireframe
+git checkout {{ wireframe_tag }}{% endcall %}
+  </div>
+  <ul class="wf-examples">
+    {%- for e in examples %}
+    <li class="wf-example">
+      <p class="wf-label wf-example__layer">{{ e.layer }}</p>
+      <h2 id="{{ e.name }}"><a href="{{ source_base }}/examples/{{ e.name }}.rs">{{ e.name }}.rs</a></h2>
+      <p>{{ e.note }}</p>
+      {% call code.command('Run ' ~ e.name) %}cargo run --example {{ e.name }} --features examples{% endcall %}
+    </li>
+    {%- endfor %}
+  </ul>
+
+  <section class="wf-mxd-case" aria-labelledby="mxd">
+    <h2 id="mxd">mxd: a whole server</h2>
+    <p>mxd, the Marrakesh Express Daemon, is df12&rsquo;s Hotline server in Rust, and it runs on wireframe {{ wireframe_version }}. Its <code>mxd-wireframe-server</code> binary frames, routes, and answers Hotline transactions through wireframe, behind a transport adapter: the domain crate does not import wireframe, so transport types never reach the domain.</p>
+    <a class="wf-arrow-link" href="/mxd/architecture/">How mxd is put together {{ ui.icon('arrow-right') }}</a>
+  </section>
+</div>
+{% endblock %}

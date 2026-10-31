@@ -1,0 +1,46 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['guide-client'] %}
+{% set crumbs = [('Guides', '/wireframe/guides/')] %}
+{% set plate_key = 'outbound' %}
+{% block article_body %}
+<section aria-labelledby="connect"><h2 id="connect">Build and connect</h2>
+<p><code>WireframeClient::builder()</code> starts from the server&rsquo;s defaults: a 4-byte big-endian length prefix, 1,024-byte frames, and the bincode serializer. The builder changes them before connecting. <code>codec_config</code> must agree with the server&rsquo;s <code>buffer_capacity</code>: if small requests work and larger ones fail, the two limits disagree.</p>
+{{ code.code('tests/client.rs', 'call', title='client.rs · configure, connect, call') }}
+<p>The builder also takes <code>socket_options</code> (<code>TCP_NODELAY</code>, keepalive, buffer sizes), a preamble to send on connect with <code>with_preamble</code>, and a <code>preamble_timeout</code>. <code>close()</code> shuts the connection down and runs the teardown hook.</p>
+</section>
+
+<section aria-labelledby="correlate"><h2 id="correlate">Correlated calls</h2>
+<p>The client offers two levels. <code>send</code>, <code>receive</code>, and <code>call</code> work with any message type. The envelope-aware methods work with a <code>Packet</code>:</p>
+<ul>
+  <li><code>send_envelope</code> stamps a correlation ID if the envelope has none, sends it, and returns the ID.</li>
+  <li><code>receive_envelope</code> reads the next frame as an envelope.</li>
+  <li><code>call_correlated</code> does both and fails with <code>ClientError::CorrelationMismatch</code> if the reply carries a different ID.</li>
+</ul>
+<p>Correlation IDs come from a per-client counter, also available through <code>next_correlation_id</code>. A wireframe server copies the request&rsquo;s ID onto its reply, so <code>call_correlated</code> against one always matches.</p>
+</section>
+
+<section aria-labelledby="streams"><h2 id="streams">Read a streamed reply</h2>
+<p><code>call_streaming</code> sends a request and returns a <code>ResponseStream</code> that yields each frame of the reply until the protocol&rsquo;s terminator arrives. The envelope type decides what a terminator is, by overriding <code>Packet::is_stream_terminator</code>:</p>
+{{ code.code('tests/streaming_client.rs', 'envelope', title='streaming_client.rs · an envelope with a terminator') }}
+{{ code.code('tests/streaming_client.rs', 'call', title='streaming_client.rs · reading the rows') }}
+<p>The stream checks every frame&rsquo;s correlation ID and ends with <code>ClientError::StreamCorrelationMismatch</code> on the first that does not match. It borrows the client mutably, so no other request can go out until it is drained or dropped. <code>StreamingResponseExt::typed_with</code> maps frames to domain values and can skip control frames along the way.</p>
+<p>The server in this sample is a few lines of plain Tokio, because a {{ wireframe_version }} <code>WireframeServer</code> answers each routed request with one frame. See <a href="/wireframe/guides/streaming/#scope">what 0.3.0 wires up</a>.</p>
+</section>
+
+<section aria-labelledby="hooks"><h2 id="hooks">Hooks and tracing</h2>
+<ul>
+  <li><strong>Lifecycle.</strong> <code>on_connection_setup</code> returns per-connection state after the connection, and any preamble, succeeds; <code>on_connection_teardown</code> receives it on <code>close()</code>; <code>on_error</code> sees every failed send, receive, or call.</li>
+  <li><strong>Per frame.</strong> <code>before_send</code> receives each serialized frame&rsquo;s bytes before they are written, and <code>after_receive</code> each raw frame before it is decoded. Several may be registered; they run in order. The sample counts frames with <code>before_send</code>.</li>
+  <li><strong>Tracing.</strong> The client emits <code>tracing</code> spans around every operation, at <code>INFO</code> for connect and close and <code>DEBUG</code> for data. <code>tracing_config</code> changes the levels and can time each operation.</li>
+</ul>
+</section>
+
+<section aria-labelledby="pools"><h2 id="pools">Pools of warm sockets</h2>
+<p>With the <code>pool</code> feature, <code>connect_pool</code> keeps a bounded set of connected sockets. A lease forwards the usual request methods to one of them; the pool recycles sockets that sit idle past <code>idle_timeout</code>, and reruns the preamble and setup hook for each new one.</p>
+{{ code.code('tests/client.rs', 'pool', title='client.rs · a pool') }}
+<p><code>max_in_flight_per_socket</code> is an admission budget, not parallel writes: I/O on one socket is still one request at a time. For a long-running workflow that should take fair turns with others, <code>pool.handle()</code> returns a <code>PoolHandle</code> that queues under the pool&rsquo;s fairness policy instead of acquiring a lease each time.</p>
+</section>
+{% endblock %}

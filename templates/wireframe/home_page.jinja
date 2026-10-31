@@ -1,0 +1,172 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% block title %}{{ homepage.title }}{% endblock %}
+{% block content %}
+{#- The stations a request passes, in the order 0.3.0 runs them. One list
+    drives the journey section. -#}
+{% set stations = [
+  {'id': 'arrival', 'name': 'Arrival', 'line': 'Bytes off the socket',
+   'detail': 'A Tokio TCP stream. If the server expects a preamble, it is read and validated before any frame.'},
+  {'id': 'uncoupling', 'name': 'Uncoupling', 'line': 'Cut at the length prefix',
+   'detail': 'A FrameCodec decodes frames. The default reads a 4-byte big-endian length prefix and refuses frames over 1,024 bytes.'},
+  {'id': 'rejoining', 'name': 'Rejoining', 'line': 'Long loads, reassembled', 'optional': true,
+   'detail': 'With fragmentation enabled, fragments are rejoined before anything is decoded, bounded by size and by time.'},
+  {'id': 'waybill', 'name': 'Waybill', 'line': 'Read the envelope',
+   'detail': 'The serializer decodes an Envelope: a message ID, an optional correlation ID, and the payload bytes.'},
+  {'id': 'points', 'name': 'Points', 'line': 'Route by message ID',
+   'detail': 'One handler per ID. An ID with no route is logged and dropped; registering an ID twice fails at setup.'},
+  {'id': 'weighbridge', 'name': 'Weighbridge', 'line': 'Weigh and stamp',
+   'detail': 'The route’s middleware wraps its handler, so it sees the request on the way in and the reply on the way out.'},
+  {'id': 'siding', 'name': 'Siding', 'line': 'Handle the message',
+   'detail': 'The handler runs with the envelope it was sent. In 0.3.0 it returns nothing; the default reply echoes the payload.'},
+  {'id': 'departure', 'name': 'Departure', 'line': 'Serialize, frame, send',
+   'detail': 'The reply keeps the request’s correlation ID and leaves through the serializer, optional fragmentation, and the codec.'},
+] %}
+
+<section class="wf-hero" aria-labelledby="hero-title">
+  <div class="wf-shell wf-hero__grid">
+    <div class="wf-hero__copy">
+      <h1 id="hero-title" class="wf-hero__title"><img src="/wireframe/assets/logos/wordmark-detailed.svg" alt="wireframe" width="704" height="140"><span class="wf-hero__kicker">A Rust router for binary protocols</span></h1>
+      <p class="wf-hero__line">Binary protocols. Clear routes.</p>
+      <p class="wf-hero__deck">Frame the bytes, route each message by ID, and wrap the work in middleware. Actix Web&rsquo;s shape, for protocols that aren&rsquo;t HTTP.</p>
+      <div class="wf-hero__actions">{{ ui.button('Get started', '/wireframe/getting-started/') }}{{ ui.button('Read the guides', '/wireframe/guides/', kind='quiet') }}</div>
+    </div>
+    <figure class="wf-signal" aria-labelledby="signal-caption">
+      <div class="wf-signal__field">{% include 'signal-path.svg.jinja' %}</div>
+      <figcaption id="signal-caption" class="wf-signal__caption">One request&rsquo;s path: bytes become a frame, the frame becomes an envelope, and its message ID selects one handler. The magenta marks are the correlation ID, carried out and back.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="wf-manifest" aria-label="At a glance">
+  <dl class="wf-shell wf-manifest__grid">
+    <div><dt>{{ wireframe_version }}</dt><dd>On crates.io since {{ wireframe_released }}</dd></div>
+    <div><dt>Tokio</dt><dd>Async I/O underneath; one worker per CPU core by default</dd></div>
+    <div><dt>Client and server</dt><dd>Both ends share the codec, serializer, and envelope</dd></div>
+    <div><dt>ISC</dt><dd>Licence; source on GitHub</dd></div>
+  </dl>
+</section>
+
+<section class="wf-journey" aria-labelledby="journey-title">
+  <div class="wf-shell wf-journey__grid">
+    <div class="wf-journey__intro">
+      <h2 id="journey-title">Frame. Route. Handle.</h2>
+      <p>Every request takes the same path through the yard. A codec cuts the bytes into frames, the router reads each envelope&rsquo;s message ID, and that route&rsquo;s middleware wraps its handler. The reply leaves the way it came.</p>
+      <p class="wf-journey__note">Fragment reassembly is a transport step and optional. Message assembly, for protocols that spread one message across several frames, is a separate step that runs after it.</p>
+      <a class="wf-arrow-link" href="/wireframe/architecture/">The yard, layer by layer {{ ui.icon('arrow-right') }}</a>
+    </div>
+    <ol class="wf-track">
+      {%- for s in stations %}
+      <li class="wf-track__stop{% if s.optional %} wf-track__stop--optional{% endif %}" id="station-{{ s.id }}">
+        <span class="wf-track__node" aria-hidden="true"></span>
+        <p class="wf-label">{{ s.name }}{% if s.optional %} <span class="wf-track__tag">Optional</span>{% endif %}</p>
+        <h3>{{ s.line }}</h3>
+        <p>{{ s.detail }}</p>
+      </li>
+      {%- endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="wf-codeduo" aria-labelledby="code-title">
+  <div class="wf-shell">
+    <h2 id="code-title">Register a route. Answer the message.</h2>
+    <p class="wf-codeduo__lead">The application routes message ID 1 to a handler, and a middleware layer turns each <code>Ping</code> into a <code>Pong</code>. The server and a client then meet over real TCP.</p>
+    <div class="wf-codeduo__grid">
+      {{ code.code('tests/first_server.rs', 'app', title='The application') }}
+      {{ code.code('tests/first_server.rs', 'call', title='A client call') }}
+    </div>
+    <p class="wf-codeduo__proof">Both panels are cut from <a href="/wireframe/getting-started/">the getting-started program</a>, compiled and run against wireframe {{ wireframe_version }} on {{ samples_verified_on }}. The handler observes and middleware writes the reply: in {{ wireframe_version }} a routed handler returns nothing.</p>
+  </div>
+</section>
+
+<section class="wf-capabilities" aria-labelledby="capabilities-title">
+  <div class="wf-shell">
+    <h2 id="capabilities-title">What the yard handles</h2>
+    <div class="wf-bento">
+      <a class="wf-bento__cell wf-bento__cell--codec" href="/wireframe/guides/codecs/">
+        <span class="wf-bento__icon">{{ ui.icon('frame') }}</span>
+        <h3>Any wire format, one trait</h3>
+        <p><code>FrameCodec</code> describes any wire format: how to cut frames, where the payload sits, and where a correlation ID lives.</p>
+        <ul class="wf-bento__list">
+          <li><strong>Hotline</strong><span>20-byte header, big-endian lengths, a transaction ID</span></li>
+          <li><strong>MySQL</strong><span>3-byte little-endian length, 1-byte sequence number</span></li>
+          <li><strong>RESP</strong><span>Typed lines: simple strings, integers, bulk strings</span></li>
+        </ul>
+        <div class="wf-frame-diagram" aria-hidden="true"><span class="wf-frame-diagram__len">00 00 00 0c</span><span class="wf-frame-diagram__body">12 payload bytes &hellip;</span></div>
+        <p class="wf-bento__caption">The default frame: a 4-byte big-endian length, then the payload. The three codecs above ship as worked examples.</p>
+      </a>
+      <a class="wf-bento__cell" href="/wireframe/guides/middleware/">
+        <span class="wf-bento__icon">{{ ui.icon('gates') }}</span>
+        <h3>Answer in middleware</h3>
+        <p>A <code>Transform</code> wraps every route&rsquo;s handler. Setup and teardown hooks carry per-connection state.</p>
+      </a>
+      <a class="wf-bento__cell wf-bento__cell--raised" href="/wireframe/guides/large-messages/">
+        <span class="wf-bento__icon">{{ ui.icon('budget') }}</span>
+        <h3>Long loads, bounded</h3>
+        <p>Fragmentation, message assembly, and per-connection memory budgets that slow reads at 80% and close the connection past the cap.</p>
+      </a>
+      <a class="wf-bento__cell" href="/wireframe/guides/client/">
+        <span class="wf-bento__icon">{{ ui.icon('outbound') }}</span>
+        <h3>The same rails, outbound</h3>
+        <p><code>WireframeClient</code> correlates replies, reads streams, and pools warm sockets.</p>
+      </a>
+      <a class="wf-bento__cell wf-bento__cell--raised" href="/wireframe/guides/testing/">
+        <span class="wf-bento__icon">{{ ui.icon('proof') }}</span>
+        <h3>Test at the frame</h3>
+        <p>Feed frames one byte at a time, fragment a payload, or pace a slow reader under paused time.</p>
+      </a>
+      <a class="wf-bento__cell wf-bento__cell--image" href="/wireframe/guides/streaming/">
+        {{ ui.plate('two-lines', sizes='(width < 768px) 100vw, 40vw', caption=false) }}
+        <div class="wf-bento__copy">
+          <span class="wf-bento__icon">{{ ui.icon('pulses') }}</span>
+          <h3>Push and streams, as parts</h3>
+          <p>Priority push queues, a fair connection actor, and multi-frame responses, ready to drive.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="wf-world" aria-labelledby="world-title">
+  <div class="wf-world__plate">{{ ui.plate('night-yard', sizes='100vw', caption=false) }}</div>
+  <div class="wf-shell wf-world__body">
+    <h2 id="world-title">The night yard</h2>
+    <p>Frames are freight. A train of bytes arrives, the codec uncouples it into wagons, and the router reads each waybill and sets the points, so every wagon takes exactly one siding. Long loads travel on several wagons and are rejoined before anyone unloads them.</p>
+    <p class="wf-world__key">On every plate: <span class="wf-key wf-key--mint">mint</span> is track and the route in use, <span class="wf-key wf-key--cyan">cyan</span> is a frame, <span class="wf-key wf-key--amber">amber</span> is traffic on the move, and <span class="wf-key wf-key--magenta">magenta</span> marks the one wagon being followed.</p>
+    <a class="wf-arrow-link" href="/wireframe/yard/">How the yard is drawn {{ ui.icon('arrow-right') }}</a>
+  </div>
+</section>
+
+<section class="wf-band" aria-labelledby="mxd-title">
+  <div class="wf-shell wf-band__grid">
+    <div>
+      <h2 id="mxd-title">Already carrying traffic</h2>
+      <p>mxd, df12&rsquo;s Hotline server, depends on wireframe {{ wireframe_version }}. Its transport adapter frames and routes the Hotline protocol; its domain crate never imports wireframe. Hotline&rsquo;s framing ships with wireframe too, as a worked codec example.</p>
+      <a class="wf-arrow-link" href="/mxd/">Read about mxd {{ ui.icon('arrow-right') }}</a>
+    </div>
+    <dl class="wf-band__facts">
+      <div><dt>Protocol</dt><dd>Hotline, 1990s Mac file sharing and chat</dd></div>
+      <div><dt>Transport</dt><dd><code>mxd-wireframe-server</code>, on wireframe {{ wireframe_version }}</dd></div>
+      <div><dt>Boundary</dt><dd>Wireframe types stop at the transport adapter</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="wf-install" aria-labelledby="install-title">
+  <div class="wf-shell wf-install__grid">
+    <div>
+      <h2 id="install-title">Add it to Cargo.toml</h2>
+      <p>The sample crate&rsquo;s dependencies, exactly as compiled. <code>pool</code> and <code>testkit</code> are opt-in features; <code>metrics</code> and the bincode serializer are on by default.</p>
+      {% call ui.callout('warning', 'Pin tokio-util ' ~ tokio_util_pin) %}<p>wireframe {{ wireframe_version }} does not compile against tokio-util 0.7.20, which added a second <code>Encoder</code> for <code>LengthDelimitedCodec</code>. Pin the previous release in the lockfile until a fixed wireframe ships.</p>{% endcall %}
+      <div class="wf-install__actions">{{ ui.button('Get started', '/wireframe/getting-started/') }}</div>
+    </div>
+    <div class="wf-install__code">
+      {{ code.code('Cargo.toml', 'deps', title='Cargo.toml', lexer='toml') }}
+      {% call code.command('Pin tokio-util') %}cargo update -p tokio-util --precise {{ tokio_util_pin }}{% endcall %}
+    </div>
+  </div>
+</section>
+{% endblock %}

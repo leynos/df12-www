@@ -1,0 +1,25 @@
+{#- The plate catalogue: every generated illustration on the sub-site, once.
+    Each raster was drawn with gpt-image-2 on 31 October 2026 in the
+    identity's X-Y vector-beam style and carries no text: the label and the
+    caption are HTML. Every image has a `-half` file at half its linear size
+    for `srcset`. Provenance is in docs/wireframe-site.md. -#}
+{% set plates = {
+  'night-yard': {'file': 'night-yard', 'width': 1600, 'height': 898, 'label': 'The night yard',
+    'alt': 'A railway yard at night drawn in glowing vector lines: a train of cyan wagons arrives from the left, passes an empty lattice signal tower, and follows the single lit mint route with amber direction marks, which carries one magenta wagon towards an empty weighbridge; the other sidings and sheds are faint outlines.',
+    'caption': 'One wagon, one lit route. The other sidings stay dark until a waybill names them.'},
+  'long-load': {'file': 'long-load', 'width': 1536, 'height': 1024, 'label': 'A long load',
+    'alt': 'A long cyan load is split into four segments on a rake of coupled flat wagons with amber couplings, rolling along a mint track into an open shed, where the load sits whole on one long flat wagon.',
+    'caption': 'Too long for one wagon, so it travels on several and is rejoined in the shed.'},
+  'two-lines': {'file': 'two-lines', 'width': 1536, 'height': 1024, 'label': 'Two lines',
+    'alt': 'An express line carrying three closely spaced cyan wagons merges under a lattice signal gantry with a slower line carrying two widely spaced wagons, and one slow-line wagon is let through between them.',
+    'caption': 'Express and slow traffic share one junction, and the slow line still gets its turn.'},
+  'outbound': {'file': 'outbound', 'width': 1536, 'height': 1024, 'label': 'Outbound',
+    'alt': 'A small mint locomotive with one headlamp pulls two cyan wagons out of a faintly drawn yard along a single lit track, with amber marks pointing ahead into open dark space.',
+    'caption': 'The client leaves on the same rails the server arrives on.'},
+  'proving-loop': {'file': 'proving-loop', 'width': 1536, 'height': 1024, 'label': 'The proving loop',
+    'alt': 'An oval test track carries one load split into four segments on separate bogies along the far side and the same load whole on the near side, around a small instrument hut with a dial.',
+    'caption': 'A load fed round in pieces on the far side, checked whole on the near side.'},
+  'yard-under-construction': {'file': 'yard-under-construction', 'width': 1536, 'height': 1024, 'label': 'Still being laid',
+    'alt': 'A finished track and an empty signal tower on the left lead to a short amber stretch where a crane lowers a cyan rail section; to the right, planned sidings and a shed appear only as dashed outlines.',
+    'caption': 'Built track on the left. Dashed lines are plans, not promises.'},
+} %}

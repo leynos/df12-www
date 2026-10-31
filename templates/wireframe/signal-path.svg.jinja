@@ -1,0 +1,69 @@
+{#- The hero's signal path, drawn as the identity specification describes:
+    raw bytes through FrameCodec, the envelope, and route selection to ONE
+    labelled handler, with the other routes as faint underdrawing so the
+    picture never implies fan-out. Matching magenta marks on the outbound
+    envelope and the return path are the correlation ID. Every label is text,
+    so the diagram survives with all glow and motion removed. -#}
+<svg class="wf-signal__svg" viewBox="0 0 640 380" role="img" aria-labelledby="signal-title signal-desc">
+  <title id="signal-title">A request routed by message ID</title>
+  <desc id="signal-desc">Bytes enter a FrameCodec, which yields a frame. The frame is decoded to an envelope with message ID 2 and correlation ID 7. The router matches ID 2 and sends it through middleware to the telemetry handler. Routes for IDs 1 and 3 stay unlit. The reply returns along the bottom carrying the same correlation ID.</desc>
+  <g class="wf-signal__under" aria-hidden="true">
+    <path d="M470 180 L500 110 L520 110"/>
+    <path d="M470 180 L500 270 L520 270"/>
+    <rect x="520" y="86" width="108" height="48"/>
+    <rect x="520" y="246" width="108" height="48"/>
+  </g>
+  <g class="wf-signal__dim-text" aria-hidden="true">
+    <text x="532" y="107">id 1</text><text x="532" y="124" class="wf-signal__small">login</text>
+    <text x="532" y="267">id 3</text><text x="532" y="284" class="wf-signal__small">control</text>
+  </g>
+
+  <g class="wf-signal__bytes">
+    <text x="16" y="146" class="wf-signal__label">Bytes</text>
+    <text x="16" y="172" class="wf-signal__hex">00 00 00 0c</text>
+    <text x="16" y="192" class="wf-signal__hex">01 02 00 07</text>
+    <text x="16" y="212" class="wf-signal__hex">&hellip;</text>
+  </g>
+
+  <g class="wf-signal__frame">
+    <rect x="120" y="140" width="110" height="80"/>
+    <text x="132" y="170" class="wf-signal__name">FrameCodec</text>
+    <text x="132" y="190" class="wf-signal__small">length prefix</text>
+    <text x="132" y="206" class="wf-signal__small">&rarr; frame</text>
+  </g>
+
+  <g class="wf-signal__frame">
+    <rect x="260" y="130" width="112" height="100"/>
+    <path d="M260 158 H372"/>
+    <text x="270" y="149" class="wf-signal__small">id 2 &middot; cid 7</text>
+    <text x="270" y="184" class="wf-signal__name">Envelope</text>
+    <text x="270" y="204" class="wf-signal__small">payload bytes</text>
+  </g>
+  <rect class="wf-signal__cid" x="356" y="138" width="9" height="9" transform="rotate(45 360.5 142.5)"/>
+
+  <g class="wf-signal__router">
+    <path d="M440 150 L470 180 L440 210 L410 180 Z"/>
+    <path class="wf-signal__router-inner" d="M440 165 L455 180 L440 195 L425 180 Z"/>
+    <text x="440" y="236" text-anchor="middle" class="wf-signal__small">route by id</text>
+  </g>
+
+  <g class="wf-signal__gates">
+    <path d="M486 160 V200 M496 160 V200"/>
+    <text x="491" y="152" text-anchor="middle" class="wf-signal__small">middleware</text>
+  </g>
+
+  <g class="wf-signal__handler">
+    <rect x="520" y="152" width="108" height="56"/>
+    <text x="532" y="176" class="wf-signal__name">id 2</text>
+    <text x="532" y="194" class="wf-signal__small">telemetry</text>
+  </g>
+
+  <path class="wf-signal__beam" pathLength="1" d="M100 180 H120 M230 180 H260 M372 180 H410 M470 180 H520"/>
+
+  <g class="wf-signal__return">
+    <path d="M574 208 V330 H40 V232"/>
+    <path d="M34 242 L40 232 L46 242"/>
+    <text x="320" y="352" text-anchor="middle" class="wf-signal__small">reply &middot; the same correlation ID</text>
+  </g>
+  <rect class="wf-signal__cid" x="315.5" y="325.5" width="9" height="9" transform="rotate(45 320 330)"/>
+</svg>

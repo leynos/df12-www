@@ -1,0 +1,40 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['guide-large-messages'] %}
+{% set crumbs = [('Guides', '/wireframe/guides/')] %}
+{% set plate_key = 'long-load' %}
+{% block article_body %}
+<section aria-labelledby="enable"><h2 id="enable">Turn fragmentation on</h2>
+<p>A frame has a size limit, 1,024 bytes by default, and some messages are larger. Fragmentation splits an oversized payload into fragments that each fit a frame, then rejoins them on the far side before anything is decoded. It is off by default. <code>enable_fragmentation()</code> derives a configuration from the frame limit: messages up to sixteen frames&rsquo; worth (16&nbsp;KiB by default), and partial messages evicted after 30 seconds.</p>
+{{ code.code('tests/large_messages.rs', 'budgets', title='large_messages.rs · explicit budgets') }}
+{{ code.code('tests/large_messages.rs', 'enable', title='large_messages.rs · fragmentation on') }}
+<p>The layering is fixed. Outbound, a reply is serialized, then fragmented, then wrapped by the codec. Inbound, frames are decoded, then reassembled, then deserialized, so handlers always receive whole envelopes. Each fragment carries a <code>FragmentHeader</code> (message ID, index, and a last-fragment flag) behind a <code>FRAG</code> marker.</p>
+<p><code>fragmentation(Some(config))</code> sets limits explicitly; <code>FragmentationConfig::for_frame_budget</code> builds one from a frame size, a maximum message size, and a reassembly timeout. Remember that changing the codec or <code>buffer_capacity</code> clears it.</p>
+</section>
+
+<section aria-labelledby="fragmenter"><h2 id="fragmenter">Split and rejoin by hand</h2>
+<p>The pieces the connection uses are public. <code>Fragmenter</code> slices a payload into capped fragments that share a message ID and count up from zero:</p>
+{{ code.code('tests/large_messages.rs', 'fragmenter', title='large_messages.rs · fragmenting') }}
+<p><code>Reassembler</code> is its mirror. It buffers fragments per message ID, rejects fragments out of order, enforces the maximum assembled size, and offers <code>purge_expired</code> for partial messages that never finish. The final fragment returns the whole message.</p>
+{{ code.code('tests/large_messages.rs', 'reassembler', title='large_messages.rs · reassembling') }}
+</section>
+
+<section aria-labelledby="assembly"><h2 id="assembly">Message assembly is different</h2>
+<p>Fragmentation is wireframe&rsquo;s own transport mechanism, invisible to the protocol. Some protocols define their own multi-frame messages instead, with a first frame and continuations in their own header format. For those, a <code>MessageAssembler</code>, installed with <code>with_message_assembler</code>, parses each frame&rsquo;s header into a first frame or a continuation, keyed by a <code>MessageKey</code>.</p>
+<p>Assembly runs after fragment reassembly and before dispatch. It can hold several messages open at once, interleaved on one connection, and, where the protocol numbers its continuations, it rejects gaps, duplicates, and frames after the last. A message that completes is routed as usual.</p>
+</section>
+
+<section aria-labelledby="budgets"><h2 id="budgets">Memory budgets</h2>
+<p>Partial messages cost memory, and a peer can send first frames forever. <code>MemoryBudgets</code> caps three things per connection: the bytes buffered for one message, for the whole connection, and across messages in flight. Without explicit budgets, wireframe derives them from the frame limit: 16, 64, and 64 times it, which is 16, 64, and 64&nbsp;KiB by default.</p>
+<div class="wf-table-scroll" tabindex="0" role="region" aria-label="Memory budget protection tiers"><table>
+<thead><tr><th scope="col">Tier</th><th scope="col">When</th><th scope="col">What happens</th></tr></thead>
+<tbody>
+<tr><td>Per frame</td><td>A frame would push buffered bytes past a cap</td><td>The frame is rejected, that partial message is freed, and the failure counts as a deserialization failure</td></tr>
+<tr><td>Soft limit</td><td>Buffered bytes reach 80% of the smaller aggregate cap</td><td>The connection pauses briefly before reading the next frame, pushing back on the sender</td></tr>
+<tr><td>Hard cap</td><td>Buffered bytes exceed the smaller aggregate cap</td><td>The connection closes</td></tr>
+</tbody></table></div>
+<p>The effective per-message limit is the smaller of the fragmentation maximum and the per-message budget. A message that arrives in a single frame is never counted against the aggregate caps, because nothing is buffered.</p>
+</section>
+{% endblock %}

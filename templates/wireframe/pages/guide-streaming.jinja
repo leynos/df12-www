@@ -1,0 +1,41 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['guide-streaming'] %}
+{% set crumbs = [('Guides', '/wireframe/guides/')] %}
+{% set plate_key = 'two-lines' %}
+{% block article_body %}
+<section aria-labelledby="scope"><h2 id="scope">What 0.3.0 wires up</h2>
+<p>Start with the boundary, because it decides what can be built today. In {{ wireframe_version }}, a connection served by <code>WireframeServer</code> answers each routed request with exactly one reply frame. The types on this page, which are <code>Response</code>, <code>PushQueues</code>, <code>ConnectionActor</code>, and <code>SessionRegistry</code>, ship, are tested, and work together. The routed server path does not drive them.</p>
+{% call ui.callout('fact', 'Building blocks, not yet a server feature') %}<p>Server-initiated pushes and multi-frame replies on a <code>WireframeServer</code> connection need a connection loop that runs the actor. That integration is upstream roadmap work. The client side is further along: <a href="/wireframe/guides/client/#streams"><code>call_streaming</code></a> already reads a multi-frame reply from any server that sends one.</p>{% endcall %}
+</section>
+
+<section aria-labelledby="response"><h2 id="response">Responses that stream</h2>
+<p><code>Response</code> describes a reply of any shape: <code>Single</code> frame, a <code>Vec</code> of frames, a <code>Stream</code> of fallible frames, a <code>MultiPacket</code> channel, or <code>Empty</code>. <code>into_stream</code> turns any of them into one boxed stream, which is the form the connection actor consumes.</p>
+{{ code.code('tests/streaming.rs', 'stream', title='streaming.rs · a stream of frames') }}
+</section>
+
+<section aria-labelledby="multi-packet"><h2 id="multi-packet">Back-pressure through a channel</h2>
+<p><code>Response::with_channel</code> returns a sender and a <code>MultiPacket</code> response around the matching receiver. A producer task sends frames whenever it has them. Each <code>send</code> waits while the channel is full, so a slow consumer slows the producer instead of growing a buffer. Dropping the last sender ends the response.</p>
+{{ code.code('tests/streaming.rs', 'multi-packet', title='streaming.rs · a channel-backed reply') }}
+<p>A protocol marks the end of such a stream with a terminator frame: the server side supplies it through the <code>stream_end_frame</code> protocol hook, and the client recognizes it through <code>Packet::is_stream_terminator</code>.</p>
+</section>
+
+<section aria-labelledby="push"><h2 id="push">Priority push queues</h2>
+<p><code>PushQueues</code> holds frames a connection should send without being asked: notifications, heartbeats, broadcast traffic. The builder sets a high- and a low-priority capacity, an optional rate limit, and an optional dead-letter queue. The rate limit defaults to 100 pushes a second, accepts up to 10,000, and is shared by both queues; <code>unlimited()</code> removes it.</p>
+<p>The builder returns the queues and a cloneable <code>PushHandle</code>. Background tasks push through the handle: <code>push_high_priority</code> and <code>push_low_priority</code> wait for the rate limiter and then for room, while <code>try_push</code> drops the frame by policy instead of waiting, forwarding it to the dead-letter queue if one is configured.</p>
+</section>
+
+<section aria-labelledby="actor"><h2 id="actor">The connection actor</h2>
+<p><code>ConnectionActor</code> drains a connection&rsquo;s push queues and its current response into one ordered output, polling a cancellation token so it stops promptly on shutdown. High-priority frames go first, but <code>FairnessConfig</code> lets a low-priority frame through after at most eight high-priority ones by default, optionally after a time slice as well, so a busy high queue cannot starve the low one.</p>
+{{ code.code('tests/streaming.rs', 'actor', title='streaming.rs · driving the actor') }}
+<p>In the sample the actor writes into a <code>Vec</code>; a connection loop would write each frame to its socket. The actor also runs the <code>WireframeProtocol</code> hooks installed with <code>with_protocol</code>, which is why those hooks have no effect on the routed path yet.</p>
+</section>
+
+<section aria-labelledby="sessions"><h2 id="sessions">Find a connection later</h2>
+<p><code>SessionRegistry</code> maps a <code>ConnectionId</code> to a connection&rsquo;s <code>PushHandle</code> so that other tasks can reach it. It holds each handle weakly: when the connection&rsquo;s queues are dropped, the entry no longer resolves, and stale entries are pruned on lookup or by <code>prune()</code>.</p>
+{{ code.code('tests/streaming.rs', 'registry', title='streaming.rs · a weak registry') }}
+<p><code>SessionRegistry::default()</code> requires the frame type to implement <code>Default</code>. <code>Envelope</code> does not, so in {{ wireframe_version }} a registry of envelope handles needs a frame type that does, or a wrapper.</p>
+</section>
+{% endblock %}

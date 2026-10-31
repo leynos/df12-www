@@ -15,7 +15,7 @@
 
 <section aria-labelledby="framecodec"><h2 id="framecodec">Write a FrameCodec</h2>
 <p>A protocol with its own framing implements <code>FrameCodec</code>. The trait owns a Tokio <code>Decoder</code> and <code>Encoder</code> for its frame type and tells wireframe four things about a frame: where its payload is, how to wrap an outgoing payload, where a correlation ID lives if the header carries one, and how large a frame may be.</p>
-<p>The example below is a small invented protocol: two bytes of length, four bytes of ticket, then the payload. The decoder waits until a whole frame has arrived, refuses one that exceeds the limit, and splits the payload off without copying it.</p>
+<p>The example below is a small invented protocol: two bytes of length, four bytes of tag, then the payload. The decoder waits until a whole frame has arrived, refuses one that exceeds the limit, and splits the payload off without copying it.</p>
 {{ code.code('tests/codec.rs', 'codec-types', title='codec.rs · frame, decoder, encoder') }}
 {{ code.code('tests/codec.rs', 'codec-impl', title='codec.rs · the FrameCodec') }}
 <p><code>frame_payload_bytes</code> is optional. Its default copies the payload slice; overriding it to clone a <code>Bytes</code> hands the payload on with a reference-count increment instead. <code>correlation_id</code> is consulted only when the decoded envelope has none of its own.</p>

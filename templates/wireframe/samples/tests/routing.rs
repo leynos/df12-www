@@ -22,7 +22,7 @@ fn handler(name: &'static str) -> Handler<Envelope> {
     })
 }
 
-fn yard() -> wireframe::Result<WireframeApp> {
+fn scope() -> wireframe::Result<WireframeApp> {
     WireframeApp::new()?
         .route(LOGIN, handler("login"))?
         .route(TELEMETRY, handler("telemetry"))
@@ -32,7 +32,7 @@ fn yard() -> wireframe::Result<WireframeApp> {
 #[test]
 fn a_message_id_is_routed_once() {
     // ANCHOR: duplicate
-    let app = yard().expect("two distinct routes");
+    let app = scope().expect("two distinct routes");
     let refused = app.route(LOGIN, handler("impostor"));
     assert!(matches!(
         refused,
@@ -41,75 +41,75 @@ fn a_message_id_is_routed_once() {
     // ANCHOR_END: duplicate
 }
 
-// ANCHOR: waybill
-/// A protocol's own envelope: a 16-bit opcode, a ticket, and the payload.
+// ANCHOR: stroke
+/// A protocol's own envelope: a 16-bit opcode, a tag, and the payload.
 #[derive(bincode::Encode, bincode::BorrowDecode, Debug, PartialEq)]
-struct Waybill {
+struct Stroke {
     opcode: u16,
-    ticket: Option<u64>,
+    tag: Option<u64>,
     payload: Vec<u8>,
 }
 
-impl CorrelatableFrame for Waybill {
+impl CorrelatableFrame for Stroke {
     fn correlation_id(&self) -> Option<u64> {
-        self.ticket
+        self.tag
     }
-    fn set_correlation_id(&mut self, ticket: Option<u64>) {
-        self.ticket = ticket;
+    fn set_correlation_id(&mut self, tag: Option<u64>) {
+        self.tag = tag;
     }
 }
 
-impl Packet for Waybill {
+impl Packet for Stroke {
     fn id(&self) -> u32 {
         u32::from(self.opcode)
     }
 
     fn into_parts(self) -> PacketParts {
-        PacketParts::new(u32::from(self.opcode), self.ticket, self.payload)
+        PacketParts::new(u32::from(self.opcode), self.tag, self.payload)
     }
 
     fn from_parts(parts: PacketParts) -> Self {
         Self {
             opcode: u16::try_from(parts.id()).unwrap_or(u16::MAX),
-            ticket: parts.correlation_id(),
+            tag: parts.correlation_id(),
             payload: parts.into_payload(),
         }
     }
 }
-// ANCHOR_END: waybill
+// ANCHOR_END: stroke
 
-// ANCHOR: waybill-app
-type WaybillApp = WireframeApp<BincodeSerializer, (), Waybill>;
+// ANCHOR: stroke-app
+type StrokeApp = WireframeApp<BincodeSerializer, (), Stroke>;
 
-fn waybill_yard() -> wireframe::Result<WaybillApp> {
-    let unload: Handler<Waybill> = Arc::new(|bill: &Waybill| {
-        let opcode = bill.opcode;
-        Box::pin(async move { println!("unloading opcode {opcode}") })
+fn stroke_scope() -> wireframe::Result<StrokeApp> {
+    let draw: Handler<Stroke> = Arc::new(|stroke: &Stroke| {
+        let opcode = stroke.opcode;
+        Box::pin(async move { println!("drawing opcode {opcode}") })
     });
-    WaybillApp::new()?.route(107, unload)
+    StrokeApp::new()?.route(107, draw)
 }
-// ANCHOR_END: waybill-app
+// ANCHOR_END: stroke-app
 
 #[tokio::test]
-async fn a_custom_envelope_keeps_its_ticket() {
-    let app = waybill_yard().expect("a waybill route");
+async fn a_custom_envelope_keeps_its_tag() {
+    let app = stroke_scope().expect("a stroke route");
     let codec = LengthDelimitedFrameCodec::new(1024);
-    let bill = Waybill {
+    let stroke = Stroke {
         opcode: 107,
-        ticket: Some(42),
-        payload: b"coal".to_vec(),
+        tag: Some(42),
+        payload: b"move".to_vec(),
     };
     let wire = BincodeSerializer
-        .serialize(&bill)
-        .expect("encode the waybill");
+        .serialize(&stroke)
+        .expect("encode the stroke");
 
     let one_byte = NonZeroUsize::new(1).expect("non-zero");
     let replies = drive_with_partial_frames(app, &codec, vec![wire], one_byte)
         .await
         .expect("the app answers");
 
-    let (reply, _): (Waybill, usize) = BincodeSerializer
+    let (reply, _): (Stroke, usize) = BincodeSerializer
         .deserialize(&replies[0])
         .expect("decode the reply");
-    assert_eq!(reply, bill, "the default reply echoes the request");
+    assert_eq!(reply, stroke, "the default reply echoes the request");
 }

@@ -9,7 +9,7 @@
 <section aria-labelledby="transform"><h2 id="transform">Write a Transform</h2>
 <p>Middleware in wireframe follows the Tower and Actix shape. A <code>Service</code> turns a <code>ServiceRequest</code> into a <code>ServiceResponse</code>; a <code>Transform</code> wraps one service in another. <code>WireframeApp::wrap</code> takes any <code>Transform</code> whose output is a <code>HandlerService</code>, the type every route&rsquo;s handler is held in.</p>
 <p>The layer below counts every request on every route. It is generic over the envelope type, so it works with a custom <code>Packet</code> as well as <code>Envelope</code>. <code>HandlerService::from_service</code> keeps the route&rsquo;s ID while swapping in the wrapping service.</p>
-{{ code.code('tests/middleware.rs', 'weighbridge', title='middleware.rs · a counting layer') }}
+{{ code.code('tests/middleware.rs', 'tally', title='middleware.rs · a counting layer') }}
 <p>Both traits are <code>async_trait</code> traits in {{ wireframe_version }}, so implementations need the <code>async-trait</code> crate.</p>
 </section>
 
@@ -33,7 +33,7 @@
 <section aria-labelledby="versions"><h2 id="versions">Accept two versions</h2>
 <p>Middleware can rewrite a request before the handler sees it. This layer upgrades a legacy message format so the handler only ever sees the current one. It tries the current format first. That test only works because version 2 added a field, so a version 1 payload is too short to decode as version 2: bincode carries no type information, and two formats with the same layout decode as each other without complaint. The sample asserts the difference before relying on it.</p>
 {{ code.code('tests/middleware.rs', 'upgrade', title='middleware.rs · upgrade on ingress') }}
-<p>In the sample, a version 1 manifest goes in and the echoed reply decodes as version 2. A production version of this layer would also count legacy traffic, so the old format can be retired when the count reaches zero.</p>
+<p>In the sample, a version 1 point goes in and the echoed reply decodes as version 2. A production version of this layer would also count legacy traffic, so the old format can be retired when the count reaches zero.</p>
 </section>
 
 <section aria-labelledby="lifecycle"><h2 id="lifecycle">Connection setup and teardown</h2>

@@ -12,21 +12,21 @@ use wireframe::{
 };
 
 // ANCHOR: codec-types
-/// Two bytes of length, four bytes of ticket, then the payload.
+/// Two bytes of length, four bytes of tag, then the payload.
 const HEADER_LEN: usize = 6;
 
 #[derive(Debug, Clone)]
-pub struct TicketFrame {
-    pub ticket: u32,
+pub struct TaggedFrame {
+    pub tag: u32,
     pub payload: Bytes,
 }
 
 #[derive(Clone)]
-pub struct TicketCodec {
+pub struct TagCodec {
     max_frame_length: usize,
 }
 
-impl TicketCodec {
+impl TagCodec {
     pub fn new(max_frame_length: usize) -> Self {
         Self {
             max_frame_length: max_frame_length.min(usize::from(u16::MAX)),
@@ -34,15 +34,15 @@ impl TicketCodec {
     }
 }
 
-pub struct TicketDecoder {
+pub struct TagDecoder {
     max_frame_length: usize,
 }
 
-impl Decoder for TicketDecoder {
-    type Item = TicketFrame;
+impl Decoder for TagDecoder {
+    type Item = TaggedFrame;
     type Error = io::Error;
 
-    fn decode(&mut self, src: &mut BytesMut) -> io::Result<Option<TicketFrame>> {
+    fn decode(&mut self, src: &mut BytesMut) -> io::Result<Option<TaggedFrame>> {
         if src.len() < HEADER_LEN {
             return Ok(None);
         }
@@ -58,23 +58,23 @@ impl Decoder for TicketDecoder {
             return Ok(None);
         }
         src.advance(2);
-        let ticket = src.get_u32();
+        let tag = src.get_u32();
         let payload = src.split_to(len).freeze();
-        Ok(Some(TicketFrame { ticket, payload }))
+        Ok(Some(TaggedFrame { tag, payload }))
     }
 }
 
-pub struct TicketEncoder;
+pub struct TagEncoder;
 
-impl Encoder<TicketFrame> for TicketEncoder {
+impl Encoder<TaggedFrame> for TagEncoder {
     type Error = io::Error;
 
-    fn encode(&mut self, frame: TicketFrame, dst: &mut BytesMut) -> io::Result<()> {
+    fn encode(&mut self, frame: TaggedFrame, dst: &mut BytesMut) -> io::Result<()> {
         let len = u16::try_from(frame.payload.len())
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "payload too large"))?;
         dst.reserve(HEADER_LEN + frame.payload.len());
         dst.put_u16(len);
-        dst.put_u32(frame.ticket);
+        dst.put_u32(frame.tag);
         dst.extend_from_slice(&frame.payload);
         Ok(())
     }
@@ -82,35 +82,35 @@ impl Encoder<TicketFrame> for TicketEncoder {
 // ANCHOR_END: codec-types
 
 // ANCHOR: codec-impl
-impl FrameCodec for TicketCodec {
-    type Frame = TicketFrame;
-    type Decoder = TicketDecoder;
-    type Encoder = TicketEncoder;
+impl FrameCodec for TagCodec {
+    type Frame = TaggedFrame;
+    type Decoder = TagDecoder;
+    type Encoder = TagEncoder;
 
-    fn decoder(&self) -> TicketDecoder {
-        TicketDecoder {
+    fn decoder(&self) -> TagDecoder {
+        TagDecoder {
             max_frame_length: self.max_frame_length,
         }
     }
 
-    fn encoder(&self) -> TicketEncoder {
-        TicketEncoder
+    fn encoder(&self) -> TagEncoder {
+        TagEncoder
     }
 
-    fn frame_payload(frame: &TicketFrame) -> &[u8] {
+    fn frame_payload(frame: &TaggedFrame) -> &[u8] {
         &frame.payload
     }
 
-    fn frame_payload_bytes(frame: &TicketFrame) -> Bytes {
+    fn frame_payload_bytes(frame: &TaggedFrame) -> Bytes {
         frame.payload.clone()
     }
 
-    fn wrap_payload(&self, payload: Bytes) -> TicketFrame {
-        TicketFrame { ticket: 0, payload }
+    fn wrap_payload(&self, payload: Bytes) -> TaggedFrame {
+        TaggedFrame { tag: 0, payload }
     }
 
-    fn correlation_id(frame: &TicketFrame) -> Option<u64> {
-        Some(u64::from(frame.ticket))
+    fn correlation_id(frame: &TaggedFrame) -> Option<u64> {
+        Some(u64::from(frame.tag))
     }
 
     fn max_frame_length(&self) -> usize {
@@ -136,16 +136,16 @@ fn the_defaults_are_small_and_explicit() {
 #[tokio::test]
 async fn a_custom_codec_survives_one_byte_reads() {
     // ANCHOR: install
-    let codec = TicketCodec::new(4096);
+    let codec = TagCodec::new(4096);
     let echo: Handler<Envelope> = Arc::new(|_: &Envelope| Box::pin(async {}));
-    let app: WireframeApp<_, _, Envelope, TicketCodec> = WireframeApp::<BincodeSerializer>::new()
+    let app: WireframeApp<_, _, Envelope, TagCodec> = WireframeApp::<BincodeSerializer>::new()
         .expect("builder")
         .with_codec(codec.clone())
         .route(1, echo)
         .expect("a route");
     // ANCHOR_END: install
 
-    let request = Envelope::new(1, Some(9), b"manifest".to_vec());
+    let request = Envelope::new(1, Some(9), b"vertex".to_vec());
     let wire = BincodeSerializer.serialize(&request).expect("encode");
     let one_byte = NonZeroUsize::new(1).expect("non-zero");
     let replies = drive_with_partial_frames(app, &codec, vec![wire.clone()], one_byte)

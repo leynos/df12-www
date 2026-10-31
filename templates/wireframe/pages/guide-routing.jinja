@@ -27,10 +27,10 @@
 
 <section aria-labelledby="packet"><h2 id="packet">A custom envelope</h2>
 <p>A protocol with its own header layout can route on its own type. Implement <code>Packet</code>, which converts to and from <code>PacketParts</code>, and <code>CorrelatableFrame</code>, which exposes the correlation ID. The example below uses a 16-bit opcode where <code>Envelope</code> uses a 32-bit ID; the router still sees a <code>u32</code>.</p>
-{{ code.code('tests/routing.rs', 'waybill', title='routing.rs · a custom envelope') }}
+{{ code.code('tests/routing.rs', 'stroke', title='routing.rs · a custom envelope') }}
 <p>The envelope type is the application&rsquo;s third type parameter. Handlers then receive the custom type:</p>
-{{ code.code('tests/routing.rs', 'waybill-app', title='routing.rs · routing on it') }}
-<p>The sample drives this application with the testkit, one byte at a time, and checks that the reply comes back with its ticket intact. Because the handler adds nothing, the reply is the request.</p>
+{{ code.code('tests/routing.rs', 'stroke-app', title='routing.rs · routing on it') }}
+<p>The sample drives this application with the testkit, one byte at a time, and checks that the reply comes back with its tag intact. Because the handler adds nothing, the reply is the request.</p>
 </section>
 
 <section aria-labelledby="correlation"><h2 id="correlation">Correlation IDs</h2>

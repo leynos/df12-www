@@ -19,65 +19,65 @@ use wireframe::{
     testkit::drive_with_partial_frames,
 };
 
-// ANCHOR: weighbridge
-/// Counts every request that crosses the weighbridge, on any route.
-struct Weighbridge {
-    weighed: Arc<AtomicUsize>,
+// ANCHOR: tally
+/// Counts every request that passes through, on any route.
+struct Tally {
+    tallied: Arc<AtomicUsize>,
 }
 
-struct WeighbridgeService<S> {
+struct TallyService<S> {
     inner: S,
-    weighed: Arc<AtomicUsize>,
+    tallied: Arc<AtomicUsize>,
 }
 
 #[async_trait]
-impl<S> Service for WeighbridgeService<S>
+impl<S> Service for TallyService<S>
 where
     S: Service<Error = Infallible> + Send + Sync + 'static,
 {
     type Error = Infallible;
 
     async fn call(&self, req: ServiceRequest) -> Result<ServiceResponse, Infallible> {
-        self.weighed.fetch_add(1, Ordering::Relaxed);
+        self.tallied.fetch_add(1, Ordering::Relaxed);
         self.inner.call(req).await
     }
 }
 
 #[async_trait]
-impl<E: Packet> Transform<HandlerService<E>> for Weighbridge {
+impl<E: Packet> Transform<HandlerService<E>> for Tally {
     type Output = HandlerService<E>;
 
     async fn transform(&self, service: HandlerService<E>) -> Self::Output {
         let id = service.id();
-        let weighed = Arc::clone(&self.weighed);
+        let tallied = Arc::clone(&self.tallied);
         HandlerService::from_service(
             id,
-            WeighbridgeService {
+            TallyService {
                 inner: service,
-                weighed,
+                tallied,
             },
         )
     }
 }
-// ANCHOR_END: weighbridge
+// ANCHOR_END: tally
 
 #[derive(bincode::Encode, bincode::BorrowDecode)]
-struct ManifestV1 {
+struct PointV1 {
     id: u64,
     name: String,
 }
 
-/// Version 2 added the tare weight, so a version 1 payload is too short to
+/// Version 2 added beam intensity, so a version 1 payload is too short to
 /// decode as version 2.
 #[derive(bincode::Encode, bincode::BorrowDecode, Debug, PartialEq)]
-struct ManifestV2 {
+struct PointV2 {
     id: u64,
     display_name: String,
-    tare_kg: u32,
+    intensity: u32,
 }
 
-/// Rewrites version 1 manifests so handlers only ever see version 2.
-struct UpgradeManifests;
+/// Rewrites version 1 points so handlers only ever see version 2.
+struct UpgradePoints;
 
 struct UpgradeService<S> {
     inner: S,
@@ -92,14 +92,14 @@ where
 
     // ANCHOR: upgrade
     async fn call(&self, mut req: ServiceRequest) -> Result<ServiceResponse, Infallible> {
-        if ManifestV2::from_bytes(req.frame()).is_err() {
-            if let Ok((v1, _)) = ManifestV1::from_bytes(req.frame()) {
-                let v2 = ManifestV2 {
+        if PointV2::from_bytes(req.frame()).is_err() {
+            if let Ok((v1, _)) = PointV1::from_bytes(req.frame()) {
+                let v2 = PointV2 {
                     id: v1.id,
                     display_name: v1.name,
-                    tare_kg: 0,
+                    intensity: 0,
                 };
-                *req.frame_mut() = v2.to_bytes().expect("encode ManifestV2");
+                *req.frame_mut() = v2.to_bytes().expect("encode PointV2");
             }
         }
         self.inner.call(req).await
@@ -108,7 +108,7 @@ where
 }
 
 #[async_trait]
-impl Transform<HandlerService<Envelope>> for UpgradeManifests {
+impl Transform<HandlerService<Envelope>> for UpgradePoints {
     type Output = HandlerService<Envelope>;
 
     async fn transform(&self, service: HandlerService<Envelope>) -> Self::Output {
@@ -118,29 +118,29 @@ impl Transform<HandlerService<Envelope>> for UpgradeManifests {
 }
 
 #[derive(Default)]
-struct Shift {
+struct Link {
     opened: AtomicUsize,
 }
 
-type ShiftApp = WireframeApp<BincodeSerializer, Shift, Envelope>;
+type LinkApp = WireframeApp<BincodeSerializer, Link, Envelope>;
 
-fn yard(weighed: Arc<AtomicUsize>, closed: Arc<AtomicUsize>) -> wireframe::Result<ShiftApp> {
-    let manifests: Handler<Envelope> = Arc::new(|_: &Envelope| Box::pin(async {}));
+fn scope(tallied: Arc<AtomicUsize>, closed: Arc<AtomicUsize>) -> wireframe::Result<LinkApp> {
+    let points: Handler<Envelope> = Arc::new(|_: &Envelope| Box::pin(async {}));
     let app: WireframeApp = WireframeApp::new()?
-        .route(5, manifests)?
-        .wrap(UpgradeManifests)?
-        .wrap(Weighbridge { weighed })?;
+        .route(5, points)?
+        .wrap(UpgradePoints)?
+        .wrap(Tally { tallied })?;
     // ANCHOR: lifecycle
     let app = app
         .on_connection_setup(|| async {
-            let shift = Shift::default();
-            shift.opened.fetch_add(1, Ordering::Relaxed);
-            shift
+            let link = Link::default();
+            link.opened.fetch_add(1, Ordering::Relaxed);
+            link
         })?
-        .on_connection_teardown(move |shift: Shift| {
+        .on_connection_teardown(move |link: Link| {
             let closed = Arc::clone(&closed);
             async move {
-                closed.fetch_add(shift.opened.load(Ordering::Relaxed), Ordering::Relaxed);
+                closed.fetch_add(link.opened.load(Ordering::Relaxed), Ordering::Relaxed);
             }
         })?;
     // ANCHOR_END: lifecycle
@@ -149,17 +149,17 @@ fn yard(weighed: Arc<AtomicUsize>, closed: Arc<AtomicUsize>) -> wireframe::Resul
 
 #[tokio::test]
 async fn handlers_only_ever_see_version_two() {
-    let weighed = Arc::new(AtomicUsize::new(0));
+    let tallied = Arc::new(AtomicUsize::new(0));
     let closed = Arc::new(AtomicUsize::new(0));
-    let app = yard(Arc::clone(&weighed), Arc::clone(&closed)).expect("configure");
+    let app = scope(Arc::clone(&tallied), Arc::clone(&closed)).expect("configure");
 
-    let legacy = ManifestV1 {
+    let legacy = PointV1 {
         id: 7,
-        name: "coal".into(),
+        name: "origin".into(),
     };
     let legacy_bytes = legacy.to_bytes().expect("encode");
     assert!(
-        ManifestV2::from_bytes(&legacy_bytes).is_err(),
+        PointV2::from_bytes(&legacy_bytes).is_err(),
         "a version 1 payload must not pass as version 2"
     );
     let request = Envelope::new(5, Some(1), legacy_bytes);
@@ -172,16 +172,16 @@ async fn handlers_only_ever_see_version_two() {
         .expect("the app answers");
 
     let (reply, _): (Envelope, usize) = BincodeSerializer.deserialize(&replies[0]).expect("decode");
-    let (manifest, _) = ManifestV2::from_bytes(reply.payload_bytes()).expect("version 2");
+    let (point, _) = PointV2::from_bytes(reply.payload_bytes()).expect("version 2");
     assert_eq!(
-        manifest,
-        ManifestV2 {
+        point,
+        PointV2 {
             id: 7,
-            display_name: "coal".into(),
-            tare_kg: 0,
+            display_name: "origin".into(),
+            intensity: 0,
         }
     );
-    assert_eq!(weighed.load(Ordering::Relaxed), 1);
+    assert_eq!(tallied.load(Ordering::Relaxed), 1);
     assert_eq!(
         closed.load(Ordering::Relaxed),
         1,

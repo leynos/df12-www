@@ -13,7 +13,7 @@ struct Hello {
     version: u16,
 }
 
-const MAGIC: [u8; 4] = *b"YARD";
+const MAGIC: [u8; 4] = *b"BEAM";
 // ANCHOR_END: hello
 
 async fn serve() -> std::io::Result<(SocketAddr, oneshot::Receiver<Hello>)> {

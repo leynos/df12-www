@@ -48,6 +48,8 @@ dev = [
     "jqpy",
     "hypothesis==6.165.10",
     "syrupy>=6.0.0",
+    "numpy>=2.5.4",
+    "pillow>=13.0.0",
 ]
 
 [tool.ruff]

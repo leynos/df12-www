@@ -70,9 +70,8 @@
   height: 4rem;
 }
 
-/* The header lockup: the simplified symbol and wordmark, drawn as SVG.
-   The halo is a filter on the image, so it is enhancement: remove it and
-   the beam cores still read. */
+/* The header lockup: the supplied logotype, keyed to alpha so its own glow
+ * carries it; no extra filter is stacked on top. */
 .wf-brand {
   display: inline-flex;
   flex: none;
@@ -83,8 +82,7 @@
 .wf-brand img {
   display: block;
   width: auto;
-  height: 1.75rem;
-  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-mint) 45%, transparent));
+  height: 2.75rem;
 }
 
 .wf-nav {

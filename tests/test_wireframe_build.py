@@ -2,8 +2,9 @@
 
 The wireframe pages make promises the identity specification holds them to:
 every working example is code the sample crate compiles and runs, the
-release a page names is the release that crate pins, the wordmark and the
-syntax colours are generated rather than drawn by hand, scrolling code can be
+release a page names is the release that crate pins, the logo is the supplied
+artwork rather than a redrawing, the syntax colours are generated rather than
+drawn by hand, scrolling code can be
 reached from the keyboard, and legal pages carry no art. Each promise a
 template edit could quietly break is asserted against the built tree here.
 
@@ -22,9 +23,9 @@ from urllib.parse import unquote, urlsplit
 
 import pytest
 from bs4 import BeautifulSoup, Tag
+from PIL import Image
 
 from df12_pages.config import load_site_config
-from scripts import generate_wireframe_marks
 from scripts.generate_wireframe_pygments_css import STYLESHEET, build_css
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -255,12 +256,20 @@ def test_the_sample_crate_pins_the_documented_release() -> None:
     )
 
 
-def test_the_marks_are_generated() -> None:
-    """The committed SVG marks match what their generator draws."""
-    for name, svg in generate_wireframe_marks.render().items():
-        committed = generate_wireframe_marks.OUTPUT / name
-        assert committed.read_text(encoding="utf-8") == svg, (
-            f"{name} is stale; rerun scripts/generate_wireframe_marks.py"
+@pytest.mark.usefixtures("built_site")
+def test_the_logo_is_the_supplied_artwork() -> None:
+    """Every page's brand mark is the keyed logotype, not a redrawn SVG."""
+    logos = PUBLIC_SITE / "assets/logos"
+    for name in ("lockup-480.webp", "lockup-800.webp", "wordmark-1400.webp"):
+        with Image.open(logos / name) as image:
+            assert image.mode == "RGBA", f"{name} lost its keyed alpha"
+    for page in _pages():
+        soup = _soup(page)
+        for brand in soup.select(".wf-brand img"):
+            src = str(brand.get("src", ""))
+            assert src.startswith("/wireframe/assets/logos/lockup-"), page
+        assert not soup.select('img[src$=".svg"][src*="/logos/"]'), (
+            f"{page} still draws a logo from SVG"
         )
 
 

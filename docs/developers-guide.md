@@ -1426,18 +1426,26 @@ the footer's `footer_art` block, which credits the illustrations, and
 page at 390 and 1440 pixels, checks that no page scrolls sideways at 320
 pixels, and drives the storybook.
 
-### 5.10. wireframe's marks, samples, and copy controls
+### 5.10. wireframe's logotype, scope, samples, and copy controls
 
 The wireframe sub-site at `/wireframe/` follows its own identity specification;
 [wireframe sub-site](wireframe-site.md)
 records it, the release facts the copy rests on, and the provenance of the art.
-Three mechanisms are specific to it.
+Four mechanisms are specific to it.
 
-- **Generated marks.** `scripts/generate_wireframe_marks.py` draws the
-  wordmark, lockup, symbol, and favicon as SVG into
-  `src/static/wireframe/assets/logos/`. `test_the_marks_are_generated` fails
-  when the committed files and the generator disagree, so change a glyph in the
-  script and rerun it, never by editing an SVG.
+- **Keyed logotype.** `scripts/build_wireframe_logo_assets.py` derives the
+  lockup, wordmark, symbol, and favicons in
+  `src/static/wireframe/assets/logos/` from the supplied raster master, keying
+  its black ground to alpha. Pass it the master's path; numpy and Pillow are
+  dev dependencies for it. `test_the_logo_is_the_supplied_artwork` holds every
+  brand image to the keyed files.
+- **The scope.** `scripts/generate_wireframe_scope.py` projects the hero's
+  three-dimensional scene into `templates/wireframe/_scope.svg.jinja`, and
+  `test_the_scope_scene_is_generated` fails when they disagree. `scope.ts`
+  redraws any `[data-wf-scope]` root's `path[data-beam]` strokes on its canvas
+  as a vector beam, with phosphor persistence, additive glow, and flyback. It
+  stays off under reduced motion or more contrast, where the SVG is the whole
+  picture. It is rung 5 because a canvas cannot be drawn in CSS.
 - **Anchored samples.** `_code.jinja`'s `code(file, anchor)` macro includes a
   file from the Cargo package under `templates/wireframe/samples/` and keeps
   the lines between `// ANCHOR: name` and `// ANCHOR_END: name`.

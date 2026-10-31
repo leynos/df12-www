@@ -11,7 +11,9 @@
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://df12.studio/wireframe/assets/images/night-yard.webp">
     <meta name="theme-color" content="#030e0c">
-    <link rel="icon" href="/wireframe/assets/logos/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/wireframe/assets/logos/favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/wireframe/assets/logos/favicon-48.png" sizes="48x48" type="image/png">
+    <link rel="apple-touch-icon" href="/wireframe/assets/logos/apple-touch-icon.png">
     <link rel="preload" href="/wireframe/assets/fonts/sintony-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/wireframe/assets/styles/wireframe.css">
     <script src="/wireframe/assets/js/copy-code.js" defer></script>
@@ -20,7 +22,7 @@
     <a class="wf-skip" href="#main-content">Skip to content</a>
     <header class="wf-mast">
       <div class="wf-shell wf-mast__inner">
-        <a class="wf-brand" href="/wireframe/"><img src="/wireframe/assets/logos/lockup-horizontal.svg" alt="wireframe home" width="436" height="72"></a>
+        <a class="wf-brand" href="/wireframe/"><img src="/wireframe/assets/logos/lockup-480.webp" srcset="/wireframe/assets/logos/lockup-480.webp 480w, /wireframe/assets/logos/lockup-800.webp 800w" sizes="13rem" alt="wireframe home" width="480" height="105"></a>
         <nav class="wf-nav" aria-label="Primary"><ul><li class="wf-nav__up"><a href="/"><span aria-hidden="true">←&nbsp;</span>df12</a></li>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}</ul></nav>
         <div class="wf-mast__actions"><a class="wf-mast__link wf-mast__link--wide" href="{{ docs_url }}">API {{ ui.icon('external') }}</a><a class="wf-mast__link" href="{{ repository_url }}">GitHub {{ ui.icon('branch') }}</a></div>
         <details class="wf-mobile"><summary>Menu</summary><nav aria-label="Mobile primary"><ul><li><a href="/"><span aria-hidden="true">←&nbsp;</span>df12</a></li>{% for link in nav_links %}<li><a href="{{ link.href }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a></li>{% endfor %}<li><a href="{{ docs_url }}">API reference on docs.rs</a></li><li><a href="{{ repository_url }}">Source on GitHub</a></li></ul></nav></details>
@@ -29,7 +31,7 @@
     <main id="main-content">{% block content %}{% endblock %}</main>
     <footer class="wf-footer">
       <div class="wf-shell wf-footer__grid">
-        <div><a class="wf-brand" href="/wireframe/"><img src="/wireframe/assets/logos/lockup-horizontal.svg" alt="wireframe home" width="436" height="72"></a><p class="wf-footer__lede">Binary protocols. Clear routes. A Rust library from df12 Productions, Edinburgh.</p></div>
+        <div><a class="wf-brand" href="/wireframe/"><img src="/wireframe/assets/logos/lockup-480.webp" srcset="/wireframe/assets/logos/lockup-480.webp 480w, /wireframe/assets/logos/lockup-800.webp 800w" sizes="13rem" alt="wireframe home" width="480" height="105"></a><p class="wf-footer__lede">Binary protocols. Clear routes. A Rust library from df12 Productions, Edinburgh.</p></div>
         <div><h2>Read</h2><ul><li><a href="/wireframe/getting-started/">Get started</a></li><li><a href="/wireframe/guides/">Guides</a></li><li><a href="/wireframe/architecture/">Architecture</a></li><li><a href="/wireframe/examples/">Examples</a></li></ul></div>
         <div><h2>Project</h2><ul><li><a href="{{ repository_url }}">Source on GitHub</a></li><li><a href="{{ docs_url }}">API reference on docs.rs</a></li><li><a href="/wireframe/roadmap/">Roadmap</a></li><li><a href="{{ source_base }}/LICENSE">ISC licence</a></li><li><a href="/wireframe/yard/">The night yard</a></li></ul></div>
         <div><h2>df12</h2><ul><li><a href="/">df12 Productions</a></li><li><a href="/wireframe/privacy-policy/">Privacy policy</a></li><li><a href="/wireframe/terms-of-use/">Terms of use</a></li><li><a href="/wireframe/code-of-conduct/">Code of conduct</a></li></ul></div>

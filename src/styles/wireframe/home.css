@@ -34,8 +34,12 @@
 }
 
 .wf-hero__title img {
-  width: min(100%, 34rem);
+  width: min(100%, 38rem);
   height: auto;
+
+  /* The keyed master's halo runs to the crop edge; pull the box in so the
+   * letters, not the glow, align with the copy below. */
+  margin-inline-start: -0.9rem;
 }
 
 .wf-hero__kicker {

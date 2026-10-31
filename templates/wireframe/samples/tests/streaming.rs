@@ -11,35 +11,35 @@ use wireframe::{
 };
 
 #[derive(Debug, Clone, PartialEq)]
-struct Wagon(u32);
+struct Vertex(u32);
 
 #[tokio::test]
 async fn a_stream_response_yields_every_frame() {
     // ANCHOR: stream
-    let wagons = stream::iter((1..=3).map(|n| Ok(Wagon(n))));
-    let response: Response<Wagon> = Response::Stream(Box::pin(wagons));
+    let vertices = stream::iter((1..=3).map(|n| Ok(Vertex(n))));
+    let response: Response<Vertex> = Response::Stream(Box::pin(vertices));
 
-    let frames: Vec<Wagon> = response.into_stream().try_collect().await.expect("frames");
-    assert_eq!(frames, vec![Wagon(1), Wagon(2), Wagon(3)]);
+    let frames: Vec<Vertex> = response.into_stream().try_collect().await.expect("frames");
+    assert_eq!(frames, vec![Vertex(1), Vertex(2), Vertex(3)]);
     // ANCHOR_END: stream
 }
 
 #[tokio::test]
 async fn a_multi_packet_sender_waits_for_room() {
     // ANCHOR: multi-packet
-    let (sender, response) = Response::<Wagon>::with_channel(2);
+    let (sender, response) = Response::<Vertex>::with_channel(2);
 
     let producer = tokio::spawn(async move {
         for n in 1..=5 {
-            // `send` waits whenever the channel already holds two wagons.
-            if sender.send(Wagon(n)).await.is_err() {
+            // `send` waits whenever the channel already holds two vertices.
+            if sender.send(Vertex(n)).await.is_err() {
                 return;
             }
         }
         // Dropping the last sender ends the response.
     });
 
-    let frames: Vec<Wagon> = response.into_stream().try_collect().await.expect("frames");
+    let frames: Vec<Vertex> = response.into_stream().try_collect().await.expect("frames");
     producer.await.expect("the producer finished");
     assert_eq!(frames.len(), 5);
     // ANCHOR_END: multi-packet

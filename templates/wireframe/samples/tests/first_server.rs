@@ -101,7 +101,7 @@ async fn call(addr: SocketAddr) -> Result<Pong, Box<dyn Error>> {
     let mut client = WireframeClient::builder().connect(addr).await?;
 
     let ping = Ping {
-        body: "from the yard".into(),
+        body: "from the scope".into(),
     };
     let request = Envelope::new(PING, None, ping.to_bytes()?);
     let response: Envelope = client.call_correlated(request).await?;
@@ -119,7 +119,7 @@ async fn a_ping_comes_back_as_a_pong() {
     assert_eq!(
         pong,
         Pong {
-            body: "pong from the yard".into()
+            body: "pong from the scope".into()
         }
     );
     let _ = stop.send(());

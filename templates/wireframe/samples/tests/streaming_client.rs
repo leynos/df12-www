@@ -66,7 +66,7 @@ async fn streaming_server() -> SocketAddr {
         let mut framed = Framed::new(socket, LengthDelimitedCodec::new());
         let bytes = framed.next().await.expect("a request").expect("a frame");
         let (request, _) = Row::from_bytes(&bytes).expect("decode");
-        for (id, body) in [(1, "coal"), (1, "timber"), (1, "empties"), (0, "")] {
+        for (id, body) in [(1, "move"), (1, "draw"), (1, "blank"), (0, "")] {
             let row = Row {
                 id,
                 correlation_id: request.correlation_id,
@@ -91,16 +91,16 @@ async fn the_client_reads_rows_until_the_terminator() {
     let request = Row {
         id: 1,
         correlation_id: None,
-        payload: b"manifest".to_vec(),
+        payload: b"vertex".to_vec(),
     };
     let mut rows = client.call_streaming::<Row>(request).await.expect("sent");
 
-    let mut cargo = Vec::new();
+    let mut ops = Vec::new();
     while let Some(row) = rows.next().await {
         let row = row.expect("a correlated row");
-        cargo.push(String::from_utf8(row.payload).expect("text"));
+        ops.push(String::from_utf8(row.payload).expect("text"));
     }
     // ANCHOR_END: call
 
-    assert_eq!(cargo, ["coal", "timber", "empties"]);
+    assert_eq!(ops, ["move", "draw", "blank"]);
 }

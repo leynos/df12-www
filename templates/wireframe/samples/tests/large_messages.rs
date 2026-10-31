@@ -11,11 +11,11 @@ use wireframe::{
 };
 
 #[test]
-fn a_long_load_travels_in_three_wagons() {
+fn a_long_message_crosses_in_three_fragments() {
     // ANCHOR: fragmenter
     let fragmenter = Fragmenter::new(NonZeroUsize::new(512).expect("non-zero"));
-    let load = [7_u8; 1400];
-    let batch = fragmenter.fragment_bytes(load).expect("fragment");
+    let message = [7_u8; 1400];
+    let batch = fragmenter.fragment_bytes(message).expect("fragment");
     assert_eq!(batch.len(), 3);
 
     let last = batch.fragments().last().expect("a final fragment");
@@ -55,7 +55,7 @@ fn budgets() -> MemoryBudgets {
 // ANCHOR_END: budgets
 
 #[tokio::test]
-async fn handlers_receive_the_whole_load() {
+async fn handlers_receive_the_whole_message() {
     // ANCHOR: enable
     let echo: Handler<Envelope> = Arc::new(|_: &Envelope| Box::pin(async {}));
     let app: WireframeApp = WireframeApp::new()

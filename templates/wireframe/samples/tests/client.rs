@@ -50,12 +50,12 @@ async fn a_correlated_call_comes_back_stamped() {
         .await
         .expect("connect");
 
-    let request = Envelope::new(1, None, b"waybill".to_vec());
+    let request = Envelope::new(1, None, b"vector".to_vec());
     let reply: Envelope = client.call_correlated(request).await.expect("a reply");
 
     assert!(reply.correlation_id().is_some());
     // ANCHOR_END: call
-    assert_eq!(reply.payload_bytes(), b"waybill");
+    assert_eq!(reply.payload_bytes(), b"vector");
     assert_eq!(sent.load(Ordering::Relaxed), 1);
     client.close().await;
 }
@@ -77,9 +77,9 @@ async fn a_pool_keeps_warm_sockets() {
         .expect("a pool");
 
     let lease = pool.acquire().await.expect("a lease");
-    let request = Envelope::new(1, Some(5), b"empties".to_vec());
+    let request = Envelope::new(1, Some(5), b"blank".to_vec());
     let reply: Envelope = lease.call(&request).await.expect("a reply");
-    assert_eq!(reply.payload_bytes(), b"empties");
+    assert_eq!(reply.payload_bytes(), b"blank");
     // ANCHOR_END: pool
 
     drop(lease);

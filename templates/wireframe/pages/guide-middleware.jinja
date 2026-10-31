@@ -27,7 +27,7 @@
 </section>
 
 <section aria-labelledby="from-fn"><h2 id="from-fn">What from_fn is for</h2>
-<p><code>middleware::from_fn</code> turns an async function into a <code>Transform</code>, and the upstream user&rsquo;s guide passes one to <code>wrap</code>. In {{ wireframe_version }} that does not compile: <code>from_fn</code>&rsquo;s output is an <code>FnService</code>, not a <code>HandlerService</code>, so it fails <code>wrap</code>&rsquo;s bound. It can still wrap a service directly, inside a hand-written <code>Transform</code> that hands the result to <code>HandlerService::from_service</code>, but for routed middleware a hand-written <code>Transform</code> is the shorter path.</p>
+<p><code>middleware::from_fn</code> turns an async function into a <code>Transform</code>, and the upstream user&rsquo;s guide passes one to <code>wrap</code>. In {{ wireframe_version }} that does not compile: <code>from_fn</code>&rsquo;s output is an <code>FnService</code>, not a <code>HandlerService</code>, so it fails <code>wrap</code>&rsquo;s bound. It can still wrap a service directly, inside a handwritten <code>Transform</code> that hands the result to <code>HandlerService::from_service</code>, but for routed middleware a handwritten <code>Transform</code> is the shorter path.</p>
 </section>
 
 <section aria-labelledby="versions"><h2 id="versions">Accept two versions</h2>

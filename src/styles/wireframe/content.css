@@ -733,13 +733,21 @@
    bloom. Every halo is decoration, so it goes, and the cores stay. */
 @media (prefers-contrast: more), (forced-colors: active) {
   .wf-brand img,
-  .wf-signal__router,
-  .wf-signal__handler,
-  .wf-signal__beam,
+  .wf-scope__svg path,
+  .wf-capability-row__icon,
   .wf-track::after,
   .wf-nav a[aria-current="page"]::after {
     filter: none;
     box-shadow: none;
+  }
+
+  .wf-glitch::before,
+  .wf-glitch::after {
+    display: none;
+  }
+
+  .wf-track::after {
+    background-image: none;
   }
 
   .wf-btn:hover,

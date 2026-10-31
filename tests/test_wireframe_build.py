@@ -26,6 +26,7 @@ from bs4 import BeautifulSoup, Tag
 from PIL import Image
 
 from df12_pages.config import load_site_config
+from scripts import generate_wireframe_scope
 from scripts.generate_wireframe_pygments_css import STYLESHEET, build_css
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -273,6 +274,18 @@ def test_the_logo_is_the_supplied_artwork() -> None:
         )
 
 
+def test_the_scope_scene_is_generated() -> None:
+    """The hero scene matches its generator, in the grammar the beam reads."""
+    committed = generate_wireframe_scope.OUTPUT.read_text(encoding="utf-8")
+    assert committed == generate_wireframe_scope.render(), (
+        "the scope scene is stale; rerun scripts/generate_wireframe_scope.py"
+    )
+    roles = set(re.findall(r'data-beam="([a-z]+)"', committed))
+    assert {"route", "mint", "magenta", "dim"} <= roles
+    for d in re.findall(r' d="([^"]+)"', committed):
+        assert re.fullmatch(r"M[-\d. ]+( L[-\d. ]+)+", d), d
+
+
 def test_the_syntax_partial_is_generated() -> None:
     """The committed syntax colours match YardStyle."""
     assert STYLESHEET.read_text(encoding="utf-8") == build_css(), (
@@ -331,13 +344,18 @@ def test_every_guide_is_listed_and_configured(built_site: Path) -> None:
     assert listed == configured
 
 
-def test_pages_load_the_copy_script(built_site: Path) -> None:
-    """Every page loads the copy script, and the script is published."""
+def test_pages_load_their_scripts(built_site: Path) -> None:
+    """Every page loads the copy script; only pages with a scope load the beam."""
     assert built_site.is_dir()
     for page in _pages():
-        scripts = [script.get("src") for script in _soup(page).select("script[src]")]
-        assert scripts == ["/wireframe/assets/js/copy-code.js"], page
-    assert (PUBLIC_SITE / "assets" / "js" / "copy-code.js").is_file()
+        soup = _soup(page)
+        scripts = [script.get("src") for script in soup.select("script[src]")]
+        expected = ["/wireframe/assets/js/copy-code.js"]
+        if soup.select("[data-wf-scope]"):
+            expected.append("/wireframe/assets/js/scope.js")
+        assert scripts == expected, page
+    for name in ("copy-code.js", "scope.js"):
+        assert (PUBLIC_SITE / "assets" / "js" / name).is_file()
 
 
 _VERSION_RE = re.compile(r"(?<![\d.])0\.\d+\.\d+(?![\d.])")

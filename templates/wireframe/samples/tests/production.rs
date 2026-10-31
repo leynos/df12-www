@@ -15,6 +15,7 @@ fn app() -> WireframeApp {
 
 #[tokio::test]
 async fn the_server_stops_when_asked() {
+    // ANCHOR: server
     let backoff = BackoffConfig {
         initial_delay: Duration::from_millis(10),
         max_delay: Duration::from_secs(1),
@@ -36,14 +37,17 @@ async fn the_server_stops_when_asked() {
         .await
         .expect("the server task joins")
         .expect("a clean stop");
+    // ANCHOR_END: server
 }
 
 #[test]
 fn metric_names_are_public_constants() {
+    // ANCHOR: metrics
     assert_eq!(metrics::CONNECTIONS_ACTIVE, "wireframe_connections_active");
     assert_eq!(
         metrics::FRAMES_PROCESSED,
         "wireframe_frames_processed_total"
     );
     assert_eq!(metrics::CODEC_ERRORS, "wireframe_codec_errors_total");
+    // ANCHOR_END: metrics
 }

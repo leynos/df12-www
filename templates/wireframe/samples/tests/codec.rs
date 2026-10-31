@@ -11,6 +11,7 @@ use wireframe::{
     testkit::drive_with_partial_frames,
 };
 
+// ANCHOR: codec-types
 /// Two bytes of length, four bytes of ticket, then the payload.
 const HEADER_LEN: usize = 6;
 
@@ -78,7 +79,9 @@ impl Encoder<TicketFrame> for TicketEncoder {
         Ok(())
     }
 }
+// ANCHOR_END: codec-types
 
+// ANCHOR: codec-impl
 impl FrameCodec for TicketCodec {
     type Frame = TicketFrame;
     type Decoder = TicketDecoder;
@@ -114,9 +117,11 @@ impl FrameCodec for TicketCodec {
         self.max_frame_length
     }
 }
+// ANCHOR_END: codec-impl
 
 #[test]
 fn the_defaults_are_small_and_explicit() {
+    // ANCHOR: defaults
     let app: WireframeApp = WireframeApp::new().expect("builder");
     assert_eq!(app.codec().max_frame_length(), 1024);
 
@@ -125,10 +130,12 @@ fn the_defaults_are_small_and_explicit() {
         .buffer_capacity(64 * 1024)
         .read_timeout_ms(250);
     assert_eq!(roomier.codec().max_frame_length(), 64 * 1024);
+    // ANCHOR_END: defaults
 }
 
 #[tokio::test]
 async fn a_custom_codec_survives_one_byte_reads() {
+    // ANCHOR: install
     let codec = TicketCodec::new(4096);
     let echo: Handler<Envelope> = Arc::new(|_: &Envelope| Box::pin(async {}));
     let app: WireframeApp<_, _, Envelope, TicketCodec> = WireframeApp::<BincodeSerializer>::new()
@@ -136,6 +143,7 @@ async fn a_custom_codec_survives_one_byte_reads() {
         .with_codec(codec.clone())
         .route(1, echo)
         .expect("a route");
+    // ANCHOR_END: install
 
     let request = Envelope::new(1, Some(9), b"manifest".to_vec());
     let wire = BincodeSerializer.serialize(&request).expect("encode");

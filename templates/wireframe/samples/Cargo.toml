@@ -5,6 +5,7 @@ edition = "2024"
 publish = false
 description = "Every code sample on the df12 wireframe site, compiled and run against the published crate."
 
+# ANCHOR: deps
 [dependencies]
 wireframe = { version = "=0.3.0", features = ["pool", "testkit"] }
 tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "sync", "test-util", "time"] }
@@ -15,6 +16,7 @@ futures = "0.3.31"
 # wireframe 0.3.0 does not compile against tokio-util 0.7.20, which adds a
 # second `Encoder` impl for `LengthDelimitedCodec`; Cargo.lock pins 0.7.19.
 tokio-util = { version = "0.7.16", features = ["codec", "rt"] }
+# ANCHOR_END: deps
 
 [profile.dev]
 incremental = false

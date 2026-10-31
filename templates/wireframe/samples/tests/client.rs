@@ -39,6 +39,7 @@ async fn a_correlated_call_comes_back_stamped() {
     let sent = Arc::new(AtomicUsize::new(0));
     let counter = Arc::clone(&sent);
 
+    // ANCHOR: call
     let mut client = WireframeClient::builder()
         .codec_config(ClientCodecConfig::default().max_frame_length(1024))
         .socket_options(SocketOptions::default().nodelay(true))
@@ -53,6 +54,7 @@ async fn a_correlated_call_comes_back_stamped() {
     let reply: Envelope = client.call_correlated(request).await.expect("a reply");
 
     assert!(reply.correlation_id().is_some());
+    // ANCHOR_END: call
     assert_eq!(reply.payload_bytes(), b"waybill");
     assert_eq!(sent.load(Ordering::Relaxed), 1);
     client.close().await;
@@ -61,6 +63,7 @@ async fn a_correlated_call_comes_back_stamped() {
 #[tokio::test]
 async fn a_pool_keeps_warm_sockets() {
     let addr = echo_server().await;
+    // ANCHOR: pool
     let pool = WireframeClient::builder()
         .connect_pool(
             addr,
@@ -77,6 +80,7 @@ async fn a_pool_keeps_warm_sockets() {
     let request = Envelope::new(1, Some(5), b"empties".to_vec());
     let reply: Envelope = lease.call(&request).await.expect("a reply");
     assert_eq!(reply.payload_bytes(), b"empties");
+    // ANCHOR_END: pool
 
     drop(lease);
     pool.close().await;

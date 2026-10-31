@@ -15,15 +15,18 @@ struct Wagon(u32);
 
 #[tokio::test]
 async fn a_stream_response_yields_every_frame() {
+    // ANCHOR: stream
     let wagons = stream::iter((1..=3).map(|n| Ok(Wagon(n))));
     let response: Response<Wagon> = Response::Stream(Box::pin(wagons));
 
     let frames: Vec<Wagon> = response.into_stream().try_collect().await.expect("frames");
     assert_eq!(frames, vec![Wagon(1), Wagon(2), Wagon(3)]);
+    // ANCHOR_END: stream
 }
 
 #[tokio::test]
 async fn a_multi_packet_sender_waits_for_room() {
+    // ANCHOR: multi-packet
     let (sender, response) = Response::<Wagon>::with_channel(2);
 
     let producer = tokio::spawn(async move {
@@ -39,10 +42,12 @@ async fn a_multi_packet_sender_waits_for_room() {
     let frames: Vec<Wagon> = response.into_stream().try_collect().await.expect("frames");
     producer.await.expect("the producer finished");
     assert_eq!(frames.len(), 5);
+    // ANCHOR_END: multi-packet
 }
 
 #[tokio::test]
 async fn the_actor_drains_push_traffic_and_the_response() {
+    // ANCHOR: actor
     let (queues, handle) = PushQueues::<Envelope>::builder()
         .high_capacity(8)
         .low_capacity(8)
@@ -68,6 +73,7 @@ async fn the_actor_drains_push_traffic_and_the_response() {
     let mut ids: Vec<u32> = out.iter().map(Envelope::id).collect();
     ids.sort_unstable();
     assert_eq!(ids, vec![10, 20, 30]);
+    // ANCHOR_END: actor
 }
 
 #[tokio::test]
@@ -78,6 +84,7 @@ async fn the_registry_holds_handles_weakly() {
         .build()
         .expect("valid capacities");
 
+    // ANCHOR: registry
     let registry: SessionRegistry<u8> = SessionRegistry::default();
     let id = ConnectionId::new(42);
     registry.insert(id, &handle);
@@ -88,4 +95,5 @@ async fn the_registry_holds_handles_weakly() {
         registry.get(&id).is_none(),
         "a closed connection leaves no handle behind"
     );
+    // ANCHOR_END: registry
 }

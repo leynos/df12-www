@@ -19,6 +19,7 @@ use wireframe::{
     testkit::drive_with_partial_frames,
 };
 
+// ANCHOR: weighbridge
 /// Counts every request that crosses the weighbridge, on any route.
 struct Weighbridge {
     weighed: Arc<AtomicUsize>,
@@ -58,6 +59,7 @@ impl<E: Packet> Transform<HandlerService<E>> for Weighbridge {
         )
     }
 }
+// ANCHOR_END: weighbridge
 
 #[derive(bincode::Encode, bincode::BorrowDecode)]
 struct ManifestV1 {
@@ -65,10 +67,13 @@ struct ManifestV1 {
     name: String,
 }
 
+/// Version 2 added the tare weight, so a version 1 payload is too short to
+/// decode as version 2.
 #[derive(bincode::Encode, bincode::BorrowDecode, Debug, PartialEq)]
 struct ManifestV2 {
     id: u64,
     display_name: String,
+    tare_kg: u32,
 }
 
 /// Rewrites version 1 manifests so handlers only ever see version 2.
@@ -85,18 +90,21 @@ where
 {
     type Error = Infallible;
 
+    // ANCHOR: upgrade
     async fn call(&self, mut req: ServiceRequest) -> Result<ServiceResponse, Infallible> {
         if ManifestV2::from_bytes(req.frame()).is_err() {
             if let Ok((v1, _)) = ManifestV1::from_bytes(req.frame()) {
                 let v2 = ManifestV2 {
                     id: v1.id,
                     display_name: v1.name,
+                    tare_kg: 0,
                 };
                 *req.frame_mut() = v2.to_bytes().expect("encode ManifestV2");
             }
         }
         self.inner.call(req).await
     }
+    // ANCHOR_END: upgrade
 }
 
 #[async_trait]
@@ -122,6 +130,7 @@ fn yard(weighed: Arc<AtomicUsize>, closed: Arc<AtomicUsize>) -> wireframe::Resul
         .route(5, manifests)?
         .wrap(UpgradeManifests)?
         .wrap(Weighbridge { weighed })?;
+    // ANCHOR: lifecycle
     let app = app
         .on_connection_setup(|| async {
             let shift = Shift::default();
@@ -134,6 +143,7 @@ fn yard(weighed: Arc<AtomicUsize>, closed: Arc<AtomicUsize>) -> wireframe::Resul
                 closed.fetch_add(shift.opened.load(Ordering::Relaxed), Ordering::Relaxed);
             }
         })?;
+    // ANCHOR_END: lifecycle
     Ok(app)
 }
 
@@ -147,7 +157,12 @@ async fn handlers_only_ever_see_version_two() {
         id: 7,
         name: "coal".into(),
     };
-    let request = Envelope::new(5, Some(1), legacy.to_bytes().expect("encode"));
+    let legacy_bytes = legacy.to_bytes().expect("encode");
+    assert!(
+        ManifestV2::from_bytes(&legacy_bytes).is_err(),
+        "a version 1 payload must not pass as version 2"
+    );
+    let request = Envelope::new(5, Some(1), legacy_bytes);
     let wire = BincodeSerializer.serialize(&request).expect("encode");
 
     let codec = LengthDelimitedFrameCodec::new(1024);
@@ -162,7 +177,8 @@ async fn handlers_only_ever_see_version_two() {
         manifest,
         ManifestV2 {
             id: 7,
-            display_name: "coal".into()
+            display_name: "coal".into(),
+            tare_kg: 0,
         }
     );
     assert_eq!(weighed.load(Ordering::Relaxed), 1);

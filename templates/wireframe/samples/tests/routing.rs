@@ -11,6 +11,7 @@ use wireframe::{
     testkit::drive_with_partial_frames,
 };
 
+// ANCHOR: routes
 const LOGIN: u32 = 1;
 const TELEMETRY: u32 = 2;
 
@@ -26,17 +27,21 @@ fn yard() -> wireframe::Result<WireframeApp> {
         .route(LOGIN, handler("login"))?
         .route(TELEMETRY, handler("telemetry"))
 }
+// ANCHOR_END: routes
 
 #[test]
 fn a_message_id_is_routed_once() {
+    // ANCHOR: duplicate
     let app = yard().expect("two distinct routes");
     let refused = app.route(LOGIN, handler("impostor"));
     assert!(matches!(
         refused,
         Err(WireframeError::DuplicateRoute(LOGIN))
     ));
+    // ANCHOR_END: duplicate
 }
 
+// ANCHOR: waybill
 /// A protocol's own envelope: a 16-bit opcode, a ticket, and the payload.
 #[derive(bincode::Encode, bincode::BorrowDecode, Debug, PartialEq)]
 struct Waybill {
@@ -71,7 +76,9 @@ impl Packet for Waybill {
         }
     }
 }
+// ANCHOR_END: waybill
 
+// ANCHOR: waybill-app
 type WaybillApp = WireframeApp<BincodeSerializer, (), Waybill>;
 
 fn waybill_yard() -> wireframe::Result<WaybillApp> {
@@ -81,6 +88,7 @@ fn waybill_yard() -> wireframe::Result<WaybillApp> {
     });
     WaybillApp::new()?.route(107, unload)
 }
+// ANCHOR_END: waybill-app
 
 #[tokio::test]
 async fn a_custom_envelope_keeps_its_ticket() {

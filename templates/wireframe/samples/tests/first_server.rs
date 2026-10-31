@@ -12,6 +12,7 @@ use wireframe::{
     server::WireframeServer,
 };
 
+// ANCHOR: messages
 #[derive(bincode::Encode, bincode::BorrowDecode, Debug)]
 struct Ping {
     body: String,
@@ -23,7 +24,9 @@ struct Pong {
 }
 
 const PING: u32 = 1;
+// ANCHOR_END: messages
 
+// ANCHOR: middleware
 /// Middleware that answers every `Ping` with a `Pong`.
 struct AnswerPings;
 
@@ -60,7 +63,9 @@ impl Transform<HandlerService<Envelope>> for AnswerPings {
         HandlerService::from_service(id, AnswerPingsService { inner: service })
     }
 }
+// ANCHOR_END: middleware
 
+// ANCHOR: app
 fn build_app() -> wireframe::Result<WireframeApp> {
     let handler: Handler<Envelope> = Arc::new(|env: &Envelope| {
         let id = env.id();
@@ -69,7 +74,9 @@ fn build_app() -> wireframe::Result<WireframeApp> {
 
     WireframeApp::new()?.route(PING, handler)?.wrap(AnswerPings)
 }
+// ANCHOR_END: app
 
+// ANCHOR: serve
 async fn serve() -> std::io::Result<(SocketAddr, oneshot::Sender<()>)> {
     let (ready_tx, ready_rx) = oneshot::channel();
     let (stop_tx, stop_rx) = oneshot::channel::<()>();
@@ -87,7 +94,9 @@ async fn serve() -> std::io::Result<(SocketAddr, oneshot::Sender<()>)> {
     ready_rx.await.map_err(std::io::Error::other)?;
     Ok((addr, stop_tx))
 }
+// ANCHOR_END: serve
 
+// ANCHOR: call
 async fn call(addr: SocketAddr) -> Result<Pong, Box<dyn Error>> {
     let mut client = WireframeClient::builder().connect(addr).await?;
 
@@ -101,6 +110,7 @@ async fn call(addr: SocketAddr) -> Result<Pong, Box<dyn Error>> {
     client.close().await;
     Ok(pong)
 }
+// ANCHOR_END: call
 
 #[tokio::test]
 async fn a_ping_comes_back_as_a_pong() {

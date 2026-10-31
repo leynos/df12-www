@@ -26,17 +26,20 @@ fn request(body: &[u8]) -> Vec<u8> {
 
 #[tokio::test]
 async fn one_byte_at_a_time() {
+    // ANCHOR: partial
     let codec = LengthDelimitedFrameCodec::new(1024);
     let one = NonZeroUsize::new(1).expect("non-zero");
     let replies = drive_with_partial_frames(app(), &codec, vec![request(b"a"), request(b"b")], one)
         .await
         .expect("the app answers");
     assert_eq!(replies, vec![request(b"a"), request(b"b")]);
+    // ANCHOR_END: partial
 }
 
 #[tokio::test(start_paused = true)]
 async fn a_slow_reader_on_paused_time() {
     let codec = LengthDelimitedFrameCodec::new(1024);
+    // ANCHOR: slow
     let pace = |bytes: usize| {
         SlowIoPacing::new(
             NonZeroUsize::new(bytes).expect("non-zero"),
@@ -52,4 +55,5 @@ async fn a_slow_reader_on_paused_time() {
         .await
         .expect("the app answers");
     assert_eq!(replies, vec![request(b"slow")]);
+    // ANCHOR_END: slow
 }

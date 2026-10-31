@@ -46,9 +46,10 @@ is authored directly as HTML.
 - **`config/pages.yaml`** is the single source of layout and copy data. It
   defines the main site's homepage, about page, and documentation bundles, and a
   `sites:` mapping that configures each sub-site (`mxd`, `episodic`, `netsuke`,
-  `weaver`, `stilyagi`, `cuprum`, `rstest-bdd`, `femtologging`). A sub-site
-  entry declares its `output_dir`, `templates_dir`, `stylesheet`, `base_path`,
-  theme metadata, navigation links, shared-content pages, and content pages.
+  `weaver`, `stilyagi`, `cuprum`, `rstest-bdd`, `femtologging`, `wireframe`).
+  A sub-site entry declares its `output_dir`, `templates_dir`, `stylesheet`,
+  `base_path`, theme metadata, navigation links, shared-content pages, and
+  content pages.
 - **`config/shared/*.md`** holds copy shared across sub-sites — the privacy
   policy, terms of use, and code of conduct. Each sub-site opts in through its
   `shared_content` list and renders the same Markdown through its own chrome.
@@ -101,6 +102,7 @@ Every published file therefore has a source elsewhere in the repository:
 | `*/assets/js/*.js`                            | swc compiling `src/static/**/assets/js/*.ts`          |
 | `netsuke/assets/search/*.json`                | `scripts/build-netsuke-search-index.mjs`              |
 | `femtologging/assets/styles/femtologging.css` | Tailwind compiling `src/styles/`                      |
+| `wireframe/assets/styles/wireframe.css`       | Tailwind compiling `src/styles/`                      |
 | everything else                               | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 To add an asset, put it in `src/static/` at the path it should occupy in the
@@ -142,16 +144,17 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Nine entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Ten entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode), `src/styles/mxd.css` for the mxd sub-site (the `mxd`
 theme), `src/styles/episodic.css` for Episodic (the `episodic` theme),
 `src/styles/weaver.css` for Weaver (the `weaver` theme),
 `src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme),
 `src/styles/netsuke.css` for Netsuke (the `netsuke` theme),
-`src/styles/cuprum.css` for Cuprum (the `cuprum` theme), and
-`src/styles/rstest-bdd.css` for rstest-bdd (the `rstest-bdd` theme), and
-`src/styles/femtologging.css` for femtologging (the `femto` theme).
+`src/styles/cuprum.css` for Cuprum (the `cuprum` theme),
+`src/styles/rstest-bdd.css` for rstest-bdd (the `rstest-bdd` theme),
+`src/styles/femtologging.css` for femtologging (the `femto` theme), and
+`src/styles/wireframe.css` for wireframe (the `wireframe` theme).
 
 Weaver's entrypoint is the one to read first when adding a sub-site stylesheet,
 and Episodic's follows the same shape. It declares the theme, then imports
@@ -251,6 +254,20 @@ the generated syntax partial. The 0.2.0-beta1 copy is prospective, and source
 links identify the verified revision. Sample files and their downloads must
 stay byte-identical. See [femtologging sub-site](docs/femtologging-site.md) for
 provenance and checks.
+
+wireframe follows its own identity specification, "Wireframe | Visual identity
+and design language": X-Y vector-display beam art on a green-black field,
+Sintony for every word, Monaspace Krypton for code, and magenta only for the
+one selected or correlated object. Its classes carry a `wf-` prefix. The
+wordmark, lockup, symbol, and favicon are generated SVG; rerun
+`scripts/generate_wireframe_marks.py` after changing a glyph, and never
+rasterize the wordmark. Its playful world is the night yard, a marshalling yard
+drawn in beams, with no characters. Every working example is cut, by mdBook
+`ANCHOR` markers, from the Cargo package under `templates/wireframe/samples/`,
+and `make wireframe-samples` compiles and runs it against the release named by
+`wireframe_version`. The upstream user's guide disagrees with the 0.3.0 release
+in several places, and the site follows the release; see
+[wireframe sub-site](docs/wireframe-site.md) before changing a claim.
 
 ### Prefer semantic classes over literal colours
 

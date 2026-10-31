@@ -602,7 +602,7 @@ block outright, so a run restores it without needing the previous content.
 | Stilyagi   | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css`   |
 | Cuprum     | `CuprumStyle`    | `python`, `console`                                | `cuprum-syntax`   | `--cuprum-syntax-`   | `600`       | `src/static/cuprum/assets/styles/syntax.css`     |
 | rstest-bdd | `LanternStyle`   | `rust`, `gherkin`, `toml`, `console`               | `lantern-syntax`  | `--lantern-syntax-`  | `600`       | `src/static/rstest-bdd/assets/styles/syntax.css` |
-| wireframe  | `YardStyle`      | `rust`, `toml`                                     | `wf-syntax`       | `--wf-syntax-`       | `600`       | `src/styles/wireframe/syntax.css`                |
+| wireframe  | `ScopeStyle`     | `rust`, `toml`                                     | `wf-syntax`       | `--wf-syntax-`       | `600`       | `src/styles/wireframe/syntax.css`                |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each

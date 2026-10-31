@@ -4,7 +4,7 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-large-messages'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = 'long-load' %}
+{% set plate_key = 'fragments' %}
 {% block article_body %}
 <section aria-labelledby="enable"><h2 id="enable">Turn fragmentation on</h2>
 <p>A frame has a size limit, 1,024 bytes by default, and some messages are larger. Fragmentation splits an oversized payload into fragments that each fit a frame, then rejoins them on the far side before anything is decoded. It is off by default. <code>enable_fragmentation()</code> derives a configuration from the frame limit: messages up to sixteen frames&rsquo; worth (16&nbsp;KiB by default), and partial messages evicted after 30 seconds.</p>

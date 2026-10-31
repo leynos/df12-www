@@ -5,8 +5,8 @@
  *
  * The site follows "Wireframe | Visual identity and design language" (v0.1,
  * 31 October 2026): X-Y vector-display beam art on a green-black field, a
- * drawn vector wordmark, Sintony for words, and Monaspace Krypton for code.
- * Its playful world is the night yard, a marshalling yard drawn in beams. It is declared
+ * the supplied logotype, Sintony for words, and Monaspace Krypton for code.
+ * Its playful world is the scope, a vector display driven hard. It is declared
  * once, as the daisyUI "wireframe" theme plus the tokens under @theme, and
  * the partials read those variables rather than restating a colour.
  *
@@ -97,7 +97,7 @@
   --font-mono: "Monaspace Krypton", consolas, monospace;
 
   /* The design-language names for the daisyUI slots above, so partials and
-     templates speak the yard while the values live in one place. */
+     templates speak the scope while the values live in one place. */
   --color-night: var(--color-base-100);
   --color-panel: var(--color-base-200);
   --color-raised: var(--color-base-300);

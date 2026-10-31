@@ -1953,9 +1953,9 @@ sites:
           guides/testing}
       - {key: guide-production, label: "Running in production", template: pages/guide-production.jinja, output_slug: 
           guides/production}
-      - {key: architecture, label: "The yard, layer by layer.", template: pages/architecture.jinja, output_slug: 
+      - {key: architecture, label: "The stack, layer by layer.", template: pages/architecture.jinja, output_slug: 
           architecture}
       - {key: examples, label: "Worked examples", template: pages/examples.jinja, output_slug: examples}
       - {key: roadmap, label: "Released, next, and further out.", template: pages/roadmap.jinja, output_slug: roadmap}
-      - {key: yard, label: "The night yard", template: pages/yard.jinja, output_slug: yard}
+      - {key: scope, label: "The scope", template: pages/scope.jinja, output_slug: scope}
     pages: {}

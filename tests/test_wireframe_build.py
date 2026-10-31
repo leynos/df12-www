@@ -287,7 +287,7 @@ def test_the_scope_scene_is_generated() -> None:
 
 
 def test_the_syntax_partial_is_generated() -> None:
-    """The committed syntax colours match YardStyle."""
+    """The committed syntax colours match ScopeStyle."""
     assert STYLESHEET.read_text(encoding="utf-8") == build_css(), (
         f"{STYLESHEET} is stale; rerun scripts/generate_wireframe_pygments_css.py"
     )

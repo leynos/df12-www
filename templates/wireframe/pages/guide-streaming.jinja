@@ -4,7 +4,7 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-streaming'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = 'two-lines' %}
+{% set plate_key = 'queues' %}
 {% block article_body %}
 <section aria-labelledby="scope"><h2 id="scope">What 0.3.0 wires up</h2>
 <p>Start with the boundary, because it decides what can be built today. In {{ wireframe_version }}, a connection served by <code>WireframeServer</code> answers each routed request with exactly one reply frame. The types on this page, which are <code>Response</code>, <code>PushQueues</code>, <code>ConnectionActor</code>, and <code>SessionRegistry</code>, ship, are tested, and work together. The routed server path does not drive them.</p>

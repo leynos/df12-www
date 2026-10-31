@@ -145,7 +145,7 @@
         <p>Feed frames one byte at a time, fragment a payload, or pace a slow reader under paused time.</p>
       </a>
       <a class="wf-bento__cell wf-bento__cell--image" href="/wireframe/guides/streaming/">
-        {{ ui.plate('two-lines', sizes='(width < 768px) 100vw, 40vw', caption=false) }}
+        {{ ui.plate('queues', sizes='(width < 768px) 100vw, 40vw', caption=false) }}
         <div class="wf-bento__copy">
           <span class="wf-bento__icon">{{ ui.icon('pulses') }}</span>
           <h3>Push and streams, as parts</h3>
@@ -157,12 +157,12 @@
 </section>
 
 <section class="wf-world" aria-labelledby="world-title">
-  <div class="wf-world__plate">{{ ui.plate('night-yard', sizes='100vw', caption=false) }}</div>
+  <div class="wf-world__plate">{{ ui.plate('scope', sizes='100vw', caption=false) }}</div>
   <div class="wf-shell wf-world__body">
-    <h2 id="world-title">The night yard</h2>
-    <p>Frames are freight. A train of bytes arrives, the codec uncouples it into wagons, and the router reads each waybill and sets the points, so every wagon takes exactly one siding. Long loads travel on several wagons and are rejoined before anyone unloads them.</p>
-    <p class="wf-world__key">On every plate: <span class="wf-key wf-key--mint">mint</span> is track and the route in use, <span class="wf-key wf-key--cyan">cyan</span> is a frame, <span class="wf-key wf-key--amber">amber</span> is traffic on the move, and <span class="wf-key wf-key--magenta">magenta</span> marks the one wagon being followed.</p>
-    <a class="wf-arrow-link" href="/wireframe/yard/">How the yard is drawn {{ ui.icon('arrow-right') }}</a>
+    <h2 id="world-title">The scope</h2>
+    <p>Every frame is a stroke. A vector display draws only lines: the beam is steered from point to point, lit where it means something and blanked where it doesn&rsquo;t. wireframe steers messages the same way. The codec cuts the byte stream into frames, the router deflects each one to exactly one handler, and where the beam stops, the trace burns brightest.</p>
+    <p class="wf-world__key">On every plate: <span class="wf-key wf-key--mint">mint</span> is structure and the route in use, <span class="wf-key wf-key--cyan">cyan</span> is a frame, <span class="wf-key wf-key--amber">amber</span> is traffic on the move, and <span class="wf-key wf-key--magenta">magenta</span> marks the one message being followed.</p>
+    <a class="wf-arrow-link" href="/wireframe/scope/">How the scope is drawn {{ ui.icon('arrow-right') }}</a>
   </div>
 </section>
 

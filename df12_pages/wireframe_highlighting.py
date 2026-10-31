@@ -22,7 +22,7 @@ from pygments.token import (
 )
 
 
-class YardStyle(Style):
+class ScopeStyle(Style):
     """Mint keywords, cyan names, amber literals, and ink text on the panel.
 
     The beam roles follow the colour and beam system: mint signals structure,

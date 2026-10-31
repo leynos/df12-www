@@ -37,3 +37,24 @@ updates:
     cooldown:
       default-days: 7
       semver-major-days: 14
+
+  # The rstest-bdd samples compile and run against the published crates and carry
+  # their own manifest and lockfile, so the entries above do not reach them.
+  - package-ecosystem: "cargo"
+    directory: "/templates/rstest-bdd/samples"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "cargo"
+    schedule:
+      interval: "daily"
+    cooldown:
+      default-days: 7
+      semver-major-days: 14

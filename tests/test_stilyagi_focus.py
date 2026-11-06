@@ -146,8 +146,18 @@ class TestFocusRingTokens:
         a focus check on the chip is only meaningful at a wider viewport.
         """
         docs_css = (STYLE_SOURCES / "pages" / "docs.css").read_text(encoding="utf-8")
-        assert f"@media (width <= {CHIP_ROW_MIN_WIDTH}px)" in docs_css
-        assert ".filter-chip {\n    display: none;\n  }" in docs_css
+        media = re.search(
+            rf"@media\s*\(\s*width\s*<=\s*{CHIP_ROW_MIN_WIDTH}px\s*\)\s*\{{", docs_css
+        )
+        assert media is not None
+        depth, end = 1, media.end()
+        while depth and end < len(docs_css):
+            depth += {"{": 1, "}": -1}.get(docs_css[end], 0)
+            end += 1
+        assert re.search(
+            r"\.filter-chip\s*\{\s*display\s*:\s*none\s*;?\s*\}",
+            docs_css[media.end() : end],
+        ), "the chip row must be hidden inside the narrow-viewport media query"
 
 
 @pytest.fixture(scope="module")

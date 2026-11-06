@@ -15,6 +15,7 @@ Run the integration coverage with::
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from bs4 import BeautifulSoup
@@ -145,9 +146,9 @@ def test_episodic_code_blocks_make_the_scroll_region_focusable(tmp_path: Path) -
     reference_styles = (REPO_ROOT / "src/styles/episodic/reference.css").read_text(
         encoding="utf-8"
     )
-    assert ".code-scroll {\n  overflow-x: auto;\n}" in reference_styles, (
-        "the focusable code-scroll region must own horizontal scrolling"
-    )
+    assert re.search(
+        r"\.code-scroll\s*\{\s*overflow-x\s*:\s*auto\s*;?\s*\}", reference_styles
+    ), "the focusable code-scroll region must own horizontal scrolling"
 
 
 def test_roadmap_task_macro_renders_nested_tasks_with_missing_optional_fields() -> None:

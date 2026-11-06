@@ -147,7 +147,7 @@ def test_episodic_code_blocks_make_the_scroll_region_focusable(tmp_path: Path) -
         encoding="utf-8"
     )
     assert re.search(
-        r"\.code-scroll\s*\{\s*overflow-x:\s*auto\s*;?\s*\}", reference_styles
+        r"\.code-scroll\s*\{\s*overflow-x\s*:\s*auto\s*;?\s*\}", reference_styles
     ), "the focusable code-scroll region must own horizontal scrolling"
 
 

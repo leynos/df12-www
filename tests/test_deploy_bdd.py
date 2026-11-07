@@ -68,7 +68,7 @@ def i_initialise_the_stack_with_the_config(
     calls: list[list[str]] = []
 
     def fake_ensure(*args: typ.Any, **kwargs: typ.Any) -> None:  # noqa: ANN401
-        """Record that the backend bucket was ensured, ignoring its arguments."""
+        """Record that the backend-bucket check was called, ignoring arguments."""
         calls.append(["ensure"])
 
     def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:

@@ -99,7 +99,7 @@ def when_render_docs(
     calls: list[str] = []
 
     class _RecordingSession:
-        """Record each URL fetched during a render and pass the rest through."""
+        """Record each URL fetched during a render and delegate those requests."""
 
         def __init__(self, delegate: requests.Session) -> None:
             """Keep the real session that requests are delegated to."""

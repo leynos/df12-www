@@ -37,6 +37,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from df12_pages._constants import PAGE_META_TEMPLATE
+from df12_pages.build_clock import build_time
 from df12_pages.config import PageConfig, SectionLayout
 from df12_pages.docs_index import ManifestDescriptionResolver
 from df12_pages.generator.link_rewriter import _build_link_rewriter
@@ -118,7 +119,7 @@ class PageContentGenerator:
         out_dir = self.output_dir_override or self.page.output_dir
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        generated_at = dt.datetime.now(dt.UTC)
+        generated_at = build_time()
         doc_updated_at = self.doc_updated_at or generated_at
         section_bundle: list[tuple[Section, SectionModel, str]] = []
         for section in sections:
@@ -328,7 +329,7 @@ class PageContentGenerator:
                 if parsed.tzinfo is None:
                     parsed = parsed.replace(tzinfo=dt.UTC)
                 return parsed.astimezone(dt.UTC)
-        return dt.datetime.now(dt.UTC)
+        return build_time()
 
     def _resolve_description(self) -> str:
         """Return the page description override or fetch it from the manifest."""

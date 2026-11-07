@@ -34,6 +34,7 @@ _CHILD_TEMPLATE = """\
 
 
 def _write_templates(templates_dir: Path) -> None:
+    """Write the base layout and the ``pages/demo.jinja`` child template."""
     templates_dir.mkdir(parents=True, exist_ok=True)
     (templates_dir / "doc_page.jinja").write_text(_BASE_TEMPLATE, encoding="utf-8")
     pages_dir = templates_dir / "pages"
@@ -42,6 +43,7 @@ def _write_templates(templates_dir: Path) -> None:
 
 
 def _make_nav() -> list[NavLinkConfig]:
+    """Return three top-level nav links: Home, Demo and Other."""
     return [
         NavLinkConfig(label="Home", href="../"),
         NavLinkConfig(label="Demo", href="../demo/"),

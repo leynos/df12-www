@@ -502,6 +502,7 @@ def test_the_walker_reports_what_the_capture_relies_on(
     by_id: dict[str, dict[str, typ.Any]] = {}
 
     def index(node: dict[str, typ.Any]) -> None:
+        """Record every node with an ``id`` in ``by_id``, depth first."""
         if node.get("id"):
             by_id[node["id"]] = node
         for child in node["children"]:
@@ -554,6 +555,7 @@ def test_the_walker_reports_what_the_capture_relies_on(
     capped_document = tools._snapshot_document(fixture.as_uri(), json.dumps(capped))
 
     def count(node: dict[str, typ.Any]) -> int:
+        """Return the number of nodes in a subtree, including its root."""
         return 1 + sum(count(child) for child in node["children"])
 
     assert count(capped_document["payload"]["tree"]) == WALKER_BUDGET, (

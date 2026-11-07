@@ -135,12 +135,14 @@ class _SubtreeParser(HTMLParser):
     """Extract the first element carrying a class token from a document."""
 
     def __init__(self, wanted_class: str) -> None:
+        """Start with no captured element, looking for ``wanted_class``."""
         super().__init__(convert_charrefs=True)
         self._wanted = wanted_class
         self._stack: list[_Node] = []
         self.root: _Node | None = None
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """Capture a start tag inside the subtree, or the first matching element."""
         if self.root is not None and not self._stack:
             return  # already captured the first match
         attributes = {key: value or "" for key, value in attrs}
@@ -159,6 +161,7 @@ class _SubtreeParser(HTMLParser):
             self._stack.append(node)
 
     def handle_endtag(self, tag: str) -> None:
+        """Pop the innermost open element when its end tag matches it."""
         if self._stack and self._stack[-1].tag == tag:
             self._stack.pop()
 

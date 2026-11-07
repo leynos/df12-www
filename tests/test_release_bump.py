@@ -92,11 +92,15 @@ def test_bump_workflow_updates_yaml(tmp_path: Path) -> None:
     )
 
     class StubClient(GitHubReleaseClient):
+        """A release client that knows about ``owner/alpha`` and nothing else."""
+
         def __init__(self) -> None:
+            """Start with no recorded calls."""
             super().__init__()
             self.calls: list[str] = []
 
         def fetch_latest(self, repo: str) -> ReleaseInfo | None:
+            """Record the repository asked for; return a release for alpha only."""
             self.calls.append(repo)
             if repo == "owner/alpha":
                 return ReleaseInfo(

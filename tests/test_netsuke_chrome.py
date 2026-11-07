@@ -123,6 +123,7 @@ def _classes(tag: Tag) -> list[str]:
 
 
 def _script_sources(soup: BeautifulSoup) -> list[str]:
+    """Return the ``src`` of every ``script`` tag that has one."""
     return [str(tag["src"]) for tag in soup.select("script[src]")]
 
 
@@ -343,6 +344,7 @@ class TestBreadcrumb:
 
     @staticmethod
     def _crumbs(source: str) -> tuple[BeautifulSoup, list[typ.Any]]:
+        """Render a breadcrumb macro call; return the soup and its entries."""
         soup = _render_macro(source)
         return soup, soup.select("nav[aria-label='Breadcrumb'] ol > li")
 

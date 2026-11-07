@@ -107,7 +107,10 @@ def http_serve(directory: Path) -> cabc.Iterator[int]:
     """
 
     class _SilentHandler(http.server.SimpleHTTPRequestHandler):
+        """Serve the directory without writing a log line per request."""
+
         def log_message(self, format: str, *args: object) -> None:  # noqa: A002
+            """Discard the request log line."""
             pass
 
     handler = functools.partial(_SilentHandler, directory=str(directory))
@@ -143,6 +146,7 @@ def relative_luminance(rgb: cabc.Sequence[float]) -> float:
     """Return the WCAG relative luminance of an sRGB triple on 0-255."""
 
     def channel(component: float) -> float:
+        """Linearise one 0-255 sRGB channel, per WCAG."""
         scaled = component / 255
         if scaled <= _SRGB_LINEAR_THRESHOLD:
             return scaled / 12.92

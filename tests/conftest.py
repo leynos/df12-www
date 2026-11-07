@@ -102,6 +102,7 @@ def drive() -> cabc.Iterator[cabc.Callable[..., str]]:
     session = ["--session", f"weaver-tests-{os.getpid()}"]
 
     def run(*args: str) -> str:
+        """Run ``agent-browser`` in this session and return its stdout."""
         completed = subprocess.run(  # noqa: S603 - fixed argv, no shell
             [browser, *args, *session],
             cwd=REPO_ROOT,

@@ -209,6 +209,7 @@ class _SubtreeParser(HTMLParser):
     """Extract the first element satisfying a match from a document."""
 
     def __init__(self, match: _Match) -> None:
+        """Start with no captured element, looking for ``match``."""
         super().__init__(convert_charrefs=True)
         self._match = match
         self._stack: list[_Node] = []
@@ -216,6 +217,7 @@ class _SubtreeParser(HTMLParser):
         self.root: _Node | None = None
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """Capture a start tag inside the subtree, or the first match itself."""
         if self._opaque_depth:
             if tag not in _VOID_ELEMENTS:
                 self._opaque_depth += 1
@@ -238,6 +240,7 @@ class _SubtreeParser(HTMLParser):
                 self._opaque_depth = 1
 
     def handle_endtag(self, tag: str) -> None:
+        """Close the innermost open element when its end tag arrives."""
         if self._opaque_depth:
             if tag in _VOID_ELEMENTS:
                 return  # a self-closed void element opened nothing

@@ -170,6 +170,7 @@ def _driven(
 
     @contextlib.contextmanager
     def served(port: int, *_args: object, **_kwargs: object) -> cabc.Iterator[str]:
+        """Stand in for ``_served``: record the port asked for and its stop."""
         record["served"].append(port)
         try:
             yield "http://127.0.0.1:9999"
@@ -178,6 +179,7 @@ def _driven(
 
     @contextlib.contextmanager
     def staged(out_dir: Path, suffix: str) -> cabc.Iterator[Path]:
+        """Stand in for ``_staged``: record the request and yield a staging dir."""
         record["staged"].append((out_dir, suffix))
         staging = out_dir / ".staging"
         staging.mkdir(parents=True, exist_ok=True)
@@ -194,6 +196,7 @@ def _driven(
     )
 
     def read(argv: cabc.Sequence[str]) -> str:
+        """Stand in for ``_read_tool``: canned defaults probe, or an empty tree."""
         record["argv"].append(list(argv))
         if "x-unknown" in argv[2]:  # the defaults probe, evaluated on about:blank
             return json.dumps(json.dumps({"base": {}, "deltas": {}}))
@@ -281,11 +284,13 @@ def test_the_capture_command_addresses_the_site_it_was_given(
     ) as run:
 
         def pages_under(root: Path) -> list[str]:
+            """Record the root asked for and return the two test pages."""
             roots.append(root)
             return ["", "docs/"]
 
         @contextlib.contextmanager
         def served(port: int, *_args: object, **kwargs: object) -> cabc.Iterator[str]:
+            """Record the site and port asked for; yield a fixed origin."""
             sites.append(str(kwargs.get("site")))
             run["served"].append(port)
             yield "http://127.0.0.1:9999"
@@ -342,6 +347,7 @@ def test_a_command_stops_its_server_even_when_a_page_fails(
     ) as run:
 
         def refuse(_argv: cabc.Sequence[str]) -> None:
+            """Fail as a browser command does when it exits with status 1."""
             raise subprocess.CalledProcessError(1, "agent-browser")
 
         monkeypatch.setattr(commands, "_run_tool", refuse)
@@ -359,6 +365,7 @@ def test_the_capture_command_names_a_walker_it_cannot_read(
     """The walker is read before any server or browser starts, and named if absent."""
 
     def unreadable() -> str:
+        """Fail as a walker file that has gone missing would."""
         message = "gone"
         raise FileNotFoundError(message)
 

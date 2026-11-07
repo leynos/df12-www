@@ -26,11 +26,12 @@
 </section>
 
 <section aria-labelledby="packet"><h2 id="packet">A custom envelope</h2>
-<p>A protocol with its own header layout can route on its own type. Implement <code>Packet</code>, which converts to and from <code>PacketParts</code>, and <code>CorrelatableFrame</code>, which exposes the correlation ID. The example below uses a 16-bit opcode where <code>Envelope</code> uses a 32-bit ID; the router still sees a <code>u32</code>.</p>
+<p>To give handlers a type of their own rather than <code>Envelope</code>, implement <code>Packet</code>, which converts to and from <code>PacketParts</code>, and <code>CorrelatableFrame</code>, which exposes the correlation ID. The example below presents a 16-bit opcode where <code>Envelope</code> has a 32-bit ID; the router still sees a <code>u32</code>.</p>
+<p>This changes what handlers see, not what travels on the wire. A connection still decodes the serializer&rsquo;s <code>Envelope</code>, rebuilds the custom type from its parts for the handler, and sends the reply as an <code>Envelope</code>. A different layout on the wire needs <a href="/wireframe/guides/codecs/#framecodec">a custom codec</a> as well.</p>
 {{ code.code('tests/routing.rs', 'stroke', title='routing.rs · a custom envelope') }}
 <p>The envelope type is the application&rsquo;s third type parameter. Handlers then receive the custom type:</p>
 {{ code.code('tests/routing.rs', 'stroke-app', title='routing.rs · routing on it') }}
-<p>The sample drives this application with the testkit, one byte at a time, and checks that the reply comes back with its tag intact. Because the handler adds nothing, the reply is the request.</p>
+<p>The sample drives this application with the testkit, one byte at a time. An <code>Envelope</code> goes in, the handler sees a <code>Stroke</code>, and an <code>Envelope</code> comes back with its correlation ID intact. Because the handler adds nothing, the reply is the request.</p>
 </section>
 
 <section aria-labelledby="correlation"><h2 id="correlation">Correlation IDs</h2>
@@ -43,7 +44,8 @@
 <p>The router answers only what it can route. In {{ wireframe_version }}:</p>
 <ul>
   <li>A message whose ID has no route is logged at warning level and dropped. The peer gets no reply.</li>
-  <li>A frame that does not decode as an envelope counts as a deserialization failure. Ten in a row close the connection; any successful frame resets the count.</li>
+  <li>A frame that does not decode as an envelope counts as a deserialization failure. Ten failures with no message dispatched in between close the connection: the count resets only once decoding, reassembly, and assembly have all succeeded.</li>
+  <li>A frame must hold exactly one envelope, so trailing bytes are a decoding failure. The bundled decoders also refuse a container length over a fixed 16&nbsp;MiB, whatever the peer declares.</li>
   <li>Routes are fixed when the application is built. Adding one later means building another application.</li>
 </ul>
 </section>

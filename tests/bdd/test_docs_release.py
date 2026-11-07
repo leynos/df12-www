@@ -117,7 +117,7 @@ def when_render_docs(
             return self._delegate.get(url, timeout=timeout)
 
         def close(self) -> None:  # pragma: no cover - betamax handles lifecycle
-            """Leave closing to Betamax, which owns the session's lifecycle."""
+            """Do nothing on close; the wrapped session is left as it is."""
 
     monkeypatch.setattr(
         "df12_pages.generator.page_generator.requests.Session",

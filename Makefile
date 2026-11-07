@@ -166,7 +166,7 @@ INTERROGATE_TARGETS ?= df12_pages scripts tests
 # Level 2 prints a MISSED row per undocumented definition, which the
 # `interrogate` target fails on: the rounded percentage alone passes a lone gap.
 INTERROGATE_FLAGS ?= -vv --no-color --ext pyi --fail-under 100
-INTERROGATE = $(UV_GATE) tool --from interrogate==$(INTERROGATE_VERSION) -- interrogate
+INTERROGATE = $(UV_GATE) tool --python 3.13 --from interrogate==$(INTERROGATE_VERSION) -- interrogate
 
 interrogate: ## Enforce complete Python docstring coverage
 	@report="$$($(INTERROGATE) $(INTERROGATE_FLAGS) $(INTERROGATE_TARGETS))"; \

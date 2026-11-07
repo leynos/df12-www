@@ -133,7 +133,10 @@ def _http_serve(directory: Path) -> typ.Iterator[int]:
     """
 
     class _SilentHandler(http.server.SimpleHTTPRequestHandler):
+        """Serve files without logging each request."""
+
         def log_message(self, format: str, *args: object) -> None:  # noqa: A002
+            """Discard the request log line."""
             pass
 
     handler = functools.partial(_SilentHandler, directory=str(directory))
@@ -232,28 +235,35 @@ def markdown_response(
     }
 
     class _Response:
+        """Stand-in for ``requests.Response`` with a body and headers."""
+
         def __init__(self, body: str, headers: dict[str, str]) -> None:
+            """Store the body text and response headers."""
             self.text = body
             self.headers = headers
 
         def raise_for_status(self) -> None:  # pragma: no cover - stub
-            return None
+            """Accept every response as successful."""
 
     def set_last_modified(value: str) -> None:
+        """Set the Last-Modified value that later responses report."""
         state["last_modified"] = value
 
     class _Session:
+        """Stand-in for ``requests.Session`` that serves the sample markdown."""
+
         def mount(
             self, *_args: object, **_kwargs: object
         ) -> None:  # pragma: no cover - stub
-            return None
+            """Ignore adapter mounting; the stub session needs none."""
 
         def get(self, url: str, timeout: int = 30) -> _Response:
+            """Record the URL and return the sample markdown."""
             state["calls"].append(url)
             return _Response(sample_markdown, {"Last-Modified": state["last_modified"]})
 
         def close(self) -> None:  # pragma: no cover - stub
-            return None
+            """Do nothing; the stub session holds no resources."""
 
     state["set_last_modified"] = set_last_modified
     monkeypatch.setattr(
@@ -285,6 +295,7 @@ def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
     mocker.patch("df12_pages.generator.page_generator.GitHub", return_value=mock_client)
 
     def set_date(value: dt.datetime) -> None:
+        """Set the author date reported by the mocked latest commit."""
         author.date = value
 
     return {"set_date": set_date}
@@ -647,28 +658,35 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     calls: list[str] = []
 
     class _Response:
+        """Stand-in for ``requests.Response`` with a status code and body."""
+
         def __init__(self, status_code: int, body: str) -> None:
+            """Store the status code, body text, and Last-Modified header."""
             self.status_code = status_code
             self.text = body
             self.headers = {"Last-Modified": "Mon, 01 Jan 2024 12:00:00 GMT"}
 
         def raise_for_status(self) -> None:
+            """Raise HTTPError for any status at or above 400."""
             if self.status_code >= http.HTTPStatus.BAD_REQUEST:
                 msg = f"{self.status_code} for test"
                 raise requests.HTTPError(msg)
 
     class _Session:
+        """Stand-in for ``requests.Session`` that returns 404 for tag URLs."""
+
         def mount(self, *_args: object, **_kwargs: object) -> None:
-            return None
+            """Ignore adapter mounting; the stub session needs none."""
 
         def get(self, url: str, timeout: int = 30) -> _Response:
+            """Record the URL, then return 404 for tags or the sample markdown."""
             calls.append(url)
             if "refs/tags/" in url:
                 return _Response(404, "missing")
             return _Response(200, sample_markdown)
 
         def close(self) -> None:
-            return None
+            """Do nothing; the stub session holds no resources."""
 
     monkeypatch.setattr(
         "df12_pages.generator.page_generator.requests.Session", _Session

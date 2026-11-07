@@ -279,6 +279,7 @@ class _Resolver:
     """Trace names through a package's modules to their defining statements."""
 
     def __init__(self, root: Path, package: str) -> None:
+        """Record the source root and package name, with an empty tree cache."""
         self.root = root
         self.package = package
         self._trees: dict[str, ast.Module] = {}

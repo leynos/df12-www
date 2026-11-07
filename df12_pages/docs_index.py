@@ -154,6 +154,7 @@ class DocsIndexBuilder:
         return entries
 
     def _render_description(self, text: str) -> str:
+        """Render a markdown description to HTML, or return an empty string."""
         normalized = (text or "").strip()
         if not normalized:
             return ""
@@ -328,6 +329,7 @@ class ManifestDescriptionResolver:
     """Resolve project descriptions from manifests with caching."""
 
     def __init__(self) -> None:
+        """Create an empty cache of resolved manifest descriptions."""
         self._cache: dict[str, str] = {}
 
     def resolve(self, page: PageConfig) -> str:

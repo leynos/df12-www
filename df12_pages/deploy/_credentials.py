@@ -101,6 +101,7 @@ def save_credentials(
         auth_table = tomlkit.table()
 
     def _set(key: str, value: str | None) -> None:
+        """Set an auth table key, or remove it when the value is None."""
         if value is None:
             auth_table.pop(key, None)
         else:

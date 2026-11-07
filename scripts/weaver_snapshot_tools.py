@@ -504,6 +504,7 @@ def _unrendered_icons(snapshot: Path) -> int:
     tree = json.loads(snapshot.read_text(encoding="utf-8"))["payload"]["tree"]
 
     def count(node: typ.Any) -> int:  # noqa: ANN401 - the document is untyped upstream data
+        """Count unrendered Iconify spans in one node and its descendants."""
         if not isinstance(node, cabc.Mapping):
             return 0
         classes = node.get("classes")
@@ -612,6 +613,7 @@ def _capture_pages(  # noqa: PLR0913, PLR0917 - one seam per outward dependency
     session = ["--session", _session_name(site, "capture")]
 
     def drive(*args: str) -> None:
+        """Run one agent-browser command in the capture session."""
         run([browser, *args, *session])
 
     try:
@@ -674,6 +676,7 @@ def _shoot_pages(  # noqa: PLR0913, PLR0917 - one seam per outward dependency
     session = ["--session", _session_name(site)]
 
     def drive(*args: str) -> None:
+        """Run one agent-browser command in the screenshot session."""
         run([browser, *args, *session])
 
     try:

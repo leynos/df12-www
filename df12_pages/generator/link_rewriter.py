@@ -41,6 +41,7 @@ class RelativeLinkExtension(Extension):
     """
 
     def __init__(self, repo: str, ref: str, base_dir: str) -> None:
+        """Store the repository, git ref, and base directory for link targets."""
         self.repo = repo
         self.ref = ref
         self.base_dir = base_dir
@@ -55,6 +56,7 @@ class RelativeLinkTreeprocessor(Treeprocessor):
     """Rewrite relative markdown links to point at GitHub raw blobs."""
 
     def __init__(self, md: Markdown, repo: str, ref: str, base_dir: str) -> None:
+        """Bind the Markdown instance and the repository link context."""
         super().__init__(md)
         self.repo = repo
         self.ref = ref

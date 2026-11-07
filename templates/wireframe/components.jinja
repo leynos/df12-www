@@ -25,7 +25,7 @@
 
 {#- A callout: a text-first panel with a left rule, its kind in words. -#}
 {% macro callout(kind, title) -%}
-<aside class="wf-callout wf-callout--{{ kind }}" aria-label="{{ title }}"><p class="wf-callout__kind">{{ {'note': 'Note', 'warning': 'Warning', 'fact': 'In 0.3.0'}[kind] }}</p><p class="wf-callout__title">{{ title }}</p>{{ caller() }}</aside>
+<aside class="wf-callout wf-callout--{{ kind }}" aria-label="{{ title }}"><p class="wf-callout__kind">{{ {'note': 'Note', 'warning': 'Warning', 'fact': 'In ' ~ wireframe_version}[kind] }}</p><p class="wf-callout__title">{{ title }}</p>{{ caller() }}</aside>
 {%- endmacro %}
 
 {#- The head of an article page. -#}

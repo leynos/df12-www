@@ -37,7 +37,7 @@
         <div><h2>Project</h2><ul><li><a href="{{ repository_url }}">Source on GitHub</a></li><li><a href="{{ docs_url }}">API reference on docs.rs</a></li><li><a href="/wireframe/roadmap/">Roadmap</a></li><li><a href="{{ source_base }}/LICENSE">ISC licence</a></li><li><a href="/wireframe/scope/">The scope</a></li></ul></div>
         <div><h2>df12</h2><ul><li><a href="/">df12 Productions</a></li><li><a href="/wireframe/privacy-policy/">Privacy policy</a></li><li><a href="/wireframe/terms-of-use/">Terms of use</a></li><li><a href="/wireframe/code-of-conduct/">Code of conduct</a></li></ul></div>
       </div>
-      <div class="wf-shell wf-footer__strip"><span>Frame. Route. Handle.</span><span>Documents wireframe {{ wireframe_version }}, released {{ wireframe_released }}</span></div>
+      <div class="wf-shell wf-footer__strip"><span>Frame. Route. Handle.</span><span>Documents wireframe {{ wireframe_version }}, {{ 'released' if wireframe_published else 'targeted for' }} {{ wireframe_released }}</span></div>
     </footer>
   </body>
 </html>

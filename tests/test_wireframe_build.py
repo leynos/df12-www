@@ -250,10 +250,11 @@ def test_the_sample_crate_pins_the_documented_release() -> None:
     assert manifest["dependencies"]["wireframe"]["version"] == f"={release}"
     assert template_vars["wireframe_tag"] == f"v{release}"
     lock = tomllib.loads((SAMPLES / "Cargo.lock").read_text(encoding="utf-8"))
-    locked = {package["name"]: package["version"] for package in lock["package"]}
-    assert locked["wireframe"] == release
-    assert locked["tokio-util"] == template_vars["tokio_util_pin"], (
-        "the pages tell readers to pin the tokio-util the samples lock"
+    locked = {package["name"]: package for package in lock["package"]}
+    assert locked["wireframe"]["version"] == release
+    assert ("source" in locked["wireframe"]) == template_vars["wireframe_published"], (
+        "at publication, flip wireframe_published and relock against the crate; "
+        "see docs/wireframe-site.md"
     )
 
 
@@ -364,20 +365,20 @@ _VERSION_RE = re.compile(r"(?<![\d.])0\.\d+\.\d+(?![\d.])")
 def test_pages_name_only_the_documented_release(built_site: Path) -> None:
     """A version on a page is the documented release or a named exception.
 
-    The roadmap is skipped, since it names the next release throughout;
-    elsewhere 0.4.0 appears only where a page warns that it changes a
-    behaviour.
+    The roadmap is skipped, since it names other releases throughout. Elsewhere
+    0.3.0 appears where a page speaks of migrating from it or of mxd, which
+    moves on its own schedule.
     """
     assert built_site.is_dir()
     template_vars = _site().template_vars
     allowed = {
         template_vars["wireframe_version"],
-        template_vars["tokio_util_pin"],
-        "0.7.20",  # the tokio-util release the pin avoids
+        template_vars["mxd_wireframe_version"],
+        "0.3.0",  # the release the migration guide starts from
         "0.1.89",  # async-trait, in the sample crate's dependencies
         "0.3.31",  # futures, likewise
         "0.7.16",  # tokio-util's floor, likewise
-        "0.4.0",  # the next release, where a page warns of a change
+        "0.4.0",  # _VERSION_RE stops at the hyphen in 0.4.0-alpha1
     }
     for page in _pages():
         if page.parent.name == "roadmap":

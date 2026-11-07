@@ -10,9 +10,11 @@ use std::{
 };
 
 use async_trait::async_trait;
+use bytes::{Bytes, BytesMut};
 use wireframe::{
     app::{Envelope, Handler, Packet, WireframeApp},
     codec::LengthDelimitedFrameCodec,
+    hooks::{ConnectionContext, WireframeProtocol},
     message::Message,
     middleware::{HandlerService, Service, ServiceRequest, ServiceResponse, Transform},
     serializer::{BincodeSerializer, Serializer},
@@ -187,4 +189,43 @@ async fn handlers_only_ever_see_version_two() {
         1,
         "teardown received the setup state"
     );
+}
+
+// ANCHOR: before-send
+/// Runs on every response frame a server connection sends, after the codec
+/// has wrapped it and just before it is encoded.
+struct Stamped;
+
+impl WireframeProtocol for Stamped {
+    type Frame = Bytes;
+    type ProtocolError = ();
+
+    fn before_send(&self, frame: &mut Bytes, _context: &mut ConnectionContext) {
+        let mut stamped = BytesMut::from(frame.as_ref());
+        stamped.extend_from_slice(b"!");
+        *frame = stamped.freeze();
+    }
+}
+// ANCHOR_END: before-send
+
+#[tokio::test]
+async fn before_send_reaches_routed_replies() {
+    let echo: Handler<Envelope> = Arc::new(|_: &Envelope| Box::pin(async {}));
+    let app: WireframeApp = WireframeApp::new()
+        .expect("builder")
+        .route(1, echo)
+        .expect("a route")
+        .with_protocol(Stamped);
+
+    let request = Envelope::new(1, Some(1), b"move".to_vec());
+    let wire = BincodeSerializer.serialize(&request).expect("encode");
+    let codec = LengthDelimitedFrameCodec::new(1024);
+    let chunk = NonZeroUsize::new(16).expect("non-zero");
+    let replies = drive_with_partial_frames(app, &codec, vec![wire.clone()], chunk)
+        .await
+        .expect("the app answers");
+
+    let mut expected = wire;
+    expected.push(b'!');
+    assert_eq!(replies, vec![expected], "the hook saw the handler's reply");
 }

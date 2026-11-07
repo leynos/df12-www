@@ -1,7 +1,7 @@
 //! The client reading a multi-frame reply that ends in a terminator.
 //!
-//! wireframe 0.3.0's routed server sends one reply per request, so the
-//! server here is a few lines of plain Tokio that speak the same framing.
+//! wireframe's routed server sends one reply per request, so the server
+//! here is a few lines of plain Tokio that speak the same framing.
 
 use std::net::SocketAddr;
 
@@ -73,7 +73,10 @@ async fn streaming_server() -> SocketAddr {
                 payload: body.as_bytes().to_vec(),
             };
             let encoded = row.to_bytes().expect("encode");
-            framed.send(encoded.into()).await.expect("send");
+            framed
+                .send(bytes::Bytes::from(encoded))
+                .await
+                .expect("send");
         }
     });
     addr

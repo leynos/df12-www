@@ -73,6 +73,19 @@
   font-size: 1.125rem;
 }
 
+.wf-hero__status {
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-amber);
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+.wf-hero__status strong {
+  color: var(--color-ink);
+}
+
 .wf-hero__actions {
   display: flex;
   flex-wrap: wrap;

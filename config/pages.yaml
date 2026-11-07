@@ -1910,17 +1910,23 @@ sites:
       # version; `make wireframe-samples` runs it. Move these together with
       # that crate's Cargo.toml, after the samples pass, and update the
       # verification date and toolchain.
-      wireframe_version: "0.3.0"
-      wireframe_tag: "v0.3.0"
-      wireframe_released: "6 April 2026"
-      # 0.3.0 does not compile against tokio-util 0.7.20; the getting-started
-      # page tells readers to pin this release in their lockfile.
-      tokio_util_pin: "0.7.19"
-      rust_verified: "1.99.0"
-      samples_verified_on: "2026-10-31"
+      wireframe_version: "0.4.0-alpha1"
+      wireframe_tag: "v0.4.0-alpha1"
+      # False until the tag and crates exist: pages then call the date below a
+      # target. docs/wireframe-site.md lists what to change at publication.
+      wireframe_published: false
+      wireframe_released: "15 November 2026"
+      # What `samples_verified_on` ran against, as a phrase in running text.
+      samples_verified_against: "wireframe 0.4.0-alpha1 built from source at commit cd634074"
+      # The crate's declared minimum, enforced upstream by a weekly build.
+      rust_minimum: "1.95"
+      rust_verified: "1.99.1"
+      samples_verified_on: "2026-11-07"
+      # mxd moves on its own schedule, so its claims do not follow the release.
+      mxd_wireframe_version: "0.3.0"
       repository_url: "https://github.com/leynos/wireframe"
-      source_base: "https://github.com/leynos/wireframe/blob/v0.3.0"
-      docs_url: "https://docs.rs/wireframe/0.3.0/wireframe/"
+      source_base: "https://github.com/leynos/wireframe/blob/v0.4.0-alpha1"
+      docs_url: "https://docs.rs/wireframe/0.4.0-alpha1/wireframe/"
     nav_links:
       - {label: Overview, href: /wireframe/}
       - {label: Get started, href: /wireframe/getting-started/}

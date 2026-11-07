@@ -5,7 +5,9 @@ use std::{num::NonZeroUsize, sync::Arc, time::Duration};
 use wireframe::{
     app::{BudgetBytes, Envelope, Handler, MemoryBudgets, WireframeApp},
     codec::LengthDelimitedFrameCodec,
-    fragment::{FragmentHeader, FragmentIndex, Fragmenter, MessageId, Reassembler},
+    fragment::{
+        FragmentHeader, FragmentIndex, FragmentationConfig, Fragmenter, MessageId, Reassembler,
+    },
     serializer::{BincodeSerializer, Serializer},
     testkit::drive_with_fragments,
 };
@@ -27,7 +29,7 @@ fn a_long_message_crosses_in_three_fragments() {
 fn the_reassembler_rejoins_in_order() {
     // ANCHOR: reassembler
     let cap = NonZeroUsize::new(4096).expect("non-zero");
-    let mut reassembler = Reassembler::new(cap, Duration::from_secs(30));
+    let mut reassembler = Reassembler::new(cap, Duration::from_secs(30), None, None);
     let id = MessageId::new(9);
 
     let first = FragmentHeader::new(id, FragmentIndex::zero(), false);
@@ -45,6 +47,26 @@ fn the_reassembler_rejoins_in_order() {
         .expect("the final fragment completes the message");
     assert_eq!(whole.payload().len(), 16);
     // ANCHOR_END: reassembler
+}
+
+#[test]
+fn the_frame_budget_also_caps_what_a_peer_can_leave_unfinished() {
+    // ANCHOR: caps
+    let limit = NonZeroUsize::new(16 * 1024).expect("non-zero");
+    let config = FragmentationConfig::for_frame_budget(1024, limit, Duration::from_secs(30))
+        .expect("the budget covers the fragment header");
+
+    // At most min(frame budget, 64) partial messages at once...
+    assert_eq!(
+        config.max_concurrent_partials.map(NonZeroUsize::get),
+        Some(64)
+    );
+    // ...holding at most the larger of 64 frames and one whole message.
+    assert_eq!(
+        config.max_buffered_bytes.map(NonZeroUsize::get),
+        Some(64 * 1024)
+    );
+    // ANCHOR_END: caps
 }
 
 // ANCHOR: budgets

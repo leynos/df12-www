@@ -3,18 +3,16 @@ name = "vector-scope"
 version = "0.1.0"
 edition = "2024"
 publish = false
-description = "Every code sample on the df12 wireframe site, compiled and run against the published crate."
+description = "Every code sample on the df12 wireframe site, compiled and run against the release the site documents."
 
 # ANCHOR: deps
 [dependencies]
-wireframe = { version = "=0.3.0", features = ["pool", "testkit"] }
+wireframe = { version = "=0.4.0-alpha1", features = ["pool", "testkit"] }
 tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "sync", "test-util", "time"] }
 async-trait = "0.1.89"
 bincode = "2.0.1"
 bytes = "1.10.1"
 futures = "0.3.31"
-# wireframe 0.3.0 does not compile against tokio-util 0.7.20, which adds a
-# second `Encoder` impl for `LengthDelimitedCodec`; Cargo.lock pins 0.7.19.
 tokio-util = { version = "0.7.16", features = ["codec", "rt"] }
 # ANCHOR_END: deps
 

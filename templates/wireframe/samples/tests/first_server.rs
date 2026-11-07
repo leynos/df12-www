@@ -3,13 +3,12 @@
 use std::{convert::Infallible, error::Error, net::SocketAddr, sync::Arc};
 
 use async_trait::async_trait;
-use tokio::sync::oneshot;
 use wireframe::{
     app::{Envelope, Handler, Packet, WireframeApp},
     client::WireframeClient,
     message::Message,
     middleware::{HandlerService, Service, ServiceRequest, ServiceResponse, Transform},
-    server::WireframeServer,
+    server::{ServerShutdown, WireframeServer},
 };
 
 // ANCHOR: messages
@@ -77,22 +76,14 @@ fn build_app() -> wireframe::Result<WireframeApp> {
 // ANCHOR_END: app
 
 // ANCHOR: serve
-async fn serve() -> std::io::Result<(SocketAddr, oneshot::Sender<()>)> {
-    let (ready_tx, ready_rx) = oneshot::channel();
-    let (stop_tx, stop_rx) = oneshot::channel::<()>();
-
-    let server = WireframeServer::new(|| build_app().expect("configure the app"))
+async fn serve() -> Result<(SocketAddr, ServerShutdown), Box<dyn Error>> {
+    let server = WireframeServer::from_app(build_app()?)
         .workers(2)
-        .ready_signal(ready_tx)
-        .bind("127.0.0.1:0".parse().expect("a socket address"))
-        .map_err(std::io::Error::other)?;
+        .bind("127.0.0.1:0".parse()?)?;
     let addr = server.local_addr().expect("a bound address");
 
-    tokio::spawn(server.run_with_shutdown(async {
-        let _ = stop_rx.await;
-    }));
-    ready_rx.await.map_err(std::io::Error::other)?;
-    Ok((addr, stop_tx))
+    let shutdown = server.spawn().await?;
+    Ok((addr, shutdown))
 }
 // ANCHOR_END: serve
 
@@ -114,7 +105,7 @@ async fn call(addr: SocketAddr) -> Result<Pong, Box<dyn Error>> {
 
 #[tokio::test]
 async fn a_ping_comes_back_as_a_pong() {
-    let (addr, stop) = serve().await.expect("server starts");
+    let (addr, shutdown) = serve().await.expect("server starts");
     let pong = call(addr).await.expect("the call succeeds");
     assert_eq!(
         pong,
@@ -122,5 +113,8 @@ async fn a_ping_comes_back_as_a_pong() {
             body: "pong from the scope".into()
         }
     );
-    let _ = stop.send(());
+    // ANCHOR: stop
+    shutdown.stop();
+    shutdown.drained().await.expect("a clean stop");
+    // ANCHOR_END: stop
 }

@@ -42,7 +42,8 @@ fn a_message_id_is_routed_once() {
 }
 
 // ANCHOR: stroke
-/// A protocol's own envelope: a 16-bit opcode, a tag, and the payload.
+/// What handlers see in place of `Envelope`: a 16-bit opcode, a tag, and the
+/// payload. The wire still carries the serializer's `Envelope`.
 #[derive(bincode::Encode, bincode::BorrowDecode, Debug, PartialEq)]
 struct Stroke {
     opcode: u16,
@@ -91,25 +92,39 @@ fn stroke_scope() -> wireframe::Result<StrokeApp> {
 // ANCHOR_END: stroke-app
 
 #[tokio::test]
-async fn a_custom_envelope_keeps_its_tag() {
+async fn a_custom_envelope_changes_what_handlers_see_not_the_wire() {
     let app = stroke_scope().expect("a stroke route");
     let codec = LengthDelimitedFrameCodec::new(1024);
-    let stroke = Stroke {
-        opcode: 107,
-        tag: Some(42),
-        payload: b"move".to_vec(),
-    };
+    let request = Envelope::new(107, Some(42), b"move".to_vec());
     let wire = BincodeSerializer
-        .serialize(&stroke)
-        .expect("encode the stroke");
+        .serialize(&request)
+        .expect("encode the envelope");
 
     let one_byte = NonZeroUsize::new(1).expect("non-zero");
     let replies = drive_with_partial_frames(app, &codec, vec![wire], one_byte)
         .await
         .expect("the app answers");
 
-    let (reply, _): (Stroke, usize) = BincodeSerializer
+    let (reply, _): (Envelope, usize) = BincodeSerializer
         .deserialize(&replies[0])
-        .expect("decode the reply");
-    assert_eq!(reply, stroke, "the default reply echoes the request");
+        .expect("the reply leaves as an Envelope");
+    assert_eq!(reply, request, "the default reply echoes the request");
+}
+
+#[tokio::test]
+async fn trailing_bytes_after_an_envelope_are_a_decode_failure() {
+    let app = scope().expect("two distinct routes");
+    let codec = LengthDelimitedFrameCodec::new(1024);
+    let request = Envelope::new(LOGIN, Some(1), b"sign in".to_vec());
+    let mut wire = BincodeSerializer.serialize(&request).expect("encode");
+    wire.push(0);
+
+    let one_byte = NonZeroUsize::new(1).expect("non-zero");
+    let replies = drive_with_partial_frames(app, &codec, vec![wire], one_byte)
+        .await
+        .expect("the connection survives one failure");
+    assert!(
+        replies.is_empty(),
+        "nothing is dispatched, so nothing answers"
+    );
 }

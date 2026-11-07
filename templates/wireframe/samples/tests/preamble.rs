@@ -3,7 +3,11 @@
 use std::{net::SocketAddr, time::Duration};
 
 use futures::FutureExt;
-use tokio::{io::AsyncWriteExt, sync::oneshot};
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::TcpStream,
+    sync::oneshot,
+};
 use wireframe::{app::WireframeApp, client::WireframeClient, server::WireframeServer};
 
 // ANCHOR: hello
@@ -28,10 +32,17 @@ async fn serve() -> std::io::Result<(SocketAddr, oneshot::Receiver<Hello>)> {
             if let Some(tx) = seen_tx.lock().expect("lock").take() {
                 let _ = tx.send(hello.clone());
             }
-            // Acknowledge with one byte. An error returned here is logged;
-            // it does not close the connection.
             let accepted = hello.magic == MAGIC;
-            async move { stream.write_all(&[u8::from(accepted)]).await }.boxed()
+            async move {
+                stream.write_all(&[u8::from(accepted)]).await?;
+                if accepted {
+                    Ok(())
+                } else {
+                    // An error here closes the connection, so write first.
+                    Err(std::io::Error::other("unknown protocol"))
+                }
+            }
+            .boxed()
         })
         .bind("127.0.0.1:0".parse().expect("a socket address"))
         .map_err(std::io::Error::other)?;
@@ -65,4 +76,29 @@ async fn the_server_reads_the_preamble_first() {
         }
     );
     client.close().await;
+}
+
+#[tokio::test]
+async fn a_rejected_preamble_closes_the_connection() {
+    let (addr, _seen) = serve().await.expect("server starts");
+
+    // Preambles use big-endian fixed-width integers, whatever the serializer.
+    let config = bincode::config::standard()
+        .with_big_endian()
+        .with_fixed_int_encoding();
+    let hello = Hello {
+        magic: *b"NOPE",
+        version: 3,
+    };
+    let bytes = bincode::encode_to_vec(&hello, config).expect("encode a preamble");
+
+    let mut stream = TcpStream::connect(addr).await.expect("connect");
+    stream.write_all(&bytes).await.expect("send the preamble");
+
+    let mut answer = Vec::new();
+    stream
+        .read_to_end(&mut answer)
+        .await
+        .expect("the server closes rather than resets");
+    assert_eq!(answer, [0], "the rejection arrives, then the stream ends");
 }

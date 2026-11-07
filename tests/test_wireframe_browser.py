@@ -54,7 +54,7 @@ PAGES = (
     "architecture/",
     "examples/",
     "roadmap/",
-    "yard/",
+    "scope/",
     "privacy-policy/",
     "terms-of-use/",
     "code-of-conduct/",

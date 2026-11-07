@@ -39,6 +39,7 @@ from tests.support.netsuke_browser import (
     _evaluate,
     _open,
 )
+from tests.support.pinned_build import PINNED_STATUS_LINE
 from tests.support.stilyagi_browser import (
     contrast_ratio,
     normalize_style,
@@ -579,9 +580,12 @@ UPDATE_BASELINE = "NETSUKE_BASELINE_UPDATE"
 # pages stamp the build date into a heading, every footer carries the build
 # year beside the copyright sign, and every page carries the release
 # version, release date, and Rust nightly configured in `pages.yaml`. The
-# first two have a fixed shape and are matched by pattern here; the release
-# values do not, so they are read from the real configuration below and
-# redacted by exact string match instead. Either way the redaction is
+# test session pins the date, because redaction reaches only the text and the
+# date's width also moves the bounding boxes the digest hashes. The
+# record was hashed with the date and year redacted, so they still are. They
+# have a fixed shape and are matched by pattern here; the release values do
+# not, so they are read from the real configuration below and redacted by
+# exact string match instead. Either way the redaction is
 # narrow on purpose: authored content that merely resembles one of these --
 # a PR number, an RFC number, a commit hash, another version mentioned on a
 # preview page -- is left alone, and its change still moves the digest, as
@@ -700,11 +704,12 @@ def _digest(snapshot: Path) -> str:
     hashed as-is: its change is a real change to the page.
 
     This has a known limit. The normalized tree also carries each node's
-    bounding box, so a redacted value whose rendered length changes -- a
-    release date that grows a digit, say -- still moves the digest even
-    though the placeholder text does not. That is the case
-    ``NETSUKE_BASELINE_UPDATE=1`` exists for: a release bump re-records the
-    baseline, as described in
+    bounding box, so a redacted value whose rendered length changes still
+    moves the digest even though the placeholder text does not. The build
+    date changes daily, so the test session pins it. A release value, such as a
+    release date that grows a digit, changes only at a release, which is the
+    case ``NETSUKE_BASELINE_UPDATE=1`` exists for: a release bump re-records
+    the baseline, as described in
     :func:`test_every_page_renders_as_the_committed_baseline`.
     """
     rendered = BUILD_DATE.sub(
@@ -714,6 +719,13 @@ def _digest(snapshot: Path) -> str:
     for value, placeholder in _release_redactions():
         rendered = rendered.replace(value, placeholder)
     return hashlib.sha256(rendered.encode("utf-8")).hexdigest()
+
+
+def test_the_build_under_test_carries_the_pinned_date(built_site: Path) -> None:
+    """The pin reaches the published page whose heading the digest depends on."""
+    del built_site  # the fixture is the build; the tree it returns is Weaver's
+    page = REPO_ROOT / "public" / SITE / "forthcoming" / "linter" / "index.html"
+    assert PINNED_STATUS_LINE in page.read_text(encoding="utf-8")
 
 
 @pytest.mark.timeout(900)
@@ -733,7 +745,8 @@ def test_every_page_renders_as_the_committed_baseline(
     that makes it. The build date the forthcoming pages stamp into a heading,
     the build year in every footer, and the release version, release date,
     and Rust nightly configured in ``pages.yaml`` are the accepted
-    differences, and all are redacted before hashing.
+    differences, and all are redacted before hashing. The date and year are
+    also pinned for the session, so the suite gives the same answer on any day.
     """
     name, out_dir = captured
     digests = {path.stem: _digest(path) for path in sorted(out_dir.glob("*.json"))}

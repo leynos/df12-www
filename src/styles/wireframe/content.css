@@ -643,7 +643,27 @@
 }
 
 .wf-horizon ul {
+  display: grid;
+  gap: 0.5rem;
   max-width: none;
+  margin-top: 0.75rem;
+  padding-left: 1.25rem;
+  list-style: square;
+}
+
+.wf-horizon li::marker {
+  color: var(--color-mint);
+}
+
+.wf-horizon > p {
+  margin-top: 0.75rem;
+}
+
+/* A table whose first column is names: a name stays whole, and the table's
+   scroll region carries the width on a narrow screen. */
+.wf-table--names td:first-child code {
+  overflow-wrap: normal;
+  white-space: nowrap;
 }
 
 /* The field guide: beam swatches. */

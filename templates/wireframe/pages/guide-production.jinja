@@ -6,46 +6,70 @@
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
 {% set plate_key = none %}
 {% block article_body %}
+{#- The upstream tables, as the users' guide lists them at the release tag. -#}
+{% set server_metrics = [
+  ('wireframe_frames_processed_total', 'Counter', 'Frames, by direction'),
+  ('wireframe_errors_total', 'Counter', 'Errors, by kind'),
+  ('wireframe_connection_panics_total', 'Counter', 'Panicking connection tasks'),
+  ('wireframe_decode_rejections_total', 'Counter', 'Decode limit rejections, by path and reason'),
+  ('wireframe_preamble_rejections_total', 'Counter', 'Rejected preambles'),
+  ('wireframe_app_response_sends_total', 'Counter', 'Response send attempts, by outcome'),
+  ('wireframe_application_preparations_total', 'Counter', 'Preparation attempts, by outcome'),
+  ('wireframe_application_preparation_duration_seconds', 'Histogram', 'Preparation time, by outcome'),
+  ('wireframe_prepared_connection_uses_total', 'Counter', 'Connections handled by a PreparedApp'),
+  ('wireframe_server_startup_failures_total', 'Counter', 'Failed server starts'),
+  ('wireframe_server_startup_duration_seconds', 'Histogram', 'Server start time'),
+  ('wireframe_server_accept_loops_exited_total', 'Counter', 'Accept loops that have exited'),
+  ('wireframe_server_supervisor_cancellations_total', 'Counter', 'Supervisor cancellations'),
+  ('wireframe_server_supervisor_abnormal_terminations_total', 'Counter', 'Unexpected supervisor exits'),
+  ('wireframe_connections_active', 'Gauge', 'Live ConnectionActor values, not accepted sockets, so it stays flat on WireframeServer'),
+  ('wireframe_codec_errors_total', 'Counter', 'Recorded only if the application calls inc_codec_error'),
+] %}
 <section aria-labelledby="bind"><h2 id="bind">Bind and size the workers</h2>
-<p><code>WireframeServer</code> is a typestate. <code>new</code> returns an unbound server; <code>bind</code> or <code>bind_existing_listener</code> returns a bound one, which can report <code>local_addr</code> and run. Configuration that belongs before binding, such as workers, backoff, readiness, and the preamble, is set on either.</p>
+<p><code>WireframeServer</code> is a typestate. <code>from_app</code> takes a built application and <code>new</code> takes a factory, and both return an unbound server; <code>bind</code> or <code>bind_existing_listener</code> returns a bound one, which can report <code>local_addr</code> and run. Configuration that belongs before binding, such as workers, backoff, readiness, and the preamble, is set on either.</p>
 {{ code.code('tests/production.rs', 'server', title='production.rs · configure, bind, run, stop') }}
 <ul>
-  <li><strong>Workers.</strong> One accept-loop task per worker, defaulting to the number of CPU cores and never fewer than one.</li>
-  <li><strong>Applications.</strong> In {{ wireframe_version }} the factory is called once for every accepted connection, so per-connection state can live in the application. 0.4.0 changes this; see <a href="/wireframe/roadmap/">the roadmap</a>.</li>
+  <li><strong>Workers.</strong> One accept-loop task per worker, defaulting to the available parallelism, which respects CPU quotas, and never fewer than one.</li>
+  <li><strong>Applications.</strong> The factory runs once per server run, and the application is prepared before the server reports readiness. Every worker and connection shares that one immutable application, so per-connection state belongs in <code>on_connection_setup</code>.</li>
   <li><strong>Accept backoff.</strong> When <code>accept</code> fails, as it does when the process runs out of file descriptors, a worker waits and retries with exponential backoff between <code>initial_delay</code> and <code>max_delay</code>. Out-of-range values are corrected, not rejected.</li>
   <li><strong>Panics.</strong> A panic inside a connection task is caught, logged, and counted; the worker and every other connection carry on.</li>
 </ul>
+<p>A factory may return a <code>Result</code>. Its failure, or a failure to prepare the application, comes back from the run as a <code>ServerError</code> rather than a half-started server:</p>
+{{ code.code('tests/production.rs', 'factory', title='production.rs · a factory that fails') }}
 </section>
 
 <section aria-labelledby="shutdown"><h2 id="shutdown">Readiness and shutdown</h2>
-<p><code>ready_signal</code> takes a oneshot sender that fires once the workers are accepting, which is what a test or an orchestration probe should wait for. <code>run</code> serves until Ctrl+C; <code>run_with_shutdown</code> serves until the future it is given completes, then stops the workers. The sample stops the server through a oneshot channel and checks that it returns cleanly.</p>
+<p><code>ready_signal</code> takes a oneshot sender that fires once the workers are accepting, which is what a test or an orchestration probe should wait for. There are three ways to run and stop a server: <code>run</code> serves until Ctrl+C; <code>run_with_shutdown</code> serves until the future it is given completes, and dropping that future cancels the accept loops, so keep it alive for as long as the server should run; and <code>spawn</code> runs in the background and returns a cloneable <code>ServerShutdown</code>, whose <code>stop</code> requests shutdown and whose <code>drained</code> waits for it to finish. Dropping the last clone also requests shutdown.</p>
+{% call ui.callout('warning', 'Shutdown has no deadline') %}<p>Shutdown waits for open connections, and it does not tell them to close. A single idle peer holds up <code>run</code>, <code>run_with_shutdown</code>, and <code>drained</code> until it disconnects. Bound the wait, or have the protocol close quiet connections:</p>{% endcall %}
+{{ code.code('tests/production.rs', 'drain', title='production.rs · a drain with a deadline') }}
 </section>
 
 <section aria-labelledby="limits"><h2 id="limits">Timeouts and failure limits</h2>
-<div class="wf-table-scroll" tabindex="0" role="region" aria-label="Server limits in wireframe 0.3.0"><table>
+<div class="wf-table-scroll" tabindex="0" role="region" aria-label="Server limits in wireframe {{ wireframe_version }}"><table class="wf-table--names">
 <thead><tr><th scope="col">Setting</th><th scope="col">Default</th><th scope="col">Effect in {{ wireframe_version }}</th></tr></thead>
 <tbody>
 <tr><td><code>buffer_capacity</code></td><td>1,024 bytes</td><td>Frames over the limit are a decoder error, and the connection closes</td></tr>
 <tr><td><code>read_timeout_ms</code></td><td>100&nbsp;ms</td><td>A housekeeping interval: when it elapses with no frame, expired partial messages are purged and the connection keeps waiting</td></tr>
-<tr><td>Deserialization failures</td><td>10 in a row</td><td>The connection closes; any good frame resets the count</td></tr>
-<tr><td><code>preamble_timeout</code></td><td>None</td><td>A preamble that does not arrive in time goes to the failure handler, and the connection closes</td></tr>
+<tr><td>Deserialization failures</td><td>10</td><td>The connection closes; a fully dispatched message resets the count</td></tr>
+<tr><td><code>preamble_timeout</code></td><td>10 seconds</td><td>Bounds the first read, with or without a preamble; on expiry the failure handler runs and the connection closes. <code>disable_preamble_timeout</code> removes it, and with it the protection against peers that connect and say nothing</td></tr>
+<tr><td>Decode limit</td><td>16&nbsp;MiB</td><td>Bounds peer-declared container lengths in the bundled decoders; fixed</td></tr>
 <tr><td>Memory budgets</td><td>16, 64, 64 &times; frame limit</td><td>Reads slow at 80% of the aggregate cap and the connection closes past it; see <a href="/wireframe/guides/large-messages/#budgets">memory budgets</a></td></tr>
+<tr><td>Fragmentation</td><td>Off</td><td>See <a href="/wireframe/guides/large-messages/#enable">fragmentation</a></td></tr>
 </tbody></table></div>
-{% call ui.callout('fact', 'An idle connection is never closed by the read timeout') %}<p>Despite its name, <code>read_timeout_ms</code> does not disconnect a quiet peer. In {{ wireframe_version }} an idle connection stays open until the peer closes it or the server shuts down. Bound idle time at the protocol level, for example with a heartbeat the server expects, or in front of the server.</p>{% endcall %}
+{% call ui.callout('fact', 'An idle connection is never closed by the read timeout') %}<p>Despite its name, <code>read_timeout_ms</code> does not disconnect a quiet peer. A peer that never sends a first byte is cut off at the preamble deadline, but once it has, an idle connection stays open until it disconnects or the process exits, and shutdown will wait for it. Bound idle time at the protocol level, for example with a heartbeat the server expects, or in front of the server. There is no built-in TLS, so terminate that in front of the server too.</p>{% endcall %}
 </section>
 
 <section aria-labelledby="metrics"><h2 id="metrics">Metrics</h2>
-<p>With the default <code>metrics</code> feature, wireframe records through the <a href="https://crates.io/crates/metrics"><code>metrics</code></a> crate, so any recorder installed by the application receives them. With the feature off, the recording helpers become no-ops, so instrumentation can stay in place. The names are public constants:</p>
+<p>With the default <code>metrics</code> feature, wireframe records through the <a href="https://crates.io/crates/metrics"><code>metrics</code></a> crate, so any recorder installed by the application receives them. With the feature off, the recording helpers become no-ops, so instrumentation can stay in place. An exporter such as <code>metrics-exporter-prometheus</code> is the application&rsquo;s own dependency. The names are public constants:</p>
 {{ code.code('tests/production.rs', 'metrics', title='production.rs · metric names') }}
-<div class="wf-table-scroll" tabindex="0" role="region" aria-label="Metrics wireframe records"><table>
+<div class="wf-table-scroll" tabindex="0" role="region" aria-label="Metrics wireframe records"><table class="wf-table--names">
 <thead><tr><th scope="col">Name</th><th scope="col">Kind</th><th scope="col">Records</th></tr></thead>
 <tbody>
-<tr><td><code>wireframe_connections_active</code></td><td>Gauge</td><td>Open connections</td></tr>
-<tr><td><code>wireframe_frames_processed_total</code></td><td>Counter</td><td>Frames, labelled by direction</td></tr>
-<tr><td><code>wireframe_errors_total</code></td><td>Counter</td><td>Errors, labelled by kind</td></tr>
-<tr><td><code>wireframe_connection_panics_total</code></td><td>Counter</td><td>Panicking connection tasks</td></tr>
-<tr><td><code>wireframe_codec_errors_total</code></td><td>Counter</td><td>Codec errors, labelled by type and recovery policy</td></tr>
+{%- for name, kind, records in server_metrics %}
+<tr><td><code>{{ name }}</code></td><td>{{ kind }}</td><td>{{ records }}</td></tr>
+{%- endfor %}
 </tbody></table></div>
-<p>Logging goes through both <code>log</code> and <code>tracing</code>. Install a subscriber or logger to see the warnings for unrouted messages, rejected frames, and preamble errors.</p>
+<p>Client pools add their own <code>wireframe_pool_*</code> metrics; <code>wireframe_pool_connection_discards_total</code> is the one to watch for socket churn. <a href="{{ source_base }}/docs/users-guide.md#client-pool-metrics">The users&rsquo; guide</a> lists them.</p>
+<p>Logging goes through both <code>log</code> and <code>tracing</code>. Install a subscriber or logger, from the application&rsquo;s own dependencies, to see the warnings for unrouted messages, rejected frames, and preamble errors; wireframe installs nothing itself, so without one they are lost.</p>
 </section>
 {% endblock %}

@@ -50,9 +50,7 @@ async fn shutdown_needs_a_deadline_of_your_own() {
         .bind("127.0.0.1:0".parse().expect("a socket address"))
         .expect("bind");
     let addr = server.local_addr().expect("a bound address");
-    // ANCHOR: spawn
     let shutdown = server.spawn().await.expect("the application prepares");
-    // ANCHOR_END: spawn
 
     // A client that connects, sends one byte, and then says nothing more.
     let mut quiet = TcpStream::connect(addr).await.expect("connect");

@@ -166,6 +166,7 @@ class HtmlContentRenderer:
         figures: dict[str, str] = {}
 
         def _replace(match: re.Match[str]) -> str:
+            """Render one Mermaid fence to a placeholder, or keep it on failure."""
             svg = self._mermaid.render(match.group(1))
             if svg is None:
                 return match.group(0)
@@ -222,6 +223,7 @@ class HtmlContentRenderer:
         lang_iter = iter(languages)
 
         def _repl(match: re.Match[str]) -> str:
+            """Stamp the next detected language onto a codehilite opening tag."""
             lang = next(lang_iter, "text")
             return (
                 f'<div class="codehilite" data-language="{escape(lang, quote=True)}">'
@@ -235,15 +237,18 @@ class HtmlContentRenderer:
         safe_lang = escape(language or "text", quote=True)
 
         def _repl(match: re.Match[str]) -> str:
+            """Rewrite a codehilite opening tag with the fixed language attribute."""
             return f'<div class="codehilite" data-language="{safe_lang}">'
 
         return CODEHILITE_OPEN_TAG.sub(_repl, html, 1)
 
     @staticmethod
     def _normalize_fenced_blocks(text: str) -> str:
+        """Strip fence indentation and comma-separated info-string extras."""
         without_indent = FENCED_INDENT_PATTERN.sub(r"\1", text)
 
         def _strip_labels(match: re.Match[str]) -> str:
+            """Keep the fence and language from a fence line, dropping the extras."""
             fence, language, _extras = match.groups()
             label = language or ""
             return f"{fence}{label}"

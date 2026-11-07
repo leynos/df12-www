@@ -82,6 +82,7 @@ def ensure_backend_bucket(
     base += ["--region", backend.region, "s3api"]
 
     def _run(args: list[str]) -> subprocess.CompletedProcess[str]:
+        """Run an ``aws s3api`` command with the shared base arguments."""
         return subprocess.run(  # noqa: S603
             base + args,
             check=True,

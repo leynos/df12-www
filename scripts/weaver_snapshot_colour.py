@@ -112,6 +112,7 @@ def _canonical_colour(match: re.Match[str]) -> str:
         return match.group(0)
 
     def value(index: int, scale: float = 1.0) -> float:
+        """Read one numeric argument, scaling percentages by *scale*."""
         raw = numbers[index]
         return float(raw.rstrip("%")) / 100 * scale if raw.endswith("%") else float(raw)
 

@@ -155,6 +155,7 @@ class PageContentGenerator:
         return written
 
     def _resolve_doc_updated_at(self) -> dt.datetime | None:
+        """Return the latest release publish date, else the doc commit date."""
         if self.page.latest_release_published_at:
             return self.page.latest_release_published_at
         return self._fetch_doc_commit_date()
@@ -338,6 +339,7 @@ class PageContentGenerator:
 
     @staticmethod
     def _strip_version_prefix(tag: str | None) -> str | None:
+        """Return the tag without a leading ``v``, or None for an empty tag."""
         if not tag:
             return None
         if tag.upper().startswith("V") and len(tag) > 1:

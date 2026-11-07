@@ -41,6 +41,7 @@ class ContentPageGenerator:
         base_path: str | None = None,
         template_vars: dict[str, object] | None = None,
     ) -> None:
+        """Store the page inputs and configure the Jinja environment."""
         self.config = config
         self.output_dir = output_dir
         self.templates_dir = templates_dir

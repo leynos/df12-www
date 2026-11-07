@@ -19,6 +19,7 @@ _AWS_FAILURE_STATUS = 255
 
 
 def _write_config(tmp_path: Path) -> Path:
+    """Write a full deploy config TOML file under *tmp_path* and return its path."""
     path = tmp_path / "config.toml"
     path.write_text(
         """
@@ -59,6 +60,7 @@ _STALE_LOCAL_BACKEND_CACHE: dict[str, object] = {
 
 
 def _write_backend_cache(root: Path, record: dict[str, object] | str) -> None:
+    """Write *record* as the cached backend state, encoding dicts as JSON."""
     cache_dir = root / ".terraform"
     cache_dir.mkdir(exist_ok=True)
     text = record if isinstance(record, str) else json.dumps(record)
@@ -178,6 +180,7 @@ def test_ensure_backend_bucket_creates_when_missing(
         text: bool,
         capture_output: bool,
     ) -> SimpleNamespace:
+        """Fail the head-bucket probe and succeed for every other aws call."""
         calls.append(cmd)
         if "head-bucket" in cmd:
             raise subprocess.CalledProcessError(returncode=1, cmd=cmd)
@@ -208,6 +211,7 @@ def test_ensure_backend_bucket_uses_env_endpoint(
         text: bool,
         capture_output: bool,
     ) -> typ.Never:
+        """Record the aws call and always fail it, so the error propagates."""
         calls.append(cmd)
         raise subprocess.CalledProcessError(returncode=1, cmd=cmd)
 
@@ -238,6 +242,7 @@ def test_init_stack_runs_init(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     )
 
     def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:
+        """Record the tofu argv and report success."""
         calls.append(args)
         return SimpleNamespace(returncode=0)
 
@@ -273,6 +278,7 @@ def test_init_stack_reconfigures_stale_local_backend(
     )
 
     def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:
+        """Record the tofu argv and report success."""
         calls.append(args)
         return SimpleNamespace(returncode=0)
 
@@ -383,6 +389,7 @@ def test_plan_stack_runs_plan(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     )
 
     def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:
+        """Record the tofu argv and report success."""
         calls.append(args)
         return SimpleNamespace(returncode=0)
 
@@ -426,6 +433,7 @@ def test_apply_stack_uses_plan_file(
     )
 
     def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:
+        """Record the tofu argv and report success."""
         calls.append(args)
         return SimpleNamespace(returncode=0)
 
@@ -458,6 +466,7 @@ def test_main_reports_subprocess_failure(
     """Test that main maps CalledProcessError to one line and its status."""
 
     def boom() -> None:
+        """Raise a CalledProcessError for a failed tofu init."""
         raise subprocess.CalledProcessError(
             _TOFU_FAILURE_STATUS, ["/usr/sbin/tofu", "init", "-reconfigure"]
         )
@@ -481,6 +490,7 @@ def test_main_relays_captured_stderr(
     """Test that captured subprocess stderr is relayed before the error line."""
 
     def boom() -> None:
+        """Raise a CalledProcessError for a failed aws call with captured stderr."""
         raise subprocess.CalledProcessError(
             _AWS_FAILURE_STATUS,
             ["/usr/bin/aws", "s3api", "head-bucket"],
@@ -507,6 +517,7 @@ def test_main_reports_missing_binary(
     """Test that main converts FileNotFoundError into a one-line message."""
 
     def boom() -> None:
+        """Raise FileNotFoundError for a missing tofu binary."""
         msg = "tofu binary not found on PATH"
         raise FileNotFoundError(msg)
 
@@ -527,6 +538,7 @@ def test_main_reports_credential_error(
     """Test that main converts CredentialError into a one-line message."""
 
     def boom() -> None:
+        """Raise CredentialError for missing AWS credentials."""
         msg = "AWS access key and secret key are required"
         raise deploy.CredentialError(msg)
 
@@ -547,6 +559,7 @@ def test_pages_apply_failure_via_entry_point(
     """Test that the console entry point maps a failed apply to clean stderr."""
 
     def boom(**kwargs: object) -> None:
+        """Raise a CalledProcessError for a failed tofu apply."""
         raise subprocess.CalledProcessError(
             _TOFU_FAILURE_STATUS, ["/usr/sbin/tofu", "apply"]
         )

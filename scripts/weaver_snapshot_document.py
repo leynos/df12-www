@@ -37,6 +37,7 @@ class MalformedSnapshotError(SnapshotError):
     """
 
     def __init__(self, where: str, expected: str, actual: str) -> None:
+        """Store the breadcrumb and types, and build the error message."""
         self.where = where
         self.expected = expected
         self.actual = actual

@@ -90,6 +90,7 @@ def _token_classes(formatter: HtmlFormatter, token: object) -> str:
     """Return the formatter-prefixed class chain for one token."""
 
     def prefixed(node: object) -> str:
+        """Return the formatter-prefixed class for one token, or an empty string."""
         token_class = _token_class(node)
         return f"{formatter.classprefix}{token_class}" if token_class else ""
 

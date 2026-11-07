@@ -104,6 +104,7 @@ def _load_config(path: Path = DEFAULT_CONFIG_PATH) -> DeployConfig:
     data = tomlkit.parse(path.read_text(encoding="utf-8"))
 
     def _as_dict(table: typ.Any) -> dict[str, typ.Any]:  # noqa: ANN401  FIXME: narrow once tomlkit exposes typed table API  https://github.com/leynos/df12-www/issues/34
+        """Return a TOML table as a plain dict, or an empty dict if it is falsy."""
         return dict(table.items()) if table else {}
 
     auth_data = _as_dict(data.get("auth"))

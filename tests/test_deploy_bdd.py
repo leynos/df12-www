@@ -21,6 +21,7 @@ def context() -> dict[str, object]:
 
 
 def _write_config(tmp_path: Path) -> Path:
+    """Write a deploy config TOML file under *tmp_path* and return its path."""
     path = tmp_path / "config.toml"
     path.write_text(
         """
@@ -67,9 +68,11 @@ def i_initialise_the_stack_with_the_config(
     calls: list[list[str]] = []
 
     def fake_ensure(*args: typ.Any, **kwargs: typ.Any) -> None:  # noqa: ANN401
+        """Record that the backend bucket was ensured, ignoring its arguments."""
         calls.append(["ensure"])
 
     def fake_run(args: list[str], env: dict[str, str]) -> SimpleNamespace:
+        """Record the tofu argv and capture the backend and tfvars paths it names."""
         calls.append(args)
         context["backend_path"] = Path(args[args.index("-backend-config") + 1])
         context["tfvars_path"] = Path(args[args.index("-var-file") + 1])

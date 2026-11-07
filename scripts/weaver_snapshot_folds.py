@@ -92,6 +92,7 @@ def _capped_radius(value: str) -> str:
     """
 
     def cap(match: re.Match[str]) -> str:
+        """Replace one pixel length with the full radius if it reaches it."""
         length = float(match.group(1))
         return f"{_FULL_RADIUS:g}px" if length >= _FULL_RADIUS else match.group(0)
 

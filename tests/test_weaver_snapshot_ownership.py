@@ -316,6 +316,8 @@ def test_a_server_that_redirects_the_marker_is_refused_unfollowed() -> None:
     with _running(_ObligingForeigner) as foreign:
 
         class _Redirecting(_Quiet):
+            """Redirect every request to the foreign server."""
+
             def do_GET(self) -> None:
                 """Answer with a redirect to the foreign server."""
                 self.send_response(302)
@@ -342,6 +344,8 @@ def test_the_readiness_probe_refuses_a_redirect() -> None:
     """
 
     class _Redirecting(_Quiet):
+        """Redirect every request to an address off the loopback."""
+
         def do_GET(self) -> None:
             """Answer with a redirect off the loopback."""
             self.send_response(302)

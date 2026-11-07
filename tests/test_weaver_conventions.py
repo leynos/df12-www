@@ -207,6 +207,7 @@ def test_a_build_does_not_rewrite_anything_the_dev_watcher_watches(
     assert built_site.is_dir(), "the session fixture should have built the tree"
 
     def snapshot() -> dict[Path, tuple[int, float]]:
+        """Return the size and mtime of each watched file, keyed by path."""
         return {
             path: (path.stat().st_size, path.stat().st_mtime)
             for path in _watched_candidates()

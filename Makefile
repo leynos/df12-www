@@ -51,7 +51,7 @@ endif
 .PHONY: prepare help all clean build build-release lint fmt check-fmt check-site-data \
         cuprum-api-data check-cuprum-api-data rstest-bdd-samples \
         docs-check markdownlint nixie site-data spelling stylelint test typecheck \
-        typecheck-js venv-ruff \
+        typecheck-js venv-ruff interrogate \
         $(TOOLS) \
         $(VENV_TOOLS) dev
 
@@ -157,7 +157,28 @@ check-fmt: venv-ruff ## Verify formatting
 	# `biome check` — formatter, linter, and assists in one pass.
 	$(MDTABLEFIX) --check $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 
-lint: venv-ruff $(NODE_MODULES_STAMP) ## Run linters
+# Interrogate measures docstring presence over the Python files it scans under
+# INTERROGATE_TARGETS (it skips some path prefixes by default, so check a new
+# file against the verbose report). The published femtologging samples under
+# src and templates are not scanned. Add a new Python directory to the targets.
+INTERROGATE_VERSION ?= 1.7.0
+INTERROGATE_TARGETS ?= df12_pages scripts tests
+# Level 2 prints a MISSED row per undocumented definition, which the
+# `interrogate` target fails on: the rounded percentage alone passes a lone gap.
+INTERROGATE_FLAGS ?= -vv --no-color --ext pyi --fail-under 100
+INTERROGATE = $(UV_GATE) tool --from interrogate==$(INTERROGATE_VERSION) -- interrogate
+
+interrogate: ## Enforce complete Python docstring coverage
+	@report="$$($(INTERROGATE) $(INTERROGATE_FLAGS) $(INTERROGATE_TARGETS))"; \
+	  status=$$?; \
+	  printf '%s\n' "$$report"; \
+	  test "$$status" -eq 0 || exit "$$status"; \
+	  if printf '%s\n' "$$report" | grep -q '| *MISSED *|'; then \
+	    printf '%s\n' 'interrogate: undocumented definitions remain; see the MISSED rows above' >&2; \
+	    exit 1; \
+	  fi
+
+lint: interrogate venv-ruff $(NODE_MODULES_STAMP) ## Run linters
 	$(RUFF) check
 	bun run lint:js
 

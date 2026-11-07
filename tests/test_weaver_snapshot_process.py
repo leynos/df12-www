@@ -295,6 +295,8 @@ def test_stopping_a_server_that_stands_down_does_not_kill_it() -> None:
     """`terminate` then one wait, and nothing more."""
 
     class _Obedient:
+        """A server that stands down after one bounded wait."""
+
         def __init__(self) -> None:
             """Start with nothing recorded."""
             self.calls: list[str] = []
@@ -329,6 +331,8 @@ def test_a_server_that_will_not_stand_down_is_killed() -> None:
     """A child still holding the port stops the next run, so escalate."""
 
     class _Stubborn:
+        """A server that times out on its first wait and stands down after a kill."""
+
         def __init__(self) -> None:
             """Start with nothing recorded."""
             self.calls: list[str] = []
@@ -370,6 +374,8 @@ def test_only_the_final_wait_may_time_out_silently() -> None:
     """
 
     class _Unkillable:
+        """A server that times out on every wait, even after a kill."""
+
         def __init__(self) -> None:
             """Start with nothing recorded."""
             self.calls: list[str] = []

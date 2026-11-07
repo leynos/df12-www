@@ -99,20 +99,25 @@ def when_render_docs(
     calls: list[str] = []
 
     class _RecordingSession:
+        """Record each URL fetched during a render and pass the rest through."""
+
         def __init__(self, delegate: requests.Session) -> None:
+            """Keep the real session that requests are delegated to."""
             self._delegate = delegate
 
         def mount(
             self, prefix: str, adapter: BaseAdapter
         ) -> None:  # pragma: no cover - passthrough
+            """Delegate the adapter mount to the real session."""
             self._delegate.mount(prefix, adapter)
 
         def get(self, url: str, timeout: int = 30) -> requests.Response:
+            """Record the URL and fetch it through the real session."""
             calls.append(url)
             return self._delegate.get(url, timeout=timeout)
 
         def close(self) -> None:  # pragma: no cover - betamax handles lifecycle
-            return None
+            """Leave closing to Betamax, which owns the session's lifecycle."""
 
     monkeypatch.setattr(
         "df12_pages.generator.page_generator.requests.Session",

@@ -1092,6 +1092,7 @@ def test_source_identity_refuses_uncommitted_package_changes(
     watched: list[tuple[str, ...]] = []
 
     def run_git_status(_root: PathType, paths: cabc.Sequence[str]) -> str:
+        """Report one modified and one untracked file in the package."""
         watched.append(tuple(paths))
         return " M cuprum/sh.py\n?? cuprum/extra.py\n"
 
@@ -1143,6 +1144,7 @@ def test_source_identity_wraps_a_failing_status(tmp_path: PathType) -> None:
     """A failing ``git status`` becomes a named error, not a raw one."""
 
     def run_git_status(_root: PathType, _paths: cabc.Sequence[str]) -> str:
+        """Fail as ``git status`` does when it exits non-zero."""
         raise subprocess.CalledProcessError(128, ["git", "status"])
 
     with pytest.raises(builder.SourceIdentityError, match="uncommitted changes: "):
@@ -1208,6 +1210,7 @@ def test_source_identity_wraps_an_unreadable_pyproject(tmp_path: PathType) -> No
     """An ``OSError`` reading ``pyproject.toml`` becomes a named error."""
 
     def read_pyproject(_root: PathType) -> str:
+        """Fail as an unreadable ``pyproject.toml`` does."""
         raise OSError("boom")
 
     with pytest.raises(
@@ -1248,6 +1251,7 @@ def test_source_identity_wraps_a_failing_git(tmp_path: PathType) -> None:
     """A non-zero git exit becomes a named error."""
 
     def run_git(_root: PathType) -> str:
+        """Fail as ``git`` does when it exits non-zero."""
         raise subprocess.CalledProcessError(1, ["git"])
 
     with pytest.raises(builder.SourceIdentityError, match="cannot resolve the commit"):
@@ -1262,6 +1266,7 @@ def test_source_identity_wraps_a_missing_git(tmp_path: PathType) -> None:
     """A missing ``git`` executable becomes a named error, not a raw one."""
 
     def run_git(_root: PathType) -> str:
+        """Fail as when the ``git`` executable cannot be found."""
         raise FileNotFoundError("git")
 
     with pytest.raises(builder.SourceIdentityError, match="cannot resolve the commit"):

@@ -55,6 +55,7 @@ def test_multiple_diagrams_each_rendered(monkeypatch: pytest.MonkeyPatch) -> Non
     calls: list[str] = []
 
     def _fake_render(self: MermaidRenderer, source: str) -> str:
+        """Record the diagram source and return a numbered stub SVG."""
         calls.append(source)
         return f"<svg>d{len(calls)}</svg>"
 

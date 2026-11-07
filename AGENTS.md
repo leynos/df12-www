@@ -440,6 +440,11 @@ Ruff is missing. ty is pinned by `TY_VERSION` in the `Makefile` and run with
 `uv tool run`. Upgrade either deliberately, in a commit that carries the fixes
 the new release asks for.
 
+`make lint` first runs `make interrogate`, which needs `uv` and fails on any
+Python definition under `INTERROGATE_TARGETS` (`df12_pages`, `scripts` and
+`tests`) without a docstring, and on any `MISSED` row, since the percentage is
+rounded. Add a new Python directory to that list.
+
 `make lint` runs Ruff over the Python and Biome over everything else —
 JavaScript, TypeScript, JSON, HTML, and the hand-crafted CSS. Biome is invoked
 as `biome check .`, which provides formatting, linting, and import assists in

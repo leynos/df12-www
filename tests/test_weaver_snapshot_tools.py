@@ -133,11 +133,13 @@ def _recording_browser(
     calls: list[list[str]] = []
 
     def run(argv: cabc.Sequence[str]) -> None:
+        """Record the call; fail the settle wait when ``settle_fails`` is set."""
         calls.append(list(argv))
         if settle_fails and argv[1] == "wait" and "--fn" in argv:
             raise subprocess.CalledProcessError(1, list(argv))
 
     def read(argv: cabc.Sequence[str]) -> str:
+        """Record the call and answer the probe, or a tree of unrendered spans."""
         calls.append(list(argv))
         if argv[2] == "probe()":
             return json.dumps(json.dumps({"base": {}, "deltas": {}}))
@@ -264,6 +266,7 @@ def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None
     attempted: list[list[str]] = []
 
     def explode(argv: cabc.Sequence[str]) -> None:
+        """Fail every command except the viewport, blank-page probe and close."""
         attempted.append(list(argv))
         # The viewport, the blank page the defaults are measured on, and the
         # close on the way out all succeed; the first selected page does not.
@@ -272,6 +275,7 @@ def test_a_failing_capture_stops_the_run_rather_than_reporting_success() -> None
         raise subprocess.CalledProcessError(1, list(argv))
 
     def probe(argv: cabc.Sequence[str]) -> str:
+        """Record the call and answer with an empty defaults probe."""
         attempted.append(list(argv))
         return json.dumps(json.dumps({"base": {}, "deltas": {}}))
 
@@ -304,6 +308,7 @@ def test_shots_closes_its_session_even_when_a_page_fails() -> None:
     calls: list[list[str]] = []
 
     def fail_on_screenshot(argv: cabc.Sequence[str]) -> None:
+        """Fail the screenshot command; every other command succeeds."""
         calls.append(list(argv))
         if "screenshot" in argv:
             raise subprocess.CalledProcessError(1, list(argv))
@@ -322,6 +327,7 @@ def test_a_failure_to_close_the_session_does_not_mask_the_real_error() -> None:
     """The page failure is what the reader needs, not the cleanup's complaint."""
 
     def fail_everything(argv: cabc.Sequence[str]) -> None:
+        """Fail every command, as a browser that has crashed would."""
         raise subprocess.CalledProcessError(2, list(argv))
 
     with pytest.raises(subprocess.CalledProcessError) as caught:
@@ -412,6 +418,7 @@ def test_capture_stops_and_names_the_page_when_the_walker_returns_no_tree(
     calls, run, _read = recording_browser()
 
     def garbage(argv: cabc.Sequence[str]) -> str:
+        """Answer the defaults probe, then a walk result with no tree."""
         calls.append(list(argv))
         if argv[2] == "probe()":
             return json.dumps(json.dumps({"base": {}, "deltas": {}}))

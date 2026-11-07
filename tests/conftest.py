@@ -20,6 +20,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.support.pinned_build import PINNED_SOURCE_DATE_EPOCH
 from tests.support.weaver_browser import TOOL_TIMEOUT_SECONDS
 from tests.support.weaver_harness import load
 
@@ -29,6 +30,17 @@ if typ.TYPE_CHECKING:
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_WEAVER = REPO_ROOT / "public" / "weaver"
+
+
+def pytest_configure() -> None:
+    """Pin the build date for the whole session, not for one fixture.
+
+    Several suites run their own ``bun run build`` over the same ``public/``
+    tree, and whichever ran last decides what the next suite reads. Setting the
+    variable in the session's environment reaches every one of those
+    subprocesses; see ``tests/support/pinned_build.py``.
+    """
+    os.environ["SOURCE_DATE_EPOCH"] = PINNED_SOURCE_DATE_EPOCH
 
 
 @pytest.fixture(scope="session")

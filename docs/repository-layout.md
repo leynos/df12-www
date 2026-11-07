@@ -60,7 +60,9 @@ rendered into every site through each site's own template wrapper.
 ### `df12_pages/`
 
 The Python package that powers the `pages` CLI. Contains the site generator,
-config loader, Markdown parser, and all builder classes. Key subdirectories:
+config loader, Markdown parser, and all builder classes. `build_clock.py` is
+its one reading of the time, which `SOURCE_DATE_EPOCH` can fix. Key
+subdirectories:
 
 - `config/` — Dataclass models, YAML loader, and config helpers.
 - `generator/` — Page rendering pipeline: section models, HTML renderer, link

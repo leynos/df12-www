@@ -22,11 +22,12 @@ writing the rendered HTML to disk.
 
 from __future__ import annotations
 
-import datetime as dt
 import typing as typ
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
+
+from .build_clock import build_time
 
 if typ.TYPE_CHECKING:
     from .config import HomepageConfig
@@ -86,7 +87,7 @@ class HomePageBuilder:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         context = {
             "homepage": self.homepage,
-            "generated_at": dt.datetime.now(dt.UTC),
+            "generated_at": build_time(),
         }
         html = self.template.render(**context)
         if not html.endswith("\n"):

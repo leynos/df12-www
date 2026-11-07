@@ -10,60 +10,90 @@ taught, how the identity was applied, and how the code and art were made.
 
 ## Sources and release status
 
-Every claim describes the released crate, wireframe 0.3.0, published on
-crates.io on 6 April 2026, unless the page labels it as unreleased. The sources
-are, in order of authority:
+Every claim describes wireframe 0.4.0-alpha1, targeted for 15 November 2026,
+unless the page labels it as history. The sources are, in order of authority:
 
-1. The published crate source (`~/.cargo/registry/src/*/wireframe-0.3.0`),
-   which settles any disagreement.
+1. The library's source, which settles any disagreement.
 2. The sample crate under `templates/wireframe/samples/`, which compiles and
-   runs every working example against 0.3.0.
-3. The user's guide as tagged at `v0.3.0`, not the default branch, which
-   already documents breaking 0.4.0 changes.
+   runs every working example.
+3. The library's `docs/users-guide.md` and `docs/v0-4-0-migration-guide.md`,
+   which are audited and carry tested examples.
+
+If the library and its documents disagree, tell the library's maintainers.
 
 `config/pages.yaml` holds the release facts in the sub-site's `template_vars`:
-`wireframe_version`, `wireframe_tag`, `wireframe_released`, `tokio_util_pin`,
-`rust_verified`, and `samples_verified_on`. The API reference is docs.rs for
-0.3.0 (`docs_url`) rather than a transcription, because rustdoc is generated
-from the release and cannot drift from it.
+`wireframe_version`, `wireframe_tag`, `wireframe_published`,
+`wireframe_released`, `samples_verified_against`, `rust_minimum`,
+`rust_verified`, `samples_verified_on`, and `mxd_wireframe_version`. mxd has
+its own variable because it moves on its own schedule, and it still pins 0.3.0.
+The API reference is docs.rs (`docs_url`) rather than a transcription, because
+rustdoc is generated from the release and cannot drift from it.
+
+### Before the release is published
+
+The site was updated ahead of publication. On 7 November 2026, the crate was
+not on crates.io, the `v0.4.0-alpha1` tag did not exist, and the library's
+stack (PRs #869, #870, #873, and #880) was unmerged. So:
+
+- The samples ran against the library's source at commit `cd634074` through a
+  `[patch.crates-io]` entry in a scratch copy. No path dependency is committed,
+  because the `deps` anchor renders on two pages.
+- `samples/Cargo.lock` comes from that run, so its `wireframe` entry has no
+  registry source. `make wireframe-samples` fails until the crate is published.
+- `source_base` and `docs_url` point at the release, so those links 404 until
+  it exists. **Do not deploy this site before the tag and crates are
+  published.**
+- `wireframe_published: false` makes pages call the date a target.
+
+At publication, in this order:
+
+1. Confirm the published crates: `wireframe` and `wireframe_testing`, both at
+   the same version, since the testing page names the latter. If the library
+   stack changed after `cd634074`, re-read the claims it touched.
+2. Run `cargo update -p wireframe` in `templates/wireframe/samples/`, then
+   `make wireframe-samples`.
+3. Set `wireframe_published: true`, the true release date, and
+   `samples_verified_against: "wireframe 0.4.0-alpha1"`, and update
+   `rust_verified` and `samples_verified_on`. A test holds the flag to the
+   lockfile, so doing only one fails the build tests.
+4. Check that every link under `source_base` and `docs_url` resolves.
+5. Update `latest_release` for wireframe with `df12_pages/bump.py`.
 
 ### What the release taught
 
-Building the sample crate against 0.3.0 contradicted the upstream user's guide
-in several places. The site states each of these plainly:
+The site follows these, and states each plainly where it matters:
 
-- **tokio-util 0.7.20 breaks the build.** It adds
-  `Encoder<&[u8]> for LengthDelimitedCodec`, so `framed.send(bytes.into())` in
-  wireframe's inbound handler no longer infers a type (E0283). A fresh
-  dependency resolves 0.7.20. The sample lockfile pins 0.7.19, and the home and
-  getting-started pages tell readers to do the same. The upstream default
-  branch still locks 0.7.19, so the break is not visible there.
+- **Inbound order.** Codec decode, deserialize envelope, reassemble, assemble,
+  route. Outbound: fragment, serialize, wrap, `before_send`, encode. Earlier
+  copy had reassembly before deserialization and serializing before
+  fragmenting, which was wrong for 0.3.0 too.
+- **The factory runs once per server run**, and the prepared application is
+  shared by every connection.
+- **The server reads first.** Even without `with_preamble` it reads a first
+  byte under a 10-second deadline, so it never speaks first.
+- **An error from the preamble success handler closes the connection.**
 - **`middleware::from_fn` cannot be passed to `WireframeApp::wrap`.** `wrap`
-  accepts only a `Transform` whose output is a `HandlerService`; `from_fn`
-  produces an `FnService`. The guide's quick start therefore does not compile.
-  Routed middleware is written as a `Transform`, as the upstream `ping_pong`
-  example does.
-- **Routed handlers return nothing.** A handler is an `Arc`'d closure from
-  `&Envelope` to a boxed future of `()`. The default `HandlerService` echoes
-  the request payload, and middleware writes replies through
-  `ServiceResponse::frame_mut()`. The README's extractor-style handlers are not
-  in 0.3.0.
-- **The routed server path sends one reply per request.** `PushQueues`,
-  `ConnectionActor`, `Response::Stream`, `Response::MultiPacket`, and the
-  `WireframeProtocol` hooks ship and are tested, but `WireframeServer` and
-  `handle_connection` do not drive them. The client's `call_streaming` works,
-  so its sample uses a plain Tokio server.
-- **The app factory runs once per connection.** 0.4.0 changes this to once
-  per server run.
-- **A preamble success handler cannot reject a connection.** Its error is
-  logged and the connection proceeds; only a decode failure or a timeout closes
-  it.
-- **The read timeout is a housekeeping tick.** When `read_timeout_ms` elapses,
-  expired partial messages are purged and the connection keeps waiting. Idle
-  connections are not closed.
-- **Codec recovery policies are not consulted.** `CodecError`,
-  `RecoveryPolicy`, `RecoveryPolicyHook`, and `on_eof` exist, but any decoder
-  error closes the connection.
+  accepts only a `Transform` whose output is a `HandlerService`.
+- **Routed handlers return nothing.** The default `HandlerService` echoes the
+  request payload, and middleware writes replies through
+  `ServiceResponse::frame_mut()`.
+- **One reply per request.** `PushQueues`, `ConnectionActor`,
+  `Response::Stream`, `Response::MultiPacket`, `SessionRegistry`, extractors,
+  and recovery policies ship and are tested, but `WireframeServer` does not
+  drive them. Of the protocol hooks, only `before_send` runs on a server
+  connection. The client's `call_streaming` works, so its sample uses a plain
+  Tokio server.
+- **A custom `Packet` changes what handlers see, not the wire.** The sample
+  sends and receives `Envelope` and shows the handler a `Stroke`.
+- **The read timeout is a housekeeping tick, and shutdown has no deadline.** An
+  idle connection stays open, and it holds up `drained`.
+- **Pool sockets open on first use.** Measured in the sample: against a port
+  with nothing listening, `acquire` returns at once, and the first `call` takes
+  30 seconds and fails with `pooled connection checkout timed out`, from bb8's
+  default checkout timeout. The library's documents do not yet mention this.
+- **`wireframe_connections_active` counts actors**, so it stays flat on
+  `WireframeServer`, and only an application's own `inc_codec_error` calls
+  record `wireframe_codec_errors_total`.
 - **`SessionRegistry::default()` needs a `Default` frame type**, which
   `Envelope` is not.
 
@@ -185,13 +215,13 @@ installation, and a tagline strip.
 ## Code panels and verification
 
 Every working example is cut from `templates/wireframe/samples/`, a Cargo
-package that depends on `wireframe = "=0.3.0"`. A panel is
+package that depends on `wireframe = "=0.4.0-alpha1"`. A panel is
 `code.code(file, anchor)`, which includes the file and keeps the lines between
 `// ANCHOR: name` and `// ANCHOR_END: name` (or `#` in TOML), the mdBook
 convention. Each panel's bar says "Working example" in words, as the
 specification's source taxonomy asks; shell commands are labelled as commands.
 Tests hold every panel to consecutive lines of its file, every named anchor to
-its file, the crate's wireframe and tokio-util versions to `template_vars`, and
+its file, the crate's wireframe version and lockfile to `template_vars`, and
 every sample to containing no Jinja delimiters.
 
 Run the samples with:
@@ -200,11 +230,19 @@ Run the samples with:
 make wireframe-samples
 ```
 
-It needs a Rust toolchain and the network, so it is not a commit gate. On
-31 October 2026 all 13 test binaries passed with Rust 1.99.0. When the release
-moves, bump the crate and `template_vars` together, rerun the samples, re-read
-each "In 0.3.0" callout against the new release, and update the verification
+It needs a Rust toolchain and the network, so it is not a commit gate, and it
+fails until the release is published; see
+[Before the release is published](#before-the-release-is-published). On
+7 November 2026 all 13 test binaries passed with Rust 1.99.1 against the
+library's source at `cd634074`, with tokio-util 0.7.20. When the release moves,
+bump the crate and `template_vars` together, rerun the samples, re-read each
+"In 0.4.0-alpha1" callout against the new release, and update the verification
 date.
+
+Some samples are not rendered at all, and exist to hold a page's claim to code
+that ran: a rejected preamble closes, a silent client is disconnected, a
+trailing byte fails decoding, `before_send` sees routed replies, an open
+connection holds up the drain, and a pool opens its sockets on first use.
 
 `ScopeStyle` in `df12_pages/wireframe_highlighting.py` owns syntax colours, and
 `scripts/generate_wireframe_pygments_css.py` writes

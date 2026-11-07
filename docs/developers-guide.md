@@ -1451,9 +1451,9 @@ Four mechanisms are specific to it.
   the lines between `// ANCHOR: name` and `// ANCHOR_END: name`.
   `test_every_sample_panel_is_a_run_of_its_sample` and
   `test_every_anchor_a_panel_names_exists` hold panels and anchors to the
-  files, and `make wireframe-samples` compiles and runs the package. The
-  package's lockfile pins tokio-util 0.7.19, because wireframe 0.3.0 does not
-  build against 0.7.20.
+  files, and `make wireframe-samples` compiles and runs the package. Until
+  0.4.0-alpha1 is published that target fails, and the samples run through a
+  scratch patch instead; see [wireframe sub-site](wireframe-site.md).
 - **Copy controls.** `copy-code.ts` is rstest-bdd's copy button with
   `data-wf-copy` attributes and no telemetry hook. Command panels draw their
   `$` prompt in CSS, so it never reaches the clipboard.

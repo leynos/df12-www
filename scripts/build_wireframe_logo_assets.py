@@ -70,11 +70,13 @@ def _bounds(rgb: np.ndarray, threshold: int = 24) -> tuple[int, int, int, int]:
 
 
 def _pad(box: tuple[int, int, int, int], by: int) -> tuple[int, int, int, int]:
+    """Grow a crop box by ``by`` pixels on every side."""
     left, top, right, bottom = box
     return left - by, top - by, right + by, bottom + by
 
 
 def _square(box: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
+    """Return the square box on the same centre that holds ``box``."""
     left, top, right, bottom = box
     side = max(right - left, bottom - top)
     cx, cy = (left + right) // 2, (top + bottom) // 2
@@ -82,6 +84,7 @@ def _square(box: tuple[int, int, int, int]) -> tuple[int, int, int, int]:
 
 
 def _scaled(image: Image.Image, width: int) -> Image.Image:
+    """Resize ``image`` to ``width`` pixels wide, keeping its aspect ratio."""
     height = round(image.height * width / image.width)
     return image.resize((width, height), Image.Resampling.LANCZOS)
 

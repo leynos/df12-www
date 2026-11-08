@@ -55,6 +55,7 @@ def _camera(p: Point3) -> tuple[float, float, float]:
 
 
 def _raw(p: Point3) -> tuple[float, float]:
+    """Project ``p`` to the image plane, before the scene is fitted to the frame."""
     x, y, depth = _camera(p)
     scale = _FOCAL / depth
     return x * scale, -y * scale
@@ -259,6 +260,7 @@ def render() -> str:
     scale, ox, oy = _fit(scene)
 
     def flat(p: Point3) -> str:
+        """Format ``p`` as SVG coordinates, fitted to the frame."""
         x, y = _raw(p)
         return f"{x * scale + ox:.1f} {y * scale + oy:.1f}"
 

@@ -1,0 +1,53 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['getting-started'] %}
+{% set crumbs = [] %}
+{% set plate_key = none %}
+{% block article_body %}
+<p class="wf-lede">The program on this page is a test in the site&rsquo;s sample crate. It starts a real server on a loopback port, connects a real client, sends a <code>Ping</code>, and checks the <code>Pong</code>. Every panel below is cut from that file, and the crate runs against {{ samples_verified_against }}, with Rust {{ rust_verified }}. wireframe needs Rust {{ rust_minimum }} or newer.</p>
+
+<section aria-labelledby="dependencies"><h2 id="dependencies">Add the dependencies</h2>
+<p>wireframe runs on Tokio and, by default, encodes messages with bincode 2. The sample crate also uses <code>async-trait</code> to write middleware, and turns on two opt-in features: <code>pool</code> for client connection pools and <code>testkit</code> for the test drivers. Neither is needed for a first server.</p>
+{{ code.code('Cargo.toml', 'deps', title='Cargo.toml', lexer='toml') }}
+{% call ui.callout('warning', 'Pin the exact version during the alpha') %}<p>{{ wireframe_version }} is an alpha for early adopters, and one alpha may change what the last one offered. The <code>=</code> in the dependency keeps a build where it is until the next one is chosen.</p>{% endcall %}
+</section>
+
+<section aria-labelledby="messages"><h2 id="messages">Describe the messages</h2>
+<p>A message is any type bincode can encode and decode. Deriving <code>bincode::Encode</code> and <code>bincode::BorrowDecode</code> is enough: wireframe implements its <code>Message</code> trait for such types, which provides <code>to_bytes</code> and <code>from_bytes</code>. The message ID is not part of the type. It travels in the envelope, so the same type could be routed under any ID. The crate root is deliberately small: each item lives in a module named for its domain, as the imports in this sample show, and <code>wireframe::prelude::*</code> gathers the most common ones.</p>
+{{ code.code('tests/first_server.rs', 'messages', title='first_server.rs · messages') }}
+</section>
+
+<section aria-labelledby="answer"><h2 id="answer">Route and answer</h2>
+<p>A route maps a message ID to a handler. A handler is an <code>Arc</code>&rsquo;d closure that receives a reference to the envelope and returns a boxed future of <code>()</code>. It can inspect the request, log it, or hand work elsewhere, but it does not return the reply.</p>
+<p>Replies are written in middleware. Each route&rsquo;s handler is wrapped in a <code>HandlerService</code>, and the default service answers with the request&rsquo;s own payload, so an unwrapped route is an echo. A middleware layer calls the inner service, then replaces the reply&rsquo;s bytes.</p>
+{{ code.code('tests/first_server.rs', 'middleware', title='first_server.rs · the reply') }}
+<p>With the middleware in place, the application is a route and a wrap. <code>WireframeApp::new()</code> is fallible, as is each builder step, so the whole chain returns <code>wireframe::Result</code>.</p>
+{{ code.code('tests/first_server.rs', 'app', title='first_server.rs · the application') }}
+{% call ui.callout('fact', 'middleware::from_fn does not fit WireframeApp::wrap') %}<p><code>wrap</code> accepts only a <code>Transform</code> whose output is a <code>HandlerService</code>, and <code>from_fn</code> produces a different service type. The <code>Transform</code> above is the pattern the upstream <code>ping_pong</code> example uses.</p>{% endcall %}
+</section>
+
+<section aria-labelledby="serve"><h2 id="serve">Serve it</h2>
+<p>The application is already built, so <code>WireframeServer::from_app</code> takes it directly. <code>WireframeServer::new</code> takes a factory instead, which it calls once per server run. Either way, the application is prepared once and shared by every connection, so per-connection state belongs in <code>on_connection_setup</code>. Binding moves the server into its bound state; port 0 asks the operating system for a free port, and <code>local_addr</code> reports which one it chose. <code>spawn</code> prepares the application, runs the server in the background, and returns a <code>ServerShutdown</code>.</p>
+{{ code.code('tests/first_server.rs', 'serve', title='first_server.rs · the server') }}
+</section>
+
+<section aria-labelledby="call"><h2 id="call">Call it</h2>
+<p>The client shares the server&rsquo;s defaults: the same length-delimited framing, the same bincode serializer, the same envelope. <code>call_correlated</code> stamps a fresh correlation ID on the request, sends it, reads the reply, and fails with <code>ClientError::CorrelationMismatch</code> if the reply carries a different one.</p>
+{{ code.code('tests/first_server.rs', 'call', title='first_server.rs · the client') }}
+<p>The server reads before it writes, so it never speaks first, and a client that connects and says nothing is disconnected after 10 seconds. Once the client has closed, the test stops the server. <code>stop</code> requests shutdown, and <code>drained</code> waits for it to finish. Shutdown waits for open connections and does not tell them to close, which is why the client goes first.</p>
+{{ code.code('tests/first_server.rs', 'stop', title='first_server.rs · stopping') }}
+<p>Run the program with the rest of the sample crate:</p>
+{% call code.command('Run the samples') %}cargo test --test first_server{% endcall %}
+</section>
+
+<section aria-labelledby="next"><h2 id="next">Where next</h2>
+<ul class="wf-next">
+  <li><a href="/wireframe/guides/routing/">Route several message types, or give handlers a custom envelope.</a></li>
+  <li><a href="/wireframe/guides/codecs/">Speak an existing wire format with a custom codec.</a></li>
+  <li><a href="/wireframe/guides/middleware/">Layer middleware and keep per-connection state.</a></li>
+  <li><a href="/wireframe/guides/testing/">Test the application without opening a socket.</a></li>
+</ul>
+</section>
+{% endblock %}

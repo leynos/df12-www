@@ -1,0 +1,426 @@
+/* The frame around every page: the shell, the masthead, navigation,
+ * buttons, labels, ticked panels, plates, and the footer. */
+
+.wf-shell {
+  width: 100%;
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (width >= 640px) {
+  .wf-shell {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (width >= 1024px) {
+  .wf-shell {
+    padding-inline: 2rem;
+  }
+}
+
+.wf-skip {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 60;
+  padding: 0.5rem 1rem;
+  background: var(--color-mint);
+  color: var(--color-night);
+  font: 700 0.9375rem / 1.4 var(--font-sans);
+  transform: translateY(-200%);
+}
+
+.wf-skip:focus {
+  transform: none;
+}
+
+/* A label: short Sintony capitals with slight tracking, as the identity
+   specification allows for "FRAME", "ROUTE", and diagram coordinates.
+   Never for running text. */
+.wf-label {
+  color: var(--color-ink-muted);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-eyebrow {
+  color: var(--color-mint);
+  font: 700 0.8125rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* The masthead. Sticky, 4rem tall, one line at every width from 1024px. */
+.wf-mast {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--color-rule);
+  background: color-mix(in oklab, var(--color-night) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.wf-mast__inner {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  height: 4rem;
+}
+
+/* The header lockup: the supplied logotype, keyed to alpha so its own glow
+ * carries it; no extra filter is stacked on top. */
+.wf-brand {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  text-decoration: none;
+}
+
+.wf-brand img {
+  display: block;
+  width: auto;
+  height: 2.75rem;
+}
+
+.wf-nav {
+  display: none;
+  flex: 1;
+  justify-content: center;
+}
+
+.wf-nav ul {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-nav a {
+  position: relative;
+  display: block;
+  padding: 0.6rem 0.7rem;
+  color: var(--color-ink-muted);
+  font: 400 0.9375rem / 1.35 var(--font-sans);
+  text-decoration: none;
+}
+
+.wf-nav a:hover {
+  color: var(--color-ink);
+}
+
+/* The current page is the selected item, so it takes the selected beam. */
+.wf-nav a[aria-current="page"] {
+  color: var(--color-ink);
+}
+
+.wf-nav a[aria-current="page"]::after {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.1rem;
+  left: 0.7rem;
+  height: 2px;
+  background: var(--color-magenta);
+  box-shadow: 0 0 8px var(--color-magenta);
+  content: "";
+}
+
+.wf-nav__up a {
+  color: var(--color-ink-dim);
+}
+
+.wf-mast__actions {
+  display: none;
+  flex: none;
+  gap: 1rem;
+  align-items: center;
+}
+
+.wf-mast__link {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--color-ink-muted);
+  font: 400 0.9375rem / 1.35 var(--font-sans);
+  text-decoration: none;
+}
+
+.wf-mast__link:hover {
+  color: var(--color-ink);
+}
+
+@media (width >= 1024px) {
+  .wf-nav,
+  .wf-mast__actions {
+    display: flex;
+  }
+
+  .wf-mobile {
+    display: none;
+  }
+}
+
+@media (1024px <= width < 1280px) {
+  .wf-nav a {
+    padding-inline: 0.45rem;
+  }
+
+  .wf-nav a[aria-current="page"]::after {
+    right: 0.45rem;
+    left: 0.45rem;
+  }
+
+  .wf-mast__link--wide {
+    display: none;
+  }
+}
+
+/* The phone and tablet menu: a disclosure, so it works without script. */
+.wf-mobile {
+  margin-left: auto;
+}
+
+.wf-mobile summary {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--color-tick);
+  color: var(--color-ink);
+  font: 700 0.9375rem / 1 var(--font-sans);
+  cursor: pointer;
+  list-style: none;
+}
+
+.wf-mobile summary::-webkit-details-marker {
+  display: none;
+}
+
+.wf-mobile[open] summary {
+  border-color: var(--color-mint);
+  color: var(--color-mint);
+}
+
+.wf-mobile nav {
+  position: absolute;
+  top: 4rem;
+  right: 0;
+  left: 0;
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-night);
+}
+
+.wf-mobile ul {
+  display: grid;
+  margin: 0;
+  padding: 0.5rem 1rem 1rem;
+  list-style: none;
+}
+
+.wf-mobile li a {
+  display: block;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--color-structure);
+  color: var(--color-ink);
+  font: 400 1rem / 1.4 var(--font-sans);
+  text-decoration: none;
+}
+
+.wf-mobile li a[aria-current="page"] {
+  color: var(--color-magenta);
+}
+
+/* Buttons. The identity specification's CTAs: the primary is a dark
+   surface with a bright mint outline in Sintony Bold, whose core brightens
+   and gains a small halo on hover; the secondary is a quiet border with light
+   text that brightens without a halo. Both stay on one line. */
+.wf-btn {
+  display: inline-flex;
+  gap: 0.6rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.65rem 1.25rem;
+  border: 2px solid var(--color-mint);
+  background: var(--color-panel);
+  color: var(--color-mint);
+  font: 700 0.9375rem / 1.35 var(--font-sans);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wf-btn:hover {
+  color: var(--color-ink);
+  box-shadow: var(--shadow-halo);
+}
+
+.wf-btn:active {
+  transform: translateY(1px);
+}
+
+.wf-btn--quiet {
+  border-width: 1px;
+  border-color: var(--color-tick);
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.wf-btn--quiet:hover {
+  border-color: var(--color-ink-muted);
+  box-shadow: none;
+}
+
+.wf-btn--compact {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+.wf-icon {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  fill: currentcolor;
+}
+
+/* A ticked panel: a hairline frame with registration ticks at each corner,
+   drawn as eight background strokes so no extra markup is needed. */
+.wf-ticked {
+  --tick-length: 0.65rem;
+  --tick-colour: var(--color-mint);
+
+  border: 1px solid var(--color-rule);
+  background-color: var(--color-panel);
+  background-image:
+    linear-gradient(var(--tick-colour), var(--tick-colour)),
+    linear-gradient(var(--tick-colour), var(--tick-colour)),
+    linear-gradient(var(--tick-colour), var(--tick-colour)),
+    linear-gradient(var(--tick-colour), var(--tick-colour)),
+    linear-gradient(var(--tick-colour), var(--tick-colour)),
+    linear-gradient(var(--tick-colour), var(--tick-colour)),
+    linear-gradient(var(--tick-colour), var(--tick-colour)),
+    linear-gradient(var(--tick-colour), var(--tick-colour));
+  background-repeat: no-repeat;
+  background-position:
+    top left,
+    top left,
+    top right,
+    top right,
+    bottom left,
+    bottom left,
+    bottom right,
+    bottom right;
+  background-size:
+    var(--tick-length) 1px,
+    1px var(--tick-length),
+    var(--tick-length) 1px,
+    1px var(--tick-length),
+    var(--tick-length) 1px,
+    1px var(--tick-length),
+    var(--tick-length) 1px,
+    1px var(--tick-length);
+}
+
+/* A plate: one generated illustration with an HTML caption. The raster
+   carries no text; anything that must be read is in the caption. */
+.wf-plate {
+  margin: 0;
+}
+
+.wf-plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--color-rule);
+  background: var(--color-night);
+}
+
+.wf-plate figcaption {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  margin-top: 0.6rem;
+  color: var(--color-ink-dim);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.wf-plate figcaption .wf-label {
+  flex: none;
+  color: var(--color-mint);
+}
+
+/* The footer. */
+.wf-footer {
+  margin-top: 6rem;
+  border-top: 1px solid var(--color-rule);
+  background: var(--color-panel);
+}
+
+.wf-footer__grid {
+  display: grid;
+  gap: 2.5rem;
+  padding-block: 3.5rem;
+}
+
+@media (width >= 768px) {
+  .wf-footer__grid {
+    grid-template-columns: 1.6fr repeat(3, 1fr);
+  }
+}
+
+.wf-footer h2 {
+  margin: 0 0 0.9rem;
+  color: var(--color-ink-muted);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-footer ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-footer li a {
+  color: var(--color-ink);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.wf-footer li a:hover {
+  color: var(--color-mint);
+  text-decoration: underline;
+}
+
+.wf-footer__lede {
+  max-width: 22rem;
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+.wf-footer__strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  justify-content: space-between;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--color-structure);
+  color: var(--color-ink-dim);
+  font: 400 0.8125rem / 1.45 var(--font-sans);
+}

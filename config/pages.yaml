@@ -124,6 +124,11 @@ homepage:
           href: "rstest-bdd/"
           meta_label: Learn more
           external: false
+        - label: wireframe
+          description: A Rust router for binary protocols. Frame the bytes, route each message by ID, answer in middleware.
+          href: "wireframe/"
+          meta_label: Learn more
+          external: false
   worlds:
     heading: Worlds We Dream
     kicker: Narratives that map the strange and human in the system.
@@ -1885,4 +1890,78 @@ sites:
       - {key: docs, label: "Documentation", template: pages/docs.jinja, output_slug: docs}
       - {key: docs-guides, label: "Task guides", template: pages/docs-guides.jinja, output_slug: docs/guides}
       - {key: docs-api, label: "API reference", template: pages/docs-api.jinja, output_slug: docs/api}
+    pages: {}
+
+  wireframe:
+    output_dir: public/wireframe
+    templates_dir: templates/wireframe
+    stylesheet: /wireframe/assets/styles/wireframe.css
+    base_path: /wireframe/
+    theme:
+      site_name: wireframe
+      hero_eyebrow: A Rust framework for binary protocols
+      hero_tagline: Binary protocols, routed.
+    parent_link:
+      label: "← df12 Productions"
+      href: /
+    template_vars:
+      # The release every sample on the sub-site is compiled and run against.
+      # The sample crate under templates/wireframe/samples/ pins the same
+      # version; `make wireframe-samples` runs it. Move these together with
+      # that crate's Cargo.toml, after the samples pass, and update the
+      # verification date and toolchain.
+      wireframe_version: "0.4.0-alpha1"
+      wireframe_tag: "v0.4.0-alpha1"
+      # False until the tag and crates exist: pages then call the date below a
+      # target. docs/wireframe-site.md lists what to change at publication.
+      wireframe_published: false
+      wireframe_released: "15 November 2026"
+      # What `samples_verified_on` ran against, as a phrase in running text.
+      samples_verified_against: "wireframe 0.4.0-alpha1 built from source at commit cd634074"
+      # The crate's declared minimum, enforced upstream by a weekly build.
+      rust_minimum: "1.95"
+      rust_verified: "1.99.1"
+      samples_verified_on: "2026-11-07"
+      # mxd moves on its own schedule, so its claims do not follow the release.
+      mxd_wireframe_version: "0.3.0"
+      repository_url: "https://github.com/leynos/wireframe"
+      source_base: "https://github.com/leynos/wireframe/blob/v0.4.0-alpha1"
+      docs_url: "https://docs.rs/wireframe/0.4.0-alpha1/wireframe/"
+    nav_links:
+      - {label: Overview, href: /wireframe/}
+      - {label: Get started, href: /wireframe/getting-started/}
+      - {label: Guides, href: /wireframe/guides/}
+      - {label: Architecture, href: /wireframe/architecture/}
+      - {label: Examples, href: /wireframe/examples/}
+      - {label: Roadmap, href: /wireframe/roadmap/}
+    shared_content:
+      - terms-of-use
+      - privacy-policy
+      - code-of-conduct
+    homepage:
+      title: "wireframe · Binary protocols, routed."
+    content_pages:
+      - {key: getting-started, label: "A first server, end to end.", template: pages/getting-started.jinja, output_slug: 
+          getting-started}
+      - {key: guides, label: Guides, template: pages/guides.jinja, output_slug: guides}
+      - {key: guide-routing, label: "Routes, envelopes, and handlers", template: pages/guide-routing.jinja, output_slug: 
+          guides/routing}
+      - {key: guide-codecs, label: "Frame codecs and preambles", template: pages/guide-codecs.jinja, output_slug: 
+          guides/codecs}
+      - {key: guide-middleware, label: "Middleware and lifecycle hooks", template: pages/guide-middleware.jinja, 
+        output_slug: guides/middleware}
+      - {key: guide-streaming, label: "Streaming, push, and sessions", template: pages/guide-streaming.jinja, 
+        output_slug: guides/streaming}
+      - {key: guide-large-messages, label: "Fragmentation and memory budgets", template: 
+          pages/guide-large-messages.jinja, output_slug: guides/large-messages}
+      - {key: guide-client, label: "The client runtime", template: pages/guide-client.jinja, output_slug: guides/client}
+      - {key: guide-testing, label: "Testing at the frame", template: pages/guide-testing.jinja, output_slug: 
+          guides/testing}
+      - {key: guide-production, label: "Running in production", template: pages/guide-production.jinja, output_slug: 
+          guides/production}
+      - {key: architecture, label: "The stack, layer by layer.", template: pages/architecture.jinja, output_slug: 
+          architecture}
+      - {key: examples, label: "Worked examples", template: pages/examples.jinja, output_slug: examples}
+      - {key: roadmap, label: "Released, next, and further out.", template: pages/roadmap.jinja, output_slug: roadmap}
+      - {key: scope, label: "The scope", template: pages/scope.jinja, output_slug: scope}
     pages: {}

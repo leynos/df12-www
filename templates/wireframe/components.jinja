@@ -1,0 +1,49 @@
+{#- Shared macros for the wireframe sub-site. Each pairs with a `wf-` class in
+    src/styles/wireframe/, so a call site says what a thing is rather than
+    how it is drawn. -#}
+{% from 'data/plates.jinja' import plates %}
+
+{% macro icon(name) -%}
+<svg class="wf-icon" aria-hidden="true" focusable="false" width="24" height="24"><use href="/wireframe/assets/icons/sprite.svg#{{ name }}"></use></svg>
+{%- endmacro %}
+
+{#- A link styled as a button. `kind` is 'primary' or 'quiet'; an external
+    link takes the external glyph in place of the arrow. -#}
+{% macro button(label, href, kind='primary', external=false) -%}
+<a class="wf-btn{% if kind == 'quiet' %} wf-btn--quiet{% endif %}" href="{{ href }}">{{ label }}{{ icon('external' if external else 'arrow-right') }}</a>
+{%- endmacro %}
+
+{#- A plate: one generated illustration from the catalogue in
+    data/plates.jinja, with its HTML caption. The raster carries no text. -#}
+{% macro plate(key, eager=false, sizes='100vw', caption=true) -%}
+{%- set p = plates[key] -%}
+<figure class="wf-plate">
+  <img src="/wireframe/assets/images/{{ p.file }}.webp" srcset="/wireframe/assets/images/{{ p.file }}-half.webp {{ p.width // 2 }}w, /wireframe/assets/images/{{ p.file }}.webp {{ p.width }}w" sizes="{{ sizes }}" alt="{{ p.alt }}" width="{{ p.width }}" height="{{ p.height }}" decoding="async" loading="{{ 'eager' if eager else 'lazy' }}"{% if eager %} fetchpriority="high"{% endif %}>
+  {%- if caption %}<figcaption><span class="wf-label">{{ p.label }}</span><span>{{ p.caption }}</span></figcaption>{% endif %}
+</figure>
+{%- endmacro %}
+
+{#- A callout: a text-first panel with a left rule, its kind in words. -#}
+{% macro callout(kind, title) -%}
+<aside class="wf-callout wf-callout--{{ kind }}" aria-label="{{ title }}"><p class="wf-callout__kind">{{ {'note': 'Note', 'warning': 'Warning', 'fact': 'In ' ~ wireframe_version}[kind] }}</p><p class="wf-callout__title">{{ title }}</p>{{ caller() }}</aside>
+{%- endmacro %}
+
+{#- The head of an article page. -#}
+{% macro page_head(crumbs, title, intro, plate_key=none) -%}
+<header class="wf-page-head">
+  <div class="wf-shell{% if plate_key %} wf-page-head__grid{% endif %}">
+    <div class="wf-page-head__copy">
+      <nav class="wf-crumbs" aria-label="Breadcrumb"><ol><li><a href="/wireframe/">wireframe</a></li>{% for label, href in crumbs %}<li><a href="{{ href }}">{{ label }}</a></li>{% endfor %}<li aria-current="page">{{ title }}</li></ol></nav>
+      <h1>{{ title }}</h1>
+      <p class="wf-deck">{{ intro }}</p>
+      <p class="wf-version">wireframe {{ wireframe_version }} · samples verified {{ samples_verified_on }}</p>
+    </div>
+    {%- if plate_key %}{{ plate(plate_key, eager=true, sizes='(width < 1024px) 100vw, 560px') }}{% endif %}
+  </div>
+</header>
+{%- endmacro %}
+
+{#- A list of linked routes with a lead line each. -#}
+{% macro route_list(items) -%}
+<ul class="wf-route-list">{% for item in items %}<li><a href="/wireframe/{{ item.slug }}/">{{ icon(item.icon) }}<span><strong>{{ item.title }}</strong><span>{{ item.intro }}</span></span>{{ icon('arrow-right') }}</a></li>{% endfor %}</ul>
+{%- endmacro %}

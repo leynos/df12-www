@@ -1,0 +1,48 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['guide-middleware'] %}
+{% set crumbs = [('Guides', '/wireframe/guides/')] %}
+{% set plate_key = none %}
+{% block article_body %}
+<section aria-labelledby="transform"><h2 id="transform">Write a Transform</h2>
+<p>Middleware in wireframe follows the Tower and Actix shape. A <code>Service</code> turns a <code>ServiceRequest</code> into a <code>ServiceResponse</code>; a <code>Transform</code> wraps one service in another. <code>WireframeApp::wrap</code> takes any <code>Transform</code> whose output is a <code>HandlerService</code>, the type every route&rsquo;s handler is held in.</p>
+<p>The layer below counts every request on every route. It is generic over the envelope type, so it works with a custom <code>Packet</code> as well as <code>Envelope</code>. <code>HandlerService::from_service</code> keeps the route&rsquo;s ID while swapping in the wrapping service.</p>
+{{ code.code('tests/middleware.rs', 'tally', title='middleware.rs · a counting layer') }}
+<p>Both traits are <code>async_trait</code> traits in {{ wireframe_version }}, so implementations need the <code>async-trait</code> crate.</p>
+</section>
+
+<section aria-labelledby="order"><h2 id="order">Order and scope</h2>
+<ul>
+  <li><strong>Per route, once.</strong> The application wraps each route&rsquo;s handler in the full middleware stack when it is prepared, and every connection shares the result. The router chooses the route first, so a message with an unknown ID never reaches middleware.</li>
+  <li><strong>First registered, outermost.</strong> The first <code>wrap</code> sees the request first and the reply last. In the sample application, the version upgrade runs before the counter.</li>
+  <li><strong>Infallible.</strong> The routed path expects <code>Error = Infallible</code>: a layer that cannot proceed writes an error reply rather than returning an error.</li>
+</ul>
+<p>Code that accepts streams itself, rather than using <code>WireframeServer</code>, calls <code>prepare()</code> once and reuses the <code>PreparedApp</code>. The older <code>WireframeApp::handle_connection</code> methods are deprecated because they rebuild the middleware chains for every connection.</p>
+</section>
+
+<section aria-labelledby="reply"><h2 id="reply">Write the reply</h2>
+<p>A routed handler returns nothing, and the default <code>HandlerService</code> answers with the request&rsquo;s payload. Replies are therefore written by middleware: call the inner service, then replace the bytes through <code>ServiceResponse::frame_mut()</code>. <a href="/wireframe/getting-started/#answer">Getting started</a> builds a full <code>Ping</code> to <code>Pong</code> layer this way. The reply keeps the request&rsquo;s message ID; see <a href="/wireframe/guides/routing/#correlation">correlation IDs</a> for what happens to its correlation ID.</p>
+<p>A handler that needs to influence the reply has to share state with the middleware, for example through a channel or a value the middleware can read. Extractors exist in <code>wireframe::extractor</code> as building blocks, but handlers cannot declare them as parameters and the runtime never builds the request they read; <a href="https://github.com/leynos/wireframe/issues/877">#877</a> tracks that.</p>
+</section>
+
+<section aria-labelledby="from-fn"><h2 id="from-fn">What from_fn is for</h2>
+<p><code>middleware::from_fn</code> turns an async function into a <code>Transform</code>, but it cannot be passed to <code>wrap</code>: <code>from_fn</code>&rsquo;s output is an <code>FnService</code>, not a <code>HandlerService</code>, so it fails <code>wrap</code>&rsquo;s bound. It can still wrap a service directly, inside a handwritten <code>Transform</code> that hands the result to <code>HandlerService::from_service</code>, but for routed middleware a handwritten <code>Transform</code> is the shorter path.</p>
+</section>
+
+<section aria-labelledby="versions"><h2 id="versions">Accept two versions</h2>
+<p>Middleware can rewrite a request before the handler sees it. This layer upgrades a legacy message format so the handler only ever sees the current one. It tries the current format first. That test only works because version 2 added a field, so a version 1 payload is too short to decode as version 2: bincode carries no type information, and two formats with the same layout decode as each other without complaint. The sample asserts the difference before relying on it.</p>
+{{ code.code('tests/middleware.rs', 'upgrade', title='middleware.rs · upgrade on ingress') }}
+<p>In the sample, a version 1 point goes in and the echoed reply decodes as version 2. A production version of this layer would also count legacy traffic, so the old format can be retired when the count reaches zero.</p>
+</section>
+
+<section aria-labelledby="lifecycle"><h2 id="lifecycle">Connection setup and teardown</h2>
+<p><code>on_connection_setup</code> runs once when a connection starts and returns a value of any type. That value is held for the life of the connection and handed to <code>on_connection_teardown</code> when the stream ends. Registering a setup hook changes the application&rsquo;s connection-state type parameter.</p>
+{{ code.code('tests/middleware.rs', 'lifecycle', title='middleware.rs · per-connection state') }}
+<p>Both hooks are async. Setup runs before any frame is read, after a preamble if the server expects one. Handlers and middleware have no access to this state; it is for per-connection bookkeeping such as metrics, registration, and cleanup. To share state with a handler, capture it when building the closure, as the counting layer above does with its counter. <code>app_data</code> stores values for the extractor building blocks, and the connection runtime never reads them.</p>
+<p>The <code>WireframeProtocol</code> trait, installed with <code>with_protocol</code>, defines further hooks. On a server connection only <code>before_send</code> runs: on each response frame, including each fragment, after the codec has wrapped it and just before it is encoded.</p>
+{{ code.code('tests/middleware.rs', 'before-send', title='middleware.rs · a protocol hook') }}
+<p>What it writes must still fit the codec&rsquo;s <code>max_frame_length</code>. The default codec rejects an oversized frame, which fails the send and ends the connection, while a custom encoder must enforce the limit itself. The other hooks belong to <a href="/wireframe/guides/streaming/#actor">the connection actor</a>, which <code>WireframeServer</code> does not run.</p>
+</section>
+{% endblock %}

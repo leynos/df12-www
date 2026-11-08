@@ -1,0 +1,36 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['guide-testing'] %}
+{% set crumbs = [('Guides', '/wireframe/guides/')] %}
+{% set plate_key = 'calibration' %}
+{% block article_body %}
+<section aria-labelledby="testkit"><h2 id="testkit">Enable the testkit</h2>
+<p>The <code>testkit</code> feature adds <code>wireframe::testkit</code>: drivers that run a real <code>WireframeApp</code> over an in-memory duplex stream, with no socket and no server. A driver encodes requests with a codec, feeds the bytes in, and returns the decoded replies. Turn the feature on for tests only, through a dev-dependency or a feature of the crate under test.</p>
+<p>Every sample on this site that does not need a real socket is tested this way, including the routing, codec, and middleware guides.</p>
+</section>
+
+<section aria-labelledby="partial"><h2 id="partial">One byte at a time</h2>
+<p>TCP delivers bytes, not frames. A codec that only works when a frame arrives in one read is a codec with a bug waiting for a busy network. <code>drive_with_partial_frames</code> concatenates the encoded requests and writes them in chunks of a chosen size, down to one byte:</p>
+{{ code.code('tests/testing.rs', 'partial', title='testing.rs · partial frames') }}
+<p>The helper builds requests by serializing an <code>Envelope</code> with <code>BincodeSerializer</code>, the application&rsquo;s default. The echo application returns each request unchanged, so the replies equal the requests. <code>drive_with_partial_codec_frames</code> returns decoded codec frames instead of payloads, for checking header fields.</p>
+</section>
+
+<section aria-labelledby="fragments"><h2 id="fragments">Feed fragments</h2>
+<p><code>drive_with_fragments</code> takes a raw payload and a <code>Fragmenter</code>, fragments the payload, wraps each fragment in an envelope, and feeds the frames through the application. The <a href="/wireframe/guides/large-messages/#enable">fragmentation guide</a>&rsquo;s sample uses it with a 2,000-byte request and 256-byte fragments. <code>drive_with_partial_fragments</code> combines both drivers, fragmenting and then chunking.</p>
+{% call ui.callout('note', 'The fragment driver addresses message ID 1') %}<p>The envelopes the fragment driver builds carry message ID 1, so the application under test needs a route there.</p>{% endcall %}
+<p><code>wireframe::testkit::reassembly</code> adds assertions over reassembly and message-assembly state, such as whether a message is still incomplete, how many bytes are buffered, and which error ended an assembly. They return a result rather than panicking, so they work in <code>rstest</code> tests and in <code>rstest-bdd</code> steps.</p>
+</section>
+
+<section aria-labelledby="slow"><h2 id="slow">Slow readers and writers</h2>
+<p>Back-pressure only shows up when something is slow. <code>SlowIoPacing</code> sets a chunk size and a delay between chunks, and <code>SlowIoConfig</code> applies one pacing to the writer, another to the reader, and a duplex capacity small enough to fill:</p>
+{{ code.code('tests/testing.rs', 'slow', title='testing.rs · paced I/O under paused time') }}
+<p>The test runs with <code>#[tokio::test(start_paused = true)]</code>, so the delays advance virtual time and the test finishes at once. A small capacity and a paced reader are what make the application&rsquo;s writes wait.</p>
+</section>
+
+<section aria-labelledby="beyond"><h2 id="beyond">Beyond the testkit</h2>
+<p>The separate <a href="https://crates.io/crates/wireframe_testing"><code>wireframe_testing</code></a> crate, also at {{ wireframe_version }}, re-exports the testkit and adds more: codec-aware drivers that return payloads or frames for any codec, Hotline-framed fixtures for valid, oversized, truncated, and correlated frames, an observability handle that captures logs and metrics together, a harness that starts a real server and a connected client in one test (<code>spawn_wireframe_pair</code>), prepared drivers that prove middleware is built once (<code>prepare_and_drive_with_frames</code>, <code>drive_prepared_with_frames</code>), and allocation counting for benchmarks (<code>benchmark_alloc_support</code>). This site&rsquo;s samples use only the main crate&rsquo;s <code>testkit</code>; the crate&rsquo;s own documentation covers the rest.</p>
+<p>For servers and clients that must meet over a real socket, the <a href="/wireframe/getting-started/">getting-started program</a> is itself a pattern: bind to port 0, read <code>local_addr</code>, call <code>spawn</code>, and finish with <code>stop</code> and <code>drained</code>. Close the client first, because shutdown waits for open connections.</p>
+</section>
+{% endblock %}

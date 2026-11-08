@@ -1,0 +1,25 @@
+{#- The plate catalogue: every generated illustration on the sub-site, once.
+    Each raster was drawn with gpt-image-2 on 31 October 2026 as X-Y
+    vector-scan display art and carries no text: the label and the caption
+    are HTML. Every image has a `-half` file at half its linear size for
+    `srcset`. Provenance is in docs/wireframe-site.md. -#}
+{% set plates = {
+  'scope': {'file': 'scope', 'width': 1600, 'height': 900, 'label': 'The scope',
+    'alt': 'A perspective grid floor drawn in glowing vector lines. A stream of cyan wireframe cubes flows in from the left through a tall mint rhombus gateway; beyond it, dim dashed paths lead to two distant terminal frames, while one amber path with travelling pulses of light carries the cubes, one of them magenta, to a third terminal that glows mint. A dashed return line curves back along the floor.',
+    'caption': 'One frame followed, one route lit. The other paths stay dark until a message ID names them.'},
+  'fragments': {'file': 'fragments', 'width': 1536, 'height': 1024, 'label': 'Fragments',
+    'alt': 'A long cyan wireframe slab, divided into four sections, separates into four short boxes that travel along a faint amber arc with blank gaps between them, and arrive inside a mint frame on the right, where they sit joined again as one long slab with glowing joints.',
+    'caption': 'Too long for one frame, so it crosses in pieces and is rejoined before any handler sees it.'},
+  'queues': {'file': 'queues', 'width': 1536, 'height': 1024, 'label': 'Two queues',
+    'alt': 'Two cyan beam tracks meet at a mint faceted rhombus. The upper track carries three closely spaced cubes, the lower two widely spaced ones; a single amber beam leaves the junction carrying three amber cubes with one cyan cube from the slow track let in between them.',
+    'caption': 'High and low priority share one connection, and the low queue still gets its turn.'},
+  'outbound': {'file': 'outbound', 'width': 1536, 'height': 1024, 'label': 'Outbound',
+    'alt': 'A mint wireframe stack of three planes on the left sends an amber beam carrying two cyan cubes and a small magenta rhombus to a tall mint terminal frame on the right; below it a dashed return line carries a matching magenta rhombus back.',
+    'caption': 'The client leaves with a mark and accepts only the reply that carries it back.'},
+  'calibration': {'file': 'calibration', 'width': 1536, 'height': 1024, 'label': 'Calibration',
+    'alt': 'On the left, an oscilloscope graticule holds a bright mint three-lobed Lissajous figure with a faint afterglow of the previous trace. On the right, an oval loop carries a cyan slab in several separate pieces along its far side and whole along its near side, with a small amber pulse where the pieces rejoin.',
+    'caption': 'Feed it round in pieces on the far side; check it arrives whole on the near side.'},
+  'construction': {'file': 'construction', 'width': 1536, 'height': 1024, 'label': 'Still being drawn',
+    'alt': 'A large mint wireframe structure in perspective: the left part is fully lit, with a faceted junction at its centre; in the middle an amber beam tip is tracing a new edge; to the right, further frames exist only as faint dashed construction lines with calibration ticks.',
+    'caption': 'Lit lines are shipped. Dashed lines are plans, not promises.'},
+} %}

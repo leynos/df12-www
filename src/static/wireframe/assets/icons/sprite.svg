@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- The wireframe icon set: a 24 x 24 grid, 1.75px strokes, square joins,
+       no fills. Each symbol draws one idea from the identity's visual
+       grammar. Referenced as /wireframe/assets/icons/sprite.svg#<id>. -->
+  <symbol id="arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M4 12h15M13 6l6 6-6 6"/>
+  </symbol>
+  <symbol id="external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M10 5H5v14h14v-5M13 5h6v6M19 5l-9 9"/>
+  </symbol>
+  <symbol id="branch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M7 4v16M7 15c0-4 10-3 10-8"/><rect x="5" y="2" width="4" height="4"/><rect x="15" y="4" width="4" height="4"/><rect x="5" y="18" width="4" height="4"/>
+  </symbol>
+  <!-- A frame: a contour with a header band enclosing its payload. -->
+  <symbol id="frame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <rect x="3" y="5" width="18" height="14"/><path d="M3 9h18M7 13h6M7 16h9"/>
+  </symbol>
+  <!-- A route: one input, an illuminated junction, one selected output. -->
+  <symbol id="route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M2 12h6l4-4 4-4h6M12 8l4 4h6" /><path d="M8 12l4-4" /><rect x="10" y="6" width="4" height="4" transform="rotate(45 12 8)"/>
+  </symbol>
+  <!-- Middleware: two coupled planes the path passes through in order. -->
+  <symbol id="gates" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M7 3v18M15 3v18M2 12h20M17 9l3 3-3 3"/>
+  </symbol>
+  <!-- A stream: discrete pulses paced through a constrained channel. -->
+  <symbol id="pulses" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M2 8h20M2 16h20"/><rect x="4" y="10" width="3" height="4"/><rect x="10.5" y="10" width="3" height="4"/><rect x="17" y="10" width="3" height="4"/>
+  </symbol>
+  <!-- Fragments: numbered parallel segments that rejoin. -->
+  <symbol id="fragments" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M2 7h5M9 7h5M16 7h4M2 17h18M20 7l2 5-2 5"/>
+  </symbol>
+  <!-- The client: the same rails, leaving the frame. -->
+  <symbol id="outbound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <rect x="3" y="6" width="10" height="12"/><path d="M13 12h9M18 8l4 4-4 4"/>
+  </symbol>
+  <!-- A test: a frame fed through in pieces, checked on the far side. -->
+  <symbol id="proof" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M2 12h3M7 12h3"/><rect x="12" y="5" width="10" height="14"/><path d="M14.5 12.5l2 2 3.5-4.5"/>
+  </symbol>
+  <!-- A guarded boundary: a budget the traffic cannot exceed. -->
+  <symbol id="budget" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <path d="M3 20h18M5 20V9M19 20V4M5 9h9M14 4v16"/><path d="M8 13h3M8 16h3"/>
+  </symbol>
+  <symbol id="copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter">
+    <rect x="8" y="8" width="12" height="12"/><path d="M16 8V4H4v12h4"/>
+  </symbol>
+</svg>

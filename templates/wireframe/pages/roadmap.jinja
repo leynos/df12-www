@@ -1,0 +1,73 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% block title %}Roadmap · wireframe{% endblock %}
+{% block description %}What wireframe {{ wireframe_version }} provides, what changed since 0.3.0, what ships ahead of the wiring, and what the road to 1.0 holds.{% endblock %}
+{% block content %}
+{% set unwired = [
+  ('ConnectionActor, streaming and multi-packet responses', 874),
+  ('Push queues and SessionRegistry', 875),
+  ('Streaming request bodies', 876),
+  ('Extractors and app_data', 877),
+  ('Recovery policies and the codec error metric', 878),
+  ('on_eof and the other protocol hooks', 879),
+] %}
+{{ ui.page_head([], 'This alpha, what changed, and what is next', wireframe_version ~ ' is an alpha for early adopters: expect interfaces to change before 1.0, and pin the version. Beyond it, the upstream roadmap is a plan, not a promise.', 'construction') }}
+<div class="wf-shell wf-landing">
+  <div class="wf-horizons">
+    <section class="wf-horizon" aria-labelledby="now">
+      <p class="wf-label">{{ 'Released' if wireframe_published else 'Target release' }} {{ wireframe_released }}</p>
+      <h2 id="now">In {{ wireframe_version }}</h2>
+      <ul>
+        <li>Routing by message ID, the bundled <code>Envelope</code> and custom <code>Packet</code> types, and correlation IDs.</li>
+        <li>Pluggable framing through <code>FrameCodec</code>, with length-delimited framing by default; preambles with a deadline.</li>
+        <li><code>Transform</code> middleware, connection setup and teardown hooks, and the <code>before_send</code> protocol hook on routed replies.</li>
+        <li>Transport fragmentation, protocol message assembly, and three-tier memory budgets.</li>
+        <li>A client with correlated calls, streamed replies, streaming sends, hooks, tracing, and pools.</li>
+        <li>The <code>testkit</code> feature and the <code>wireframe_testing</code> crate.</li>
+      </ul>
+      <p>One routed request produces one reply, split across frames only by fragmentation, and a handler cannot return a stream.</p>
+    </section>
+    <section class="wf-horizon wf-horizon--next" aria-labelledby="changed">
+      <p class="wf-label">Since 0.3.0</p>
+      <h2 id="changed">What to act on</h2>
+      <p>The <a href="{{ source_base }}/docs/v0-4-0-migration-guide.md">migration guide</a> lists every change. The ones most likely to surprise are those that still compile.</p>
+      <ul>
+        <li><strong>A prepared application.</strong> <code>WireframeServer::new</code> calls its factory once per server run and shares the prepared application across connections. Per-connection state moves to <code>on_connection_setup</code>; <code>WireframeServer::from_app</code> takes an application already built, and <code>spawn</code> returns a <code>ServerShutdown</code>.</li>
+        <li><strong>Preamble deadlines.</strong> The first read has a 10-second default deadline, with or without a preamble, and an error from the success handler now closes the connection.</li>
+        <li><strong>Bounded, exact decoding.</strong> The bundled bincode decoders cap peer-declared lengths at 16&nbsp;MiB for messages and 1&nbsp;KiB for preambles, and trailing bytes after an envelope are a decoding error.</li>
+        <li><strong>Binding totals and counted fragments.</strong> A declared <code>total_body_len</code> is a commitment, and fragment bytes count towards memory budgets.</li>
+        <li><strong>Hooks on replies.</strong> <code>before_send</code> now runs on every handler response, including each fragment.</li>
+        <li><strong>Pool limits.</strong> At most <code>max_waiters</code> acquisitions may queue, closed pools say so, and interrupted work discards its socket.</li>
+        <li><strong>Reassembly caps.</strong> <code>FragmentationConfig</code> gains <code>max_concurrent_partials</code> and <code>max_buffered_bytes</code>, and <code>Reassembler::new</code> takes both.</li>
+        <li><strong>Error enums.</strong> <code>ClientError</code> is now <code>#[non_exhaustive]</code>, and it, <code>ServerError</code>, <code>MessageAssemblyError</code>, and <code>ReassemblyError</code> gain variants.</li>
+        <li><strong>No linger.</strong> <code>SocketOptions::linger</code> and the builder&rsquo;s <code>linger</code> are gone; <code>close().await</code> is the graceful path.</li>
+        <li><strong>Deprecations.</strong> <code>WireframeApp::handle_connection</code> and <code>handle_connection_result</code> rebuild the middleware chains for every connection. Prepare the application once and use <code>PreparedApp</code>.</li>
+        <li><strong>Dependencies.</strong> <code>metrics-exporter-prometheus</code> and <code>tracing-subscriber</code> are no longer brought along at run time. Declare them if the application uses them.</li>
+      </ul>
+    </section>
+    <section class="wf-horizon wf-horizon--next" aria-labelledby="boundary">
+      <p class="wf-label">Tested, not yet wired</p>
+      <h2 id="boundary">Ahead of the server</h2>
+      <p>These parts ship and are tested on their own, but <code>WireframeServer</code> does not drive them, so adopting one means writing the glue. <a href="{{ source_base }}/docs/users-guide.md#building-blocks-not-yet-wired-into-the-server">The users&rsquo; guide</a> says how far each goes, and each has a tracking issue:</p>
+      <ul>
+        {%- for name, issue in unwired %}
+        <li><a href="{{ repository_url }}/issues/{{ issue }}">{{ name }} (#{{ issue }})</a></li>
+        {%- endfor %}
+      </ul>
+    </section>
+    <section class="wf-horizon wf-horizon--later" aria-labelledby="later">
+      <p class="wf-label">Planned · upstream roadmap</p>
+      <h2 id="later">Toward 1.0</h2>
+      <ul>
+        <li>Streaming request extraction in the handler dispatch path.</li>
+        <li>Connection-local runtime ownership and lifecycle finalization.</li>
+        <li>Protocol-neutral adapters for the first consumers, starting with mxd serving Hotline through generic public primitives.</li>
+        <li>Zero-copy payloads through the public byte APIs. This is not in the alpha: <code>Serializer::serialize</code> still returns <code>Vec&lt;u8&gt;</code>.</li>
+        <li>Alternative transports beyond raw TCP, a formal message versioning system, and built-in middleware or guides for TLS.</li>
+        <li>Formal verification of message assembly and dispatch: bounded model checks with Kani, model checks with Stateright, and proofs with Verus.</li>
+      </ul>
+      <p>Track the detail in the <a href="{{ repository_url }}/blob/main/docs/roadmap.md">upstream roadmap</a> and the <a href="{{ repository_url }}/blob/main/CHANGELOG.md">changelog</a>.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

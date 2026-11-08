@@ -378,6 +378,7 @@ Every published file has a source elsewhere in the repository:
 | `netsuke/assets/css/himotoshi.css`        | Tailwind compiling `src/styles/`                                              |
 | `cuprum/assets/styles/cuprum.css`         | Tailwind compiling `src/styles/`                                              |
 | `rstest-bdd/assets/styles/rstest-bdd.css` | Tailwind compiling `src/styles/`                                              |
+| `wireframe/assets/styles/wireframe.css`   | Tailwind compiling `src/styles/`                                              |
 | `images/*.webp`, `images/*.avif`          | `scripts/generate-image-variants.ts`                                          |
 | `*/assets/js/*.js`                        | `scripts/compile-browser-scripts.ts` compiling `src/static/**/assets/js/*.ts` |
 | `netsuke/assets/search/*.json`            | `scripts/build-netsuke-search-index.mjs`                                      |
@@ -601,6 +602,7 @@ block outright, so a run restores it without needing the previous content.
 | Stilyagi   | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css`   |
 | Cuprum     | `CuprumStyle`    | `python`, `console`                                | `cuprum-syntax`   | `--cuprum-syntax-`   | `600`       | `src/static/cuprum/assets/styles/syntax.css`     |
 | rstest-bdd | `LanternStyle`   | `rust`, `gherkin`, `toml`, `console`               | `lantern-syntax`  | `--lantern-syntax-`  | `600`       | `src/static/rstest-bdd/assets/styles/syntax.css` |
+| wireframe  | `ScopeStyle`     | `rust`, `toml`                                     | `wf-syntax`       | `--wf-syntax-`       | `600`       | `src/styles/wireframe/syntax.css`                |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each
@@ -1423,6 +1425,44 @@ the footer's `footer_art` block, which credits the illustrations, and
 `tests/test_rstest_bdd_browser.py`, marked `playwright`, runs axe over every
 page at 390 and 1440 pixels, checks that no page scrolls sideways at 320
 pixels, and drives the storybook.
+
+### 5.10. wireframe's logotype, scope, samples, and copy controls
+
+The wireframe sub-site at `/wireframe/` follows its own identity specification;
+[wireframe sub-site](wireframe-site.md)
+records it, the release facts the copy rests on, and the provenance of the art.
+Four mechanisms are specific to it.
+
+- **Keyed logotype.** `scripts/build_wireframe_logo_assets.py` derives the
+  lockup, wordmark, symbol, and favicons in
+  `src/static/wireframe/assets/logos/` from the supplied raster master, keying
+  its black ground to alpha. Pass it the master's path; numpy and Pillow are
+  dev dependencies for it. `test_the_logo_is_the_supplied_artwork` holds every
+  brand image to the keyed files.
+- **The scope.** `scripts/generate_wireframe_scope.py` projects the hero's
+  three-dimensional scene into `templates/wireframe/_scope.svg.jinja`, and
+  `test_the_scope_scene_is_generated` fails when they disagree. `scope.ts`
+  redraws any `[data-wf-scope]` root's `path[data-beam]` strokes on its canvas
+  as a vector beam, with phosphor persistence, additive glow, and flyback. It
+  stays off under reduced motion or more contrast, where the SVG is the whole
+  picture. It is rung 5 because a canvas cannot be drawn in CSS.
+- **Anchored samples.** `_code.jinja`'s `code(file, anchor)` macro includes a
+  file from the Cargo package under `templates/wireframe/samples/` and keeps
+  the lines between `// ANCHOR: name` and `// ANCHOR_END: name`.
+  `test_every_sample_panel_is_a_run_of_its_sample` and
+  `test_every_anchor_a_panel_names_exists` hold panels and anchors to the
+  files, and `make wireframe-samples` compiles and runs the package. Until
+  0.4.0-alpha1 is published that target fails, and the samples run through a
+  scratch patch instead; see [wireframe sub-site](wireframe-site.md).
+- **Copy controls.** `copy-code.ts` is rstest-bdd's copy button with
+  `data-wf-copy` attributes and no telemetry hook. Command panels draw their
+  `$` prompt in CSS, so it never reaches the clipboard.
+
+`_code.jinja` is kept apart from `components.jinja` because the shared
+legal-page renderer does not load the `highlight` extension, and the layout
+imports `components.jinja` on every page, legal notices included.
+`tests/test_wireframe_browser.py`, marked `playwright`, runs axe over every
+page at 390 and 1440 pixels and checks that no page scrolls sideways at 320.
 
 ## 6. Browser-side components
 

@@ -1,0 +1,52 @@
+{% extends '_article.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% import '_code.jinja' as code with context %}
+{% from 'data/pages.jinja' import catalogue %}
+{% set article = catalogue['guide-routing'] %}
+{% set crumbs = [('Guides', '/wireframe/guides/')] %}
+{% set plate_key = none %}
+{% block article_body %}
+<section aria-labelledby="register"><h2 id="register">Register routes</h2>
+<p>A route is a <code>u32</code> message ID and the handler that receives messages carrying it. <code>WireframeApp::route</code> takes both and returns the builder, so routes chain. A handler&rsquo;s type is <code>Handler&lt;Envelope&gt;</code>: an <code>Arc</code> around a closure that takes <code>&amp;Envelope</code> and returns a pinned, boxed future of <code>()</code>.</p>
+{{ code.code('tests/routing.rs', 'routes', title='routing.rs · two routes') }}
+<p>Each ID has one handler. Registering an ID a second time is an error at setup, not a silent replacement, so a dispatch table can never be ambiguous:</p>
+{{ code.code('tests/routing.rs', 'duplicate', title='routing.rs · one handler per ID') }}
+</section>
+
+<section aria-labelledby="envelope"><h2 id="envelope">The bundled envelope</h2>
+<p>Unless told otherwise, an application decodes every frame into <code>Envelope</code>: a message ID, an optional correlation ID, and the payload bytes. The router reads only the ID. The payload is opaque until something decodes it, usually with <code>Message::from_bytes</code> in middleware.</p>
+<div class="wf-table-scroll" tabindex="0" role="region" aria-label="The vocabulary of a request"><table>
+<thead><tr><th scope="col">Term</th><th scope="col">Layer</th><th scope="col">What it is</th></tr></thead>
+<tbody>
+<tr><td>Frame</td><td>Transport</td><td>The unit a <code>FrameCodec</code> cuts from the byte stream</td></tr>
+<tr><td>Envelope</td><td>Routing</td><td>The decoded wrapper: <code>id</code>, <code>correlation_id</code>, payload</td></tr>
+<tr><td>Packet</td><td>Routing</td><td>The trait an envelope type implements</td></tr>
+<tr><td>Message</td><td>Domain</td><td>The typed value encoded in the payload</td></tr>
+</tbody></table></div>
+</section>
+
+<section aria-labelledby="packet"><h2 id="packet">A custom envelope</h2>
+<p>To give handlers a type of their own rather than <code>Envelope</code>, implement <code>Packet</code>, which converts to and from <code>PacketParts</code>, and <code>CorrelatableFrame</code>, which exposes the correlation ID. The example below presents a 16-bit opcode where <code>Envelope</code> has a 32-bit ID; the router still sees a <code>u32</code>.</p>
+<p>This changes what handlers see, not what travels on the wire. A connection still decodes the serializer&rsquo;s <code>Envelope</code>, rebuilds the custom type from its parts for the handler, and sends the reply as an <code>Envelope</code>. A different layout on the wire needs <a href="/wireframe/guides/codecs/#framecodec">a custom codec</a> as well.</p>
+{{ code.code('tests/routing.rs', 'stroke', title='routing.rs · a custom envelope') }}
+<p>The envelope type is the application&rsquo;s third type parameter. Handlers then receive the custom type:</p>
+{{ code.code('tests/routing.rs', 'stroke-app', title='routing.rs · routing on it') }}
+<p>The sample drives this application with the testkit, one byte at a time. An <code>Envelope</code> goes in, the handler sees a <code>Stroke</code>, and an <code>Envelope</code> comes back with its correlation ID intact. Because the handler adds nothing, the reply is the request.</p>
+</section>
+
+<section aria-labelledby="correlation"><h2 id="correlation">Correlation IDs</h2>
+<p>The correlation ID ties a reply to its request. In {{ wireframe_version }} the reply is rebuilt with the request&rsquo;s message ID and passed through <code>PacketParts::inherit_correlation</code>: if middleware left the correlation ID unset, the request&rsquo;s is copied across, and if middleware set a different one, the request&rsquo;s wins and a warning is logged. When an envelope arrives without a correlation ID, a codec that carries one in its frame header supplies it instead.</p>
+<p>A <code>None</code> correlation ID means an unsolicited frame, such as a server push. Use <code>None</code> rather than <code>Some(0)</code>.</p>
+<p>On the client, <code>call_correlated</code> generates the ID and rejects a reply that does not carry it back. See <a href="/wireframe/guides/client/">the client runtime</a>.</p>
+</section>
+
+<section aria-labelledby="unrouted"><h2 id="unrouted">Unrouted and malformed traffic</h2>
+<p>The router answers only what it can route. In {{ wireframe_version }}:</p>
+<ul>
+  <li>A message whose ID has no route is logged at warning level and dropped. The peer gets no reply.</li>
+  <li>A frame that does not decode as an envelope counts as a deserialization failure. Ten failures with no message dispatched in between close the connection: the count resets only once decoding, reassembly, and assembly have all succeeded.</li>
+  <li>A frame must hold exactly one envelope, so trailing bytes are a decoding failure. The bundled decoders also refuse a container length over a fixed 16&nbsp;MiB, whatever the peer declares.</li>
+  <li>Routes are fixed when the application is built. Adding one later means building another application.</li>
+</ul>
+</section>
+{% endblock %}

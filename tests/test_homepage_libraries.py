@@ -167,13 +167,15 @@ def test_shipped_config_lists_local_library_subsites() -> None:
 
     assert libraries is not None, "homepage.systems.libraries should be configured"
     by_label = {link.label: link for link in libraries.links}
-    assert set(by_label) == {"femtologging", "Cuprum", "rstest-bdd"}
+    assert set(by_label) == {"femtologging", "Cuprum", "rstest-bdd", "wireframe"}
     assert by_label["femtologging"].href == "femtologging/"
     assert not by_label["femtologging"].external
     assert by_label["Cuprum"].href == "cuprum/"
     assert not by_label["Cuprum"].external, "Cuprum is a local sub-site"
     assert by_label["rstest-bdd"].href == "rstest-bdd/"
     assert not by_label["rstest-bdd"].external, "rstest-bdd is a local sub-site"
+    assert by_label["wireframe"].href == "wireframe/"
+    assert not by_label["wireframe"].external, "wireframe is a local sub-site"
 
 
 def test_rendered_homepage_lists_libraries_in_the_tools_section(tmp_path: Path) -> None:

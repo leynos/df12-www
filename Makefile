@@ -160,9 +160,10 @@ check-fmt: venv-ruff ## Verify formatting
 # Interrogate measures docstring presence over the Python files it scans under
 # INTERROGATE_TARGETS (it skips some path prefixes by default, so check a new
 # file against the verbose report). The published femtologging samples under
-# src and templates are not scanned. Add a new Python directory to the targets.
+# src and templates are scanned too, so each carries a docstring. Add a new
+# Python directory to the targets.
 INTERROGATE_VERSION ?= 1.7.0
-INTERROGATE_TARGETS ?= df12_pages scripts tests
+INTERROGATE_TARGETS ?= df12_pages scripts tests src templates
 # Level 2 prints a MISSED row per undocumented definition, which the
 # `interrogate` target fails on: the rounded percentage alone passes a lone gap.
 INTERROGATE_FLAGS ?= -vv --no-color --ext pyi --fail-under 100

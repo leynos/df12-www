@@ -441,8 +441,8 @@ Ruff is missing. ty is pinned by `TY_VERSION` in the `Makefile` and run with
 the new release asks for.
 
 `make lint` first runs `make interrogate`, which needs `uv` and fails on any
-Python definition under `INTERROGATE_TARGETS` (`df12_pages`, `scripts` and
-`tests`) without a docstring, and on any `MISSED` row, since the percentage is
+Python definition under `INTERROGATE_TARGETS` (`df12_pages`, `scripts`,
+`tests`, `src` and `templates`) without a docstring, and on any `MISSED` row, since the percentage is
 rounded. Add a new Python directory to that list.
 
 `make lint` runs Ruff over the Python and Biome over everything else —

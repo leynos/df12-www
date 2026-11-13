@@ -44,7 +44,7 @@
         statuses=['preview'], meta='Optional backend · not required · native wheels for CPython 3.12 and later · describes Cuprum ' ~ cuprum_version,
         art_image=valve_art, stamp='Technical preview') %}
         {{ ui.button('Read backend selection', '#selection', icon='arrow-down') }}
-        {{ ui.button('ADR-001', src ~ 'docs/adr-001-rust-extension.md', variant='outline', icon='external') }}
+        {{ ui.button('ADR-001', src ~ 'docs/adrs/adr-0001-rust-extension.md', variant='outline', icon='external') }}
       {% endcall %}
       {{ ui.routemap(sections, 'Annex R') }}
 
@@ -200,8 +200,8 @@ False
         </div>
       </div>
       <div class="cu-card-grid">
-        {{ ui.card('ADR-001 · Optional Rust extension', 'Why stream operations, why optional, and the fallback strategy.', number='Decision · Proposed', href=src ~ 'docs/adr-001-rust-extension.md') }}
-        {{ ui.card('ADR-002 · Additional Rust components', 'The consume and raw-sink proposals, and the evidence each must produce.', number='Decision', href=src ~ 'docs/adr-002-additional-rust-components.md') }}
+        {{ ui.card('ADR-001 · Optional Rust extension', 'Why stream operations, why optional, and the fallback strategy.', number='Decision · Proposed', href=src ~ 'docs/adrs/adr-0001-rust-extension.md') }}
+        {{ ui.card('ADR-002 · Additional Rust components', 'The consume and raw-sink proposals, and the evidence each must produce.', number='Decision', href=src ~ 'docs/adrs/adr-0002-additional-rust-components.md') }}
         {{ ui.card('Send feedback', 'Tried the native path? Report what you measured, or what declined, on the issue tracker.', number='Issues', href=repository_url ~ '/issues') }}
       </div>
       {% endcall %}

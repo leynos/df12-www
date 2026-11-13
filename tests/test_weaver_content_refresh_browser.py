@@ -425,10 +425,10 @@ def test_docs_publish_the_architecture_decision_library(
     assert report["heading"] == "Architecture Decisions"
     assert report["links"] == sorted(
         [
-            "https://github.com/leynos/weaver/blob/main/docs/adr-001-plugin-capability-model-and-act-extricate.md",
-            "https://github.com/leynos/weaver/blob/main/docs/adr-007-agent-native-command-surface.md",
-            "https://github.com/leynos/weaver/blob/main/docs/rfcs/0002-multi-workspace-daemon.md",
-            "https://github.com/leynos/weaver/blob/main/docs/rfcs/0003-sempai-query-to-selector.md",
+            "https://github.com/leynos/weaver/blob/main/docs/adrs/adr-0001-plugin-capability-model-and-act-extricate.md",
+            "https://github.com/leynos/weaver/blob/main/docs/adrs/adr-0007-agent-native-command-surface.md",
+            "https://github.com/leynos/weaver/blob/main/docs/rfcs/rfc-0002-multi-workspace-daemon-and-language-server-lifecycle.md",
+            "https://github.com/leynos/weaver/blob/main/docs/rfcs/rfc-0003-sempai-query-to-selector-vertical-slice.md",
             "https://github.com/leynos/weaver/blob/main/docs/ui-gap-analysis.md",
         ]
     )

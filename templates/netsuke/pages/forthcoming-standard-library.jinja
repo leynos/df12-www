@@ -5,7 +5,7 @@
 {% block page_title %}Standard Library Expansion (Forthcoming) - Netsuke Build System{% endblock %}
 {% block content %}
 {% set rm = 'https://github.com/leynos/netsuke/blob/main/docs/roadmap.md' %}
-{% set rfc = 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/0006-ansible-inspired-template-standard-library.md' %}
+{% set rfc = 'https://github.com/leynos/netsuke/blob/main/docs/rfcs/rfc-0006-ansible-inspired-template-standard-library-expansion.md' %}
 
     <div class="site-container pt-16 grow flex">
 
@@ -29,7 +29,7 @@
                     <ul class="space-y-2 text-sm text-charcoal-mid">
                         <li class="flex items-start"><span class="iconify text-accent mt-1 mr-2 text-xs" data-icon="carbon:close" aria-hidden="true"></span> <span><strong>Not in v{{ netsuke_version }}.</strong> No helper from the expansion ships. All 49 tasks in <a href="{{ rm }}#6-template-standard-library-expansion" class="hm-link">roadmap phase 6</a> are unticked. The <a href="/netsuke/docs/standard-library/" class="hm-link">shipped standard library</a> is documented separately.</span></li>
                         <li class="flex items-start"><span class="iconify text-success mt-1 mr-2 text-xs" data-icon="carbon:checkmark" aria-hidden="true"></span> <span><strong>Specified.</strong> <a href="{{ rfc }}" class="hm-link">RFC 0006</a> (status Proposed, created 26 August 2026) was merged to <code>main</code> as a specification. Its release target: after v0.1.0 final, and &ldquo;no part of this RFC may land in the v0.1.0 hardening release&rdquo;. It names v0.1.x and v0.2.x as targets.</span></li>
-                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Being split.</strong> Open PR <a href="https://github.com/leynos/netsuke/pull/697" class="hm-link">#697</a> divides the accepted set among focused child RFCs 0013 to 0020, of which only <a href="https://github.com/leynos/netsuke/blob/6-1-1-split-rfc-0006-set-into-focused-child-rfcs-and-task/docs/rfcs/0013-structured-data-interchange-helpers.md" class="hm-link">RFC 0013, structured data interchange</a>, is written; it adds a test suite asserting that every accepted helper has exactly one owner.</span></li>
+                        <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Being split.</strong> Open PR <a href="https://github.com/leynos/netsuke/pull/697" class="hm-link">#697</a> divides the accepted set among focused child RFCs 0013 to 0020, of which only <a href="https://github.com/leynos/netsuke/blob/6-1-1-split-rfc-0006-set-into-focused-child-rfcs-and-task/docs/rfcs/rfc-0013-structured-data-interchange-helpers.md" class="hm-link">RFC 0013, structured data interchange</a>, is written; it adds a test suite asserting that every accepted helper has exactly one owner.</span></li>
                         <li class="flex items-start"><span class="iconify text-warning mt-1 mr-2 text-xs" data-icon="carbon:branch" aria-hidden="true"></span> <span><strong>Adjacent work in flight.</strong> Open PR <a href="https://github.com/leynos/netsuke/pull/702" class="hm-link">#702</a> (roadmap 3.14.8) implements <code>env(name, default=...)</code> and a <code>compact</code> filter. <code>shell_escape</code> and <code>shell_join</code>, on which RFC 0006's <code>shell_quote</code> depends, are not on that branch yet.</span></li>
                     </ul>
                 </div>
@@ -162,7 +162,7 @@
                     RFC 0006's Ansible-derived set but follows the same contract. It exposes the paths changed between two commits as typed
                     data, and a pure filter to test them, so a manifest can leave an expensive gate out of the graph when nothing it checks
                     has changed. The <a href="https://github.com/leynos/netsuke/blob/main/docs/git-change-detection-helpers-design.md" class="hm-link">design</a>
-                    is Proposed; <a href="https://github.com/leynos/netsuke/blob/main/docs/adr-015-use-bounded-git-cli-for-change-detection.md" class="hm-link">ADR-015</a>
+                    is Proposed; <a href="https://github.com/leynos/netsuke/blob/main/docs/adrs/adr-0015-use-bounded-git-cli-queries-for-change-detection.md" class="hm-link">ADR-015</a>
                     governs the bounded Git adapter.
                 </p>
                 <p class="text-xs text-charcoal-mid mb-2">The design document's motivating example (proposed)</p>

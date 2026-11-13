@@ -232,14 +232,14 @@
       <div class="cu-card-grid">
         {{ ui.card('Cuprum design', 'The design document: principles, conceptual model, async execution, pipelines, error model, and the Rust extension.', number='Plan', href=src ~ 'docs/cuprum-design.md') }}
         {{ ui.card("Users' guide", 'The public API, with every option and its failure behaviour.', number='Manual', href=src ~ 'docs/users-guide.md') }}
-        {{ ui.card('ADR-006 · Context package split', 'Why the scope, hooks, and registrations live where they do.', number='Decision', href=src ~ 'docs/adrs/adr-0006-context-package-split.md') }}
-        {{ ui.card('ADR-007 · Execution module boundaries', 'How single-command execution is divided between modules.', number='Decision', href=src ~ 'docs/adrs/adr-0007-subprocess-execution-module-boundaries.md') }}
-        {{ ui.card('ADR-013 · GitHub Actions sink', 'Why presentation is an opt-in sink rather than a change to echo.', number='Decision', href=src ~ 'docs/adrs/adr-0013-opt-in-github-actions-presentation-sink.md') }}
-        {{ ui.card('ADR-018 · Typed environment policies', 'Why inherit, overlay, and replace are a closed enum on the context, and why UNSET is a value.', number='Decision', href=src ~ 'docs/adrs/adr-0018-typed-environment-policies.md') }}
-        {{ ui.card('ADR-019 · Control observation channel', 'Why what a stop request did to a child is reported on its own channel, and why refusal is an outcome.', number='Decision', href=src ~ 'docs/adrs/adr-0019-control-observation-channel.md') }}
-        {{ ui.card('ADR-020 · Typed argument contract', 'Why builders accept exactly ArgValue and refuse execution-option names.', number='Decision', href=src ~ 'docs/adrs/adr-0020-typed-argument-contract-for-sh-make.md') }}
-        {{ ui.card('ADR-021 · Process-group ownership', 'Why group ownership is an opt-in policy on the execution context, and what it cannot promise.', number='Decision', href=src ~ 'docs/adrs/adr-0021-process-group-ownership.md') }}
-        {{ ui.card('ADR-023 · Opt-in telemetry redaction', 'Why redaction is a policy each exporting adapter is given, masks only configured text, and fails closed.', number='Decision', href=src ~ 'docs/adrs/adr-0023-opt-in-telemetry-redaction.md') }}
+        {{ ui.card('ADR-006 · Context package split', 'Why the scope, hooks, and registrations live where they do.', number='Decision', href=src ~ 'docs/adr-006-context-package-split.md') }}
+        {{ ui.card('ADR-007 · Execution module boundaries', 'How single-command execution is divided between modules.', number='Decision', href=src ~ 'docs/adr-007-subprocess-execution-module-boundaries.md') }}
+        {{ ui.card('ADR-013 · GitHub Actions sink', 'Why presentation is an opt-in sink rather than a change to echo.', number='Decision', href=src ~ 'docs/adr-013-opt-in-github-actions-presentation-sink.md') }}
+        {{ ui.card('ADR-018 · Typed environment policies', 'Why inherit, overlay, and replace are a closed enum on the context, and why UNSET is a value.', number='Decision', href=src ~ 'docs/adr-018-typed-environment-policies.md') }}
+        {{ ui.card('ADR-019 · Control observation channel', 'Why what a stop request did to a child is reported on its own channel, and why refusal is an outcome.', number='Decision', href=src ~ 'docs/adr-019-control-observation-channel.md') }}
+        {{ ui.card('ADR-020 · Typed argument contract', 'Why builders accept exactly ArgValue and refuse execution-option names.', number='Decision', href=src ~ 'docs/adr-020-typed-argument-contract-for-sh-make.md') }}
+        {{ ui.card('ADR-021 · Process-group ownership', 'Why group ownership is an opt-in policy on the execution context, and what it cannot promise.', number='Decision', href=src ~ 'docs/adr-021-process-group-ownership.md') }}
+        {{ ui.card('ADR-023 · Opt-in telemetry redaction', 'Why redaction is a policy each exporting adapter is given, masks only configured text, and fails closed.', number='Decision', href=src ~ 'docs/adr-023-opt-in-telemetry-redaction.md') }}
       </div>
       {% endcall %}
 {% endblock %}

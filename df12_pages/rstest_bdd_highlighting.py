@@ -18,7 +18,7 @@ The values are mirrored by the generated ``.lantern-syntax`` rules in
 this module.
 
 Like the Cuprum style, this one is not registered through a Pygments entry
-point: the highlight tag emits token classes only, and the colours arrive from
+point: the highlight filter emits token classes only, and the colours arrive from
 the generated stylesheet, so the style exists to author that stylesheet.
 """
 

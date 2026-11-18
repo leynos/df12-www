@@ -64,12 +64,12 @@
               them from <code>rstest_bdd_macros</code>.
             </p>
             {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
-            {% highlight 'toml', 'lantern-syntax' %}
+            {% filter highlight('toml', 'lantern-syntax') %}
 [dev-dependencies]
 rstest = "{{ rstest_version }}"
 rstest-bdd = "{{ rstest_bdd_version }}"
 rstest-bdd-macros = "{{ rstest_bdd_version }}"
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
           </section>
 
@@ -110,9 +110,9 @@ rstest-bdd-macros = "{{ rstest_bdd_version }}"
               <code>cargo test</code> runs it and a filter selects it.
             </p>
             {% call ui.code_panel('Terminal', copy='console') %}
-            {% highlight 'console', 'lantern-syntax' %}
+            {% filter highlight('console', 'lantern-syntax') %}
 $ cargo test --test lantern
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             {% call ui.output('Output', 'rstest-bdd ' ~ rstest_bdd_version) %}
 running 1 test
@@ -129,13 +129,13 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
               <code>When</code> step by adding one line to <code>depart</code>:
             </p>
             {% call ui.code_panel('tests/lantern.rs, with one line added', copy=false, foot='The added line is the last one in the function.') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[when("the departure bell rings")]
 fn depart(trolley: &mut Trolley) {
     trolley.arrived = true;
     trolley.upright = false;
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>The run now fails, and says where:</p>
             {% call ui.output('Output', 'failed') %}

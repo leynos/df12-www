@@ -19,10 +19,10 @@ import re
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from jinja2 import Environment, FileSystemLoader
 
 from df12_pages.cli import _generate_subsite
 from df12_pages.config import load_site_config
+from df12_pages.templating import template_environment
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -153,19 +153,15 @@ def test_episodic_code_blocks_make_the_scroll_region_focusable(tmp_path: Path) -
 
 def test_roadmap_task_macro_renders_nested_tasks_with_missing_optional_fields() -> None:
     """The recursive roadmap macro accepts incomplete nested task records."""
-    environment = Environment(
-        autoescape=True,
-        loader=FileSystemLoader(REPO_ROOT / "templates/episodic"),
-    )
-    rendered = environment.from_string(
-        '{% import "records.jinja" as rec %}{{ rec.roadmap_task(task) }}'
-    ).render(
+    environment = template_environment(REPO_ROOT / "templates/episodic")
+    rendered = environment.render_str(
+        '{% import "records.jinja" as rec %}{{ rec.roadmap_task(task) }}',
         task={
             "done": False,
             "id": "1",
             "subtasks": [{"done": True, "id": "1.1", "title": "Nested task"}],
             "title": "Parent task",
-        }
+        },
     )
     soup = BeautifulSoup(rendered, "html.parser")
     nested = soup.select_one("ul.task-list--nested")

@@ -39,7 +39,7 @@
                         <div class="flex items-center space-x-3"><span class="text-xs font-mono text-base-300 bg-base-content px-2 py-1 rounded">examples/writing.yml</span>{{ exdata.copy_manifest_button('multi-format-documentation', 'text-charcoal-light hover:text-accent') }}</div>
                     </div>
                     <div class="hm-example-code-block p-6 text-sm shadow-lg overflow-x-auto">
-{% highlight 'netsuke' %}{{ exdata.snippet_writing }}{% endhighlight %}
+{% filter highlight('netsuke') %}{{ exdata.snippet_writing }}{% endfilter %}
                     </div>
                     <div class="grid gap-4 mt-6">
                         <div class="flex items-start p-4 rounded-lg bg-base-100 border border-base-300"><div class="shrink-0 w-6 h-6 rounded-full bg-accent text-white text-sm font-bold flex items-center justify-center mt-0.5">1</div><div class="ml-4"><h4 class="font-bold text-base-content text-sm mb-1">Intermediates are explicit</h4><p class="text-sm text-charcoal-mid">Each Markdown chapter becomes a TeX file in `build/`. Those files are not hand-waved away; they are graph nodes.</p></div></div>
@@ -50,13 +50,13 @@
 
                 <section id="terminal-preview">
                     <h2 class="font-serif text-2xl font-bold text-base-content mb-6 flex items-center"><span class="iconify text-accent mr-3 text-lg" data-icon="carbon:terminal" aria-hidden="true"></span> Running the Build</h2>
-                    {% call chrome.example_terminal() %}{% highlight 'netsuke-console' %}
+                    {% call chrome.example_terminal() %}{% filter highlight('netsuke-console') %}
 $ netsuke build build/book.pdf
 [1/4] mkdir -p build
 [2/4] pandoc -N --pdf-engine=xelatex chapters/introduction.md -o build/introduction.tex
 [3/4] pandoc -N --pdf-engine=xelatex chapters/architecture.md -o build/architecture.tex
 [4/4] pandoc --standalone build/introduction.tex build/architecture.tex -o build/book.tex && latexmk -pdf -outdir=build build/book.tex
-{% endhighlight %}{% endcall %}
+{% endfilter %}{% endcall %}
                 </section>
 
                 <section id="build-flow" class="bg-white rounded-xl border border-base-300 shadow-xs p-6 lg:p-8">

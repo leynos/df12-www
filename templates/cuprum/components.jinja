@@ -112,7 +112,7 @@
     menu after a choice. -#}
 {% macro _routemap_links(sections) -%}
 {% for section in sections %}
-<li><a class="cu-routemap__link" href="#{{ section.id }}" data-cu-routemap-link><span class="cu-routemap__num" aria-hidden="true">{{ '%02d' % loop.index }}</span>{{ section.label }}</a></li>
+<li><a class="cu-routemap__link" href="#{{ section.id }}" data-cu-routemap-link><span class="cu-routemap__num" aria-hidden="true">{{ '%02d' | format(loop.index) }}</span>{{ section.label }}</a></li>
 {% endfor %}
 {%- endmacro %}
 
@@ -144,9 +144,9 @@
     literal <section>, since a block cannot live inside a macro call. -#}
 {% macro section_head(sections, id, lede=none) -%}
 {% set ids = sections | map(attribute='id') | list %}
-{% set entry = sections[ids.index(id)] %}
+{% set entry = sections[(ids | index(id))] %}
 <div class="cu-section-head">
-  <p class="cu-kicker">{{ '%02d' % (ids.index(id) + 1) }} — {{ entry.label }}</p>
+  <p class="cu-kicker">{{ '%02d' | format((ids | index(id)) + 1) }} — {{ entry.label }}</p>
   <h2 id="{{ id }}-title" class="cu-section-head__title">{{ entry.title }}</h2>
   {% if lede or entry.lede %}
   <p class="cu-section-head__lede">{{ lede or entry.lede }}</p>

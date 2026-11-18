@@ -18,7 +18,7 @@ The values are mirrored by the generated ``.episodic-syntax`` rules in
 this module.
 
 Unlike the Netsuke and Stilyagi styles, this one is not registered through a
-Pygments entry point. Nothing needs to resolve it by name: the highlight tag
+Pygments entry point. Nothing needs to resolve it by name: the highlight filter
 emits token classes only, and the colours arrive from the generated
 stylesheet, so the style exists purely to author that stylesheet.
 """

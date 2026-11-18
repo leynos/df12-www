@@ -95,7 +95,7 @@
       {% endcall %}
       <div class="cu-pair mt-8">
         {% call ui.code_panel('generated_api_example.py (excerpt)', 'Illustrative') %}
-        {% highlight 'python', 'cuprum-syntax' %}
+        {% filter highlight('python', 'cuprum-syntax') %}
 def echo(
     *text: TextOperand,
     n: bool = False,
@@ -124,11 +124,11 @@ def echo(
         argv.append("-E")
     argv.extend(operands)
     return _BUILD_ECHO(*argv)
-        {% endhighlight %}
+        {% endfilter %}
         {% endcall %}
         <div class="cu-stack">
           {% call ui.code_panel('use_adapters.py', 'Illustrative', foot=['Run ' ~ cuprum_verified_on ~ ' against Cuprum ' ~ cuprum_pypi], flat=true) %}
-          {% highlight 'python', 'cuprum-syntax' %}
+          {% filter highlight('python', 'cuprum-syntax') %}
 import functools
 
 from generated_api_example import BlockSize, Conversion, dd, echo
@@ -148,7 +148,7 @@ try:
     echo("-n")
 except ValueError as exc:
     print(f"ValueError: {exc}")
-          {% endhighlight %}
+          {% endfilter %}
           {% endcall %}
           {% call ui.output('Exact argv', 'stdout') %}
 ('dd', 'if=disk.img', 'of=backup.img', 'bs=4M', 'conv=noerror,sync')

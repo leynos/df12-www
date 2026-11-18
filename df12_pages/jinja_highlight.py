@@ -1,53 +1,15 @@
-"""A Jinja ``{% highlight %}`` tag rendering code through Pygments.
-
-Modelled on the ``jinja2-highlight`` package's tag, implemented in-house so
-the formatter can emit the Himotoshi ``hm-syntax`` wrapper and so custom
-lexers resolve without depending on an unmaintained package. Usage inside a
-template::
-
-    {% highlight 'netsuke' %}
-    netsuke_version: "1.0.0"
-    {% endhighlight %}
-
-The body is dedented, leading and trailing blank lines are stripped, and the
-result is rendered with :class:`pygments.formatters.html.HtmlFormatter`.
-The wrapper CSS class defaults to ``hm-syntax``, styled in
-``src/styles/netsuke/himotoshi.css``; a sub-site with its own
-syntax palette names its own class as a second argument::
-
-    {% highlight 'python', 'stilyagi-syntax' %}
-    from stilyagi.rule import Rule
-    {% endhighlight %}
-
-Where the wrapper is itself the horizontal scroller it is emitted with
-``tabindex="0"``, because a scrolling region has to be reachable from the
-keyboard; see :data:`SCROLLING_CSS_CLASSES`.
-
-Jinja lexes the tag body before this extension sees it, so source text that
-itself contains Jinja syntax (every ``Netsukefile`` with ``{{ ins }}``
-placeholders) must be wrapped in ``{% raw %}`` inside the tag::
-
-    {% highlight 'netsuke' %}{% raw %}
-    command: "{{ cc }} -c {{ ins }}"
-    {% endraw %}{% endhighlight %}
-"""
+"""Render MiniJinja highlight filter blocks through Pygments."""
 
 from __future__ import annotations
 
 import functools
 import textwrap
-import typing as typ
 
-from jinja2 import TemplateRuntimeError, nodes
-from jinja2.ext import Extension
 from markupsafe import Markup
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
-
-if typ.TYPE_CHECKING:
-    from jinja2.parser import Parser
 
 #: Wrapper class used when a template does not name one, kept for the Netsuke
 #: sub-site whose stylesheet styles ``hm-syntax``.
@@ -89,7 +51,7 @@ def _make_focusable(markup: str, css_class: str) -> str:
 
     Raises
     ------
-    TemplateRuntimeError
+    RuntimeError
         If *markup* does not begin with the expected opening tag.
 
     Examples
@@ -103,7 +65,7 @@ def _make_focusable(markup: str, css_class: str) -> str:
             f"expected Pygments to open its output with {opening!r}; "
             f"it starts {markup[: len(opening)]!r}"
         )
-        raise TemplateRuntimeError(message)
+        raise RuntimeError(message)
     replacement = f'<div class="{css_class}" tabindex="0">'
     return replacement + markup[len(opening) :]
 
@@ -123,45 +85,33 @@ def _formatter(css_class: str) -> HtmlFormatter:
     return HtmlFormatter(cssclass=css_class, wrapcode=True)
 
 
-class HighlightExtension(Extension):
-    """Add ``{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}``."""
+def highlight_code(
+    value: str, lexer_name: str, css_class: str = DEFAULT_CSS_CLASS
+) -> Markup:
+    """Render a MiniJinja filter block with Pygments.
 
-    # The base class declares this attribute without `ClassVar`, which ty
-    # reads as an instance variable; RUF012 still wants the annotation here.
-    tags: typ.ClassVar[set[str]] = {"highlight"}  # ty: ignore[invalid-attribute-override]
+    Parameters
+    ----------
+    value : str
+        Rendered block body, including the contents of any included sample.
+    lexer_name : str
+        Pygments lexer alias.
+    css_class : str
+        Class for the wrapper that carries the site's syntax palette.
 
-    def parse(self, parser: Parser) -> nodes.Node:
-        """Parse the tag and defer rendering to :meth:`_render`."""
-        lineno = next(parser.stream).lineno
-        lexer_name = parser.parse_expression()
-        if parser.stream.skip_if("comma"):
-            css_class = parser.parse_expression()
-        else:
-            css_class = nodes.Const(DEFAULT_CSS_CLASS)
-        body = parser.parse_statements(("name:endhighlight",), drop_needle=True)
-        call = self.call_method("_render", [lexer_name, css_class])
-        return nodes.CallBlock(call, [], [], body).set_lineno(lineno)
-
-    def _render(
-        self,
-        lexer_name: str,
-        css_class: str,
-        caller: typ.Callable[[], str],
-    ) -> Markup:
-        """Highlight the block body with the named Pygments lexer."""
-        source = textwrap.dedent(str(caller())).strip("\n")
-        try:
-            lexer = get_lexer_by_name(lexer_name)
-        except ClassNotFound as exc:
-            message = (
-                f"{{% highlight {lexer_name!r} %}} names an unknown Pygments lexer"
-            )
-            raise TemplateRuntimeError(message) from exc
-        formatter = _formatter(css_class)
-        rendered = highlight(source, lexer, formatter)
-        if css_class in SCROLLING_CSS_CLASSES:
-            rendered = _make_focusable(rendered, css_class)
-        return Markup(rendered)  # noqa: S704 -- Pygments escapes the untrusted source text
-
-
-__all__ = ["DEFAULT_CSS_CLASS", "SCROLLING_CSS_CLASSES", "HighlightExtension"]
+    Returns
+    -------
+    Markup
+        Highlighted HTML with a keyboard stop when the wrapper scrolls.
+    """
+    source = textwrap.dedent(value).strip("\n")
+    try:
+        lexer = get_lexer_by_name(lexer_name)
+    except ClassNotFound as exc:
+        message = f"highlight({lexer_name!r}) names an unknown Pygments lexer"
+        raise RuntimeError(message) from exc
+    formatter = _formatter(css_class)
+    rendered = highlight(source, lexer, formatter)
+    if css_class in SCROLLING_CSS_CLASSES:
+        rendered = _make_focusable(rendered, css_class)
+    return Markup(rendered)  # noqa: S704 -- Pygments escapes the untrusted source text

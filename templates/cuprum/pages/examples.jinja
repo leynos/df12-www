@@ -34,7 +34,7 @@
             </div>
           </div>
           {% call ui.code_panel('word_count.py', 'Excerpt', foot=[verified]) %}
-          {% highlight 'python', 'cuprum-syntax' %}
+          {% filter highlight('python', 'cuprum-syntax') %}
 WC = Program("wc")
 CATALOGUE = ProgramCatalogue.from_programs(WC, name="word-count")
 
@@ -49,7 +49,7 @@ def word_count(text: str) -> int:
         msg = f"wc failed with exit code {result.exit_code}: {result.stderr}"
         raise RuntimeError(msg)
     return int((result.stdout or "").strip())
-          {% endhighlight %}
+          {% endfilter %}
           {% endcall %}
         </div>
       </section>

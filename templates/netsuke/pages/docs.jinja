@@ -121,7 +121,7 @@
                             <span>examples/basic/Netsukefile</span>
                             <span>RO</span>
                         </div>
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 # Compile a simple C program
 netsuke_version: "1.0.0"
 
@@ -133,7 +133,7 @@ targets:
   - name: "hello_world"
     command: "gcc {{ ins }} -o {{ outs }}"
     sources: ["main.o", "print.o"]
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                     </div>
                 </div>
             </section>

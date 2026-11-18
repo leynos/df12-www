@@ -16,12 +16,12 @@
               the macros together.
             </p>
             {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
-            {% highlight 'toml', 'lantern-syntax' %}
+            {% filter highlight('toml', 'lantern-syntax') %}
 [dev-dependencies]
 rstest = "{{ rstest_version }}"
 rstest-bdd = "{{ rstest_bdd_version }}"
 rstest-bdd-macros = "{{ rstest_bdd_version }}"
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
           </section>
 
@@ -36,10 +36,10 @@ rstest-bdd-macros = "{{ rstest_bdd_version }}"
               meant a fixture literally named <code>_world</code> now says so:
             </p>
             {% call ui.code_panel('From the v0.6.0 migration guide', copy=false, foot='Quoted from the migration guide.') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[scenario(path = "tests/features/search.feature")]
 fn search_works(#[from(_world)] world: SearchWorld) {}
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <h3>A <code>Result</code> alias can now fail a scenario</h3>
             <p>
@@ -73,7 +73,7 @@ fn search_works(#[from(_world)] world: SearchWorld) {}
               <code>HarnessError</code>:
             </p>
             {% call ui.code_panel('tests/own_stage.rs', sample='tests/own_stage.rs') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 impl HarnessAdapter for LanternStage {
     type Context = ();
 
@@ -82,7 +82,7 @@ impl HarnessAdapter for LanternStage {
         Ok(request.run_without_context())
     }
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>
               A harness named in <code>harness = …</code> is built with

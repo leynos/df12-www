@@ -32,7 +32,6 @@ from pathlib import Path
 import requests
 from github3 import GitHub
 from github3 import exceptions as gh_exc
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -43,6 +42,7 @@ from df12_pages.generator.link_rewriter import _build_link_rewriter
 from df12_pages.generator.models import NumberedStep, SectionModel
 from df12_pages.generator.renderer import CODE_BLOCK_PATTERN, HtmlContentRenderer
 from df12_pages.markdown_parser import Section, Subsection, parse_sections
+from df12_pages.templating import template_environment
 
 
 class PageContentGenerator:
@@ -82,13 +82,7 @@ class PageContentGenerator:
         self.doc_version_display: str | None = None
         self._github_client: GitHub | None = None
         self.doc_updated_at: dt.datetime | None = self._resolve_doc_updated_at()
-        self.env = Environment(
-            loader=FileSystemLoader(str(self.templates_dir)),
-            autoescape=select_autoescape(["html", "xml"]),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.template = self.env.get_template("doc_page.jinja")
+        self.env = template_environment(self.templates_dir, escape_by_suffix=True)
         self.source_url = self._resolve_source_url(source_url)
 
     def run(self) -> list[Path]:
@@ -145,7 +139,7 @@ class PageContentGenerator:
                 "html_title": html_title,
                 "footer_note": self.page.footer_note,
             }
-            html = self.template.render(**context)
+            html = self.env.render_template("doc_page.jinja", **context)
             filename = f"{self.page.filename_prefix}{section.slug}.html"
             output_path = out_dir / filename
             output_path.write_text(html, encoding="utf-8")

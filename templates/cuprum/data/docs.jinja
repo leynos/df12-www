@@ -24,11 +24,12 @@
   {'slug': 'troubleshoot', 'title': 'Troubleshoot a run', 'summary': 'The first thing to check for each common outcome, from an unknown program to a missing speed-up.', 'href': '/cuprum/docs/guides/troubleshoot/'},
   {'slug': 'migrate', 'title': 'Migrate to 0.2.0', 'summary': 'The changes an application using Cuprum 0.1 meets on upgrade, each with its fix, then what 0.2.0 adds and how to adopt each part.', 'href': '/cuprum/docs/guides/migrate/'},
 ] %}
-{% set docs_api = [] %}
+{% set ns = namespace(api=[]) %}
 {% for group in api_groups %}
-{% set _ = docs_api.append({'slug': group.slug, 'title': group.title, 'lede': group.lede,
-  'href': '/cuprum/docs/api/' ~ group.slug ~ '/', 'names': group.entries | map(attribute='name') | list}) %}
+{% set ns.api = ns.api + [{'slug': group.slug, 'title': group.title, 'lede': group.lede,
+  'href': '/cuprum/docs/api/' ~ group.slug ~ '/', 'names': group.entries | map(attribute='name') | list}] %}
 {% endfor %}
+{% set docs_api = ns.api %}
 
 {#- The engraved plates: `docs` closes the landing page, `api` heads the
     API index, and each guide's heads that guide. Each is an alpha mask

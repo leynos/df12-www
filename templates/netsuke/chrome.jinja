@@ -7,15 +7,15 @@
 
       {% import "chrome.jinja" as chrome %}
       ...
-      {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
+      {% call chrome.faux_window('Netsukefile') %}{% filter highlight('netsuke') %}{% raw %}
       ...
-      {% endraw %}{% endhighlight %}{% endcall %}
+      {% endraw %}{% endfilter %}{% endcall %}
 
   The windows were opener/closer pairs until the raw regions narrowed. That
   kept a long body inside the page's raw region rather than leaving and
   re-entering it around the macro call, which mattered while page bodies were
   raw from top to bottom. Now that raw wraps only the sample, a `{% call %}`
-  block holds both the `{% highlight %}` tag and its fence, so the windows are
+  block holds both the `highlight` filter and its fence, so the windows are
   balanced blocks like `page_header`: an unclosed one is a template error
   rather than broken markup, and no macro emits half an element.
 #}

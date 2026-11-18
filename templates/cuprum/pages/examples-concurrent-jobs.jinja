@@ -27,7 +27,7 @@
 
 {% block code %}
 {% call ui.code_panel('checks.py', 'Complete', foot=[verified]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import (
@@ -61,7 +61,7 @@ print(f"ok={result.ok}")
 print(f"failures={result.failures}")
 for index, item in zip(result.submission_indices, result.results):
     print(index, item.exit_code, item.stdout.strip())
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 {% endblock %}
 
@@ -96,7 +96,7 @@ failures=(1,)
 </div>
 <div class="cu-pair mt-8">
 {% call ui.code_panel('checks_fail_fast.py', 'Failure path', foot=[verified], flat=true) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import (
@@ -131,7 +131,7 @@ print(f"ok={result.ok}")
 print(f"returned {len(result.results)} of {len(jobs)} results")
 print(f"submission_indices={result.submission_indices}")
 print(f"failure_submission_indices={result.failure_submission_indices}")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   {% call ui.output('Observed output', 'stdout') %}
 ok=False

@@ -11,7 +11,7 @@
 {% import "_icons.jinja" as icons %}
 {% from "data/guides.jinja" import guides %}
 {% set slugs = guides | map(attribute='slug') | list %}
-{% set position = slugs.index(guide_slug) %}
+{% set position = (slugs | index(guide_slug)) %}
 {% set guide = guides[position] %}
 {% block title %}{{ guide.title }} · rstest-bdd guides{% endblock %}
 {% block description %}{{ thesis }}{% endblock %}

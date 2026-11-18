@@ -406,17 +406,17 @@ together on the Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd sub-sites,
 referenced from the
 [Netsuke update execution plan](execplans/netsuke-update.md).
 
-### 4.1. Styles, lexers, and the highlight tag
+### 4.1. Styles, lexers, and the highlight filter
 
 Code blocks on the Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd
-sub-sites are highlighted at build time by the Jinja tag
-`{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
-`df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
+sub-sites are highlighted at build time by the MiniJinja filter block
+`{% filter highlight(lexer, css_class) %} ... {% endfilter %}`, implemented in
+`df12_pages/jinja_highlight.py`. The filter dedents its body, runs it through
 `pygments.highlight` with the named lexer, and wraps the result in a
 `<div class="hm-syntax">` (or the named class, when a second argument is given)
 using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
 syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
-must be wrapped in `{% raw %}` inside the tag.
+must be wrapped in `{% raw %}` inside the filter block.
 
 Five Pygments styles supply the colours:
 
@@ -435,7 +435,7 @@ Five Pygments styles supply the colours:
   rstest-bdd sub-site.
 
 `EpisodicStyle`, `CuprumStyle`, and `LanternStyle` are imported directly by
-their generators; nothing resolves them by name, because the highlight tag
+their generators; nothing resolves them by name, because the highlight filter
 emits token classes and the colours arrive from the generated stylesheet. The
 Netsuke custom lexers and the `HimotoshiStyle` and `StilyagiStyle` classes are
 registered with Pygments through the `pygments.lexers` and `pygments.styles`
@@ -603,7 +603,7 @@ block outright, so a run restores it without needing the previous content.
 | rstest-bdd | `LanternStyle`   | `rust`, `gherkin`, `toml`, `console`               | `lantern-syntax`  | `--lantern-syntax-`  | `600`       | `src/static/rstest-bdd/assets/styles/syntax.css` |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
-in a `{% highlight %}` tag, and the generator parameters that produce each
+in a `highlight` filter, and the generator parameters that produce each
 stylesheet._
 
 The lexer list reflects what the templates currently use, not the full set
@@ -864,8 +864,8 @@ Call it like any other macro:
 Netsuke page bodies used to be wrapped in `{% raw %}` from top to bottom, which
 forced every call to step out of the region and back in. They no longer are:
 markup is live Jinja by default, and `{% raw %}` wraps only the literal
-examples that must reach the reader unrendered — chiefly the `{% highlight %}`
-bodies holding Netsukefile snippets, which are themselves full of Jinja.
+examples that must reach the reader unrendered — chiefly the `highlight` bodies
+holding Netsukefile snippets, which are themselves full of Jinja.
 
 Each sub-site centralizes its chrome in a `_layout.jinja` that every page
 extends, directly or through the sub-site's `doc_page.jinja`.
@@ -938,21 +938,21 @@ document is `pages/icon-replacements.jinja`, which carries its own head and
 scripts.
 
 The windows are `{% call %}` blocks, and the call joins the fence the
-`{% highlight %}` tag already needs:
+`highlight` filter already needs:
 
 ```jinja
-{% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
+{% call chrome.faux_window('Netsukefile') %}{% filter highlight('netsuke') %}{% raw %}
 netsuke_version: "1.0.0"
-{% endraw %}{% endhighlight %}{% endcall %}
+{% endraw %}{% endfilter %}{% endcall %}
 ```
 
 They were opener/closer pairs until the raw regions narrowed, to keep a long
 sample inside the page's raw region rather than leaving and re-entering it
 around the macro call. That mattered while page bodies were raw from top to
-bottom; now that raw wraps only the sample, a block holds both the
-`{% highlight %}` tag and its fence. The block form is worth the change on its
-own: an unclosed window is a template error rather than markup that renders
-wrong, and no macro emits half an element.
+bottom; now that raw wraps only the sample, a block holds both the `highlight`
+filter and its fence. The block form is worth the change on its own: an
+unclosed window is a template error rather than markup that renders wrong, and
+no macro emits half an element.
 
 `faux_window(label, variant='', outer_class='', frame=none, body_class=none)`
 draws the dark frame and a titlebar with the traffic-light dots and a centred
@@ -1288,9 +1288,9 @@ The macros:
 
 - `href(key, section=none)` — the URL of a preview, or of one of its
   sections. An unknown preview, or a section not listed in that preview's
-  `sections`, calls an undefined function, which fails the build with a Jinja2
-  `UndefinedError` rather than publishing a link to nowhere — the same device
-  `api.ref` uses for Cuprum's API reference (section 5.5).
+  `sections`, calls an undefined function, which fails the build with a
+  MiniJinja `TemplateError` rather than publishing a link to nowhere — the same
+  device `api.ref` uses for Cuprum's API reference (section 5.5).
 - `target_label(entry)` — the chip text naming how near a preview is.
 - `chip(entry)` — the status chip built from `target_label`.
 - `sidebar(key)` — the preview sidebar: every preview, with the current one's
@@ -2425,9 +2425,9 @@ so the answer differs by sub-site:
   and `.hm-syntax:focus-visible` in `himotoshi.css` draws the ring.
 
 A handwritten `overflow-x-auto` wrapper — a wide table, a `pre` that is not run
-through the highlight tag — carries `tabindex="0"` in the markup. Whether one
-scrolls depends on the viewport, so check at 360px as well as at desktop width;
-several Netsuke tables scroll only at the narrow end.
+through the highlight filter — carries `tabindex="0"` in the markup. Whether
+one scrolls depends on the viewport, so check at 360px as well as at desktop
+width; several Netsuke tables scroll only at the narrow end.
 
 ### 8.3. Inline links carry an underline
 

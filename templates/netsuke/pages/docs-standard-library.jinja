@@ -402,12 +402,12 @@
                     </div>
                 </div>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto text-xs font-mono text-stone-light">
-                    {% highlight 'netsuke' %}
+                    {% filter highlight('netsuke') %}
 targets:
   - when: 'src/main.c' is file and command_available('clang')
     name: "build/main.o"
     rule: "compile"
-{% endhighlight %}
+{% endfilter %}
                 </div>
             </section>
 

@@ -70,13 +70,13 @@
                 </p>
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Invocations from the design document</div>
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke check
 $ netsuke check --explain
 $ netsuke check --explain directory-dep-not-order-only
 $ netsuke check --rule clarity=off --rule literal-recipe-path=error --fail-on warning
 $ netsuke --json check
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
                     <table class="min-w-full hm-rows prop-table">
@@ -177,26 +177,26 @@ $ netsuke --json check
                     <div>
                         <p class="text-xs font-mono uppercase tracking-wide text-accent mb-2">Reported</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 targets:
   - name: app
     command: "cc build/main.o -o {{ outs }}"
   - name: build/main.o
     command: "cc -c src/main.c -o {{ outs }}"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div>
                         <p class="text-xs font-mono uppercase tracking-wide text-success mb-2">Fixed</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 targets:
   - name: app
     sources: build/main.o
     command: "cc {{ ins }} -o {{ outs }}"
   - name: build/main.o
     command: "cc -c src/main.c -o {{ outs }}"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -212,24 +212,24 @@ targets:
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Project policy</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Both policy flags layer through the existing configuration precedence, so a project can fix its policy in <code>netsuke.toml</code>. Setting a severity on an off-by-default rule enables it; setting <code>off</code> on any rule disables it. Nothing about policy resolution consults the environment beyond that chain, reads the terminal, or varies with time.</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'toml' %}
+{% filter highlight('toml') %}
 [cmds.check]
 rule = ["clarity=off", "unreachable-target=warning"]
 fail_on = "warning"
-{% endhighlight %}
+{% endfilter %}
                         </div>
                     </div>
                     <div>
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">Suppression directives</h3>
                         <p class="text-sm text-charcoal-mid mb-4">Suppression is narrow by construction: a directive names one or more rules and must state a reason. There is no blanket disable comment and no <code>all</code> selector. Scoping follows YAML indentation: a directive alone on its line governs the next declaration and everything indented beneath it, and a directive at the end of a line governs that line&rsquo;s declaration.</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}
+{% filter highlight('netsuke') %}
 targets:
   # netsuke-lint: allow background-job -- the previewer is intentionally detached
   - name: preview
     script: |
       feh processed &
-{% endhighlight %}
+{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -256,7 +256,7 @@ targets:
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke --json check (passing, abridged from the design document; the URL resolves once #621 merges)</div>
-                    {% highlight 'json' %}{% raw %}
+                    {% filter highlight('json') %}{% raw %}
 {
   "schema_version": 1,
   "generator": { "name": "netsuke", "version": "0.4.0" },
@@ -279,7 +279,7 @@ targets:
     ]
   }
 }
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
             </section>
 

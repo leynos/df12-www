@@ -97,7 +97,7 @@
     {% call ui.code_block(
       "Synthetic provenance fragment from a canonical TEI header",
       "Illustrative shape, not a live payload") %}
-      {% highlight 'xml', 'episodic-syntax' %}
+      {% filter highlight('xml', 'episodic-syntax') %}
       <sourceDesc>
         <listBibl>
           <bibl xml:id="src-transcript-01" n="1">
@@ -117,7 +117,7 @@
           </bibl>
         </listBibl>
       </sourceDesc>
-      {% endhighlight %}
+      {% endfilter %}
     {% endcall %}
     <p>
       Identifiers generated during canonical ingestion are time-ordered UUIDv7

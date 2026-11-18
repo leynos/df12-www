@@ -17,12 +17,12 @@
               so a unit test and a scenario can share one definition.
             </p>
             {% call ui.code_panel('tests/lantern.rs', sample='tests/lantern.rs') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[fixture]
 fn trolley() -> Trolley {
     Trolley::default()
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>
               The scenario function names the fixtures the scenario owns, and
@@ -40,7 +40,7 @@ fn trolley() -> Trolley {
               <code>RefCell</code> is needed for either.
             </p>
             {% call ui.code_panel('tests/lantern.rs', sample='tests/lantern.rs') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[when("the departure bell rings")]
 fn depart(trolley: &mut Trolley) {
     trolley.arrived = true;
@@ -52,7 +52,7 @@ fn check(trolley: &Trolley) {
     assert!(trolley.arrived);
     assert!(trolley.upright);
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>
               A step can also return a new value instead, which replaces the

@@ -131,7 +131,7 @@
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed syntax, verbatim from RFC 0012 &sect;3</div>
-                    {% highlight 'netsuke' %}{% raw %}
+                    {% filter highlight('netsuke') %}{% raw %}
 netsuke_test_version: "1.1"
 
 test_command_env_is_closed_over_declared_vars:
@@ -150,7 +150,7 @@ test_command_env_is_closed_over_declared_vars:
         for_all_actions:
           - "action.env | keys | reject('in', declared_env) | length == 0"
           - "action.inputs | unique | length == action.inputs | length"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
                 <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] mb-6" tabindex="0">
                     <table class="min-w-full hm-rows prop-table">
@@ -192,7 +192,7 @@ test_command_env_is_closed_over_declared_vars:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed syntax, verbatim from RFC 0012 &sect;4</div>
-                        {% highlight 'netsuke' %}{% raw %}
+                        {% filter highlight('netsuke') %}{% raw %}
 netsuke_test_version: "1.1"
 
 test_generation_is_order_invariant:
@@ -202,7 +202,7 @@ test_generation_is_order_invariant:
   mutations:
     - permute_declarations
     - insert_irrelevant_target
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                     </div>
                     <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] min-w-0" tabindex="0">
                         <table class="min-w-full hm-rows prop-table">
@@ -244,10 +244,10 @@ test_generation_is_order_invariant:
                 </div>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-6" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Adapted: two flags named in RFC 0012 prose, which shows no combined invocation</div>
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke test --seed <n>
 $ netsuke test --strict-coverage
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <p class="text-sm text-charcoal-mid max-w-3xl">
                     Everything else on the command line &mdash; filters, <code>--tag</code>, <code>--timeout</code>, <code>--json</code>, the exit
@@ -268,7 +268,7 @@ $ netsuke test --strict-coverage
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/hello.yml &mdash; dialect 1.0, verbatim from the testing framework UX design &sect;14.1</div>
-                    {% highlight 'netsuke' %}
+                    {% filter highlight('netsuke') %}
 netsuke_test_version: "1.0"
 
 test_hello_target_is_generated:
@@ -277,7 +277,7 @@ test_hello_target_is_generated:
       then:
         - result.ok
         - result.graph.has_target("build/hello.txt")
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <ol class="space-y-4 mb-6 max-w-3xl">
                     <li class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">

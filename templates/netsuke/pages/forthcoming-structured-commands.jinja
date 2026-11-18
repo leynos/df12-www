@@ -57,7 +57,7 @@
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Legacy recipe, valid today (RFC 0001 &sect;2)</div>
-                    {% highlight 'netsuke' %}
+                    {% filter highlight('netsuke') %}
 actions:
   - name: coverage
     command:
@@ -69,7 +69,7 @@ actions:
         LDFLAGS="-fuse-ld=lld"
         cargo llvm-cov --lcov --output-path lcov.info
         --all-targets --all-features
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <div class="grid md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
@@ -102,7 +102,7 @@ actions:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed field forms (RFC 0001 &sect;4)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 # Existing scalar shell command.
 command: cargo test
 
@@ -118,11 +118,11 @@ command:
   - rule: package
   - script: |
       printf '%s\n' 'package complete'
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed interpolation (RFC 0001; comments added)</div>
-                        {% highlight 'netsuke' %}{% raw %}
+                        {% filter highlight('netsuke') %}{% raw %}
 command:
   invoke: frobnicate --output={{ destination }}
 # destination = "release files; delete nothing"
@@ -137,7 +137,7 @@ command:
 command:
   invoke: clang {{ ins }} -o {{ outs }}
 # one argv element per path, spaces and all
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                     </div>
                 </div>
                 <p class="text-charcoal-mid mb-6 max-w-3xl">
@@ -176,7 +176,7 @@ command:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">The coverage recipe, proposed (RFC 0001 &sect;4)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 actions:
   - name: coverage
     command:
@@ -189,11 +189,11 @@ actions:
           RUSTFLAGS: -D warnings -C link-arg=-fuse-ld=lld
           CFLAGS: -fuse-ld=lld
           LDFLAGS: -fuse-ld=lld
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Per-block and per-stage cwd, proposed (RFC 0009)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 command:
   invoke: cargo test --all-targets
   cwd: rust_extension
@@ -205,7 +205,7 @@ command:
   - invoke: validator --schema schema.json
     cwd: consumer
     stdout: validated.json
-{% endhighlight %}
+{% endfilter %}
                     </div>
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
@@ -236,7 +236,7 @@ command:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Capture, then use as cwd; proposed (RFC 0010)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 command:
   - invoke: workspace-locator --relative
     stdout:
@@ -244,11 +244,11 @@ command:
   - invoke: cargo test --all-targets
     cwd:
       env: WORKSPACE_DIR
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A runner-owned temporary directory; proposed (RFC 0010)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 command:
   - invoke: prepare-fixture
     cwd:
@@ -257,7 +257,7 @@ command:
   - invoke: verify-fixture
     cwd:
       env: FIXTURE_DIR
-{% endhighlight %}
+{% endfilter %}
                     </div>
                 </div>
                 <blockquote class="border-l-4 border-primary/40 pl-4 mb-6 max-w-3xl text-sm text-charcoal-mid italic">
@@ -303,7 +303,7 @@ command:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A three-stage pipeline; proposed (RFC 0001)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 command:
   - invoke: producer --format=json
     pipe: true
@@ -311,17 +311,17 @@ command:
     pipe: true
   - invoke: consumer
     stdout: result.txt
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Piping standard error; proposed (RFC 0010)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 command:
   - invoke: compiler invalid-source.rs
     pipe: stderr
   - invoke: normalize-diagnostics
     stdout: normalized-errors.txt
-{% endhighlight %}
+{% endfilter %}
                     </div>
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
@@ -333,13 +333,13 @@ command:
                         <h3 class="font-bold text-base-content mb-2 text-sm">Where legacy state stops</h3>
                         <p class="text-xs text-charcoal-mid mb-3">Pipelines never cross a rule, script, or legacy-string boundary, and a structured item ends the current legacy shell group:</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                            {% highlight 'netsuke' %}
+                            {% filter highlight('netsuke') %}
 command:
   - export MODE=fast
   - echo "$MODE"   # Same legacy shell group: prints fast.
   - invoke: tool
   - echo "$MODE"   # New legacy shell group: MODE is not retained.
-{% endhighlight %}
+{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -364,7 +364,7 @@ command:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed selectors (RFC 0011 &sect;4)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 command:
   - invoke: cargo test --workspace
     shell: false          # direct: argv-safe
@@ -374,7 +374,7 @@ command:
     shell: bash           # named: shell text
   - invoke: Get-ChildItem Env:
     shell: pwsh           # named: shell text
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-white rounded-lg border border-base-300 shadow-xs overflow-x-auto [contain:inline-size] min-w-0" tabindex="0">
                         <table class="min-w-full hm-rows prop-table">
@@ -438,7 +438,7 @@ command:
                 <div class="grid lg:grid-cols-2 gap-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">cd to cwd; proposed migration (RFC 0009)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 # Before
 command: cd rust_extension && cargo clippy --all-targets
 
@@ -446,11 +446,11 @@ command: cd rust_extension && cargo clippy --all-targets
 command:
   invoke: cargo clippy --all-targets
   cwd: rust_extension
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Substitution to capture; proposed migration (RFC 0010)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 # Before
 command: WORKSPACE_DIR=$(tool locate) && cd "$WORKSPACE_DIR" && cargo test
 
@@ -462,7 +462,7 @@ command:
   - invoke: cargo test
     cwd:
       env: WORKSPACE_DIR
-{% endhighlight %}
+{% endfilter %}
                     </div>
                 </div>
                 <p class="text-sm text-charcoal-mid mt-6 max-w-3xl">

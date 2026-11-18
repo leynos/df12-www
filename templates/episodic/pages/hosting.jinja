@@ -100,12 +100,12 @@
   {{ ui.section_open(5, "local", "Exercising it locally",
      "The same chart and image, in k3d, before any of it reaches the platform.") }}
     {% call ui.code_block("Local Kubernetes preview") %}
-      {% highlight 'make', 'episodic-syntax' %}
+      {% filter highlight('make', 'episodic-syntax') %}
       make local-k8s-up      # create or update the preview
       make local-k8s-status  # inspect it
       make local-k8s-logs    # read its logs
       make local-k8s-down    # tear it down
-      {% endhighlight %}
+      {% endfilter %}
     {% endcall %}
     <p>
       The targets drive a Cyclopts command that provisions a k3d cluster and

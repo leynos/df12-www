@@ -9,12 +9,12 @@
 {% set docs_group = api_groups | selectattr('slug', 'equalto', api_slug) | first %}
 {% set docs_current = '/cuprum/docs/api/' ~ api_slug ~ '/' %}
 {% set slugs = api_groups | map(attribute='slug') | list %}
-{% set position = slugs.index(api_slug) %}
+{% set position = (slugs | index(api_slug)) %}
 {% block title %}{{ docs_group.title }} · API reference · Cuprum{% endblock %}
 {% block description %}{{ docs_group.lede }}{% endblock %}
 {% block docs_body %}
           <header class="cu-docs__head">
-            <p class="cu-kicker">API reference · {{ '%02d' % (position + 1) }} of {{ slugs | length }}</p>
+            <p class="cu-kicker">API reference · {{ '%02d' | format((position + 1)) }} of {{ slugs | length }}</p>
             <h1 class="cu-docs__title">{{ docs_group.title }}</h1>
             <p class="cu-docs__lede">{{ docs_group.lede }}</p>
             <p class="cu-docs__meta">Read from Cuprum {{ api_source.version }} at <a href="{{ repository_url }}/tree/{{ api_source.commit }}">{{ api_source.commit[:8] }}</a></p>

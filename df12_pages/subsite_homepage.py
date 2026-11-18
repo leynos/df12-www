@@ -14,9 +14,7 @@ import datetime as dt
 import typing as typ
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
-
-from .jinja_highlight import HighlightExtension
+from .templating import template_environment
 
 if typ.TYPE_CHECKING:
     from .config import NavLinkConfig, SubSiteHomepageConfig
@@ -61,19 +59,7 @@ class SubSiteHomePageBuilder:
         self.nav_links = nav_links or []
         self.parent_link = parent_link
         self.base_path = base_path
-        self.env = Environment(
-            loader=FileSystemLoader(str(self.templates_dir)),
-            autoescape=True,
-            trim_blocks=True,
-            lstrip_blocks=True,
-            extensions=[HighlightExtension],
-        )
-        if template_vars:
-            # Jinja types `globals` as the literal of its default namespace,
-            # so a checker rejects any other value; the namespace is open by
-            # design, and the cast says so once.
-            typ.cast("dict[str, object]", self.env.globals).update(template_vars)
-        self.template = self.env.get_template("home_page.jinja")
+        self.env = template_environment(self.templates_dir, variables=template_vars)
 
     def run(self) -> Path:
         """Render and write the sub-site homepage HTML.
@@ -113,7 +99,7 @@ class SubSiteHomePageBuilder:
             "parent_link": dc.asdict(self.parent_link) if self.parent_link else None,
             "generated_at": dt.datetime.now(dt.UTC),
         }
-        html = self.template.render(**context)
+        html = self.env.render_template("home_page.jinja", **context)
         if not html.endswith("\n"):
             html += "\n"
         output_path.write_text(html, encoding="utf-8")

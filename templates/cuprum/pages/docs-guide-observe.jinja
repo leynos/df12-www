@@ -46,7 +46,7 @@
     matches on <code>phase</code> a default arm:
   </p>
 {% call ui.code_panel('settled.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import ExecEvent, Program, ProgramCatalogue, sh
@@ -67,7 +67,7 @@ def hook(event: ExecEvent) -> None:
 with sh.observe(hook):
     python("-c", "pass").run_sync()
 assert [outcome.value for outcome in outcomes] == ["exit_zero"]
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Every event also carries the execution's <code>env_mode</code> and
@@ -95,7 +95,7 @@ assert [outcome.value for outcome in outcomes] == ["exit_zero"]
     telemetry library.
   </p>
 {% call ui.code_panel('telemetry.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import logging
 import sys
 
@@ -119,7 +119,7 @@ with (
 
 assert metrics.counters["cuprum_executions_total"] == 1
 assert [span.name for span in tracer.spans] and tracer.spans[0].ended
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     <code>MetricsHook</code> counts <code>cuprum_failures_total</code> and
@@ -150,7 +150,7 @@ assert [span.name for span in tracer.spans] and tracer.spans[0].ended
     the text it is told about before it is exported:
   </p>
 {% call ui.code_panel('telemetry_redaction.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import logging
 import re
 import sys
@@ -182,7 +182,7 @@ assert result.stdout == "token-value session-314\n"
 assert exports and tracer.spans
 assert "token-value" not in repr(exports) + repr(tracer.spans)
 assert "session-314" not in repr(exports) + repr(tracer.spans)
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <ul>
     <li><strong>It masks only what it is given.</strong> Rules are literal strings (<code>literals=</code>) and compiled regular expressions (<code>patterns=</code>); the policy does not guess at secrets. Each match becomes the mask, <code>[REDACTED]</code> by default or the <code>mask=</code> text, and overlapping matches become a single mask.</li>
@@ -217,7 +217,7 @@ assert "session-314" not in repr(exports) + repr(tracer.spans)
     the measured duration, and the run's <code>exec_id</code>:
   </p>
 {% call ui.code_panel('control_observation.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import asyncio
 import sys
 
@@ -241,7 +241,7 @@ with observe_control(events.append):
 assert [(event.operation, event.outcome) for event in events] == [
     ("terminate", "delivered"),
 ]
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     An outcome of <code>escalated</code> means the child ignored
@@ -271,7 +271,7 @@ assert [(event.operation, event.outcome) for event in events] == [
     failures are logged and suppressed, so observing never changes a run.
   </p>
 {% call ui.code_panel('stream_metrics.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -285,7 +285,7 @@ metrics = InMemoryMetrics()
 with observe_stream_operation(stream_operation_metrics_hook(metrics)):
     python("-c", "print('hello')").run_sync()
 assert metrics.counters["cuprum_stream_operation_bytes_total"] > 0
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 </section>
 
@@ -307,7 +307,7 @@ assert metrics.counters["cuprum_stream_operation_bytes_total"] > 0
     sink, so shared options can carry them safely:
   </p>
 {% call ui.code_panel('ci_flags.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import dataclasses
 import io
 import sys
@@ -333,7 +333,7 @@ except ValueError:
     pass
 else:
     raise AssertionError("a non-bool flag should be rejected")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     The flags are independent, and both default to <code>False</code>.
@@ -365,7 +365,7 @@ else:
     frame.
   </p>
 {% call ui.code_panel('actions_sink.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import io
 import sys
 
@@ -381,7 +381,7 @@ result = python("-c", "print('building')").run_sync(
 )
 assert result.ok and result.stdout == "building\n"
 assert workflow_log.getvalue().startswith("::group::Build")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 </section>
 {% endblock %}

@@ -12,7 +12,6 @@ import typing as typ
 
 import pytest
 from bs4 import BeautifulSoup
-from jinja2 import TemplateRuntimeError
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
@@ -239,9 +238,9 @@ class TestStilyagiHighlighting:
         templates_dir = tmp_path / "templates"
         templates_dir.mkdir()
         (templates_dir / "page.jinja").write_text(
-            "{% highlight 'python', 'stilyagi-syntax' %}{% raw %}\n"
+            "{% filter highlight('python', 'stilyagi-syntax') %}{% raw %}\n"
             + RULE_FRAGMENT
-            + "{% endraw %}{% endhighlight %}\n",
+            + "{% endraw %}{% endfilter %}\n",
             encoding="utf-8",
         )
 
@@ -286,9 +285,9 @@ class TestStilyagiHighlighting:
         templates_dir = tmp_path / "templates"
         templates_dir.mkdir()
         (templates_dir / "page.jinja").write_text(
-            "{% highlight 'python' %}{% raw %}\n"
+            "{% filter highlight('python') %}{% raw %}\n"
             "x = 1\n"
-            "{% endraw %}{% endhighlight %}\n",
+            "{% endraw %}{% endfilter %}\n",
             encoding="utf-8",
         )
 
@@ -325,5 +324,5 @@ def test_the_focusable_wrapper_guard_rejects_markup_it_does_not_recognise() -> N
     assumed: an unrecognised tag raises here instead of leaving every code
     block on the sub-site quietly unfocusable again.
     """
-    with pytest.raises(TemplateRuntimeError, match="expected Pygments"):
+    with pytest.raises(RuntimeError, match="expected Pygments"):
         _make_focusable("<pre>x</pre>", DEFAULT_CSS_CLASS)

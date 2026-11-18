@@ -95,13 +95,13 @@
 
                 <div class="bg-base-content rounded-xl overflow-hidden">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Restricting fetch to a single host</div>
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke \
   --fetch-default-deny \
   --fetch-allow-host releases.example.com \
   --fetch-block-host internal.example.com \
   build
-{% endhighlight %}
+{% endfilter %}
                 </div>
             </section>
 
@@ -120,28 +120,28 @@ $ netsuke \
                     <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
                         <h3 class="font-bold text-base-content text-sm mb-2">Configuration file</h3>
                         <div class="bg-base-content rounded-lg p-3 overflow-x-auto [contain:inline-size]" tabindex="0">
-{% highlight 'toml' %}
+{% filter highlight('toml') %}
 env_allow_var = ["CI", "PACKAGE_REGISTRY_TOKEN"]
 env_block_var = ["AWS_SECRET_ACCESS_KEY"]
-{% endhighlight %}
+{% endfilter %}
                         </div>
                     </div>
                     <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
                         <h3 class="font-bold text-base-content text-sm mb-2">Environment (JSON arrays)</h3>
                         <div class="bg-base-content rounded-lg p-3 overflow-x-auto [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke-console' %}
+{% filter highlight('netsuke-console') %}
 NETSUKE_ENV_ALLOW_VAR='["CI"]'
 NETSUKE_ENV_BLOCK_VAR='["GITHUB_TOKEN"]'
-{% endhighlight %}
+{% endfilter %}
                         </div>
                     </div>
                     <div class="bg-white p-5 rounded-xl border border-base-300 shadow-xs min-w-0">
                         <h3 class="font-bold text-base-content text-sm mb-2">CLI (one name, repeatable)</h3>
                         <div class="bg-base-content rounded-lg p-3 overflow-x-auto [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke-console' %}
+{% filter highlight('netsuke-console') %}
 $ netsuke --env-allow-var CI \
     --env-block-var GITHUB_TOKEN build
-{% endhighlight %}
+{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -242,11 +242,11 @@ $ netsuke --env-allow-var CI \
                     </div>
                 </div>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 vars:
   version: "{{ 'generated/version.txt' | contents(follow_symlinks=true) }}"
   header_sum: "{{ 'fixtures/header.bin' | hash(max_bytes=1024) }}"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
             </section>
 
@@ -283,12 +283,12 @@ vars:
                 </div>
                 <div class="bg-base-content rounded-xl overflow-hidden">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Keeping POSIX recipes on Windows</div>
-                    {% highlight 'powershell' %}
+                    {% filter highlight('powershell') %}
 choco install git --yes --no-progress
 $env:PATH = "C:\Program Files\Git\bin;$env:PATH"
 $env:NETSUKE_WINDOWS_SHELL = "bash"
 netsuke build
-{% endhighlight %}
+{% endfilter %}
                 </div>
             </section>
 
@@ -303,14 +303,14 @@ netsuke build
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <h3 class="font-bold text-base-content mb-3 text-sm">Write this</h3>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 targets:
   - name: build/app
     sources: src/main.c
     command: >-
       ${CC:-cc} $CFLAGS {{ ins }} -o {{ outs }}
       && echo "built on $HOSTNAME"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3"><code>$CC</code>, <code>$CFLAGS</code>, and <code>$HOSTNAME</code> reach <code>/bin/sh</code> as literal shell variables. On the PowerShell route, write <code>$env:CC</code> instead; PowerShell does not perform POSIX <code>${VAR:-default}</code> expansion.</p>
                     </div>

@@ -70,7 +70,7 @@
                 </p>
                 <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0021 &sect;3 (verbatim)</p>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 states:
   build-directory:
     kind: directory
@@ -82,7 +82,7 @@ actions:
   - name: prepare-directory
     command:
       ensure_state: build-directory
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
                 <p class="text-sm text-charcoal-mid mb-8 max-w-3xl">It promises only that <code>build</code> is a directory, &ldquo;not that its contents form a valid build&rdquo;. Unknown fields, duplicate names, unresolved references, and unsupported kinds fail before execution.</p>
 
@@ -123,7 +123,7 @@ actions:
                 </p>
                 <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0021 &sect;3 (verbatim)</p>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 states:
   dev-env:
     kind: python-venv
@@ -142,7 +142,7 @@ actions:
     command:
       - ensure_state: dev-env
       - invoke: uv run --no-sync pytest
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
                 <p class="text-sm text-charcoal-mid mb-8 max-w-3xl">
                     The built-in environment checks still run. The external check adds a condition; &ldquo;it cannot bypass the built-in checks
@@ -222,13 +222,13 @@ actions:
                 </div>
                 <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Adapted from RFC 0021 &sect;5 and &sect;9; the <code>built-extension</code> definition is omitted</p>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 actions:
   - name: extension-tests
     command:
       - require_state: built-extension
       - invoke: uv run --no-sync pytest tests/extension
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
                 <p class="text-sm text-charcoal-mid mb-6 max-w-3xl">
                     This is the guard the RFC's Cuprum canary wants: <code>require_state</code> reports a missing extension without running
@@ -313,7 +313,7 @@ actions:
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Quickstart manifest, as RFC 0025 &sect;2 fixes it</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 netsuke_version: "1.0.0"
 
 targets:
@@ -322,7 +322,7 @@ targets:
 
 defaults:
   - hello.txt
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                         <p class="text-xs text-charcoal-mid mt-2">A normal hello-world build must start zero probes and create no state records.</p>
                     </div>

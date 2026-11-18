@@ -13,8 +13,9 @@ import re
 import typing as typ
 from pathlib import Path
 
-import jinja2
 import pytest
+
+from df12_pages.templating import template_environment
 
 if typ.TYPE_CHECKING:
     from types import ModuleType
@@ -193,20 +194,17 @@ def icon_macro() -> typ.Callable[..., str]:
     refuses to parse, or on a macro that renders an empty string. Rendering it
     is what shows it works.
     """
-    environment = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(str(WEAVER_TEMPLATES)),
-        autoescape=True,
-    )
-    module = environment.get_template("_icons.jinja").module
-    # The macro is an attribute of the rendered module, which is dynamic, so
-    # the type checker cannot see it; that it exists at all is the first thing
-    # these tests assert.
-    macro = getattr(module, "icon", None)
-    assert macro is not None, (
-        "templates/weaver/_icons.jinja defines no `icon` macro; every call "
-        "site in every Weaver template would render nothing"
-    )
-    return typ.cast("typ.Callable[..., str]", macro)
+    environment = template_environment(WEAVER_TEMPLATES)
+
+    def render(name: str, extra_class: str = "") -> str:
+        """Render one icon in the template engine."""
+        return environment.render_str(
+            '{% from "_icons.jinja" import icon %}{{ icon(icon_name, extra_class) }}',
+            icon_name=name,
+            extra_class=extra_class,
+        )
+
+    return render
 
 
 def test_the_generated_macro_renders_an_svg(icon_macro: typ.Callable[..., str]) -> None:

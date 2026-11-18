@@ -36,7 +36,7 @@ HEADER = """/* Syntax highlighting for build-time Pygments output.
  *
  * Colours come from the Episodic signal palette and are checked at a minimum
  * 4.5:1 against the code ground. Markup comes from the parent generator's
- * `{% highlight %}` tag, which emits token classes and no attributes, so the
+ * `highlight` filter, which emits token classes and no attributes, so the
  * scroll region and its label are supplied by the template wrapper.
  */
 

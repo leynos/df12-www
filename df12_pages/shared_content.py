@@ -10,8 +10,9 @@ from pathlib import Path
 import nh3
 import requests
 from bs4 import BeautifulSoup
-from jinja2 import Environment, FileSystemLoader
 from markdown import markdown
+
+from .templating import template_environment
 
 if typ.TYPE_CHECKING:
     from .config import SharedContentConfig, SharedContentPageChrome
@@ -86,20 +87,10 @@ class SharedContentGenerator:
         self.template_name = template_name
         self.page_chrome = page_chrome
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
-        self.env = Environment(
-            loader=FileSystemLoader(str(self.templates_dir)),
-            autoescape=True,
-            trim_blocks=True,
-            lstrip_blocks=True,
+        self.env = template_environment(
+            self.templates_dir,
+            variables=page_chrome.template_vars if page_chrome else None,
         )
-        if page_chrome and page_chrome.template_vars:
-            # Jinja types `globals` as the literal of its default namespace,
-            # so a checker rejects any other value; the namespace is open by
-            # design, and the cast says so once.
-            typ.cast("dict[str, object]", self.env.globals).update(
-                page_chrome.template_vars
-            )
-        self.template = self.env.get_template(self.template_name)
         self._markdown_extensions = [
             "sane_lists",
             "tables",
@@ -152,7 +143,7 @@ class SharedContentGenerator:
                 page_chrome.site_title_suffix if page_chrome else "df12"
             ),
         }
-        html = self.template.render(**context)
+        html = self.env.render_template(self.template_name, **context)
         if not html.endswith("\n"):
             html += "\n"
         output_path.write_text(html, encoding="utf-8")

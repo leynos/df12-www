@@ -33,11 +33,11 @@ import typing as typ
 from pathlib import Path
 
 import requests
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown import markdown
 
 from ._constants import PAGE_META_TEMPLATE
 from .config import PAGE_CATEGORIES
+from .templating import template_environment
 
 if typ.TYPE_CHECKING:  # pragma: no cover - import for type hints only
     from .config import PageConfig, SiteConfig
@@ -99,13 +99,7 @@ class DocsIndexBuilder:
         """
         self.site_config = site_config
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
-        self.env = Environment(
-            loader=FileSystemLoader(str(self.templates_dir)),
-            autoescape=select_autoescape(["html", "xml"]),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.template = self.env.get_template("docs_index.jinja")
+        self.env = template_environment(self.templates_dir, escape_by_suffix=True)
         self.description_resolver = ManifestDescriptionResolver()
         self._markdown_extensions = ["sane_lists", "tables", "fenced_code"]
 
@@ -121,7 +115,7 @@ class DocsIndexBuilder:
             "sections": _group_entries_by_category(entries),
             "generated_at": generated_at,
         }
-        html = self.template.render(**context)
+        html = self.env.render_template("docs_index.jinja", **context)
         output_path.write_text(html, encoding="utf-8")
         return output_path
 

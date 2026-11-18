@@ -28,7 +28,7 @@
 
 {% block code %}
 {% call ui.code_panel('deploy.py', 'Complete', foot=[verified]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 import tempfile
 from pathlib import Path
@@ -84,7 +84,7 @@ print(f"archive holds {listed.stdout.split()}")
 print(f"cleaned up: {not staging.exists()}")
 for line in audit:
     print(line)
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 {% endblock %}
 
@@ -125,7 +125,7 @@ tar -tzf exited 0
 </div>
 <div class="cu-pair mt-8">
 {% call ui.code_panel('deploy_timeout.py', 'Failure path', foot=[verified], flat=true) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 import tempfile
 from pathlib import Path
@@ -160,7 +160,7 @@ except TimeoutExpired as exc:
     print(f"timed out after {exc.timeout}s")
     print(f"partial output: {exc.output!r}")
 print(f"cleaned up: {staging is not None and not staging.exists()}")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   {% call ui.output('Observed output', 'stdout') %}
 timed out after 1.0s

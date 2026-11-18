@@ -138,7 +138,7 @@
                         </div>
                         <p class="text-xs text-charcoal-mid mb-4">{{ f.body | safe }}</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{{ f.code | safe }}{% endhighlight %}
+{% filter highlight('netsuke') %}{{ f.code | safe }}{% endfilter %}
                         </div>
                     </div>
                     {% endfor %}
@@ -167,14 +167,14 @@
                 </p>
                 <p class="text-xs text-charcoal-mid mb-2">The design document's motivating example (proposed)</p>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-8" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 targets:
   - name: lint-rust
     when: >-
       git_changed_files('origin/main...HEAD')
       | matches_glob('**/*.rs', 'Cargo.toml', 'Cargo.lock')
     command: cargo clippy --workspace --all-targets --all-features -- -D warnings
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">

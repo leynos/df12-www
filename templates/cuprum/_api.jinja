@@ -32,7 +32,7 @@
 <div class="cu-api__section">
   <{{ heading }} class="cu-api__section-title">Examples</{{ heading }}>
   <div class="code-scroll cu-api__example" tabindex="0" role="region" aria-label="Examples{{ ' for ' ~ label if label }}">
-  {% highlight 'pycon', 'cuprum-syntax' %}{{ d.examples | safe }}{% endhighlight %}
+  {% filter highlight('pycon', 'cuprum-syntax') %}{{ d.examples | safe }}{% endfilter %}
   </div>
 </div>
 {% endif %}
@@ -43,7 +43,7 @@
     already set long parameter lists one to a line. -#}
 {% macro declaration(text) -%}
 <div class="cu-api__decl">
-{% highlight 'python', 'cuprum-syntax' %}{{ text | safe }}{% endhighlight %}
+{% filter highlight('python', 'cuprum-syntax') %}{{ text | safe }}{% endfilter %}
 </div>
 {%- endmacro %}
 
@@ -80,9 +80,9 @@
     not have, fails the build. A dotted module entry such as
     `cuprum.sinks` matches by its whole name. -#}
 {% macro ref(name, label=none) -%}
-{% set head, _, member = name.partition('.') %}
+{% set parts = name.split('.', 1) %}
 {% set found = namespace(href=none) %}
-{% for group in api_groups %}{% for e in group.entries %}{% if e.name == name or (e.name == head and member and member in (e.members | default([]) | map(attribute='name') | list)) %}{% set found.href = '/cuprum/docs/api/' ~ group.slug ~ '/#' ~ name %}{% endif %}{% endfor %}{% endfor %}
+{% for group in api_groups %}{% for e in group.entries %}{% if e.name == name or (e.name == parts[0] and parts[1] and parts[1] in (e.members | default([]) | map(attribute='name') | list)) %}{% set found.href = '/cuprum/docs/api/' ~ group.slug ~ '/#' ~ name %}{% endif %}{% endfor %}{% endfor %}
 {% if found.href is none %}{{ raise_missing_reference(name) }}{% endif %}
 <a href="{{ found.href }}"><code>{{ label or name }}</code></a>
 {%- endmacro %}

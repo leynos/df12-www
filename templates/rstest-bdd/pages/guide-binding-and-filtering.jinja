@@ -19,12 +19,12 @@
               scenario is used.
             </p>
             {% call ui.code_panel('tests/hamper.rs', sample='tests/hamper.rs') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[scenario(path = "tests/features/hamper.feature", name = "Pack the picnic")]
 fn pack_the_picnic(hamper: Hamper) {
     let _ = hamper;
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>
               The function’s parameters are the scenario’s fixtures, and its
@@ -81,7 +81,7 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
               exactly that:
             </p>
             {% call ui.code_panel('tests/weather.rs', sample='tests/weather.rs') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[given("the forecast is \"{forecast}\"")]
 fn forecast(evening: &mut Evening, forecast: String) {
     if forecast == "thunder" {
@@ -89,7 +89,7 @@ fn forecast(evening: &mut Evening, forecast: String) {
     }
     evening.forecast = forecast;
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>
               A skipped scenario still reports <code>ok</code>, which is easy to
@@ -98,9 +98,9 @@ fn forecast(evening: &mut Evening, forecast: String) {
               <code>@allow_skipped</code>, as the thunder does.
             </p>
             {% call ui.code_panel('Terminal', copy='console') %}
-            {% highlight 'console', 'lantern-syntax' %}
+            {% filter highlight('console', 'lantern-syntax') %}
 $ RSTEST_BDD_FAIL_ON_SKIPPED=1 cargo test --test weather
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>
               <code>cargo bdd skipped --reasons</code> lists every skip and its

@@ -16,7 +16,7 @@
     log processing downstream; it does not filter output itself.
   </p>
 {% call ui.code_panel('application_catalogue.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, ProjectSettings, sh
@@ -42,7 +42,7 @@ except DuplicateProgramError as exc:
     assert exc.program == PYTHON
 else:
     raise AssertionError("a program listed twice should be rejected")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     A catalogue that lists the same program twice raises
@@ -68,7 +68,7 @@ else:
     need the tools installed; running them does.
   </p>
 {% call ui.code_panel('project_builders.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 from pathlib import Path
 
@@ -97,7 +97,7 @@ except ValueError:
     pass
 else:
     raise AssertionError("an unsafe ref should be rejected")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     <code>safe_path()</code> rejects empty paths, NUL characters, and

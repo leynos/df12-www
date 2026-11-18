@@ -349,7 +349,7 @@ example.files_processed = { $count -&gt;
 
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Steps 1&ndash;3: create, copy, translate</div>
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 # 1. Create the locale directory
 $ mkdir -p locales/is
 
@@ -359,7 +359,7 @@ $ cp locales/en-US/messages.ftl locales/is/messages.ftl
 # 3. Translate values, keep keys, follow the glossary. For example:
 #   cli.about = Netsuke þýðir YAML + Jinja-lýsingar
 #               í Ninja-áætlanir.
-{% endhighlight %}
+{% endfilter %}
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
@@ -377,10 +377,10 @@ $ cp locales/en-US/messages.ftl locales/is/messages.ftl
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs">
                         <h3 class="font-bold text-base-content mb-3 text-sm">Steps 5&ndash;6: build and test</h3>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto mb-3">
-                            {% highlight 'netsuke-console' %}
+                            {% filter highlight('netsuke-console') %}
 $ cargo build
 $ cargo run -- --locale is --help
-{% endhighlight %}
+{% endfilter %}
                         </div>
                         <p class="text-xs text-charcoal-mid">
                             The compile-time audit verifies every key and every <code>{ $variable }</code> is present; missing or orphaned keys, variable mismatches, and metadata drift fail the build with a detailed error.

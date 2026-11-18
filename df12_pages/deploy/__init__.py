@@ -166,7 +166,7 @@ def _load_json_dict(path: Path) -> dict[str, typ.Any] | None:
     """Parse *path* as JSON, returning the document or ``None`` if not a dict."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    except OSError, ValueError:
         return None
     return data if isinstance(data, dict) else None
 

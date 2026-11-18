@@ -28,9 +28,9 @@ as a default.
 
 ## Language and runtime
 
-- Target Python 3.13 for all new scripts. Older versions may only be used when
-  integration constraints require them, and any exception must be documented
-  inline.
+- Target free-threaded CPython 3.15.2 for new project scripts. Older versions
+  may only be used when integration constraints require them, and any exception
+  must be documented inline.
 - Each script starts with an `uv` script block so runtime and dependency
   expectations travel with the file. Prefer the shebang
   `#!/usr/bin/env -S uv run python` followed by the metadata block shown in the
@@ -46,7 +46,7 @@ as a default.
 ```python
 #!/usr/bin/env -S uv run python
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15.2"
 # dependencies = ["plumbum", "cmd-mox"]
 # ///
 
@@ -76,7 +76,7 @@ Employ Cyclopts when a script requires parameters, particularly under CI with
 ```python
 #!/usr/bin/env -S uv run python
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15.2"
 # dependencies = ["cyclopts>=2.9", "plumbum", "cmd-mox"]
 # ///
 
@@ -291,7 +291,7 @@ except FileNotFoundError:
 ```python
 #!/usr/bin/env -S uv run python
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15.2"
 # dependencies = ["cyclopts>=2.9", "plumbum", "cmd-mox"]
 # ///
 

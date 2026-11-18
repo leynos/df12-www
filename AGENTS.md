@@ -108,6 +108,10 @@ published site, then rebuild.
 
 ### Building
 
+Install the pinned free-threaded CPython 3.15.2 with `uv python install` and run
+`uv sync --locked`. The generator requires the GIL to be disabled and uses
+eight documentation workers by default.
+
 ```bash
 bun run build          # static assets, CSS, images, pages, and search indices
 bun run dev            # watch and rebuild, serving on :8080

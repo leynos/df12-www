@@ -67,6 +67,7 @@ if typ.TYPE_CHECKING:
     from .generator.page_generator import RenderedDocument
 
 
+DEFAULT_DOC_WORKERS = 8
 DEFAULT_CONFIG = Path("config/pages.yaml")
 
 app = App(name="pages", config=cyclopts.config.Env("INPUT_", command=False))  # type: ignore[unknown-argument]
@@ -105,7 +106,7 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     ] = None,
     doc_workers: typ.Annotated[
         int, Parameter(help="Concurrent documentation bundles")
-    ] = 1,
+    ] = DEFAULT_DOC_WORKERS,
     all_sites: typ.Annotated[
         bool,
         Parameter(help="Generate main site and all sub-sites"),
@@ -130,7 +131,7 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     site : str or None, optional
         Generate only the named sub-site (e.g. ``weaver``).
     doc_workers : int
-        Maximum concurrent documentation bundles. Defaults to one.
+        Maximum concurrent documentation bundles. Defaults to eight.
     all_sites : bool
         Generate the main site plus all configured sub-sites.
 
@@ -218,7 +219,7 @@ def _write_documents(
             yield from render(page).write()
         return
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        # Bound buffered HTML even on Python 3.13, which lacks map(buffersize=).
+        # Keep at most one worker-sized batch of rendered HTML in memory.
         for batch in batched(pages, min(workers, len(pages)), strict=False):
             for document in pool.map(render, batch):
                 yield from document.write()
@@ -227,7 +228,7 @@ def _write_documents(
 def _generate_main_site(
     site_config: SiteConfig,
     *,
-    doc_workers: int = 1,
+    doc_workers: int = DEFAULT_DOC_WORKERS,
     page: str | None = None,
     source_url: str | None = None,
     output_dir: Path | None = None,
@@ -301,7 +302,7 @@ def _generate_subsite(
     site_config: SiteConfig,
     subsite: SubSiteConfig,
     *,
-    doc_workers: int = 1,
+    doc_workers: int = DEFAULT_DOC_WORKERS,
     page: str | None = None,
 ) -> None:
     """Generate all pages for a single sub-site.
@@ -686,6 +687,17 @@ def main() -> None:
     --------
     >>> main()  # doctest: +SKIP
     """
+    if (
+        sys.implementation.name != "cpython"
+        or sys.version_info < (3, 15, 2)
+        or sys._is_gil_enabled()
+    ):
+        message = (
+            "pages requires free-threaded CPython 3.15.2 or newer with the GIL "
+            "disabled. Run 'uv python install' and 'uv sync --locked' from the "
+            "checkout and unset PYTHON_GIL."
+        )
+        raise SystemExit(message)
     try:
         app()
     except subprocess.CalledProcessError as exc:

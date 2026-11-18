@@ -243,7 +243,7 @@ def _read_page_metadata(page: PageConfig) -> Path | None:
         return None
     try:
         payload = json.loads(meta_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):  # pragma: no cover - IO guard
+    except OSError, json.JSONDecodeError:  # pragma: no cover - IO guard
         return None
     candidate = payload.get("first_file")
     if not candidate:
@@ -359,7 +359,7 @@ class ManifestDescriptionResolver:
             return f"Reference docs for {page.label}."
         try:
             description = _extract_description(resp.text, page.language, url)
-        except (ValueError, TypeError):  # pragma: no cover - parse failure fallback
+        except ValueError, TypeError:  # pragma: no cover - parse failure fallback
             description = None
         if not description:
             description = f"Reference docs for {page.label}."

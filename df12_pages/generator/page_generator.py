@@ -358,7 +358,7 @@ class PageContentGenerator:
         if header_value:
             try:
                 parsed = parsedate_to_datetime(header_value)
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 parsed = None
             if parsed is not None:
                 if parsed.tzinfo is None:

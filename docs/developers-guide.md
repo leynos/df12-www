@@ -33,6 +33,11 @@ rationale for a specific change lives in its execution plan under
 
 ## 2. Build and serve
 
+Run `uv python install` and `uv sync --locked` from the checkout. The project
+pins free-threaded CPython 3.15.2 and the CLI requires the GIL to be disabled.
+A fresh Linux x86-64 development environment needs a C compiler for the locked
+`msgspec` test dependency.
+
 `bun run build` runs the full pipeline in a fixed order, because each step
 depends on the last:
 
@@ -67,12 +72,13 @@ uv run pages generate --site netsuke  # one sub-site
 ```
 
 To render documentation bundles concurrently, pass `--doc-workers N` or set
-`INPUT_DOC_WORKERS=N` for a Bun build. The default is one worker. Each worker
-fetches and renders a whole upstream document. The generator writes the HTML
-and metadata in configuration order before building the documentation index. Set
-`SOURCE_DATE_EPOCH` to a Unix timestamp to fix the UTC date rendered by the
-page templates. The browser tests use the reference capture date so the width
-of date-bearing headings stays reproducible.
+`INPUT_DOC_WORKERS=N` for a Bun build. The default is eight workers. Set the
+count to one for a serial build. Each worker fetches and renders a whole
+upstream document. The generator writes the HTML and metadata in configuration
+order before building the documentation index. Set `SOURCE_DATE_EPOCH` to a
+Unix timestamp to fix the UTC date rendered by the page templates. The browser
+tests use the reference capture date so the width of date-bearing headings
+stays reproducible.
 
 For the free-threaded runtime and worker-count measurements, see the
 [MiniJinja benchmark](minijinja-benchmark.md#free-threaded-document-workers).

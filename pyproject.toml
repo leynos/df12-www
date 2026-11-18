@@ -3,7 +3,7 @@ name = "df12-pages"
 version = "0.1.0"
 description = "Build environment for df12 Productions web site pages"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.15.2"
 license = { text = "ISC" }
 authors = [{ name = "Payton McIntosh", email = "pmcintosh@df12.net" }]
 dependencies = [
@@ -55,7 +55,8 @@ dev = [
 # Vendored byte for byte; its digest is audited, so Ruff must not touch it.
 extend-exclude = ["scripts/uv_gate.py"]
 line-length = 88
-target-version = "py313"
+# The pinned Ruff release supports targets through Python 3.14.
+target-version = "py314"
 
 [tool.ruff.lint]
 select = [

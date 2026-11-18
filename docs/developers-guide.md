@@ -2254,10 +2254,14 @@ captured renders as `tests/support/netsuke_baseline.json` records — a SHA-256
 of each page's normalized computed-style tree, the same normalization `diff`
 compares with, at each width, with the build date the forthcoming pages stamp
 into a heading redacted first; and that `shots --site netsuke` runs end to end.
-A page that renders differently fails the baseline test by name; capture the
-last good commit and this one and `diff` them to see what moved, and once the
-change is meant, rerun the test with `NETSUKE_BASELINE_UPDATE=1` to rewrite the
-record in the same commit. Run the suite alone with:
+Redaction reaches only the date's text, and its width still moves the bounding
+boxes, so `built_site` also builds under a pinned `SOURCE_DATE_EPOCH`
+(`tests/support/pinned_build.py`) and the test gives the same answer on any day.
+`df12_pages/build_clock.py` is the generator's one reading of the time. A page
+that renders differently fails the baseline test by name; capture the last good
+commit and this one and `diff` them to see what moved, and once the change is
+meant, rerun the test with `NETSUKE_BASELINE_UPDATE=1` to rewrite the record in
+the same commit. Run the suite alone with:
 
 ```bash
 uv run pytest tests/test_netsuke_browser.py -v

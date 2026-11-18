@@ -1439,13 +1439,11 @@ Four mechanisms are specific to it.
   its black ground to alpha. Pass it the master's path; numpy and Pillow are
   dev dependencies for it. `test_the_logo_is_the_supplied_artwork` holds every
   brand image to the keyed files.
-- **The scope.** `scripts/generate_wireframe_scope.py` projects the hero's
-  three-dimensional scene into `templates/wireframe/_scope.svg.jinja`, and
-  `test_the_scope_scene_is_generated` fails when they disagree. `scope.ts`
-  redraws any `[data-wf-scope]` root's `path[data-beam]` strokes on its canvas
-  as a vector beam, with phosphor persistence, additive glow, and flyback. It
-  stays off under reduced motion or more contrast, where the SVG is the whole
-  picture. It is rung 5 because a canvas cannot be drawn in CSS.
+- **Common Signal plates.** The home page serves three local posters. The
+  host module imports a vendored Three.js bundle on Play and keeps at most one
+  custom element mounted. Its shadow root owns the WebGL canvas. Removing the
+  element releases the scene. See the
+  [illustration import recipe](wireframe-site.md#reproducing-the-illustrations).
 - **Anchored samples.** `_code.jinja`'s `code(file, anchor)` macro includes a
   file from the Cargo package under `templates/wireframe/samples/` and keeps
   the lines between `// ANCHOR: name` and `// ANCHOR_END: name`.

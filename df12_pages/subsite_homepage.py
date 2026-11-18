@@ -109,6 +109,7 @@ class SubSiteHomePageBuilder:
                 **self.config.context,
                 "title": self.config.title,
             },
+            "base_path": self.base_path,
             "nav_links": nav_dicts,
             "parent_link": dc.asdict(self.parent_link) if self.parent_link else None,
             "generated_at": build_time(),

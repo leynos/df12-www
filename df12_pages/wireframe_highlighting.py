@@ -1,9 +1,4 @@
-"""The beam palette for wireframe's generated code panels.
-
-The style owns token colours; the CSS generator exposes them as variables in
-the sub-site stylesheet. Every colour is read on the panel ground, ``#091A16``,
-where the faintest token, the muted comment, holds 9.26:1.
-"""
+"""Common Signal syntax colours on the dark code surface."""
 
 import typing as typ
 
@@ -23,33 +18,28 @@ from pygments.token import (
 
 
 class ScopeStyle(Style):
-    """Mint keywords, cyan names, amber literals, and ink text on the panel.
+    """Readable syntax roles for the Wireframe code panels."""
 
-    The beam roles follow the colour and beam system: mint signals structure,
-    cyan marks the things that travel, amber marks values on the active path,
-    and magenta, the rare colour, is kept for attributes and macros.
-    """
-
-    background_color = "#091a16"
-    highlight_color = "#102720"
+    background_color = "#0b1928"
+    highlight_color = "#11283a"
     default_style = ""
     styles: typ.ClassVar = {  # ty: ignore[invalid-attribute-override]  # Pygments declares its class map without ClassVar.
-        Text: "#f1fff8",
-        Comment: "#9fc2b3",
-        Comment.Preproc: "#ff6ad5",
-        Error: "#ff6ad5",
-        Generic: "#f1fff8",
-        Keyword: "#7cffb3",
-        Name: "#f1fff8",
-        Name.Attribute: "#ff6ad5",
-        Name.Builtin: "#00ffff",
-        Name.Class: "#00ffff",
-        Name.Function: "#00ffff",
-        Name.Function.Magic: "#ff6ad5",
-        Name.Namespace: "#9fc2b3",
-        String: "#ffb347",
-        String.Doc: "#9fc2b3",
-        Number: "#ffb347",
-        Operator: "#9fc2b3",
-        Punctuation: "#9fc2b3",
+        Text: "#edf6ff",
+        Comment: "#bed0de",
+        Comment.Preproc: "#63ebf4",
+        Error: "#fe536c",
+        Generic: "#edf6ff",
+        Keyword: "#38f49d",
+        Name: "#edf6ff",
+        Name.Attribute: "#63ebf4",
+        Name.Builtin: "#63ebf4",
+        Name.Class: "#63ebf4",
+        Name.Function: "#63ebf4",
+        Name.Function.Magic: "#63ebf4",
+        Name.Namespace: "#bed0de",
+        String: "#edf6ff",
+        String.Doc: "#bed0de",
+        Number: "#edf6ff",
+        Operator: "#bed0de",
+        Punctuation: "#bed0de",
     }

@@ -4,8 +4,8 @@
 {% block title %}Worked examples · wireframe{% endblock %}
 {% block description %}The runnable examples in the wireframe {{ wireframe_version }} repository, what each demonstrates, and how to run it, plus mxd, a full server built on wireframe.{% endblock %}
 {% block content %}
-{#- The upstream examples at the release tag, described from each file's own
-    header comment. Commands run from a checkout of the tag. -#}
+{#- The upstream examples at the sample revision, described from each file's own
+    header comment. Commands run from a checkout of that revision. -#}
 {% set examples = [
   {'name': 'echo', 'layer': 'Routing', 'note': 'The smallest server: one route, and the default reply echoes each envelope back. It listens on 127.0.0.1:7878 and stops on Ctrl+C.'},
   {'name': 'client_echo_login', 'layer': 'Client', 'note': 'Sends a typed login request inside an Envelope to the echo server and decodes the acknowledgement. Start echo first.'},
@@ -18,13 +18,14 @@
   {'name': 'async_stream', 'layer': 'Streaming', 'note': 'Builds a Response::Stream of five frames with the async-stream crate, ready for a ConnectionActor to consume.', 'walkthrough': true},
   {'name': 'multi_packet', 'layer': 'Streaming', 'note': 'Splits a transcript across frames sent through a bounded channel by two producer tasks, with back-pressure keeping them in step with the consumer.', 'walkthrough': true},
 ] %}
-{{ ui.page_head([], 'Worked examples', 'The wireframe repository ships ten runnable examples at ' ~ wireframe_tag ~ '. mxd, a complete Hotline server, is the full-size one.') }}
+{{ ui.page_head([], 'Worked examples', 'The wireframe repository ships ten runnable examples at ' ~ sample_revision[:8] ~ '. mxd, a complete Hotline server, is the full-size one.') }}
 <div class="wf-shell wf-landing">
-  <p class="wf-landing__lede">Run them from a checkout of the release tag. Its lockfile pins dependencies that build, and its toolchain file names the nightly Rust it was tested with, which rustup installs on first use. Each example needs the <code>examples</code> feature.</p>
+  <p class="wf-landing__lede">Run them from a checkout of the sample revision. Its lockfile pins dependencies that build, and its toolchain file names the nightly Rust it was tested with, which rustup installs on first use. Each example needs the <code>examples</code> feature.</p>
   <div class="wf-landing__setup">
-    {% call code.command('Check out the release') %}git clone https://github.com/leynos/wireframe.git
+    {% call code.command('Check out the sample revision') %}git clone https://github.com/leynos/wireframe.git
 cd wireframe
-git checkout {{ wireframe_tag }}{% endcall %}
+git fetch origin {{ sample_revision }}
+git checkout --detach FETCH_HEAD{% endcall %}
   </div>
   <ul class="wf-examples">
     {%- for e in examples %}
@@ -39,7 +40,7 @@ git checkout {{ wireframe_tag }}{% endcall %}
 
   <section class="wf-mxd-case" aria-labelledby="mxd">
     <h2 id="mxd">mxd: a whole server</h2>
-    <p>mxd, the Marrakesh Express Daemon, is df12&rsquo;s Hotline server in Rust, and it runs on wireframe {{ mxd_wireframe_version }}. Its <code>mxd-wireframe-server</code> binary frames, routes, and answers Hotline transactions through wireframe, behind a transport adapter: the domain crate does not import wireframe, so transport types never reach the domain.</p>
+    <p>mxd, the Marrakesh Express Daemon, is df12&rsquo;s Hotline server in Rust, and its <a href="https://github.com/leynos/mxd/blob/cb907885cc2a61df2d708f38a3cf42da85c2a016/Cargo.toml">manifest declares wireframe {{ mxd_wireframe_version }}</a>. Its <code>mxd-wireframe-server</code> binary frames, routes, and answers Hotline transactions through wireframe, behind a transport adapter: the domain crate does not import wireframe, so transport types never reach the domain.</p>
     <a class="wf-arrow-link" href="/mxd/architecture/">How mxd is put together {{ ui.icon('arrow-right') }}</a>
   </section>
 </div>

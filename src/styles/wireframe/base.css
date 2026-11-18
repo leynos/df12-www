@@ -23,6 +23,7 @@ body {
   line-height: 1.6;
   font-synthesis: none;
   text-rendering: optimizelegibility;
+  overflow-wrap: anywhere;
 }
 
 h1,
@@ -42,7 +43,7 @@ dd {
 }
 
 a {
-  color: var(--color-mint);
+  color: var(--wf-signal);
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
@@ -55,13 +56,13 @@ a:hover {
 /* The focus ring is the brightest beam on the page, with a halo, and it
    never depends on colour alone: it is a 2px outline offset from the box. */
 :focus-visible {
-  outline: 2px solid var(--color-mint);
+  outline: 2px solid var(--wf-signal);
   outline-offset: 3px;
-  box-shadow: 0 0 14px -2px color-mix(in oklab, var(--color-mint) 60%, transparent);
+  box-shadow: 0 0 14px -2px color-mix(in oklab, var(--wf-signal) 60%, transparent);
 }
 
 ::selection {
-  background: var(--color-mint);
+  background: var(--wf-signal);
   color: var(--color-night);
 }
 

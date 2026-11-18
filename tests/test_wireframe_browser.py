@@ -117,3 +117,46 @@ def test_a_wireframe_page_fits_the_narrowest_phone(
     assert not layout["offenders"], (
         f"{BASE_PATH}{page} has elements past the viewport: {layout['offenders']}"
     )
+
+
+def test_reduced_motion_keeps_plates_static(
+    drive: cabc.Callable[..., str], served: str
+) -> None:
+    """Reduced motion exposes complete stills and never auto-starts on change."""
+    drive("set", "media", "dark", "reduced-motion")
+    try:
+        _open(drive, served, "", PHONE)
+        assert _evaluate(
+            drive,
+            """[...document.querySelectorAll('[data-wf-plate]')].every(figure =>
+                figure.querySelector('img').naturalWidth > 0 ||
+                figure.querySelector('img').loading === 'lazy')""",
+        )
+        assert _evaluate(
+            drive,
+            """[...document.querySelectorAll('[data-play]')].every(b => b.hidden)
+                && !document.querySelector('wireframe-plate')""",
+        )
+    finally:
+        drive("set", "media", "light")
+    assert _evaluate(drive, "!document.querySelector('wireframe-plate')")
+
+
+def test_failed_plate_keeps_the_focused_play_control(
+    drive: cabc.Callable[..., str], served: str
+) -> None:
+    """A failed WebGL constructor restores the poster and allows a retry."""
+    _open(drive, served, "", DESKTOP)
+    drive(
+        "eval",
+        """HTMLCanvasElement.prototype.getContext = () => null;
+        const play = document.querySelector('[data-play]');
+        play.focus(); play.click();""",
+    )
+    drive("wait", "--text", "Playback unavailable.")
+    assert _evaluate(
+        drive,
+        """document.activeElement.matches('[data-play]')
+            && !document.querySelector('wireframe-plate')
+            && document.querySelector('[data-wf-plate] img').naturalWidth > 0""",
+    )

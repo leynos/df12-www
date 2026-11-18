@@ -12,7 +12,7 @@
 {% block title %}{{ article.title }} · wireframe{% endblock %}
 {% block description %}{{ article.intro }}{% endblock %}
 {% block content %}
-{{ ui.page_head(crumbs, article.title, article.intro, plate_key) }}
+{{ ui.page_head(crumbs, article.title, article.intro) }}
 <div class="wf-shell wf-article-grid">
   <aside class="wf-aside">
     <div class="wf-aside__rail">{{ local_navigation() }}</div>
@@ -21,7 +21,7 @@
   <article class="wf-article">
     {% block article_body %}{% endblock %}
     <footer class="wf-article__foot">
-      <p><span class="wf-label">Sources</span> <a href="{{ source_base }}/{{ article.source }}">Upstream: {{ article.source }} at {{ wireframe_tag }}</a> · <a href="{{ docs_url }}{{ article.docs }}">API reference on docs.rs</a> · <a href="{{ repository_url }}/issues">Report a documentation issue</a></p>
+      <p><span class="wf-label">Sources</span> <a href="{{ source_base }}/{{ article.source }}">Upstream: {{ article.source }} at {{ sample_revision[:8] }}</a> · <a href="{{ docs_url }}{{ article.docs }}">Published API · {{ published_api_version }}</a> · <a href="{{ repository_url }}/issues">Report a documentation issue</a></p>
     </footer>
   </article>
 </div>

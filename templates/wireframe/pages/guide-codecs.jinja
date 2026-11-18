@@ -4,7 +4,6 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-codecs'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = none %}
 {% block article_body %}
 <section aria-labelledby="defaults"><h2 id="defaults">The defaults</h2>
 <p>A new application frames with <code>LengthDelimitedFrameCodec</code>: a 4-byte big-endian length prefix, then the payload, with frames over 1,024 bytes refused. Everything inside the frame is bincode, and the connection loop wakes every 100&nbsp;ms to clear stale partial messages.</p>

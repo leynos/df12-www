@@ -4,7 +4,6 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-client'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = 'outbound' %}
 {% block article_body %}
 <section aria-labelledby="connect"><h2 id="connect">Build and connect</h2>
 <p><code>WireframeClient::builder()</code> starts from the server&rsquo;s defaults: a 4-byte big-endian length prefix, 1,024-byte frames, and the bincode serializer. The builder changes them before connecting. <code>codec_config</code> must agree with the server&rsquo;s <code>buffer_capacity</code>: if small requests work and larger ones fail, the two limits disagree. The client shares the server&rsquo;s definitions with one exception: it has no fragmentation support, so against a fragmenting server it sees <code>FRAG</code> payloads.</p>

@@ -3,7 +3,6 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['architecture'] %}
 {% set crumbs = [] %}
-{% set plate_key = none %}
 {% block article_body %}
 <section aria-labelledby="vocabulary"><h2 id="vocabulary">Four nouns</h2>
 <p>wireframe keeps each layer&rsquo;s vocabulary separate, so transport concerns do not leak into routing and routing does not leak into the domain.</p>
@@ -36,23 +35,26 @@
 <div class="wf-table-scroll" tabindex="0" role="region" aria-label="Where state lives"><table>
 <thead><tr><th scope="col">Scope</th><th scope="col">Mechanism</th></tr></thead>
 <tbody>
-<tr><td>Application-wide</td><td>Values captured by handler and middleware closures. <code>app_data</code> stores values for the extractor building blocks, but nothing reads it while serving, so it never reaches handlers</td></tr>
+<tr><td>Application-wide</td><td>Values captured by handler and middleware closures.</td></tr>
 <tr><td>Per connection</td><td>The value returned by <code>on_connection_setup</code>, handed to <code>on_connection_teardown</code></td></tr>
 <tr><td>Per middleware layer</td><td>Fields of the <code>Transform</code>, such as the counter in <a href="/wireframe/guides/middleware/#transform">the middleware guide</a></td></tr>
 <tr><td>Across connections</td><td><code>SessionRegistry</code>, holding weak push handles by connection ID. The application inserts them; nothing populates it automatically</td></tr>
 </tbody></table></div>
 </section>
 
-<section aria-labelledby="not-yet"><h2 id="not-yet">What this release does not do</h2>
+<section aria-labelledby="not-yet"><h2 id="not-yet">Runtime limits in the alpha</h2>
 <p>A frank list, because every one of these appears somewhere in the upstream design documents. Several parts ship ahead of the runtime that will use them, and <a href="{{ source_base }}/docs/users-guide.md#building-blocks-not-yet-wired-into-the-server">the users&rsquo; guide</a> says how far each goes:</p>
 <ul>
-  <li>Handlers do not return replies or take extractors, and <code>app_data</code> and request bodies do not reach them. Replies are written in middleware.</li>
+  <li>Handlers do not return replies or take extractors, and current development uses closure captures for shared state. Replies are written in middleware.</li>
   <li><code>middleware::from_fn</code> cannot be passed to <code>WireframeApp::wrap</code>.</li>
   <li>The routed server path sends one reply per request. Push queues, the connection actor, and streaming responses are not driven by it, and of the <code>WireframeProtocol</code> hooks it runs only <code>before_send</code>.</li>
   <li>Codec recovery policies and the <code>on_eof</code> hook are defined but not consulted.</li>
   <li>The read timeout does not close idle connections, and shutdown waits for them with no deadline.</li>
   <li>There is no built-in TLS.</li>
 </ul>
-<p>The <a href="/wireframe/roadmap/">roadmap</a> says what is in progress.</p>
+<h3>Proposed runtime contracts</h3>
+<p><a href="{{ development_base }}/docs/rfcs/rfc-0003-native-message-adapter-boundary.md">Proposed · RFC 0003</a> would let native adapters retain headers, correlation and reply context. The alpha sample’s custom packet still travels inside an envelope.</p>
+<p><a href="{{ development_base }}/docs/rfcs/rfc-0004-duplex-session-driver.md">Proposed · RFC 0004</a> coordinates reads, writes, application work and cancellation. Reserved control capacity cannot skip unread ordered bytes or interrupt a partially written frame.</p>
+<p>Follow the <a href="/wireframe/roadmap/">roadmap</a> for the rest of the proposed contracts.</p>
 </section>
 {% endblock %}

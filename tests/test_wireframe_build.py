@@ -15,6 +15,7 @@ network, so it is ``make wireframe-samples`` rather than a test here.
 
 from __future__ import annotations
 
+import hashlib
 import re
 import textwrap
 import tomllib
@@ -26,7 +27,6 @@ from bs4 import BeautifulSoup, Tag
 from PIL import Image
 
 from df12_pages.config import load_site_config
-from scripts import generate_wireframe_scope
 from scripts.generate_wireframe_pygments_css import STYLESHEET, build_css
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -262,6 +262,10 @@ def test_the_sample_crate_pins_the_documented_release() -> None:
 def test_the_logo_is_the_supplied_artwork() -> None:
     """Every page's brand mark is the keyed logotype, not a redrawn SVG."""
     logos = PUBLIC_SITE / "assets/logos"
+    manifest = REPO_ROOT / "tests/fixtures/wireframe-logos.sha256"
+    for line in manifest.read_text(encoding="ascii").splitlines():
+        digest, name = line.split()
+        assert hashlib.sha256((logos / name).read_bytes()).hexdigest() == digest
     for name in ("lockup-480.webp", "lockup-800.webp", "wordmark-1400.webp"):
         with Image.open(logos / name) as image:
             assert image.mode == "RGBA", f"{name} lost its keyed alpha"
@@ -275,16 +279,17 @@ def test_the_logo_is_the_supplied_artwork() -> None:
         )
 
 
-def test_the_scope_scene_is_generated() -> None:
-    """The hero scene matches its generator, in the grammar the beam reads."""
-    committed = generate_wireframe_scope.OUTPUT.read_text(encoding="utf-8")
-    assert committed == generate_wireframe_scope.render(), (
-        "the scope scene is stale; rerun scripts/generate_wireframe_scope.py"
-    )
-    roles = set(re.findall(r'data-beam="([a-z]+)"', committed))
-    assert {"route", "mint", "magenta", "dim"} <= roles
-    for d in re.findall(r' d="([^"]+)"', committed):
-        assert re.fullmatch(r"M[-\d. ]+( L[-\d. ]+)+", d), d
+def test_plates_are_inert_until_playback(built_site: Path) -> None:
+    """All playable plates have local, complete posters and inert controls."""
+    assert built_site.is_dir()
+    soup = _soup(PUBLIC_SITE / "index.html")
+    figures = soup.select("figure[data-wf-plate]")
+    assert [figure["data-wf-plate"] for figure in figures] == ["29", "15", "25"]
+    assert not soup.select("wireframe-plate, canvas")
+    for figure in figures:
+        assert figure.select_one("img[width][height]")
+        assert figure.select_one("figcaption")
+        assert figure.select_one(".wf-controls[hidden] button[data-play]")
 
 
 def test_the_syntax_partial_is_generated() -> None:
@@ -346,17 +351,17 @@ def test_every_guide_is_listed_and_configured(built_site: Path) -> None:
 
 
 def test_pages_load_their_scripts(built_site: Path) -> None:
-    """Every page loads the copy script; only pages with a scope load the beam."""
+    """Every page loads the copy script; playable plates load the host module."""
     assert built_site.is_dir()
     for page in _pages():
         soup = _soup(page)
         scripts = [script.get("src") for script in soup.select("script[src]")]
         expected = ["/wireframe/assets/js/copy-code.js"]
-        if soup.select("[data-wf-scope]"):
-            expected.append("/wireframe/assets/js/scope.js")
+        if soup.select("[data-wf-plate]"):
+            expected.append("/wireframe/assets/js/plates.js")
         assert scripts == expected, page
-    for name in ("copy-code.js", "scope.js"):
-        assert (PUBLIC_SITE / "assets" / "js" / name).is_file()
+    for name in ("js/copy-code.js", "js/plates.js", "vendor/plates/wireframe-plate.js"):
+        assert (PUBLIC_SITE / "assets" / name).is_file()
 
 
 _VERSION_RE = re.compile(r"(?<![\d.])0\.\d+\.\d+(?![\d.])")

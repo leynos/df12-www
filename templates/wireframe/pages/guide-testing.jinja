@@ -4,7 +4,6 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-testing'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = 'calibration' %}
 {% block article_body %}
 <section aria-labelledby="testkit"><h2 id="testkit">Enable the testkit</h2>
 <p>The <code>testkit</code> feature adds <code>wireframe::testkit</code>: drivers that run a real <code>WireframeApp</code> over an in-memory duplex stream, with no socket and no server. A driver encodes requests with a codec, feeds the bytes in, and returns the decoded replies. Turn the feature on for tests only, through a dev-dependency or a feature of the crate under test.</p>
@@ -30,7 +29,7 @@
 </section>
 
 <section aria-labelledby="beyond"><h2 id="beyond">Beyond the testkit</h2>
-<p>The separate <a href="https://crates.io/crates/wireframe_testing"><code>wireframe_testing</code></a> crate, also at {{ wireframe_version }}, re-exports the testkit and adds more: codec-aware drivers that return payloads or frames for any codec, Hotline-framed fixtures for valid, oversized, truncated, and correlated frames, an observability handle that captures logs and metrics together, a harness that starts a real server and a connected client in one test (<code>spawn_wireframe_pair</code>), prepared drivers that prove middleware is built once (<code>prepare_and_drive_with_frames</code>, <code>drive_prepared_with_frames</code>), and allocation counting for benchmarks (<code>benchmark_alloc_support</code>). This site&rsquo;s samples use only the main crate&rsquo;s <code>testkit</code>; the crate&rsquo;s own documentation covers the rest.</p>
+<p>The separate <a href="https://crates.io/crates/wireframe_testing"><code>wireframe_testing</code></a> crate in the {{ wireframe_version }} source tree re-exports the testkit and adds more: codec-aware drivers that return payloads or frames for any codec, Hotline-framed fixtures for valid, oversized, truncated, and correlated frames, an observability handle that captures logs and metrics together, a harness that starts a real server and a connected client in one test (<code>spawn_wireframe_pair</code>), prepared drivers that prove middleware is built once (<code>prepare_and_drive_with_frames</code>, <code>drive_prepared_with_frames</code>), and allocation counting for benchmarks (<code>benchmark_alloc_support</code>). This site&rsquo;s samples use only the main crate&rsquo;s <code>testkit</code>; the crate&rsquo;s own documentation covers the rest.</p>
 <p>For servers and clients that must meet over a real socket, the <a href="/wireframe/getting-started/">getting-started program</a> is itself a pattern: bind to port 0, read <code>local_addr</code>, call <code>spawn</code>, and finish with <code>stop</code> and <code>drained</code>. Close the client first, because shutdown waits for open connections.</p>
 </section>
 {% endblock %}

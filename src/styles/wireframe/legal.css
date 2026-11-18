@@ -25,7 +25,7 @@
 
 .wf-legal-page__eyebrow {
   margin: 0;
-  color: var(--color-mint);
+  color: var(--wf-signal);
   font: 700 0.8125rem / 1.45 var(--font-sans);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
@@ -92,13 +92,13 @@
 }
 
 .wf-legal li::marker {
-  color: var(--color-mint);
+  color: var(--wf-signal);
 }
 
 .wf-legal blockquote {
   margin-inline: 0;
   padding-left: 1.25rem;
-  border-left: 3px solid var(--color-mint);
+  border-left: 3px solid var(--wf-signal);
   color: var(--color-ink-muted);
 }
 
@@ -166,15 +166,15 @@
   width: 2.5rem;
   height: 2.5rem;
   margin-top: 0.125rem;
-  border: 1px solid var(--color-mint);
-  color: var(--color-mint);
+  border: 1px solid var(--wf-signal);
+  color: var(--wf-signal);
   font: 700 0.8125rem / 1 var(--font-sans);
   text-transform: uppercase;
 }
 
 .wf-legal .content-card--accent .content-card__badge {
-  border-color: var(--color-amber);
-  color: var(--color-amber);
+  border-color: var(--wf-notice);
+  color: var(--wf-notice);
 }
 
 .wf-legal .content-card__body {

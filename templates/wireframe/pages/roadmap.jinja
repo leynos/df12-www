@@ -7,11 +7,10 @@
   ('ConnectionActor, streaming and multi-packet responses', 874),
   ('Push queues and SessionRegistry', 875),
   ('Streaming request bodies', 876),
-  ('Extractors and app_data', 877),
   ('Recovery policies and the codec error metric', 878),
   ('on_eof and the other protocol hooks', 879),
 ] %}
-{{ ui.page_head([], 'This alpha, what changed, and what is next', wireframe_version ~ ' is an alpha for early adopters: expect interfaces to change before 1.0, and pin the version. Beyond it, the upstream roadmap is a plan, not a promise.', 'construction') }}
+{{ ui.page_head([], 'Release and roadmap', 'Follow the alpha in development, the changes since the published crate and the contracts still under proposal.') }}
 <div class="wf-shell wf-landing">
   <div class="wf-horizons">
     <section class="wf-horizon" aria-labelledby="now">
@@ -59,12 +58,13 @@
       <p class="wf-label">Planned · upstream roadmap</p>
       <h2 id="later">Toward 1.0</h2>
       <ul>
-        <li>Streaming request extraction in the handler dispatch path.</li>
-        <li>Connection-local runtime ownership and lifecycle finalization.</li>
-        <li>Protocol-neutral adapters for the first consumers, starting with mxd serving Hotline through generic public primitives.</li>
-        <li>Zero-copy payloads through the public byte APIs. This is not in the alpha: <code>Serializer::serialize</code> still returns <code>Vec&lt;u8&gt;</code>.</li>
-        <li>Alternative transports beyond raw TCP, a formal message versioning system, and built-in middleware or guides for TLS.</li>
-        <li>Formal verification of message assembly and dispatch: bounded model checks with Kani, model checks with Stateright, and proofs with Verus.</li>
+        <li><a href="{{ development_base }}/docs/rfcs/rfc-0003-native-message-adapter-boundary.md">Proposed · RFC 0003 · native message adapter boundary</a></li>
+        <li><a href="{{ development_base }}/docs/rfcs/rfc-0004-duplex-session-driver.md">Proposed · RFC 0004 · duplex session driver</a></li>
+        <li><a href="{{ development_base }}/docs/rfcs/rfc-0005-negotiated-transport-entry-points.md">Proposed · RFC 0005 · negotiated transport entry points</a></li>
+        <li><a href="{{ development_base }}/docs/rfcs/rfc-0006-configurable-framing-primitives.md">Proposed · RFC 0006 · configurable framing primitives</a></li>
+        <li><a href="{{ development_base }}/docs/rfcs/rfc-0007-budgets-scheduling-and-assembly.md">Proposed · RFC 0007 · budgets scheduling and assembly</a></li>
+        <li><a href="{{ development_base }}/docs/rfcs/rfc-0008-external-adapter-conformance-harness.md">Proposed · RFC 0008 · external adapter conformance harness</a></li>
+        <li><a href="{{ development_base }}/docs/rfcs/rfc-0009-datagram-session-transport.md">Proposed · RFC 0009 · datagram session transport</a></li>
       </ul>
       <p>Track the detail in the <a href="{{ repository_url }}/blob/main/docs/roadmap.md">upstream roadmap</a> and the <a href="{{ repository_url }}/blob/main/CHANGELOG.md">changelog</a>.</p>
     </section>

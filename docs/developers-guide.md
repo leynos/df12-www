@@ -66,6 +66,17 @@ uv run pages generate --all-sites     # main site plus every sub-site
 uv run pages generate --site netsuke  # one sub-site
 ```
 
+To render documentation bundles concurrently, pass `--doc-workers N` or set
+`INPUT_DOC_WORKERS=N` for a Bun build. The default is one worker. Each worker
+fetches and renders a whole upstream document. The generator writes the HTML
+and metadata in configuration order before building the documentation index. Set
+`SOURCE_DATE_EPOCH` to a Unix timestamp to fix the UTC date rendered by the
+page templates. The browser tests use the reference capture date so the width
+of date-bearing headings stays reproducible.
+
+For the free-threaded runtime and worker-count measurements, see the
+[MiniJinja benchmark](minijinja-benchmark.md#free-threaded-document-workers).
+
 `scripts/build-episodic-search-index.mjs` then reads the rendered
 `public/episodic/` routes and the upstream-document manifest, writing the
 committed MiniSearch projection at

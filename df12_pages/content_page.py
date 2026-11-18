@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import dataclasses as dc
-import datetime as dt
 import typing as typ
 
-from .templating import template_environment
+from .templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:
     from pathlib import Path
@@ -71,7 +70,7 @@ class ContentPageGenerator:
             "nav_links": marked_nav,
             "parent_link": self.parent_link,
             "stylesheet": self.stylesheet,
-            "generated_at": dt.datetime.now(dt.UTC),
+            "generated_at": build_timestamp(),
         }
         html = self.env.render_template(self.config.template, **context)
         if not html.endswith("\n"):

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import datetime as dt
+import os
 import typing as typ
 
 from markupsafe import Markup, escape
@@ -13,6 +15,21 @@ if typ.TYPE_CHECKING:
     from pathlib import Path
 
     from minijinja._lowlevel import State
+
+
+def build_timestamp() -> dt.datetime:
+    """Return the UTC build time, honouring a reproducible build epoch.
+
+    Returns
+    -------
+    datetime.datetime
+        The instant specified by ``SOURCE_DATE_EPOCH`` in Unix seconds,
+        or the current UTC time when the variable is unset.
+    """
+    epoch = os.environ.get("SOURCE_DATE_EPOCH")
+    if epoch is None:
+        return dt.datetime.now(dt.UTC)
+    return dt.datetime.fromtimestamp(int(epoch), dt.UTC)
 
 
 @pass_state

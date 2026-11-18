@@ -29,6 +29,8 @@ import shutil
 import subprocess
 import sys
 import typing as typ
+from concurrent.futures import ThreadPoolExecutor
+from itertools import batched
 from pathlib import Path
 
 import cyclopts
@@ -36,7 +38,13 @@ from cyclopts import App, Parameter
 
 from .about_page import AboutPageBuilder
 from .bump import bump_latest_release_metadata
-from .config import SharedContentPageChrome, SiteConfig, SubSiteConfig, load_site_config
+from .config import (
+    PageConfig,
+    SharedContentPageChrome,
+    SiteConfig,
+    SubSiteConfig,
+    load_site_config,
+)
 from .content_page import ContentPageGenerator
 from .deploy import (
     DEFAULT_CONFIG_PATH,
@@ -52,6 +60,12 @@ from .homepage import HomePageBuilder
 from .releases import GitHubReleaseClient
 from .shared_content import SharedContentGenerator
 from .subsite_homepage import SubSiteHomePageBuilder
+
+if typ.TYPE_CHECKING:
+    import collections.abc as cabc
+
+    from .generator.page_generator import RenderedDocument
+
 
 DEFAULT_CONFIG = Path("config/pages.yaml")
 
@@ -89,6 +103,9 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         str | None,
         Parameter(help="Generate a specific sub-site only"),
     ] = None,
+    doc_workers: typ.Annotated[
+        int, Parameter(help="Concurrent documentation bundles")
+    ] = 1,
     all_sites: typ.Annotated[
         bool,
         Parameter(help="Generate main site and all sub-sites"),
@@ -112,6 +129,8 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         multiple pages are selected).
     site : str or None, optional
         Generate only the named sub-site (e.g. ``weaver``).
+    doc_workers : int
+        Maximum concurrent documentation bundles. Defaults to one.
     all_sites : bool
         Generate the main site plus all configured sub-sites.
 
@@ -123,7 +142,8 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     Raises
     ------
     ValueError
-        If ``--site`` and ``--all-sites`` are both supplied (mutually
+        If ``--doc-workers`` is less than one, or
+        if ``--site`` and ``--all-sites`` are both supplied (mutually
         exclusive).  If ``--source-url`` or ``--output-dir`` overrides are
         combined with ``--site``.  If ``--all-sites`` is combined with any
         partial-render override (``--page``, ``--source-url``,
@@ -131,6 +151,9 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         supplied when more than one page is requested.  If ``--site`` names an
         unknown sub-site.
     """
+    if doc_workers < 1:
+        msg = "--doc-workers must be at least one"
+        raise ValueError(msg)
     if site and all_sites:
         msg = "--site and --all-sites are mutually exclusive"
         raise ValueError(msg)
@@ -153,7 +176,9 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
             available = ", ".join(sorted(site_config.sites))
             msg = f"Unknown site '{site}'. Known sites: {available}"
             raise ValueError(msg)
-        _generate_subsite(site_config, site_config.sites[site], page=page)
+        _generate_subsite(
+            site_config, site_config.sites[site], page=page, doc_workers=doc_workers
+        )
         return
 
     _generate_main_site(
@@ -161,16 +186,48 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         page=page,
         source_url=source_url,
         output_dir=output_dir,
+        doc_workers=doc_workers,
     )
 
     if all_sites:
         for subsite in site_config.sites.values():
-            _generate_subsite(site_config, subsite)
+            _generate_subsite(site_config, subsite, doc_workers=doc_workers)
+
+
+def _write_documents(
+    pages: list[PageConfig],
+    workers: int,
+    *,
+    templates_dir: Path | None = None,
+    source_url: str | None = None,
+    output_dir: Path | None = None,
+) -> cabc.Iterator[Path]:
+    """Render independent bundles and write potentially overlapping paths in order."""
+
+    def render(page: PageConfig) -> RenderedDocument:
+        """Keep each generator and its render state local to one job."""
+        return PageContentGenerator(
+            page,
+            templates_dir=templates_dir,
+            source_url=source_url,
+            output_dir=output_dir,
+        ).render()
+
+    if workers == 1 or len(pages) <= 1:
+        for page in pages:
+            yield from render(page).write()
+        return
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        # Bound buffered HTML even on Python 3.13, which lacks map(buffersize=).
+        for batch in batched(pages, min(workers, len(pages)), strict=False):
+            for document in pool.map(render, batch):
+                yield from document.write()
 
 
 def _generate_main_site(
     site_config: SiteConfig,
     *,
+    doc_workers: int = 1,
     page: str | None = None,
     source_url: str | None = None,
     output_dir: Path | None = None,
@@ -190,13 +247,10 @@ def _generate_main_site(
         msg = "Cannot override source_url/output_dir when generating multiple pages."
         raise ValueError(msg)
 
-    for page_config in target_pages:
-        generator = PageContentGenerator(
-            page_config, source_url=source_url, output_dir=output_dir
-        )
-        written = generator.run()
-        for path in written:
-            print(f"wrote {_format_path(path)}")
+    for path in _write_documents(
+        target_pages, doc_workers, source_url=source_url, output_dir=output_dir
+    ):
+        print(f"wrote {_format_path(path)}")
 
     if page:
         return
@@ -247,6 +301,7 @@ def _generate_subsite(
     site_config: SiteConfig,
     subsite: SubSiteConfig,
     *,
+    doc_workers: int = 1,
     page: str | None = None,
 ) -> None:
     """Generate all pages for a single sub-site.
@@ -257,6 +312,8 @@ def _generate_subsite(
         Top-level site configuration, used to resolve shared content.
     subsite : SubSiteConfig
         Configuration for the sub-site to generate.
+    doc_workers : int
+        Maximum number of upstream document bundles rendered concurrently.
     page : str or None, optional
         Specific page key to render; when ``None`` (default) all pages,
         the docs index, homepage, about page, shared content, content
@@ -283,11 +340,10 @@ def _generate_subsite(
     else:
         target_pages = list(subsite.pages.values())
 
-    for page_config in target_pages:
-        generator = PageContentGenerator(page_config, templates_dir=templates_dir)
-        written = generator.run()
-        for path in written:
-            print(f"[{subsite.key}] wrote {_format_path(path)}")
+    for path in _write_documents(
+        target_pages, doc_workers, templates_dir=templates_dir
+    ):
+        print(f"[{subsite.key}] wrote {_format_path(path)}")
 
     if page is not None:
         return

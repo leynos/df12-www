@@ -71,7 +71,71 @@ uncompressed bytes to the Episodic stylesheet. No generated Episodic element
 uses that class. The Netsuke search indexes differed only in their build
 timestamps.
 
-The committed Netsuke browser baseline differs on the ten date-bearing
-forthcoming pages at both desktop and phone widths. All 40 normalized
-computed-style snapshots per viewport matched between Jinja2 and MiniJinja on
-this host. The committed reference snapshots were left intact.
+The initial November run differed from the committed Netsuke browser baseline
+on ten forthcoming pages whose headings include the build date. All 40
+normalized computed-style snapshots per viewport matched between Jinja2 and
+MiniJinja on this host. The browser test build now sets `SOURCE_DATE_EPOCH` to
+2 October 2026 to reproduce the heading widths in the committed captures.
+
+## Free-threaded document workers
+
+The follow-up benchmark uses the MiniJinja site at commit `8648fe2` as the
+starting point. Run the workers with CPython 3.15.2t as follows.
+
+```bash
+uv python install cpython-3.15.2+freethreaded-linux-x86_64-gnu
+uv run --locked --no-dev --python 3.15.2t pages generate --all-sites --doc-workers 8
+```
+
+For the complete website build, Bun passes the following environment settings
+through to `uv run pages generate --all-sites`.
+
+```bash
+UV_PYTHON=3.15.2t UV_NO_DEV=1 INPUT_DOC_WORKERS=8 bun run build
+```
+
+The worker-count sweep used the same eight logical CPUs and frozen HTTP
+responses as the original benchmark. Each timing includes a fresh process, real
+Mermaid execution and writing all generated files. The timed processes reported
+the GIL disabled at exit.
+
+| Document workers | Mean over three builds |
+| ---------------: | ---------------------: |
+| 1                | 8.34 s                 |
+| 2                | 7.34 s                 |
+| 4                | 6.13 s                 |
+| 8                | 5.34 s                 |
+
+A separate interleaved run compared the previous MiniJinja commit with the
+worker implementation. The 3.15.2t controls used the same interpreter and
+locked dependencies, with `PYTHON_GIL=1` for the GIL-enabled cases. Each cell
+is the mean of three all-sites page-generation runs.
+
+| Runtime                           | One worker | Eight workers |
+| --------------------------------- | ---------: | ------------: |
+| CPython 3.13.11, commit `8648fe2` | 7.58 s     | —             |
+| CPython 3.15.2t, GIL enabled      | 8.80 s     | 10.01 s       |
+| CPython 3.15.2t, GIL disabled     | 8.70 s     | 5.63 s        |
+
+Eight workers with the GIL disabled cut page-generation time by 25.8% against
+the committed serial generator. Switching interpreters alone made the serial
+run slower. For the complete warm `bun run build`, which also compiles CSS and
+scripts, processes assets, and indexes search, the mean fell from 22.56 s to
+20.50 s (9.1%) over three measured builds per version.
+
+Scalene 2.4.0 enabled the GIL for its native extensions. py-spy 0.4.3 could not
+locate the interpreter. CPython's sampling profiler captured the main thread
+and all eight pool threads with the GIL disabled. Of 1,469 worker samples
+inside a render job, 1,334 included the Markdown renderer. The main thread was
+waiting for an ordered result in 350 of its 562 samples. These are wall-clock
+samples and include time spent waiting.
+
+```bash
+uv run --locked --no-dev --python 3.15.2t python -m profiling.sampling run \
+  --all-threads --blocking -r 100hz --gecko -o threads.json \
+  .venv/bin/pages generate --all-sites --doc-workers 8
+```
+
+With fixed diagram SVGs for the equivalence check, the eight-worker output
+matched the serial CPython 3.15.2t output and the earlier MiniJinja baseline
+byte for byte across all 1,007 generated files, including all 940 HTML pages.

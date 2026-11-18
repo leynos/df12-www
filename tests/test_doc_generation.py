@@ -95,6 +95,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from df12_pages._constants import PAGE_META_TEMPLATE
+from df12_pages.cli import _write_documents, generate
 from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.generator import PageContentGenerator
 
@@ -323,11 +324,9 @@ def generated_docs(generated_doc_paths: dict[str, Path]) -> dict[str, BeautifulS
 
 
 @pytest.fixture(scope="session")
-def css_build_artifact() -> Path:
+def css_build_artifact(built_site: Path) -> Path:
     """Ensure the Tailwind/Daisy build artifact exists for tests."""
-    bun_exe = _require_executable("bun")
-    subprocess.run([bun_exe, "run", "build"], cwd=REPO_ROOT, check=True)  # noqa: S603
-    css_path = REPO_ROOT / "public" / "assets" / "site.css"
+    css_path = built_site.parent / "assets" / "site.css"
     if not css_path.exists():  # pragma: no cover - defensive
         msg = f"Expected CSS artifact at {css_path}"
         raise FileNotFoundError(msg)
@@ -713,3 +712,33 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     assert "Version 9.9.9" not in meta_items, (
         f"fallback content must not claim the release version, got {meta_items!r}"
     )
+
+
+def test_document_workers_publish_overlaps_in_order(
+    page_config: PageConfig, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Both renders overlap, but the later configured bundle wins a shared path."""
+    ready = threading.Barrier(2, timeout=5)
+
+    def markdown(generator: PageContentGenerator) -> str:
+        """Rendezvous in the workers and identify each bundle in the output."""
+        ready.wait()
+        return f"## Shared heading\n\nContent from {generator.page.key}.\n"
+
+    monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", markdown)
+    pages = [
+        dc.replace(page_config, key=key, output_dir=tmp_path)
+        for key in ("first", "second")
+    ]
+    paths = list(_write_documents(pages, 2))
+    assert paths == [tmp_path / "docs-test-shared-heading.html"] * 2
+    assert "Content from second." in paths[0].read_text()
+    for page in pages:
+        metadata = tmp_path / PAGE_META_TEMPLATE.format(key=page.key)
+        assert json.loads(metadata.read_text()) == {"first_file": paths[0].name}
+
+
+def test_generate_rejects_zero_document_workers() -> None:
+    """Reject an invalid pool size before doing any build work."""
+    with pytest.raises(ValueError, match="--doc-workers must be at least one"):
+        generate(doc_workers=0)

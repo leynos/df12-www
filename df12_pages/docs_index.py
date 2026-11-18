@@ -25,7 +25,6 @@ to the docs output directory.
 
 from __future__ import annotations
 
-import datetime as dt
 import json
 import os
 import tomllib
@@ -37,7 +36,7 @@ from markdown import markdown
 
 from ._constants import PAGE_META_TEMPLATE
 from .config import PAGE_CATEGORIES
-from .templating import template_environment
+from .templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:  # pragma: no cover - import for type hints only
     from .config import PageConfig, SiteConfig
@@ -106,7 +105,7 @@ class DocsIndexBuilder:
     def run(self) -> Path:
         """Render the docs index HTML file to the configured output path."""
         entries = self._gather_entries()
-        generated_at = dt.datetime.now(dt.UTC)
+        generated_at = build_timestamp()
         output_path = self.site_config.docs_index_output
         output_path.parent.mkdir(parents=True, exist_ok=True)
         context = {

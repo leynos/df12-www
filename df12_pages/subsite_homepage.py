@@ -10,11 +10,10 @@ metadata, and writes the final HTML document to the requested output path.
 from __future__ import annotations
 
 import dataclasses as dc
-import datetime as dt
 import typing as typ
 from pathlib import Path
 
-from .templating import template_environment
+from .templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:
     from .config import NavLinkConfig, SubSiteHomepageConfig
@@ -97,7 +96,7 @@ class SubSiteHomePageBuilder:
             },
             "nav_links": nav_dicts,
             "parent_link": dc.asdict(self.parent_link) if self.parent_link else None,
-            "generated_at": dt.datetime.now(dt.UTC),
+            "generated_at": build_timestamp(),
         }
         html = self.env.render_template("home_page.jinja", **context)
         if not html.endswith("\n"):

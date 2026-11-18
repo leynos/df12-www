@@ -21,6 +21,8 @@ Example
 
 from __future__ import annotations
 
+import contextlib
+import dataclasses as dc
 import datetime as dt
 import json
 import os
@@ -42,7 +44,36 @@ from df12_pages.generator.link_rewriter import _build_link_rewriter
 from df12_pages.generator.models import NumberedStep, SectionModel
 from df12_pages.generator.renderer import CODE_BLOCK_PATTERN, HtmlContentRenderer
 from df12_pages.markdown_parser import Section, Subsection, parse_sections
-from df12_pages.templating import template_environment
+from df12_pages.templating import build_timestamp, template_environment
+
+
+@dc.dataclass
+class RenderedDocument:
+    """HTML sections and the metadata destination for one documentation bundle."""
+
+    output_dir: Path
+    metadata_path: Path
+    sections: list[tuple[str, str]]
+
+    def write(self) -> list[Path]:
+        """Write sections in order, then publish the index pointer to the first.
+
+        Returns
+        -------
+        list[Path]
+            Written HTML paths in section order.
+        """
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        written = []
+        for filename, html in self.sections:
+            path = self.output_dir / filename
+            path.write_text(html, encoding="utf-8")
+            written.append(path)
+        if written:
+            metadata = {"first_file": written[0].name}
+            with contextlib.suppress(OSError):  # metadata is best effort
+                self.metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+        return written
 
 
 class PageContentGenerator:
@@ -103,6 +134,21 @@ class PageContentGenerator:
         Side effects include writing HTML files and metadata artifacts into the
         configured output directory.
         """
+        return self.render().write()
+
+    def render(self) -> RenderedDocument:
+        """Fetch and render one bundle in memory for ordered publication.
+
+        Returns
+        -------
+        RenderedDocument
+            The HTML and destination paths ready for the writer.
+
+        Raises
+        ------
+        RuntimeError
+            If the upstream document has no second-level sections.
+        """
         markdown_source = self._fetch_markdown()
         sections = parse_sections(markdown_source)
         if not sections:
@@ -110,9 +156,8 @@ class PageContentGenerator:
             raise RuntimeError(msg)
 
         out_dir = self.output_dir_override or self.page.output_dir
-        out_dir.mkdir(parents=True, exist_ok=True)
 
-        generated_at = dt.datetime.now(dt.UTC)
+        generated_at = build_timestamp()
         doc_updated_at = self.doc_updated_at or generated_at
         section_bundle: list[tuple[Section, SectionModel, str]] = []
         for section in sections:
@@ -122,7 +167,7 @@ class PageContentGenerator:
             section_bundle.append((section, section_model, html_title))
 
         nav_groups = self._build_nav_groups([bundle[1] for bundle in section_bundle])
-        written: list[Path] = []
+        rendered = []
         for section, section_model, html_title in section_bundle:
             context = {
                 "section": section_model,
@@ -141,12 +186,8 @@ class PageContentGenerator:
             }
             html = self.env.render_template("doc_page.jinja", **context)
             filename = f"{self.page.filename_prefix}{section.slug}.html"
-            output_path = out_dir / filename
-            output_path.write_text(html, encoding="utf-8")
-            written.append(output_path)
-        if written:
-            self._write_metadata(written[0].name)
-        return written
+            rendered.append((filename, html))
+        return RenderedDocument(out_dir, self._metadata_path(), rendered)
 
     def _resolve_doc_updated_at(self) -> dt.datetime | None:
         """Return the latest release date, else the doc commit date if any."""
@@ -323,7 +364,7 @@ class PageContentGenerator:
                 if parsed.tzinfo is None:
                     parsed = parsed.replace(tzinfo=dt.UTC)
                 return parsed.astimezone(dt.UTC)
-        return dt.datetime.now(dt.UTC)
+        return build_timestamp()
 
     def _resolve_description(self) -> str:
         """Return the page description override or fetch it from the manifest."""
@@ -344,15 +385,6 @@ class PageContentGenerator:
         """Return the path to the metadata JSON file for this page."""
         filename = PAGE_META_TEMPLATE.format(key=self.page.key)
         return self.page.output_dir / filename
-
-    def _write_metadata(self, first_filename: str) -> None:
-        """Persist the metadata JSON that records the first generated filename."""
-        metadata = {"first_file": first_filename}
-        path = self._metadata_path()
-        try:
-            path.write_text(json.dumps(metadata), encoding="utf-8")
-        except OSError:  # pragma: no cover - IO issues
-            return
 
     def _build_nav_groups(
         self, section_models: list[SectionModel]

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime as dt
 import re
 import typing as typ
 from pathlib import Path
@@ -12,7 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 from markdown import markdown
 
-from .templating import template_environment
+from .templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:
     from .config import SharedContentConfig, SharedContentPageChrome
@@ -131,7 +130,7 @@ class SharedContentGenerator:
             "eyebrow": self.shared_config.eyebrow,
             "summary": self.shared_config.summary,
             "body_html": body_html,
-            "generated_at": dt.datetime.now(dt.UTC),
+            "generated_at": build_timestamp(),
             "nav_links": page_chrome.nav_links if page_chrome else [],
             "parent_link": page_chrome.parent_link if page_chrome else None,
             "stylesheet": page_chrome.stylesheet if page_chrome else None,

@@ -1,0 +1,26 @@
+--- a/src/wireframe-plate.js
++++ b/src/wireframe-plate.js
+@@ -3,8 +3,13 @@
+ 
+ const SCAN_SECONDS = 3.2;
+ 
++// df12-www local change: `allow-motion` is a per-element opt-in that lets one
++// plate animate while the browser asks for reduced motion. The host page sets
++// it only in response to a visitor's direct Play action and removes it when
++// the preference changes. Without it the element honours the media query.
++
+ class WireframePlate extends HTMLElement {
+-  static observedAttributes = ["plate", "paused", "low-glow"];
++  static observedAttributes = ["plate", "paused", "low-glow", "allow-motion"];
+   constructor() {
+     super();
+     const root = this.attachShadow({ mode: "open" });
+@@ -116,7 +121,7 @@
+     const dt =
+       this.last === null ? 0 : Math.min(0.25, (now - this.last) / 1000);
+     const paused = this.hasAttribute("paused"),
+-      reduced = this.reduced.matches;
++      reduced = this.reduced.matches && !this.hasAttribute("allow-motion");
+     if (reduced) this.scanTime = SCAN_SECONDS;
+     else if (!paused) {
+       this.clock += dt;

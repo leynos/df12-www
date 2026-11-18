@@ -85,6 +85,7 @@ class ContentPageGenerator:
             "nav_links": marked_nav,
             "parent_link": self.parent_link,
             "stylesheet": self.stylesheet,
+            "base_path": self.base_path,
             "generated_at": build_time(),
         }
         html = template.render(**context)

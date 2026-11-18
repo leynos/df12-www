@@ -57,4 +57,5 @@ ignore = [
 ]
 
 [files]
-exclude = []
+# Preserve the pinned, byte-identical upstream bundle and its shader strings.
+exclude = ["src/static/wireframe/assets/vendor/plates/wireframe-plate.js"]

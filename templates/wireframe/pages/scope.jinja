@@ -1,0 +1,27 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% block title %}Common Signal field guide · Wireframe{% endblock %}
+{% block description %}The civic geometry, colour roles and artwork behind Common Signal.{% endblock %}
+{% block content %}
+{{ ui.page_head([], 'Common Signal field guide', 'Roads show where a message can travel. A crossing makes the choice of route visible.') }}
+<div class="wf-shell wf-landing wf-field"><section><h2 id="metaphor">Reading the city</h2><p>A codec marks a boundary in the incoming bytes. A route selects a handler. Independent gauges let us picture how much capacity each part of a system has left.</p></section>
+<section><h2 id="beam">Avenue fly-through</h2>{{ ui.plate('29') }}</section>
+<section><h2 id="beams">Colour and meaning</h2><ul class="wf-swatches">
+<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--void"></div><div class="wf-swatch__body"><strong>Void</strong><code>#040911</code><span>Negative space</span></div></li>
+<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--cobalt"></div><div class="wf-swatch__body"><strong>Cobalt</strong><code>#477CF8</code><span>Roads and topology</span></div></li>
+<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--signal"></div><div class="wf-swatch__body"><strong>Signal</strong><code>#63EBF4</code><span>Information and annotations</span></div></li>
+<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--flow"></div><div class="wf-swatch__body"><strong>Flow</strong><code>#38F49D</code><span>Selected or traversable flow</span></div></li>
+<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--capacity"></div><div class="wf-swatch__body"><strong>Capacity</strong><code>#F04FA5</code><span>Allocation and containment</span></div></li>
+<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--halt"></div><div class="wf-swatch__body"><strong>Halt</strong><code>#FE536C</code><span>Rejection or exhaustion</span></div></li>
+<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--notice"></div><div class="wf-swatch__body"><strong>Notice</strong><code>#FFEB39</code><span>Proposal or deliberate notice</span></div></li>
+</ul></section>  <section aria-labelledby="type">
+    <h2 id="type">Type and logotype</h2>
+    <p><strong>Sintony</strong> sets every word of interface and prose, at its two distributed weights. <strong>Monaspace Krypton</strong> sets code and byte sequences, with ligatures off so that <code>-&gt;</code>, <code>=&gt;</code>, and <code>::</code> stay distinct. Both are SIL Open Font License faces, served from this site.</p>
+    <p>The logotype is the approved artwork, published as it was drawn rather than retyped or redrawn: lower-case letters built from beam lattices, beside a faceted rhombus. Its near-black ground is keyed to transparency, treating the art as light emitted over black, so its own glow carries it on every surface. The favicon is the rhombus alone.</p>
+    <div class="wf-field__marks">
+      <img src="/wireframe/assets/logos/wordmark-1400.webp" alt="The wireframe wordmark" width="1400" height="357">
+      <img src="/wireframe/assets/logos/symbol-192.webp" alt="The wireframe symbol, a faceted rhombus" width="192" height="192">
+    </div>
+  </section>
+
+<section><h2 id="plates">The plates</h2><p>The Three.js atlas supplies the scenes and their matching stills. Captions describe what each drawing represents. On the home page, choose Play illustration to explore one scene at a time.</p></section></div>{% endblock %}

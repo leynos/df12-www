@@ -88,19 +88,40 @@ flaky network-dependent tests.
    - To refresh the snapshot, run the bump tooling (see `pages bump` BDD
      coverage) which re-syncs release info and rewrites `config/pages.yaml`.
 
-3. **Jinja Rendering from the Snapshot**
+3. **MiniJinja Rendering from the Snapshot**
    - `PageContentGenerator` reads `config/pages.yaml`, fetches the referenced
      Markdown blob via GitHub (respecting releases or branches), and parses it
      into sections.
-   - Jinja templates (`doc_page.jinja`, `docs_index.jinja`, `home_page.jinja`)
-     consume the snapshot data plus parsed Markdown to produce HTML in
-     `public/`.
+   - MiniJinja templates (`doc_page.jinja`, `docs_index.jinja`,
+     `home_page.jinja`) consume the snapshot data plus parsed Markdown to
+     produce HTML in `public/`. Every builder renders through the shared
+     environment in `df12_pages/templating.py`, which owns template loading,
+     per-suffix escaping, the `highlight` filter and the reproducible
+     `SOURCE_DATE_EPOCH` timestamp.
    - Because all HTML is derived from the snapshot + committed documentation,
      reruns are deterministic: the rendered site only changes when GitHub
      content or the snapshot does.
 
 This workflow lets GitHub stay the source of truth for docs while providing a
 checked-in configuration record that guarantees reproducible builds.
+
+### Concurrent document rendering
+
+`PageContentGenerator.render()` renders a bundle into memory as a
+`RenderedDocument`, and `RenderedDocument.write()` publishes it. The
+`_write_documents` helper in `df12_pages/cli.py` renders batches of bundles
+through a `ThreadPoolExecutor` and writes each document in configuration order,
+so the published output does not depend on which worker finished first. The
+pool size comes from `--doc-workers` or `INPUT_DOC_WORKERS` and defaults to
+eight.
+
+### Runtime requirement
+
+The generator requires free-threaded CPython 3.15.2 or newer with the GIL
+disabled. `main()` in `df12_pages/cli.py` checks the interpreter and GIL state
+before parsing arguments, because dependency metadata cannot express that
+requirement. The engine and runtime decision, with its measurements, is
+recorded in [ADR 0001](adrs/adr-0001-minijinja-and-free-threaded-cpython.md).
 
 ## Template variables and site chrome
 
@@ -110,15 +131,19 @@ need to be shared across every page in that sub-site.
 `SubSiteConfig.template_vars`, and the CLI passes that mapping into each
 relevant renderer:
 
-- `ContentPageGenerator` updates the Jinja environment globals for regular
-  sub-site content pages.
-- `SubSiteHomePageBuilder` updates the globals for the sub-site homepage.
-- `SharedContentGenerator` updates the globals for shared-content pages through
-  `SharedContentPageChrome.template_vars`.
+- `ContentPageGenerator` passes `template_vars` as globals to its MiniJinja
+  environment for regular sub-site content pages.
+- `SubSiteHomePageBuilder` passes the same globals for the sub-site homepage.
+- `SharedContentGenerator` passes them through
+  `SharedContentPageChrome.template_vars` for shared-content pages.
 
 That keeps the template context consistent across the Episodic boundary: the
-same site-wide values are available to pages rendered from Jinja templates and
-to shared Markdown pages wrapped in the sub-site chrome.
+same site-wide values are available to pages rendered from MiniJinja templates
+and to shared Markdown pages wrapped in the sub-site chrome. Imported macros
+see the globals too, because `template_environment()` seeds them on the
+environment rather than in one page's render context. The
+[Developer's guide](developers-guide.md#91-the-shared-template-environment)
+describes the environment contract in full.
 
 ## Styling & Semantic Classes
 

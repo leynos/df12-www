@@ -428,12 +428,16 @@ referenced from the
 Code blocks on the Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd
 sub-sites are highlighted at build time by the MiniJinja filter block
 `{% filter highlight(lexer, css_class) %} ... {% endfilter %}`, implemented in
-`df12_pages/jinja_highlight.py`. The filter dedents its body, runs it through
+`df12_pages/jinja_highlight.py`. The filter is `highlight_code()`; an unknown
+lexer alias raises `RuntimeError` naming the alias rather than silently
+rendering unhighlighted text. The filter dedents its body, runs it through
 `pygments.highlight` with the named lexer, and wraps the result in a
 `<div class="hm-syntax">` (or the named class, when a second argument is given)
-using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
-syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
-must be wrapped in `{% raw %}` inside the filter block.
+using `pygments.formatters.html.HtmlFormatter`. A wrapper class that the
+stylesheet makes scrollable (`SCROLLING_CSS_CLASSES`) also receives
+`tabindex="0"`. Source text containing Jinja syntax of its own — every
+`Netsukefile` example with `{{ ins }}` placeholders — must be wrapped in
+`{% raw %}` inside the filter block.
 
 Five Pygments styles supply the colours:
 
@@ -2490,6 +2494,89 @@ bun add -d playwright
 bun x playwright install chromium
 uv run pytest tests/test_stilyagi_focus.py -v
 ```
+
+## 9. Template rendering and document publication
+
+The page builders share one MiniJinja environment, defined in
+`df12_pages/templating.py`, and the documentation builders separate rendering
+from writing so independent bundles can render concurrently without changing
+what is published where. The engine and runtime choice are recorded in
+[ADR 0001](adrs/adr-0001-minijinja-and-free-threaded-cpython.md).
+
+### 9.1. The shared template environment
+
+`template_environment(directory, variables=..., escape_by_suffix=...)` returns
+a MiniJinja `Environment` that loads named templates, imports and includes from
+`directory` with `load_from_path`. Templates load on first use rather than
+eagerly. The environment sets `trim_blocks` and `lstrip_blocks`, registers the
+`highlight`, `forceescape` and `index` filters, and installs a finalizer that
+keeps URL-valued macros comparable to raw `href` values when HTML escaping is
+on.
+
+Escaping is decided per template name, not globally:
+
+- `escape_by_suffix=True` escapes only `.html` and `.xml` templates. The
+  document builder (`PageContentGenerator`) and the docs-index builder use
+  this, because they also load fragments whose suffix should not trigger
+  escaping.
+- `escape_by_suffix=False` escapes every template, including `.jinja`, which is
+  what the sub-site content, homepage, shared-content and chrome builders want.
+
+`variables` populates the environment globals, so imported macros see the same
+site-wide values as the page template that imports them; this is how a
+sub-site's `template_vars` reach both. `render_template(name, **context)`
+renders one named template from that environment and is the only entry point
+the builders use; nothing constructs a standalone `Template` object.
+
+### 9.2. Reproducible build timestamps
+
+`build_timestamp()` returns the UTC instant a page was rendered. When
+`SOURCE_DATE_EPOCH` is set to an integer number of Unix seconds, it returns
+that instant instead of the current time, so repeated builds of the same inputs
+produce byte-identical pages. A non-integer value raises `ValueError` rather
+than silently falling back to the wall clock. The browser capture fixtures set
+the reference epoch (`1790899200`, 2 October 2026) so date-bearing headings
+keep a stable width.
+
+### 9.3. The render and write split
+
+A documentation bundle used to be fetched, rendered and written in one step.
+`PageContentGenerator` now separates the two halves:
+
+- `PageContentGenerator.render()` fetches the upstream Markdown, parses it into
+  sections, builds the navigation model and renders every section into memory.
+  It returns a `RenderedDocument` and touches no output file.
+- `RenderedDocument.write()` creates the output directory, writes the HTML
+  sections in order, then writes the metadata JSON that points the docs index
+  at the first section. Metadata is best effort: an `OSError` there is logged
+  and the published HTML is still returned, because the pointer is a
+  convenience rather than the page itself. A bundle with no sections writes
+  neither HTML nor metadata.
+
+`PageContentGenerator.run()` remains the convenience entry point that calls
+`render().write()` for a single bundle.
+
+### 9.4. Concurrent document workers
+
+`df12_pages.cli._write_documents` renders one site's bundles through a
+`ThreadPoolExecutor` when `--doc-workers` (or `INPUT_DOC_WORKERS`) is greater
+than one. Each worker renders a whole bundle, and the pool is given at most one
+worker-sized batch of pages at a time, so only that many rendered documents are
+held in memory.
+
+Rendering order is not publication order. The pool maps each batch in
+configuration order and every `RenderedDocument` is written as it is yielded,
+so a later-configured bundle always wins a path that two bundles share, even
+when it finished rendering first. Tests in `tests/test_doc_generation.py` pin
+the serial, multi-batch and reverse-completion cases. The effective worker
+count, the bundle count, and each bundle's render and total elapsed time are
+logged at `INFO` through the `df12_pages.cli` logger; a worker failure is
+logged with the page key and re-raised.
+
+The CLI requires free-threaded CPython 3.15.2 or newer with the GIL disabled.
+`main()` checks the interpreter and GIL state before parsing arguments, because
+package version metadata cannot express that requirement. Setup and worker
+overrides are covered in [Build and serve](#2-build-and-serve).
 
 ## femtologging sub-site
 

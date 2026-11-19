@@ -27,9 +27,24 @@ if typ.TYPE_CHECKING:
 REFERENCE_EPOCH = 1790899200
 REFERENCE_EPOCH_UTC = dt.datetime(2026, 10, 2, tzinfo=dt.UTC)
 
-#: Suffixes the escaping property draws from, in both cases.
-ESCAPING_SUFFIXES = st.sampled_from(
-    ("html", "xml", "jinja", "txt", "HTML", "XML", "Jinja", "TXT")
+
+def _case_variants(word: str) -> st.SearchStrategy[str]:
+    """Draw ``word`` with each character independently upper- or lower-cased.
+
+    A property that sampled a fixed list of whole suffixes could never reach a
+    name like ``guide.HtMl``, so it would not prove that the suffix test is
+    case-insensitive.
+    """
+    letters = [st.sampled_from((char.lower(), char.upper())) for char in word]
+    return st.tuples(*letters).map("".join)
+
+
+#: Suffixes the escaping property draws from, in every case combination.
+ESCAPING_SUFFIXES = st.one_of(
+    _case_variants("html"),
+    _case_variants("xml"),
+    _case_variants("jinja"),
+    _case_variants("txt"),
 )
 #: Path-safe template names, so a generated name is legal on every filesystem.
 TEMPLATE_STEMS = st.from_regex(r"[a-z][a-z0-9_-]{0,11}", fullmatch=True)

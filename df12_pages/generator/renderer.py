@@ -12,6 +12,10 @@ import typing as typ
 from html import escape
 
 from markdown import Markdown
+from markdown.extensions.codehilite import CodeHiliteExtension
+from markdown.extensions.fenced_code import FencedCodeExtension
+from markdown.extensions.sane_lists import SaneListExtension
+from markdown.extensions.tables import TableExtension
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
@@ -189,25 +193,24 @@ class HtmlContentRenderer:
         """Convert prepared markdown and restore its Mermaid figures."""
         if not normalized.strip():
             return ""
+        # Instances rather than names: naming an extension makes Python-Markdown
+        # scan every installed distribution's ``entry_points.txt`` through
+        # ``importlib.metadata`` to look the name up. Configuring instances
+        # keeps that filesystem work out of a render.
         extensions: list[Extension | str] = [
-            "fenced_code",
-            "codehilite",
-            "tables",
-            "sane_lists",
+            FencedCodeExtension(),
+            CodeHiliteExtension(
+                linenums=False,
+                guess_lang=False,
+                css_class="codehilite",
+                pygments_style=self.pygments_style,
+            ),
+            TableExtension(),
+            SaneListExtension(),
         ]
         if self._link_extension:
             extensions.append(self._link_extension)
-        md = Markdown(
-            extensions=extensions,
-            extension_configs={
-                "codehilite": {
-                    "linenums": False,
-                    "guess_lang": False,
-                    "css_class": "codehilite",
-                    "pygments_style": self.pygments_style,
-                }
-            },
-        )
+        md = Markdown(extensions=extensions)
         html = md.convert(normalized)
         html = self._annotate_codehilite(html, normalized)
         return self._restore_mermaid_blocks(html, figures)

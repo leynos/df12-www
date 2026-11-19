@@ -1248,43 +1248,20 @@ def test_any_completion_permutation_publishes_in_configuration_order(
         }
 
 
-#: The calls the no-I/O tests forbid: the build clock and the Mermaid CLI.
+#: The calls the no-I/O tests forbid: the clock, the environment and the CLI.
 FORBIDDEN_IN_RENDER = (
     "df12_pages.generator.page_generator.build_timestamp",
     "df12_pages.generator.renderer.subprocess.run",
     "os.getenv",
 )
 
-#: Repository root, so a project file opened during rendering stands out.
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-
-
-def _is_project_file(path: Path) -> bool:
-    """Return whether ``path`` is repository source rather than an installed file.
-
-    Markdown resolves its extensions through :mod:`importlib.metadata`, which
-    reads the ``entry_points.txt`` of every installed distribution each time a
-    :class:`markdown.Markdown` instance is built. That is library import
-    machinery, not document I/O, so installed files and distribution metadata
-    are excluded from the recording. Everything else the repository owns stays
-    in scope.
-    """
-    resolved = path.resolve()
-    if ".venv" in resolved.parts or "site-packages" in resolved.parts:
-        return False
-    if any(part.endswith((".egg-info", ".dist-info")) for part in resolved.parts):
-        return False
-    return resolved.is_relative_to(PROJECT_ROOT)
-
 
 @contextmanager
 def _watched(monkeypatch: pytest.MonkeyPatch) -> typ.Iterator[list[str]]:
-    """Record project-file reads and reject the build clock and the Mermaid CLI.
+    """Record file reads and reject the build clock, environment and Mermaid CLI.
 
-    Yields the list of repository files opened, so a test can assert on it once
-    the watched work has returned. Installed packages are left out of the
-    recording, since building a Markdown parser reads their metadata; see
-    :func:`_is_project_file`.
+    Yields the list of files read, so a test can assert on it once the watched
+    work has returned.
     """
     reads: list[str] = []
     original_read_text = Path.read_text
@@ -1293,15 +1270,13 @@ def _watched(monkeypatch: pytest.MonkeyPatch) -> typ.Iterator[list[str]]:
     def _record_read(
         self: Path, encoding: str | None = None, errors: str | None = None
     ) -> str:
-        """Record a project-file text read and still perform it."""
-        if _is_project_file(self):
-            reads.append(str(self))
+        """Record a text read and still perform it."""
+        reads.append(str(self))
         return original_read_text(self, encoding=encoding, errors=errors)
 
     def _record_read_bytes(self: Path) -> bytes:
-        """Record a project-file byte read and still perform it."""
-        if _is_project_file(self):
-            reads.append(str(self))
+        """Record a byte read and still perform it."""
+        reads.append(str(self))
         return original_read_bytes(self)
 
     def _forbidden(*_args: object, **_kwargs: object) -> typ.NoReturn:

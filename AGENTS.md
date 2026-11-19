@@ -46,9 +46,10 @@ is authored directly as HTML.
 - **`config/pages.yaml`** is the single source of layout and copy data. It
   defines the main site's homepage, about page, and documentation bundles, and a
   `sites:` mapping that configures each sub-site (`mxd`, `episodic`, `netsuke`,
-  `weaver`, `stilyagi`, `cuprum`, `rstest-bdd`, `femtologging`). A sub-site
-  entry declares its `output_dir`, `templates_dir`, `stylesheet`, `base_path`,
-  theme metadata, navigation links, shared-content pages, and content pages.
+  `weaver`, `stilyagi`, `cuprum`, `rstest-bdd`, `femtologging`, `wireframe`).
+  A sub-site entry declares its `output_dir`, `templates_dir`, `stylesheet`,
+  `base_path`, theme metadata, navigation links, shared-content pages, and
+  content pages.
 - **`config/shared/*.md`** holds copy shared across sub-sites — the privacy
   policy, terms of use, and code of conduct. Each sub-site opts in through its
   `shared_content` list and renders the same Markdown through its own chrome.
@@ -101,6 +102,7 @@ Every published file therefore has a source elsewhere in the repository:
 | `*/assets/js/*.js`                            | swc compiling `src/static/**/assets/js/*.ts`          |
 | `netsuke/assets/search/*.json`                | `scripts/build-netsuke-search-index.mjs`              |
 | `femtologging/assets/styles/femtologging.css` | Tailwind compiling `src/styles/`                      |
+| `wireframe/assets/styles/wireframe.css`       | Tailwind compiling `src/styles/`                      |
 | everything else                               | `src/static/`, copied by `scripts/copy-static.ts`     |
 
 To add an asset, put it in `src/static/` at the path it should occupy in the
@@ -142,16 +144,17 @@ clean rebuild is the check that everything really is sourced from `src/`.
 
 ## Styling
 
-The site uses **Tailwind CSS v4** with **daisyUI v5**. Nine entrypoints are
+The site uses **Tailwind CSS v4** with **daisyUI v5**. Ten entrypoints are
 compiled: `src/styles/site.css` for the main site (the `df12` theme, with
 `dracula` for dark mode), `src/styles/mxd.css` for the mxd sub-site (the `mxd`
 theme), `src/styles/episodic.css` for Episodic (the `episodic` theme),
 `src/styles/weaver.css` for Weaver (the `weaver` theme),
 `src/styles/stilyagi.css` for Stilyagi (the `stilyagi` theme),
 `src/styles/netsuke.css` for Netsuke (the `netsuke` theme),
-`src/styles/cuprum.css` for Cuprum (the `cuprum` theme), and
-`src/styles/rstest-bdd.css` for rstest-bdd (the `rstest-bdd` theme), and
-`src/styles/femtologging.css` for femtologging (the `femto` theme).
+`src/styles/cuprum.css` for Cuprum (the `cuprum` theme),
+`src/styles/rstest-bdd.css` for rstest-bdd (the `rstest-bdd` theme),
+`src/styles/femtologging.css` for femtologging (the `femto` theme), and
+`src/styles/wireframe.css` for wireframe (the `wireframe` theme).
 
 Weaver's entrypoint is the one to read first when adding a sub-site stylesheet,
 and Episodic's follows the same shape. It declares the theme, then imports
@@ -252,6 +255,29 @@ links identify the verified revision. Sample files and their downloads must
 stay byte-identical. See [femtologging sub-site](docs/femtologging-site.md) for
 provenance and checks.
 
+wireframe follows the Common Signal identity, "Wireframe | Visual identity and
+design language" v0.4: a civic network in X-Y vector geometry on a near-black
+field, the seven-role palette of responsibility (void, cobalt, signal, flow,
+capacity, halt, notice; one job each), Sintony for every word, and Monaspace
+Krypton for code. Its classes carry a `wf-` prefix. The logotype, symbol, and
+favicons are the supplied raster artwork, keyed to alpha by
+`scripts/build_wireframe_logo_assets.py`; a test holds them to recorded hashes,
+so do not redraw, recolour, or re-encode them. The home page keeps its sections
+in their order; the identity restyles them in place. Its plates are Three.js
+scenes from `leynos/wireframe-3js`, vendored at a pin with their posters by
+`make wireframe-plates` (see `scripts/import_wireframe_plates.py` and its local
+patch). `plates.ts` plays them without a Play gate or other controls under
+ordinary motion, and shows posters with a Play control under reduced motion.
+Every working example is cut, by mdBook `ANCHOR` markers, from the Cargo
+package under `templates/wireframe/samples/`, and `make wireframe-samples`
+compiles and runs it against the release named by `wireframe_version`. The site
+documents 0.4.0-alpha1 ahead of its publication, so that target fails and the
+site must not be deployed until the tag and crates exist; `wireframe_published`
+records the state, and [wireframe sub-site](docs/wireframe-site.md) lists what
+to change at publication. The library's users' guide and migration guide are
+audited and tested, so check a claim against them and the source before
+changing it.
+
 ### Prefer semantic classes over literal colours
 
 Colour belongs in the theme, not in the markup. Define it once as a daisyUI
@@ -330,8 +356,9 @@ understand and more to maintain than the one above it.
 
    Prefer the light DOM. The sub-sites' stylesheets style their markup
    directly, and a shadow root would cut an element off from them for no gain
-   the site currently needs. Nothing uses custom elements today, so the first
-   one sets the pattern: justify it in the pull request.
+   the site currently needs. The one exception is vendored: wireframe's
+   `<wireframe-plate>` owns a WebGL canvas in its shadow root, and its poster,
+   controls, and caption stay in the light DOM beside it.
 
 Do not reach for a front-end framework. The site is statically generated and
 ships no client-side framework; introducing one is an architectural decision,

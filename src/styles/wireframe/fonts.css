@@ -1,0 +1,48 @@
+/* Self-hosted faces for the wireframe sub-site.
+ *
+ * The identity specification divides the work three ways: the drawn vector
+ * wordmark for identity, Sintony for every word of interface and prose, and
+ * Monaspace Krypton for code and byte sequences. Both typefaces are SIL Open
+ * Font License 1.1; the files are the Fontsource 5.3.0 Latin builds, and the
+ * licences sit beside them under src/static/wireframe/assets/fonts/.
+ *
+ * Sintony ships at 400 and 700 only, so no other weight is declared and the
+ * base layer turns off synthesis. Krypton is served at 400 for code and 600
+ * for deliberate emphasis.
+ *
+ * Every face is served from this origin, so loading a page discloses no
+ * address to a third party. URLs are absolute because this file is inlined
+ * into the compiled stylesheet.
+ */
+
+@font-face {
+  font-family: Sintony;
+  src: url("/wireframe/assets/fonts/sintony-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Sintony;
+  src: url("/wireframe/assets/fonts/sintony-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Monaspace Krypton";
+  src: url("/wireframe/assets/fonts/monaspace-krypton-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Monaspace Krypton";
+  src: url("/wireframe/assets/fonts/monaspace-krypton-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}

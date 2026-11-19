@@ -378,6 +378,7 @@ Every published file has a source elsewhere in the repository:
 | `netsuke/assets/css/himotoshi.css`        | Tailwind compiling `src/styles/`                                              |
 | `cuprum/assets/styles/cuprum.css`         | Tailwind compiling `src/styles/`                                              |
 | `rstest-bdd/assets/styles/rstest-bdd.css` | Tailwind compiling `src/styles/`                                              |
+| `wireframe/assets/styles/wireframe.css`   | Tailwind compiling `src/styles/`                                              |
 | `images/*.webp`, `images/*.avif`          | `scripts/generate-image-variants.ts`                                          |
 | `*/assets/js/*.js`                        | `scripts/compile-browser-scripts.ts` compiling `src/static/**/assets/js/*.ts` |
 | `netsuke/assets/search/*.json`            | `scripts/build-netsuke-search-index.mjs`                                      |
@@ -601,6 +602,7 @@ block outright, so a run restores it without needing the previous content.
 | Stilyagi   | `StilyagiStyle`  | `python`                                           | `stilyagi-syntax` | `--stilyagi-syntax-` | `700`       | `src/static/stilyagi/assets/styles/syntax.css`   |
 | Cuprum     | `CuprumStyle`    | `python`, `console`                                | `cuprum-syntax`   | `--cuprum-syntax-`   | `600`       | `src/static/cuprum/assets/styles/syntax.css`     |
 | rstest-bdd | `LanternStyle`   | `rust`, `gherkin`, `toml`, `console`               | `lantern-syntax`  | `--lantern-syntax-`  | `600`       | `src/static/rstest-bdd/assets/styles/syntax.css` |
+| wireframe  | `SignalStyle`    | `rust`, `toml`                                     | `wf-syntax`       | `--wf-syntax-`       | `600`       | `src/styles/wireframe/syntax.css`                |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
 in a `{% highlight %}` tag, and the generator parameters that produce each
@@ -1423,6 +1425,54 @@ the footer's `footer_art` block, which credits the illustrations, and
 `tests/test_rstest_bdd_browser.py`, marked `playwright`, runs axe over every
 page at 390 and 1440 pixels, checks that no page scrolls sideways at 320
 pixels, and drives the storybook.
+
+### 5.10. wireframe's logotype, plates, samples, and copy controls
+
+The wireframe sub-site at `/wireframe/` follows the Common Signal identity;
+[wireframe sub-site](wireframe-site.md) records it, the release facts the copy
+rests on, and the provenance of the art. Four mechanisms are specific to it.
+
+- **Keyed logotype.** `scripts/build_wireframe_logo_assets.py` derives the
+  lockup, wordmark, symbol, and favicons in
+  `src/static/wireframe/assets/logos/` from the supplied raster master, keying
+  its black ground to alpha. Pass it the master's path; numpy and Pillow are
+  dev dependencies for it. `test_the_logo_is_the_supplied_artwork` holds every
+  brand image to the keyed files, and `test_the_protected_logos_are_unchanged`
+  holds the files to `tests/fixtures/wireframe-logos.sha256`.
+- **Plates.** Every illustration is a Three.js scene from
+  `leynos/wireframe-3js`.
+  `make wireframe-plates WIREFRAME_3JS_SOURCE=../wireframe-3js` exports the pin
+  in `scripts/import_wireframe_plates.py`, applies
+  `scripts/wireframe-plates/*.patch`, builds it with the source's own
+  `make build`, and vendors the self-contained module and the chosen posters
+  under `src/static/wireframe/assets/vendor/plates/` with a `PROVENANCE.txt` of
+  hashes. `make check-wireframe-plates` rebuilds and compares.
+  `templates/wireframe/data/plates.jinja` catalogues each plate's title, alt
+  text, caption, and status, and the `plate` macro renders the poster, hidden
+  controls, and caption. `plates.ts`, a classic script, imports the module on
+  demand and mounts `<wireframe-plate>` over the poster: on load for the hero
+  and on intersection for the rest under ordinary motion, and only on a Play
+  click under reduced motion, through the local `allow-motion` patch. It is
+  rung 6 because the scene is a vendored custom element with its own canvas
+  lifecycle; the site's own code stays a rung-5 script.
+- **Anchored samples.** `_code.jinja`'s `code(file, anchor)` macro includes a
+  file from the Cargo package under `templates/wireframe/samples/` and keeps
+  the lines between `// ANCHOR: name` and `// ANCHOR_END: name`.
+  `test_every_sample_panel_is_a_run_of_its_sample` and
+  `test_every_anchor_a_panel_names_exists` hold panels and anchors to the
+  files, and `make wireframe-samples` compiles and runs the package. Until
+  0.4.0-alpha1 is published that target fails, and the samples run through a
+  scratch patch instead; see [wireframe sub-site](wireframe-site.md).
+- **Copy controls.** `copy-code.ts` is rstest-bdd's copy button with
+  `data-wf-copy` attributes and no telemetry hook. Command panels draw their
+  `$` prompt in CSS, so it never reaches the clipboard.
+
+`_code.jinja` is kept apart from `components.jinja` because the shared
+legal-page renderer does not load the `highlight` extension, and the layout
+imports `components.jinja` on every page, legal notices included.
+`tests/test_wireframe_browser.py`, marked `playwright`, runs axe over every
+page at 390 and 1440 pixels, checks that no page scrolls sideways at 320, and
+drives the plate runtime in both motion modes.
 
 ## 6. Browser-side components
 
@@ -2254,10 +2304,14 @@ captured renders as `tests/support/netsuke_baseline.json` records — a SHA-256
 of each page's normalized computed-style tree, the same normalization `diff`
 compares with, at each width, with the build date the forthcoming pages stamp
 into a heading redacted first; and that `shots --site netsuke` runs end to end.
-A page that renders differently fails the baseline test by name; capture the
-last good commit and this one and `diff` them to see what moved, and once the
-change is meant, rerun the test with `NETSUKE_BASELINE_UPDATE=1` to rewrite the
-record in the same commit. Run the suite alone with:
+Redaction reaches only the date's text, and its width still moves the bounding
+boxes, so `built_site` also builds under a pinned `SOURCE_DATE_EPOCH`
+(`tests/support/pinned_build.py`) and the test gives the same answer on any day.
+`df12_pages/build_clock.py` is the generator's one reading of the time. A page
+that renders differently fails the baseline test by name; capture the last good
+commit and this one and `diff` them to see what moved, and once the change is
+meant, rerun the test with `NETSUKE_BASELINE_UPDATE=1` to rewrite the record in
+the same commit. Run the suite alone with:
 
 ```bash
 uv run pytest tests/test_netsuke_browser.py -v

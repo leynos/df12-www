@@ -1,0 +1,790 @@
+/* The home page: the hero and its plate, the three steps, the journey, the
+ * capabilities, the scope world, the mxd band, installation, and the
+ * tagline, in that order. Every rule is scoped by a section class, because
+ * every page shares this one sheet.
+ *
+ * The sections are the site's own; the Common Signal identity (v0.4)
+ * restyles them in place. The four movements of the mood book are a visual
+ * vocabulary across these sections, not new ones. */
+
+/* The hero. The proposition on the left; Plate 27 on the right, lit from
+   behind by a wide, faint cobalt bloom. The bloom sits behind the plate,
+   never behind the copy. */
+.wf-hero {
+  position: relative;
+  padding-block: 3rem 2.5rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-rule);
+  background:
+    radial-gradient(
+      ellipse 55% 60% at 78% 42%,
+      color-mix(in oklab, var(--color-cobalt) 16%, transparent),
+      transparent 70%
+    ),
+    var(--color-void);
+}
+
+.wf-hero__grid {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (width >= 1024px) {
+  .wf-hero {
+    padding-block: 4rem 3rem;
+  }
+
+  .wf-hero__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 2.5rem;
+  }
+}
+
+/* The editorial marque: real text, small, beside the product mark rather
+   than competing with it. */
+.wf-marque {
+  margin: 0 0 1rem;
+  color: var(--color-ink-muted);
+  font: 700 0.8125rem / 1.5 var(--font-sans);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.wf-marque span:first-child {
+  color: var(--color-signal);
+}
+
+.wf-marque span[aria-hidden] {
+  margin-inline: 0.4em;
+}
+
+.wf-hero__title {
+  margin: 0;
+}
+
+/* The wordmark is the supplied artwork, unchanged and unanimated. */
+.wf-hero__title img {
+  width: min(100%, 38rem);
+  height: auto;
+
+  /* The keyed master's halo runs to the crop edge; pull the box in so the
+   * letters, not the glow, align with the copy below. */
+  margin-inline-start: -1.1rem;
+}
+
+/* The principal tagline, set as a statement. */
+.wf-hero__line {
+  margin: 1.25rem 0 0;
+  color: var(--color-ink);
+  font: 700 clamp(1.75rem, 1.2rem + 2vw, 2.5rem) / 1.15 var(--font-display);
+  text-wrap: balance;
+}
+
+.wf-hero__deck {
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+  font-size: 1.125rem;
+}
+
+/* The release status is a deliberate notice, so it takes the notice rule.
+   It sits under the actions, quieter than the proposition above it. */
+.wf-hero__status {
+  max-width: 34rem;
+  margin: 1.5rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-notice);
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+}
+
+.wf-hero__status strong {
+  color: var(--color-ink);
+}
+
+.wf-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+/* The foundation line above the capability row. */
+.wf-foundation {
+  max-width: 48rem;
+  margin: 3rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-foundation strong {
+  color: var(--color-ink);
+}
+
+/* The capability row: four API nouns with their glyphs, as links. */
+.wf-capability-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 1rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width >= 1024px) {
+  .wf-capability-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.wf-capability-row a {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.wf-capability-row .wf-label {
+  color: var(--color-signal);
+}
+
+.wf-capability-row a:hover .wf-label {
+  text-decoration: underline;
+}
+
+.wf-capability-row__icon {
+  color: var(--color-signal);
+  font-size: 2.25rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-signal) 45%, transparent));
+}
+
+/* The readout: release facts as instrument data, in the code face. */
+.wf-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  margin: 2.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-rule);
+  font: 400 0.8125rem / 1.5 var(--font-mono);
+}
+
+.wf-readout div {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.wf-readout dt {
+  color: var(--color-ink-dim);
+}
+
+.wf-readout dd {
+  margin: 0;
+  color: var(--color-signal);
+}
+
+/* The three steps: numbered panels with cobalt corner ticks, as on an
+   instrument bezel. Two hold working examples; the third, Plate 28. */
+.wf-steps {
+  padding-block: 4rem;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+/* The three panels run wider than the page column, so the working examples
+   have room to breathe. */
+.wf-steps > .wf-shell {
+  max-width: 105rem;
+}
+
+.wf-steps__grid {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (width >= 1024px) {
+  .wf-steps__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+}
+
+.wf-panel {
+  --wf-tick: var(--color-cobalt);
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--color-rule);
+  background:
+    linear-gradient(var(--wf-tick), var(--wf-tick)) top left / 12px 1px no-repeat,
+    linear-gradient(var(--wf-tick), var(--wf-tick)) top left / 1px 12px no-repeat,
+    linear-gradient(var(--wf-tick), var(--wf-tick)) top right / 12px 1px no-repeat,
+    linear-gradient(var(--wf-tick), var(--wf-tick)) top right / 1px 12px no-repeat,
+    linear-gradient(var(--wf-tick), var(--wf-tick)) bottom left / 12px 1px no-repeat,
+    linear-gradient(var(--wf-tick), var(--wf-tick)) bottom left / 1px 12px no-repeat,
+    linear-gradient(var(--wf-tick), var(--wf-tick)) bottom right / 12px 1px no-repeat,
+    linear-gradient(var(--wf-tick), var(--wf-tick)) bottom right / 1px 12px no-repeat,
+    var(--color-surface);
+}
+
+.wf-panel__title {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  margin: 0.25rem 0.25rem 0.75rem;
+  color: var(--color-ink);
+  font: 700 0.875rem / 1.4 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-panel__title span {
+  color: var(--color-signal);
+  font-family: var(--font-mono);
+}
+
+.wf-panel .wf-code {
+  flex: 1;
+}
+
+/* The third panel's plate fills the panel; its caption carries the legend
+   the old drawing kept beneath it. */
+.wf-panel--reduction .wf-plate {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.wf-steps__proof {
+  max-width: 48rem;
+  margin: 1.5rem 0 0;
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+/* The journey: a sticky introduction beside a vertical track of stations.
+   The rail is the glowing trace of the original scope site, kept at the
+   owner's request: an amber core with a phosphor halo, a brighter pulse
+   running down it, and stations that light as the section scrolls past.
+   Under reduced motion it is lit from the start and does not move. */
+.wf-journey {
+  padding-block: 5rem;
+}
+
+.wf-journey__grid {
+  display: grid;
+  gap: 3rem;
+}
+
+@media (width >= 1024px) {
+  .wf-journey__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+  }
+
+  .wf-journey__intro {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+.wf-journey h2,
+.wf-capabilities h2,
+.wf-band h2,
+.wf-install h2 {
+  margin: 0;
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+}
+
+.wf-journey__intro p {
+  max-width: 36rem;
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-journey__intro .wf-journey__note {
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-signal);
+  font-size: 0.9375rem;
+}
+
+.wf-arrow-link {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  font-weight: 700;
+}
+
+.wf-track {
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0 0 0 2.25rem;
+  list-style: none;
+}
+
+/* The rail, unlit. */
+.wf-track::before {
+  position: absolute;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  width: 2px;
+  background: var(--color-rule);
+  content: "";
+}
+
+/* The rail, lit: an amber core, a hot pulse, and a three-layer halo. */
+.wf-track::after {
+  position: absolute;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  width: 2px;
+  background-color: var(--color-trace);
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklab, var(--color-trace) 30%, white) 50%,
+    transparent
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 7rem;
+  box-shadow:
+    0 0 4px color-mix(in oklab, var(--color-trace) 90%, transparent),
+    0 0 14px color-mix(in oklab, var(--color-trace) 55%, transparent),
+    0 0 32px color-mix(in oklab, var(--color-trace) 25%, transparent);
+  content: "";
+  transform-origin: top;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wf-track::after {
+    animation: wf-rail-pulse 2.8s linear infinite;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .wf-track::after {
+      animation:
+        wf-rail-pulse 2.8s linear infinite,
+        wf-light-rail linear both;
+      animation-range:
+        normal,
+        entry 40% cover 70%;
+      animation-timeline: auto, view();
+    }
+
+    /* Each station lights as it crosses the middle of the viewport. */
+    .wf-track__node {
+      animation: wf-node-ignite linear both;
+      animation-range: cover 30% cover 50%;
+      animation-timeline: view();
+    }
+  }
+}
+
+@keyframes wf-rail-pulse {
+  from {
+    background-position: 0 -7rem;
+  }
+
+  to {
+    background-position: 0 calc(100% + 7rem);
+  }
+}
+
+@keyframes wf-light-rail {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes wf-node-ignite {
+  0% {
+    border-color: var(--color-cobalt);
+    box-shadow: 0 0 0 transparent;
+  }
+
+  100% {
+    border-color: var(--color-trace);
+    box-shadow: 0 0 10px var(--color-trace);
+  }
+}
+
+/* The track's stations. */
+.wf-track__stop {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.wf-track__stop:last-child {
+  padding-bottom: 0;
+}
+
+/* A station node: a small rhombus, the routing-junction shape, lit with
+   the trace (or, while the rail lights, drawn in structure first). */
+.wf-track__node {
+  position: absolute;
+  top: 0.35rem;
+  left: -2.1rem;
+  z-index: 1;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid var(--color-trace);
+  background: var(--color-void);
+  transform: rotate(45deg);
+}
+
+/* An optional station is dashed, so it reads as optional without colour. */
+.wf-track__stop--optional .wf-track__node {
+  border-style: dashed;
+  border-color: var(--color-signal);
+}
+
+.wf-track__stop .wf-label {
+  margin: 0;
+  color: var(--color-signal);
+}
+
+.wf-track__tag {
+  margin-left: 0.4rem;
+  padding: 0 0.35rem;
+  border: 1px dashed var(--color-signal);
+  color: var(--color-signal);
+}
+
+.wf-track__stop h3 {
+  margin: 0.3rem 0 0;
+  font-size: 1.25rem;
+}
+
+.wf-track__stop p:last-child {
+  max-width: 38rem;
+  margin: 0.4rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+/* Capabilities: a bento of six cells with exactly six cells of content.
+   Text cells, raised cells, a byte diagram, and one plate keep it from
+   reading as six identical cards. Five cells are links in their entirety;
+   the plate cell holds playback buttons, which cannot sit inside a link,
+   so its heading carries the link instead. */
+.wf-capabilities {
+  padding-block: 5rem;
+}
+
+.wf-bento {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Six cells, exactly filled: at two columns the codec and plate cells span
+   the row; at four, the codec cell takes a 2 x 2 block beside four single
+   cells, and the plate cell spans the last row. */
+@media (width >= 768px) {
+  .wf-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wf-bento__cell--codec,
+  .wf-bento__cell--image {
+    grid-column: span 2;
+  }
+}
+
+@media (width >= 1024px) {
+  .wf-bento {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .wf-bento__cell--codec {
+    grid-row: span 2;
+  }
+
+  .wf-bento .wf-bento__cell--image {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+  }
+
+  .wf-bento .wf-bento__cell--image .wf-bento__copy {
+    padding: 1.5rem 2rem;
+  }
+}
+
+.wf-bento__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid var(--color-rule);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: border-color 160ms ease-out;
+}
+
+a.wf-bento__cell:hover,
+.wf-bento__cell:has(h3 a:hover) {
+  border-color: var(--color-signal);
+}
+
+.wf-bento__cell--raised {
+  background: var(--color-raised);
+}
+
+.wf-bento__cell h3 {
+  margin: 0;
+  font-size: 1.1875rem;
+}
+
+.wf-bento__cell h3 a {
+  color: var(--color-ink);
+  text-decoration-color: var(--color-flow);
+}
+
+.wf-bento__cell p {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: 0.9688rem;
+}
+
+.wf-bento__icon {
+  color: var(--color-signal);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.wf-bento__cell--image {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* The plate's own words keep the cell's inset. */
+.wf-bento__cell--image .wf-plate__controls,
+.wf-bento__cell--image .wf-plate__caption {
+  padding-inline: 1.5rem;
+}
+
+.wf-bento__cell--image .wf-plate__caption {
+  padding-bottom: 1.25rem;
+}
+
+.wf-bento__copy {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.5rem;
+}
+
+/* A proposal named at the point of use: a dashed notice rule and the word
+   "Proposed", so the status never depends on colour. */
+.wf-proposal {
+  margin-top: 0.4rem;
+  padding-left: 0.85rem;
+  border-left: 2px dashed var(--color-notice);
+}
+
+.wf-bento__cell .wf-proposal p {
+  margin-top: 0.25rem;
+  font-size: 0.9375rem;
+}
+
+.wf-proposal__label {
+  color: var(--color-notice);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* The default frame drawn as bytes: the length prefix in signal, the
+   payload beyond it. Real values: 12 bytes of bincode envelope follow. */
+.wf-frame-diagram {
+  display: flex;
+  margin-top: auto;
+  overflow: hidden;
+  border: 1px solid var(--color-signal);
+  font: 400 0.8125rem / 1 var(--font-mono);
+  white-space: nowrap;
+}
+
+.wf-frame-diagram__len {
+  flex: none;
+  padding: 0.7rem 0.75rem;
+  border-right: 1px solid var(--color-signal);
+  background: color-mix(in oklab, var(--color-signal) 12%, var(--color-surface));
+  color: var(--color-signal);
+}
+
+.wf-frame-diagram__body {
+  padding: 0.7rem 0.75rem;
+  overflow: hidden;
+  color: var(--color-ink-muted);
+  text-overflow: clip;
+}
+
+.wf-bento__caption {
+  font-size: 0.875rem;
+}
+
+/* The codecs that ship as worked examples, by header shape. */
+.wf-bento__list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-bento__list li {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-rule);
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+.wf-bento__list strong {
+  color: var(--color-ink);
+}
+
+/* The cityscape fly-through: Plate 29, full width, between the bento and
+   the mxd band. */
+.wf-flythrough {
+  padding-bottom: 4rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+/* The mxd band. */
+.wf-band {
+  padding-block: 4rem;
+  border-block: 1px solid var(--color-rule);
+  background: var(--color-raised);
+}
+
+.wf-band__grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (width >= 1024px) {
+  .wf-band__grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+  }
+}
+
+.wf-band p {
+  max-width: 40rem;
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-band__facts {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+}
+
+.wf-band__facts div {
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-cobalt);
+}
+
+.wf-band__facts dt {
+  color: var(--color-ink-muted);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-band__facts dd {
+  margin: 0.2rem 0 0;
+  color: var(--color-ink);
+}
+
+/* Installation. */
+.wf-install {
+  padding-block: 5rem 0;
+}
+
+.wf-install__grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (width >= 1024px) {
+  .wf-install__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+  }
+}
+
+.wf-install__grid > div > p {
+  margin: 1rem 0 0;
+  color: var(--color-ink-muted);
+}
+
+.wf-install__code {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.wf-install__actions {
+  margin-top: 1.5rem;
+}
+
+/* The tagline: the principal line, once more, between crosshairs. It is
+   sentence case, as written, and not tracked. */
+.wf-tagline {
+  padding-block: 2.5rem;
+  border-top: 1px solid var(--color-rule);
+}
+
+.wf-tagline p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-block: 0;
+  color: var(--color-ink);
+  font: 700 clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem) / 1.4 var(--font-sans);
+  text-align: center;
+}
+
+.wf-tagline p::before,
+.wf-tagline p::after {
+  flex: 1 1 4rem;
+  height: 1px;
+  background:
+    linear-gradient(var(--color-signal), var(--color-signal)) left center / 1px 9px no-repeat,
+    linear-gradient(var(--color-rule), var(--color-rule)) center / 100% 1px no-repeat;
+  content: "";
+}
+
+.wf-tagline p::after {
+  background:
+    linear-gradient(var(--color-signal), var(--color-signal)) right center / 1px 9px no-repeat,
+    linear-gradient(var(--color-rule), var(--color-rule)) center / 100% 1px no-repeat;
+}

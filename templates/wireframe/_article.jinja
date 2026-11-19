@@ -1,0 +1,28 @@
+{#- The article layout for getting started, the guides, and architecture: a
+    page head, then a side rail (this page's sections and the guide list)
+    beside a reading column held to a 68 to 82 character measure. Pages set
+    `article` from data/pages.jinja and fill `article_body`. -#}
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% from 'data/pages.jinja' import catalogue, guides %}
+{% macro local_navigation() -%}
+<nav aria-label="On this page"><p class="wf-label">On this page</p><ul class="wf-toc">{% for section in article.sections %}<li><a href="#{{ section.id }}">{{ section.title }}</a></li>{% endfor %}</ul></nav>
+<nav aria-label="Guides"><p class="wf-label">Guides</p><ul class="wf-toc wf-toc--guides">{% for key in guides %}{% set item = catalogue[key] %}<li><a href="/wireframe/{{ item.slug }}/"{% if item.key == article.key %} aria-current="page"{% endif %}>{{ item.title }}</a></li>{% endfor %}</ul></nav>
+{%- endmacro %}
+{% block title %}{{ article.title }} · wireframe{% endblock %}
+{% block description %}{{ article.intro }}{% endblock %}
+{% block content %}
+{{ ui.page_head(crumbs, article.title, article.intro, plate_key) }}
+<div class="wf-shell wf-article-grid">
+  <aside class="wf-aside">
+    <div class="wf-aside__rail">{{ local_navigation() }}</div>
+    <details class="wf-aside__menu"><summary>Contents and guides</summary>{{ local_navigation() }}</details>
+  </aside>
+  <article class="wf-article">
+    {% block article_body %}{% endblock %}
+    <footer class="wf-article__foot">
+      <p><span class="wf-label">Sources</span> <a href="{{ source_base }}/{{ article.source }}">Upstream: {{ article.source }} at {{ wireframe_tag }}</a> · <a href="{{ docs_url }}{{ article.docs }}">API reference on docs.rs</a> · <a href="{{ repository_url }}/issues">Report a documentation issue</a></p>
+    </footer>
+  </article>
+</div>
+{% endblock %}

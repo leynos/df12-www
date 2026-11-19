@@ -1,0 +1,77 @@
+{% extends '_layout.jinja' %}
+{% import 'components.jinja' as ui with context %}
+{% block title %}Common Signal: how this site is drawn · wireframe{% endblock %}
+{% block description %}How the wireframe site is drawn: the Common Signal series, its palette of responsibility, the Three.js plates and how they move, the typefaces, and the logotype.{% endblock %}
+{% block content %}
+{#- The section IDs are the ones this page had when it described the scope,
+    so older links still land on the matching part. -#}
+{% set vocabulary = [
+  ('Wire bytes', 'Transport input and output', 'Discrete signals along a marked conduit'),
+  ('Frame', 'A unit a FrameCodec emits or consumes', 'A bounded contour, or a gated length of channel'),
+  ('Envelope', 'The routable message: an ID, an optional correlation ID, a payload', 'A labelled header band, distinct from the frame around it'),
+  ('Router', 'Selection of one handler by message ID', 'A junction with one selected exit'),
+  ('Handler', 'Application work a route selects', 'A named destination'),
+  ('Middleware', 'Work around a route’s handler, in and out', 'Ordered checkpoints at the junction'),
+  ('Budget', 'A declared limit, with units, scope, and what happens at it', 'A gauge or boundary, marked illustrative unless measured'),
+] %}
+{% set palette = [
+  ('void', 'Void', '#040911', 'The quiet field and negative space', 'Ground'),
+  ('surface', 'Surface', '#0b1928', 'Panels, code, and captions', 'Ground'),
+  ('raised', 'Raised', '#11283a', 'A panel inside a panel', 'Ground'),
+  ('ink', 'Text', '#edf6ff', 'Body and interface copy', '18.27:1 on void, 13.85:1 on raised'),
+  ('ink-muted', 'Muted text', '#bed0de', 'Secondary explanation', '12.61:1 on void, 9.55:1 on raised'),
+  ('cobalt', 'Cobalt', '#477cf8', 'Structure, roads, frames, topology', '5.23:1 on void; 3.97:1 on raised, so never small text there'),
+  ('signal', 'Signal', '#63ebf4', 'Active information, labels, focus', '13.99:1 on void, 10.60:1 on raised'),
+  ('flow', 'Flow', '#38f49d', 'The route actually taken, and links', '13.87:1 on void, 10.51:1 on raised'),
+  ('capacity', 'Capacity', '#f04fa5', 'Allocation, containment, budgets', '6.05:1 on void, 4.59:1 on raised'),
+  ('halt', 'Halt', '#fe536c', 'A real stop, rejection, or failure', '6.34:1 on void, 4.80:1 on raised'),
+  ('notice', 'Notice', '#ffeb39', 'Deliberate notices and proposals', '16.34:1 on void, 12.38:1 on raised'),
+] %}
+{{ ui.page_head([], 'Common Signal', 'How this site is drawn: a civic network in X-Y vector geometry, a palette in which every colour has one job, and plates that move only as the visitor allows.') }}
+<div class="wf-shell wf-landing wf-field">
+  <section aria-labelledby="metaphor">
+    <h2 id="metaphor">A public machine</h2>
+    <p class="wf-landing__lede">Common Signal is the editorial series this site belongs to. It draws a network as a city: roads, crossings, and destinations, laid out deliberately and lit where something means something. The conceit has one job, which is to make the mechanisms easier to see. Shared foundations, explicit rules, finite capacity, and the care that keeps a system working are civic virtues as much as engineering ones. What we connect, we should understand.</p>
+    <p>The city is a setting, not a product. wireframe is a Rust library; it does not run a city, a cloud, or a network operations centre. Where the analogy would mislead, it stops, and every technical figure uses the library&rsquo;s own stages and types.</p>
+    <div class="wf-table-scroll" tabindex="0" role="region" aria-label="The civic vocabulary and what it stands for"><table class="wf-field__table">
+      <thead><tr><th scope="col">Concept</th><th scope="col">In wireframe</th><th scope="col">As drawn</th></tr></thead>
+      <tbody>{% for concept, lib, drawn in vocabulary %}<tr><td>{{ concept }}</td><td>{{ lib }}</td><td>{{ drawn }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+    <p>A routed message selects one handler. No figure shows one route splitting between handlers, because wireframe does not broadcast.</p>
+  </section>
+
+  <section aria-labelledby="beams">
+    <h2 id="beams">The palette of responsibility</h2>
+    <p>Seven colours from the Common Signal mood book, each with one job. Void is the ground, cobalt draws the world, signal makes information legible, and flow marks the chosen path. Capacity, halt, and notice are kept for budgets, real stops, and proposals. None is a spare accent, and none carries meaning alone: every mark that matters also has a label, a line style, or a shape.</p>
+    <ul class="wf-swatches">{% for key, name, hex, role, contrast in palette %}<li class="wf-swatch"><div class="wf-swatch__chip wf-swatch__chip--{{ key }}"></div><div class="wf-swatch__body"><strong>{{ name }}</strong><code>{{ hex }}</code><span>{{ role }}</span><span>{{ contrast }}</span></div></li>{% endfor %}</ul>
+    <p>The contrast figures are for the flat colour as text. Cobalt falls short of 4.5:1 on the raised panel, so words in that hue use a lighter cut, <code>#7a9ffa</code>. The quiet border colour is decoration only; any edge that identifies a control is drawn in a stronger tick colour that holds 3:1. The logotype keeps its own green: it is the supplied artwork, and it is not recoloured to fit the palette.</p>
+  </section>
+
+  <section aria-labelledby="plates">
+    <h2 id="plates">The plates</h2>
+    <p>Every illustration is a Three.js scene from <a href="https://github.com/leynos/wireframe-3js/tree/57be19c6183be36f5d4b811d31ea29bae3fdf251">leynos/wireframe-3js</a>, served from this site at commit <code>57be19c</code>, with the poster that source supplies for each. Its renderer draws three-dimensional line segments in stroke order and lets light gather where they cross. Labels inside the art belong to the art; anything a reader needs is in the caption beside it.</p>
+    <div class="wf-field__plates">
+      {{ ui.plate('26') }}
+      {{ ui.plate('30') }}
+    </div>
+    <p>Each caption says what kind of picture it is. A <strong>technical diagram</strong> follows the library&rsquo;s real order of stages, simplified where it says so. <strong>Concept artwork</strong> illustrates an idea, often a proposal, and certifies nothing. A <strong>civic setting</strong> carries no technical claim. No plate is a measurement, and the moving packets are not traffic data.</p>
+    <p>Legal pages carry no plates.</p>
+  </section>
+
+  <section aria-labelledby="beam">
+    <h2 id="beam">How the plates move</h2>
+    <p>With ordinary motion settings, a plate plays by itself: the hero as the page loads, the others as they come into view. A plate that scrolls out of view, or a tab left in the background, stops drawing until it returns.</p>
+    <p>If the browser asks for reduced motion, every plate starts as its complete still, with a <strong>Play illustration</strong> button. Pressing it plays that one plate and offers <strong>Show still</strong>; nothing else on the page moves. If the preference changes while a plate is playing, it stops at once. Under <code>prefers-contrast: more</code> the live plates draw without their halo. Without JavaScript or WebGL, and in print, the still is the plate.</p>
+  </section>
+
+  <section aria-labelledby="type">
+    <h2 id="type">Type and logotype</h2>
+    <p><strong>Sintony</strong> sets every word of interface and prose, at its two distributed weights. <strong>Monaspace Krypton</strong> sets code and byte sequences, with ligatures off so that <code>-&gt;</code>, <code>=&gt;</code>, and <code>::</code> stay distinct. Both are SIL Open Font License faces, served from this site.</p>
+    <p>The logotype is the approved artwork, published as it was drawn rather than retyped or redrawn: lower-case letters built from beam lattices, beside a faceted rhombus. Its near-black ground is keyed to transparency, treating the art as light emitted over black, so its own glow carries it on every surface. The favicon is the rhombus alone. <em>Common Signal</em> is set in type beside it, as a series name, never as a second logo.</p>
+    <div class="wf-field__marks">
+      <img src="/wireframe/assets/logos/wordmark-1400.webp" alt="The wireframe wordmark" width="1400" height="357">
+      <img src="/wireframe/assets/logos/symbol-192.webp" alt="The wireframe symbol, a faceted rhombus" width="192" height="192">
+    </div>
+  </section>
+</div>
+{% endblock %}

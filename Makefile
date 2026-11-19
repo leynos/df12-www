@@ -43,13 +43,15 @@ TYPOS_CONFIG_BUILDER = uv tool run --python 3.14 --from \
 NODE_MODULES_STAMP := node_modules/.install-stamp
 EPISODIC_SOURCE ?= ../episodic
 CUPRUM_SOURCE ?= ../cuprum
+WIREFRAME_3JS_SOURCE ?= ../wireframe-3js
 
 ifeq ($(strip $(SKIP_PLAYWRIGHT)),1)
 PYTEST_FILTER += -m 'not playwright'
 endif
 
 .PHONY: prepare help all clean build build-release lint fmt check-fmt check-site-data \
-        cuprum-api-data check-cuprum-api-data rstest-bdd-samples \
+        cuprum-api-data check-cuprum-api-data rstest-bdd-samples wireframe-samples \
+        wireframe-plates check-wireframe-plates \
         docs-check markdownlint nixie site-data spelling stylelint test typecheck \
         typecheck-js venv-ruff interrogate \
         $(TOOLS) \
@@ -78,6 +80,15 @@ check-cuprum-api-data: prepare ## Check the committed Cuprum API reference again
 
 rstest-bdd-samples: ## Compile and run every rstest-bdd code sample against the published crates
 	cargo test --manifest-path templates/rstest-bdd/samples/Cargo.toml --locked
+
+wireframe-samples: ## Compile and run every wireframe code sample against the published crate
+	cargo test --manifest-path templates/wireframe/samples/Cargo.toml --locked
+
+wireframe-plates: prepare ## Vendor the pinned wireframe-3js plate runtime and posters
+	$(UV_GATE) run -- python scripts/import_wireframe_plates.py "$(WIREFRAME_3JS_SOURCE)"
+
+check-wireframe-plates: prepare ## Rebuild the pinned plates and compare them with the vendored copy
+	$(UV_GATE) run -- python scripts/import_wireframe_plates.py "$(WIREFRAME_3JS_SOURCE)" --check
 
 # Biome, Tailwind, and the test runner all live in node_modules, so every
 # target that shells out to bun has to depend on this. `bun` is order-only:

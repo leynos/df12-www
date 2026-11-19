@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import datetime as dt
 import typing as typ
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
+
+from .build_clock import build_time
 
 if typ.TYPE_CHECKING:
     from .config import AboutPageConfig
@@ -33,7 +34,7 @@ class AboutPageBuilder:
         """Render and write the About page HTML, returning the output path."""
         output_path = self.about.output
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        context = {"about": self.about, "generated_at": dt.datetime.now(dt.UTC)}
+        context = {"about": self.about, "generated_at": build_time()}
         html = self.template.render(**context)
         if not html.endswith("\n"):
             html += "\n"

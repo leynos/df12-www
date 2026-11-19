@@ -121,6 +121,12 @@
   --color-halt: var(--color-error); /* a real stop or failure only: 4.80:1 on raised */
   --color-notice: var(--color-warning); /* deliberate notice, proposals: 12.38:1 on raised */
 
+  /* The journey rail's amber trace, kept from the original scope site at
+     the owner's request. It is outside the palette of responsibility and is
+     used for that one trace and its stations only, as decoration: 11.00:1
+     on void, but never for text. */
+  --color-trace: #ffb347;
+
   /* Cobalt as type. Cobalt itself is 3.97:1 on raised, short of 4.5:1, so
      words in the structural hue take this lighter cut: 5.88:1 on raised. */
   --color-cobalt-text: #7a9ffa;

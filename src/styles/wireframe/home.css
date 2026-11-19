@@ -18,7 +18,7 @@
   background:
     radial-gradient(
       ellipse 55% 60% at 78% 42%,
-      color-mix(in oklab, var(--color-cobalt) 10%, transparent),
+      color-mix(in oklab, var(--color-cobalt) 16%, transparent),
       transparent 70%
     ),
     var(--color-void);
@@ -44,24 +44,22 @@
 /* The editorial marque: real text, small, beside the product mark rather
    than competing with it. */
 .wf-marque {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.6rem;
-  align-items: center;
   margin: 0 0 1rem;
   color: var(--color-ink-muted);
-  font: 700 0.8125rem / 1.4 var(--font-sans);
-  letter-spacing: 0.16em;
+  font: 700 0.8125rem / 1.5 var(--font-sans);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.wf-marque span:last-child {
+.wf-marque span:first-child {
   color: var(--color-signal);
 }
 
+.wf-marque span[aria-hidden] {
+  margin-inline: 0.4em;
+}
+
 .wf-hero__title {
-  display: grid;
-  gap: 0.75rem;
   margin: 0;
 }
 
@@ -73,13 +71,6 @@
   /* The keyed master's halo runs to the crop edge; pull the box in so the
    * letters, not the glow, align with the copy below. */
   margin-inline-start: -1.1rem;
-}
-
-.wf-hero__kicker {
-  color: var(--color-ink-muted);
-  font: 700 0.875rem / 1.4 var(--font-sans);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 /* The principal tagline, set as a statement. */
@@ -97,14 +88,15 @@
   font-size: 1.125rem;
 }
 
-/* The release status is a deliberate notice, so it takes the notice rule. */
+/* The release status is a deliberate notice, so it takes the notice rule.
+   It sits under the actions, quieter than the proposition above it. */
 .wf-hero__status {
   max-width: 34rem;
-  margin: 1rem 0 0;
+  margin: 1.5rem 0 0;
   padding-left: 0.75rem;
   border-left: 2px solid var(--color-notice);
   color: var(--color-ink-muted);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
 
 .wf-hero__status strong {
@@ -115,7 +107,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-top: 2rem;
+  margin-top: 1.75rem;
 }
 
 /* The foundation line above the capability row. */
@@ -200,6 +192,12 @@
   border-bottom: 1px solid var(--color-rule);
 }
 
+/* The three panels run wider than the page column, so the working examples
+   have room to breathe. */
+.wf-steps > .wf-shell {
+  max-width: 105rem;
+}
+
 .wf-steps__grid {
   display: grid;
   gap: 1.25rem;
@@ -272,10 +270,10 @@
 }
 
 /* The journey: a sticky introduction beside a vertical track of stations.
-   The rail is the route a request takes, so it is drawn in flow. It lights
-   as the section scrolls past, where the browser supports scroll-driven
-   animation and motion is welcome; elsewhere it is lit from the start. It
-   never moves on its own. */
+   The rail is the glowing trace of the original scope site, kept at the
+   owner's request: an amber core with a phosphor halo, a brighter pulse
+   running down it, and stations that light as the section scrolls past.
+   Under reduced motion it is lit from the start and does not move. */
 .wf-journey {
   padding-block: 5rem;
 }
@@ -299,7 +297,6 @@
 
 .wf-journey h2,
 .wf-capabilities h2,
-.wf-world h2,
 .wf-band h2,
 .wf-install h2 {
   margin: 0;
@@ -346,27 +343,46 @@
   content: "";
 }
 
-/* The rail, lit: the selected route, a flow core with a local halo. */
+/* The rail, lit: an amber core, a hot pulse, and a three-layer halo. */
 .wf-track::after {
   position: absolute;
   top: 0.6rem;
   bottom: 0.6rem;
   left: 0.6rem;
   width: 2px;
-  background-color: var(--color-flow);
+  background-color: var(--color-trace);
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklab, var(--color-trace) 30%, white) 50%,
+    transparent
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 7rem;
   box-shadow:
-    0 0 4px color-mix(in oklab, var(--color-flow) 85%, transparent),
-    0 0 14px color-mix(in oklab, var(--color-flow) 45%, transparent);
+    0 0 4px color-mix(in oklab, var(--color-trace) 90%, transparent),
+    0 0 14px color-mix(in oklab, var(--color-trace) 55%, transparent),
+    0 0 32px color-mix(in oklab, var(--color-trace) 25%, transparent);
   content: "";
   transform-origin: top;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wf-track::after {
+    animation: wf-rail-pulse 2.8s linear infinite;
+  }
 }
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .wf-track::after {
-      animation: wf-light-rail linear both;
-      animation-range: entry 40% cover 70%;
-      animation-timeline: view();
+      animation:
+        wf-rail-pulse 2.8s linear infinite,
+        wf-light-rail linear both;
+      animation-range:
+        normal,
+        entry 40% cover 70%;
+      animation-timeline: auto, view();
     }
 
     /* Each station lights as it crosses the middle of the viewport. */
@@ -375,6 +391,16 @@
       animation-range: cover 30% cover 50%;
       animation-timeline: view();
     }
+  }
+}
+
+@keyframes wf-rail-pulse {
+  from {
+    background-position: 0 -7rem;
+  }
+
+  to {
+    background-position: 0 calc(100% + 7rem);
   }
 }
 
@@ -395,8 +421,8 @@
   }
 
   100% {
-    border-color: var(--color-flow);
-    box-shadow: 0 0 10px color-mix(in oklab, var(--color-flow) 70%, transparent);
+    border-color: var(--color-trace);
+    box-shadow: 0 0 10px var(--color-trace);
   }
 }
 
@@ -410,8 +436,8 @@
   padding-bottom: 0;
 }
 
-/* A station node: a small rhombus, the routing-junction shape, lit in flow
-   (or, while the rail lights, drawn in structure first). */
+/* A station node: a small rhombus, the routing-junction shape, lit with
+   the trace (or, while the rail lights, drawn in structure first). */
 .wf-track__node {
   position: absolute;
   top: 0.35rem;
@@ -419,7 +445,7 @@
   z-index: 1;
   width: 0.85rem;
   height: 0.85rem;
-  border: 2px solid var(--color-flow);
+  border: 2px solid var(--color-trace);
   background: var(--color-void);
   transform: rotate(45deg);
 }
@@ -498,12 +524,6 @@
     align-items: center;
   }
 
-  .wf-bento .wf-bento__cell--image .wf-plate__stage,
-  .wf-bento .wf-bento__cell--image .wf-plate__controls,
-  .wf-bento .wf-bento__cell--image .wf-plate__caption {
-    border-left: 0;
-  }
-
   .wf-bento .wf-bento__cell--image .wf-bento__copy {
     padding: 1.5rem 2rem;
   }
@@ -558,15 +578,14 @@ a.wf-bento__cell:hover,
   overflow: hidden;
 }
 
-.wf-bento__cell--image .wf-plate__stage,
+/* The plate's own words keep the cell's inset. */
 .wf-bento__cell--image .wf-plate__controls,
 .wf-bento__cell--image .wf-plate__caption {
-  border-right: 0;
-  border-left: 0;
+  padding-inline: 1.5rem;
 }
 
-.wf-bento__cell--image .wf-plate__stage {
-  border-top: 0;
+.wf-bento__cell--image .wf-plate__caption {
+  padding-bottom: 1.25rem;
 }
 
 .wf-bento__copy {
@@ -648,66 +667,11 @@ a.wf-bento__cell:hover,
   color: var(--color-ink);
 }
 
-/* The scope: a full-bleed civic plate, then the explanation and its key. */
-.wf-world {
-  padding-bottom: 5rem;
+/* The cityscape fly-through: Plate 29, full width, between the bento and
+   the mxd band. */
+.wf-flythrough {
+  padding-bottom: 4rem;
   border-top: 1px solid var(--color-rule);
-}
-
-.wf-world__body {
-  max-width: 52rem;
-  margin-top: 2.5rem;
-}
-
-.wf-world__body p {
-  margin: 1rem 0 0;
-  color: var(--color-ink-muted);
-  font-size: 1.0625rem;
-}
-
-/* The key: each role named in words, with a mark that differs in line
-   style as well as hue, so it survives greyscale. */
-.wf-key-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-  gap: 0.6rem 1.5rem;
-  margin: 1.25rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.wf-key-list li {
-  display: flex;
-  gap: 0.6rem;
-  align-items: baseline;
-  color: var(--color-ink-muted);
-  font-size: 0.9375rem;
-}
-
-.wf-key-list strong {
-  color: var(--color-ink);
-}
-
-.wf-key {
-  flex: none;
-  width: 1.5rem;
-  height: 0;
-  border-top: 2px solid var(--color-cobalt);
-  transform: translateY(-0.25em);
-}
-
-.wf-key--signal {
-  border-top-style: dashed;
-  border-top-color: var(--color-signal);
-}
-
-.wf-key--flow {
-  border-top-width: 4px;
-  border-top-color: var(--color-flow);
-}
-
-.wf-key--capacity {
-  border-top: 4px dotted var(--color-capacity);
 }
 
 /* The mxd band. */

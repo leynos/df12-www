@@ -16,9 +16,9 @@
 {#- A plate: one Three.js scene from the catalogue in data/plates.jinja.
 
     The server renders it whole: the matching poster, the caption, and the
-    status line. plates.js adds the live scene over the poster and un-hides
-    the controls, which stay out of the artwork; without the script, WebGL, or
-    motion, the poster is the plate. `eager` marks the one plate a page should
+    status line. plates.js adds the live scene over the poster. The controls,
+    Play and Show still, appear only under reduced motion and stay out of the
+    artwork; without the script, WebGL, or motion, the poster is the plate. `eager` marks the one plate a page should
     start loading at once (the hero) and fetches its poster first. `variant`
     names a layout modifier on `wf-plate`. -#}
 {% macro plate(key, eager=false, variant=none) -%}
@@ -26,7 +26,7 @@
 {%- set title_id = 'plate-' ~ p.id ~ '-title' -%}
 <figure class="wf-plate{% if variant %} wf-plate--{{ variant }}{% endif %}" data-wf-plate="{{ p.id }}" data-wf-plate-runtime="/wireframe/assets/vendor/plates/wireframe-plate.js"{% if eager %} data-wf-plate-eager{% endif %}>
   <div class="wf-plate__stage" data-wf-plate-stage><img class="wf-plate__poster" data-wf-plate-poster src="/wireframe/assets/vendor/plates/posters/{{ p.id }}.webp" alt="{{ p.alt }}" width="929" height="494" decoding="async"{% if eager %} fetchpriority="high"{% else %} loading="lazy"{% endif %}></div>
-  <div class="wf-plate__controls" data-wf-plate-controls hidden><button type="button" class="wf-plate__button" data-wf-plate-toggle aria-describedby="{{ title_id }}">Play illustration</button><button type="button" class="wf-plate__button" data-wf-plate-still aria-describedby="{{ title_id }}" hidden>Show still</button><button type="button" class="wf-plate__button wf-plate__button--quiet" data-wf-plate-glow aria-describedby="{{ title_id }}" hidden>Reduce glow</button><span class="wf-plate__status" data-wf-plate-status></span></div>
+  <div class="wf-plate__controls" data-wf-plate-controls hidden><button type="button" class="wf-plate__button" data-wf-plate-play aria-describedby="{{ title_id }}">Play illustration</button><button type="button" class="wf-plate__button" data-wf-plate-still aria-describedby="{{ title_id }}" hidden>Show still</button><span class="wf-plate__status" data-wf-plate-status></span></div>
   <figcaption class="wf-plate__caption"><span class="wf-plate__number">Plate {{ p.id }} · {{ p.kind }}</span> <strong id="{{ title_id }}" class="wf-plate__title">{{ p.title }}.</strong> {{ p.caption }} <span class="wf-plate__source">{% if p.href %}<a href="{{ p.href }}">{{ p.status }}</a>{% else %}{{ p.status }}{% endif %}</span></figcaption>
 </figure>
 {%- endmacro %}

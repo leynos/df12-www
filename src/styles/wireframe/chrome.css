@@ -333,11 +333,12 @@
 
 /* A plate: one Three.js scene with its poster, controls, and caption.
 
-   The stage keeps the poster's aspect ratio, so nothing moves when the live
-   scene replaces it. The scene sits over the poster; the controls and the
-   caption sit below the art on opaque surfaces, so their contrast never
-   depends on a frame of the animation. Without the script the controls stay
-   hidden and the poster is the plate. */
+   The scene floats on the page's own field, unframed, as light on the void;
+   the poster's ground is the void colour, so no edge shows. The stage keeps
+   the poster's aspect ratio, so nothing moves when the live scene replaces
+   it. The controls and the caption sit below the art, never over it, so
+   their contrast never depends on a frame of the animation. Without the
+   script the controls stay hidden and the poster is the plate. */
 .wf-plate {
   min-width: 0;
   margin: 0;
@@ -347,7 +348,6 @@
   position: relative;
   aspect-ratio: 929 / 494;
   overflow: hidden;
-  border: 1px solid var(--color-rule);
   background: var(--color-void);
 }
 
@@ -373,10 +373,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-rule);
-  border-top: 0;
-  background: var(--color-surface);
+  padding-top: 0.75rem;
 }
 
 .wf-plate__controls[hidden],
@@ -400,10 +397,6 @@
   border-color: var(--color-signal);
 }
 
-.wf-plate__button--quiet {
-  font-weight: 400;
-}
-
 .wf-plate__status {
   margin-left: auto;
   color: var(--color-ink-dim);
@@ -417,10 +410,8 @@
 }
 
 .wf-plate__caption {
-  padding: 0.75rem;
-  border: 1px solid var(--color-rule);
-  border-top: 0;
-  background: var(--color-surface);
+  max-width: 48rem;
+  padding-top: 0.75rem;
   color: var(--color-ink-muted);
   font-size: 0.875rem;
   line-height: 1.5;
@@ -446,19 +437,25 @@
   font-size: 0.8125rem;
 }
 
+/* The hero's scene fades into the hero's own bloom at its edges, so it
+   reads as light on the field rather than a picture in a box. The fade
+   touches only the empty margin of the art, never its labels. */
+.wf-plate--hero .wf-plate__stage {
+  mask-image: radial-gradient(ellipse 72% 78% at 50% 50%, #000 62%, transparent 100%);
+}
+
 /* Civic scenes run edge to edge with a shorter stage; the live scene and
-   the poster crop to it rather than squeezing. */
+   the poster crop to it rather than squeezing. Their caption still lines up
+   with the page column. */
 .wf-plate--wide .wf-plate__stage {
   aspect-ratio: auto;
   height: clamp(16rem, 42vw, 36rem);
-  border-inline: 0;
 }
 
-/* Its controls and caption still line up with the page column. */
 .wf-plate--wide .wf-plate__controls,
 .wf-plate--wide .wf-plate__caption {
+  max-width: none;
   padding-inline: max(1rem, calc((100% - 78rem) / 2 + 2rem));
-  border-inline: 0;
 }
 
 @media (forced-colors: active) {

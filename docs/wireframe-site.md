@@ -145,13 +145,15 @@ taken from it except the checked logo hashes, which match.
   `tests/fixtures/wireframe-logos.sha256` records their bytes, and their green
   is a deliberate exception to the palette. The wordmark no longer flickers on
   load.
-- **Motion.** The plates move as section 10 of the identity requires (see
-  [Plates](#plates)). Elsewhere, the journey rail lights in flow as it scrolls
-  past, where scroll-driven animation is supported and motion is welcome, and
-  never moves on its own. The deflection glitch on the hero line, the rail's
-  endless pulse, and the wordmark's ignition were removed: the identity
-  excludes recurring glitches and logo motion, and the pulse was continuous
-  motion without a pause control.
+- **Motion.** The plates move as described under [Plates](#plates). The
+  journey rail keeps the original site's amber trace at the owner's request:
+  `--color-trace` `#FFB347`, outside the palette and used for that trace and
+  its stations only, with a three-layer halo and a pulse that runs down it
+  every 2.8 seconds. Its stations light as they scroll past. Under reduced
+  motion the rail is lit and still; under more contrast its halo and pulse go.
+  The pulse is continuous motion without a pause control, as the plates now
+  are. The deflection glitch on the hero line and the wordmark's ignition were
+  removed: the identity excludes recurring glitches and logo motion.
 - **Icons.** `src/static/wireframe/assets/icons/sprite.svg` draws frame,
   route, gates, pulses, fragments, outbound, proof, and budget on a 24 by 24
   grid.
@@ -186,12 +188,16 @@ no page implies a municipal customer, a hosted service, or live telemetry.
 | `/wireframe/privacy-policy/` and siblings | Shared legal pages               |
 
 The home page keeps the sections and order it had at `0227ac5`, as version 0.4
-requires: the hero with its figure, now Plate 27; the capability row and
-release readout; three numbered panels (two working examples and Plate 28); the
-"Frame. Route. Handle." station track, with its anchors; the "What it carries"
-bento; the scope world, now Plate 29; mxd; installation; and the tagline strip.
-Two bento cells swapped places so that the large-messages cell, with Plate 15
-and its RFC 0007 note, is the full-width plate cell; a cell holding playback
+requires, with one owner-directed removal: the hero with its figure, now Plate
+27; the capability row and release readout; three numbered panels (two working
+examples and Plate 28), on a wider 105rem row; the "Frame. Route. Handle."
+station track, with its anchors; the "What it carries" bento; mxd;
+installation; and the tagline strip. On 19 November 2026, at the owner's
+request, the "The scope" section's heading, copy, and colour key were removed;
+its Plate 29 fly-through stays as a full-width band between the bento and mxd.
+The field guide at `/wireframe/scope/` remains, linked from the footer. Two
+bento cells swapped places so that the large-messages cell, with Plate 15 and
+its RFC 0007 note, is the full-width plate cell; a cell holding playback
 buttons cannot be a link, so its heading carries the link.
 
 ## Templates
@@ -265,16 +271,31 @@ matching posters captured by the source's documented procedure. The source tree
 states no licence for the original scenes; they are reused at the owner's
 direction. Three.js's MIT licence is vendored beside the module.
 
-| Plate | Title               | Kind              | Where                                |
-| ----- | ------------------- | ----------------- | ------------------------------------ |
-| 27    | One request's path  | Technical diagram | Home hero                            |
-| 28    | Complexity, reduced | Technical diagram | Home, third step                     |
-| 15    | Independent budgets | Concept artwork   | Home bento; RFC 0007, proposed       |
-| 29    | Avenue fly-through  | Civic setting     | Home, the scope section              |
-| 21    | Conformance harness | Concept artwork   | Testing guide; RFC 0008, proposed    |
-| 06    | Seven proposals     | Concept artwork   | Roadmap; RFCs 0003 to 0009, proposed |
-| 26    | The common signal   | Civic setting     | Field guide                          |
-| 30    | Transit panorama    | Civic setting     | Field guide                          |
+| Plate | Title                 | Kind              | Where                                   |
+| ----- | --------------------- | ----------------- | --------------------------------------- |
+| 27    | One request's path    | Technical diagram | Home hero                               |
+| 28    | Complexity, reduced   | Technical diagram | Home, third step                        |
+| 15    | Independent budgets   | Concept artwork   | Home bento; RFC 0007, proposed          |
+| 29    | Avenue fly-through    | Civic setting     | Home, full-width band                   |
+| 04    | The threshold         | Civic setting     | Getting started                         |
+| 08    | Routing table         | Civic setting     | Guide index                             |
+| 07    | The envelope          | Concept artwork   | Routing guide                           |
+| 12    | Inside the channel    | Concept artwork   | Codecs guide                            |
+| 11    | Streams and datagrams | Concept artwork   | Streaming guide; RFC 0009, proposed     |
+| 17    | Buffer instruments    | Concept artwork   | Large-messages guide; bars illustrative |
+| 18    | Civic sphere          | Civic setting     | Client guide                            |
+| 21    | Conformance harness   | Concept artwork   | Testing guide; RFC 0008, proposed       |
+| 25    | Maintenance           | Civic setting     | Production guide                        |
+| 03    | System architecture   | Civic setting     | Architecture                            |
+| 30    | Transit panorama      | Civic setting     | Examples; field guide                   |
+| 06    | Seven proposals       | Concept artwork   | Roadmap; RFCs 0003 to 0009, proposed    |
+| 26    | The common signal     | Civic setting     | Field guide                             |
+
+Every page but the middleware guide and the legal pages carries one. The
+middleware guide has none: the nearest scene, Plate 13, draws a guarded core in
+the capacity colour, which would misstate what middleware is. Plate 07's tag
+reads `DATA-ID` and `ROUTE`; its caption says those are the artwork's labels,
+not wireframe's field names.
 
 Plate 27's labels were checked against the candidate's inbound path:
 `FrameCodec` cuts frames, the envelope carries message ID 2 and correlation ID
@@ -297,7 +318,8 @@ source's `make build` (Node.js 22 or later; `npm ci` against its lockfile,
 Three.js 0.182.0, esbuild 0.28.2), and writes the module, the posters, the
 licence, and `PROVENANCE.txt`; the second rebuilds and compares. Two builds
 matched byte for byte. The module is 601,013 bytes (about 163 KB gzipped),
-because it bundles Three.js and all 30 scenes; posters are 12 to 177 KB.
+because it bundles Three.js and all 30 scenes. The seventeen posters total
+about 1.3 MB, 12 to 177 KB each, and only the plates on a page are fetched.
 
 The one local patch, `explicit-motion.patch`, adds an `allow-motion` attribute.
 The pinned element always draws a fixed still when
@@ -317,15 +339,14 @@ a plate may render, and never under reduced motion until Play.
 | Situation                                    | Result                                                                                       |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Ordinary motion, page load                   | The hero's module load starts at once; the scene mounts and plays when in view, no Play gate |
-| Ordinary motion, a plate scrolls into view   | It mounts and plays; **Pause illustration** is beside it                                     |
-| Pause                                        | The scene freezes; scrolling, resizing, and a hidden tab do not undo it                      |
+| Ordinary motion, a plate scrolls into view   | It mounts and plays, with no controls                                                        |
 | Reduced motion at load                       | Posters only, with **Play illustration**; no module, no WebGL                                |
-| Play under reduced motion                    | That plate alone plays, with Pause and **Show still**                                        |
+| Play under reduced motion                    | That plate alone plays, with **Show still** to return it to the poster                       |
 | Preference changes to reduce                 | Every scene is removed at once and every opt-in is forgotten                                 |
-| Preference changes back                      | Unpaused plates in view play; paused ones stay paused                                        |
+| Preference changes back                      | Plates in view play again                                                                    |
 | No JavaScript                                | The poster and caption; controls stay hidden                                                 |
 | No WebGL 2, a failed import, or context loss | The poster, with "Live illustration unavailable; showing the still."                         |
-| `prefers-contrast: more` or forced colours   | Live scenes start with low glow; **Restore glow** is offered                                 |
+| `prefers-contrast: more` or forced colours   | Live scenes draw with low glow                                                               |
 | Print                                        | The poster and caption; no controls                                                          |
 
 At most four plates keep a renderer. Mounting one more releases the least
@@ -338,6 +359,14 @@ The element is hidden from assistive technology. The poster's `alt` and the
 caption are the plate's one description; a civic setting's poster has empty alt
 text. The buttons are native, outside the art, 44 pixels tall, and described by
 the plate's title.
+
+The identity asks for a Pause control on every autoplaying plate and an
+optional glow control. The owner removed both on 19 November 2026. The plates
+therefore move for longer than five seconds with no way to stop them under
+ordinary motion, which WCAG 2.2's Pause, Stop, Hide criterion (2.2.2) asks for;
+a visitor who needs stillness has to set the browser's reduced-motion
+preference, which the site honours. Restore a Pause control before claiming
+WCAG 2.2 AA conformance for the plates.
 
 ## Release evidence
 

@@ -2,14 +2,15 @@
  * @file Tests for wireframe's plate playback.
  *
  * The Common Signal identity (v0.4, section 10) fixes how a plate behaves in
- * each motion mode, and these tests hold the script to that table. The
- * `presentation` suite checks the pure decision for every state. The
- * controller suite mounts figures shaped like the `plate` macro in
- * `templates/wireframe/components.jinja` and drives them through fake media
- * queries, a fake intersection observer, and a runtime loader the test
- * resolves, rejects, or counts. The live `<wireframe-plate>` element is the
- * vendored runtime's business and is checked in a browser; here it is an
- * undefined element whose attributes and presence are the observable result.
+ * each motion mode, with the owner's choice of no Pause or glow controls, and
+ * these tests hold the script to that table. The `presentation` suite checks
+ * the pure decision for every state. The controller suite mounts figures
+ * shaped like the `plate` macro in `templates/wireframe/components.jinja` and
+ * drives them through fake media queries, a fake intersection observer, and a
+ * runtime loader the test resolves, rejects, or counts. The live
+ * `<wireframe-plate>` element is the vendored runtime's business and is
+ * checked in a browser; here it is an undefined element whose attributes and
+ * presence are the observable result.
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { createRequire } from "node:module";
@@ -29,9 +30,8 @@ function figure(id, { eager = false } = {}) {
         <img class="wf-plate__poster" data-wf-plate-poster src="/p/${id}.webp" alt="Plate ${id}" width="929" height="494">
       </div>
       <div class="wf-plate__controls" data-wf-plate-controls hidden>
-        <button type="button" data-wf-plate-toggle>Play illustration</button>
+        <button type="button" data-wf-plate-play>Play illustration</button>
         <button type="button" data-wf-plate-still hidden>Show still</button>
-        <button type="button" data-wf-plate-glow hidden>Reduce glow</button>
         <span data-wf-plate-status></span>
       </div>
       <figcaption>Plate ${id}</figcaption>
@@ -84,9 +84,9 @@ function setup(ids, { reduced = false, contrast = false, webgl = true, load } = 
     controller,
     fig,
     live: (id) => fig(id).querySelector("wireframe-plate"),
-    toggle: (id) => fig(id).querySelector("[data-wf-plate-toggle]"),
+    controls: (id) => fig(id).querySelector("[data-wf-plate-controls]"),
+    play: (id) => fig(id).querySelector("[data-wf-plate-play]"),
     still: (id) => fig(id).querySelector("[data-wf-plate-still]"),
-    glow: (id) => fig(id).querySelector("[data-wf-plate-glow]"),
     status: (id) => fig(id).querySelector("[data-wf-plate-status]").textContent,
     async see(id, inView = true) {
       notify([{ target: fig(id), isIntersecting: inView }]);
@@ -99,37 +99,29 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-const base = { userPaused: false, optIn: false, visible: true, failed: false, lowGlow: false };
+const base = { optIn: false, visible: true, failed: false };
 
 describe("presentation", () => {
-  test("ordinary motion plays without a Play gate and offers Pause", () => {
+  test("ordinary motion plays with no controls at all", () => {
     const shown = presentation("normal", base);
     expect(shown.live).toBe(true);
-    expect(shown.paused).toBe(false);
     expect(shown.allowMotion).toBe(false);
-    expect(shown.toggleLabel).toBe("Pause illustration");
-    expect(shown.showStill).toBe(false);
-  });
-
-  test("a pause under ordinary motion is offered back as Play", () => {
-    const shown = presentation("normal", { ...base, userPaused: true });
-    expect(shown.paused).toBe(true);
-    expect(shown.toggleLabel).toBe("Play illustration");
+    expect(shown.showControls).toBe(false);
   });
 
   test("reduced motion is a still with a Play button until the visitor opts in", () => {
     const shown = presentation("reduced", base);
     expect(shown.live).toBe(false);
-    expect(shown.toggleLabel).toBe("Play illustration");
-    expect(shown.showToggle).toBe(true);
-    expect(shown.showGlow).toBe(false);
+    expect(shown.showControls).toBe(true);
+    expect(shown.showPlay).toBe(true);
+    expect(shown.showStill).toBe(false);
   });
 
-  test("an opt-in under reduced motion plays that plate and offers Pause and Show still", () => {
+  test("an opt-in under reduced motion plays that plate and offers Show still", () => {
     const shown = presentation("reduced", { ...base, optIn: true });
     expect(shown.live).toBe(true);
     expect(shown.allowMotion).toBe(true);
-    expect(shown.toggleLabel).toBe("Pause illustration");
+    expect(shown.showPlay).toBe(false);
     expect(shown.showStill).toBe(true);
   });
 
@@ -137,7 +129,8 @@ describe("presentation", () => {
     for (const mode of ["normal", "reduced"]) {
       const shown = presentation(mode, { ...base, failed: true, optIn: true });
       expect(shown.live).toBe(false);
-      expect(shown.showToggle).toBe(false);
+      expect(shown.showControls).toBe(true);
+      expect(shown.showPlay).toBe(false);
       expect(shown.showStill).toBe(false);
       expect(shown.status).toContain("unavailable");
     }
@@ -145,9 +138,8 @@ describe("presentation", () => {
 });
 
 describe("ordinary motion", () => {
-  test("controls appear, and a plate mounts unpaused once it is in view", async () => {
+  test("a plate mounts once it is in view, with its controls hidden", async () => {
     const page = setup(["27"]);
-    expect(page.fig("27").querySelector("[data-wf-plate-controls]").hidden).toBe(false);
     expect(page.live("27")).toBeNull();
     await page.see("27");
     const live = page.live("27");
@@ -156,10 +148,10 @@ describe("ordinary motion", () => {
     expect(live.getAttribute("aria-hidden")).toBe("true");
     expect(live.hasAttribute("paused")).toBe(false);
     expect(live.hasAttribute("allow-motion")).toBe(false);
-    expect(page.toggle("27").textContent).toBe("Pause illustration");
+    expect(page.controls("27").hidden).toBe(true);
   });
 
-  test("the hero loads the runtime at once; other plates wait for their turn", async () => {
+  test("the hero loads the runtime at once; other plates wait for their turn", () => {
     const page = setup(["27", "29"]);
     expect(page.loads).toEqual([RUNTIME]);
   });
@@ -172,19 +164,13 @@ describe("ordinary motion", () => {
     expect(page.fig("27").querySelector("[data-wf-plate-poster]").alt).toBe("Plate 27");
   });
 
-  test("Pause holds across leaving and re-entering the viewport", async () => {
+  test("leaving and re-entering the viewport keeps the same scene", async () => {
     const page = setup(["27"]);
     await page.see("27");
-    page.toggle("27").click();
-    await settle();
-    expect(page.live("27").hasAttribute("paused")).toBe(true);
-    expect(page.toggle("27").textContent).toBe("Play illustration");
+    const first = page.live("27");
     await page.see("27", false);
     await page.see("27");
-    expect(page.live("27").hasAttribute("paused")).toBe(true);
-    page.toggle("27").click();
-    await settle();
-    expect(page.live("27").hasAttribute("paused")).toBe(false);
+    expect(page.live("27")).toBe(first);
   });
 
   test("the status reports what the element says it is doing", async () => {
@@ -196,6 +182,12 @@ describe("ordinary motion", () => {
     live.dispatchEvent(new CustomEvent("plate-state", { detail: "scanning" }));
     expect(page.status("27")).toBe("Playing");
   });
+
+  test("a contrast preference starts live plates with low glow", async () => {
+    const page = setup(["27"], { contrast: true });
+    await page.see("27");
+    expect(page.live("27").hasAttribute("low-glow")).toBe(true);
+  });
 });
 
 describe("reduced motion", () => {
@@ -204,36 +196,28 @@ describe("reduced motion", () => {
     await page.see("27");
     expect(page.live("27")).toBeNull();
     expect(page.loads).toEqual([]);
-    expect(page.toggle("27").textContent).toBe("Play illustration");
-    expect(page.toggle("27").hidden).toBe(false);
+    expect(page.controls("27").hidden).toBe(false);
+    expect(page.play("27").hidden).toBe(false);
+    expect(page.still("27").hidden).toBe(true);
   });
 
   test("Play opts that one plate in; Show still returns it to the poster", async () => {
     const page = setup(["27", "28"], { reduced: true });
     await page.see("27");
     await page.see("28");
-    page.toggle("27").click();
+    page.play("27").click();
     await settle();
     expect(page.live("27").hasAttribute("allow-motion")).toBe(true);
     expect(page.live("28")).toBeNull();
-    expect(page.toggle("27").textContent).toBe("Pause illustration");
+    expect(page.play("27").hidden).toBe(true);
     expect(page.still("27").hidden).toBe(false);
+    expect(document.activeElement).toBe(page.still("27"));
     page.still("27").click();
     await settle();
     expect(page.live("27")).toBeNull();
     expect(page.still("27").hidden).toBe(true);
-    expect(document.activeElement).toBe(page.toggle("27"));
-  });
-
-  test("Pause under an opt-in freezes the scene rather than removing it", async () => {
-    const page = setup(["27"], { reduced: true });
-    await page.see("27");
-    page.toggle("27").click();
-    await settle();
-    page.toggle("27").click();
-    await settle();
-    expect(page.live("27").hasAttribute("paused")).toBe(true);
-    expect(page.toggle("27").textContent).toBe("Play illustration");
+    expect(page.play("27").hidden).toBe(false);
+    expect(document.activeElement).toBe(page.play("27"));
   });
 });
 
@@ -241,7 +225,7 @@ describe("a change of motion preference", () => {
   test("to reduce stops every plate and forgets every opt-in", async () => {
     const page = setup(["27", "29"], { reduced: true });
     await page.see("27");
-    page.toggle("27").click();
+    page.play("27").click();
     await settle();
     page.deps.reducedMotion.set(false);
     await page.see("29");
@@ -250,24 +234,19 @@ describe("a change of motion preference", () => {
     await settle();
     expect(page.live("27")).toBeNull();
     expect(page.live("29")).toBeNull();
-    expect(page.toggle("27").textContent).toBe("Play illustration");
+    expect(page.play("27").hidden).toBe(false);
     await page.see("27");
     expect(page.live("27")).toBeNull();
   });
 
-  test("back to ordinary motion resumes unpaused plates and leaves paused ones paused", async () => {
-    const page = setup(["27", "29"]);
+  test("back to ordinary motion plays plates in view and hides the controls", async () => {
+    const page = setup(["27", "29"], { reduced: true });
     await page.see("27");
-    await page.see("29");
-    page.toggle("29").click();
-    await settle();
-    page.deps.reducedMotion.set(true);
-    await settle();
     page.deps.reducedMotion.set(false);
     await settle();
     expect(page.live("27")).not.toBeNull();
+    expect(page.controls("27").hidden).toBe(true);
     expect(page.live("29")).toBeNull();
-    expect(page.toggle("29").textContent).toBe("Play illustration");
   });
 });
 
@@ -275,20 +254,20 @@ describe("fallback", () => {
   test("a runtime that cannot load leaves the poster and withdraws Play", async () => {
     const page = setup(["27"], { reduced: true, load: () => Promise.reject(new Error("offline")) });
     await page.see("27");
-    page.toggle("27").click();
+    page.play("27").click();
     await settle();
     await settle();
     expect(page.live("27")).toBeNull();
-    expect(page.toggle("27").hidden).toBe(true);
+    expect(page.play("27").hidden).toBe(true);
     expect(page.status("27")).toContain("unavailable");
     expect(page.fig("27").dataset.wfPlateState).toBe("fallback");
   });
 
-  test("a runtime that cannot load withdraws Play from every plate on the page", async () => {
+  test("a runtime that cannot load marks every plate on the page", async () => {
     const page = setup(["27", "29"], { load: () => Promise.reject(new Error("offline")) });
     await settle();
     for (const id of ["27", "29"]) {
-      expect(page.toggle(id).hidden).toBe(true);
+      expect(page.controls(id).hidden).toBe(false);
       expect(page.status(id)).toContain("unavailable");
     }
   });
@@ -297,7 +276,7 @@ describe("fallback", () => {
     const page = setup(["27"], { webgl: false });
     await page.see("27");
     expect(page.live("27")).toBeNull();
-    expect(page.toggle("27").hidden).toBe(true);
+    expect(page.play("27").hidden).toBe(true);
     expect(page.status("27")).toContain("unavailable");
   });
 
@@ -308,24 +287,6 @@ describe("fallback", () => {
     await settle();
     expect(page.live("27")).toBeNull();
     expect(page.status("27")).toContain("unavailable");
-  });
-});
-
-describe("glow", () => {
-  test("a contrast preference starts plates with low glow, and the button restores it", async () => {
-    const page = setup(["27"], { contrast: true });
-    await page.see("27");
-    expect(page.live("27").hasAttribute("low-glow")).toBe(true);
-    expect(page.glow("27").textContent).toBe("Restore glow");
-    page.glow("27").click();
-    await settle();
-    expect(page.live("27").hasAttribute("low-glow")).toBe(false);
-  });
-
-  test("the glow control only shows while a live scene can honour it", async () => {
-    const page = setup(["27"], { reduced: true });
-    await page.see("27");
-    expect(page.glow("27").hidden).toBe(true);
   });
 });
 

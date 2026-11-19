@@ -4,7 +4,7 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-routing'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = none %}
+{% set plate_key = '07' %}
 {% block article_body %}
 <section aria-labelledby="register"><h2 id="register">Register routes</h2>
 <p>A route is a <code>u32</code> message ID and the handler that receives messages carrying it. <code>WireframeApp::route</code> takes both and returns the builder, so routes chain. A handler&rsquo;s type is <code>Handler&lt;Envelope&gt;</code>: an <code>Arc</code> around a closure that takes <code>&amp;Envelope</code> and returns a pinned, boxed future of <code>()</code>.</p>

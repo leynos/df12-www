@@ -49,7 +49,6 @@ HOME_SECTIONS = (
     "steps-title",
     "journey-title",
     "capabilities-title",
-    "world-title",
     "mxd-title",
     "install-title",
 )
@@ -412,9 +411,10 @@ def test_the_home_page_keeps_its_sections_in_order(built_site: Path) -> None:
     assert panels[2].select_one("[data-wf-plate='28']") is not None
     assert len(panels[0].select("[data-wf-sample]")) == 1
     assert len(panels[1].select("[data-wf-sample]")) == 1
-    world = soup.select_one(".wf-world [data-wf-plate]")
-    assert world is not None
-    assert world["data-wf-plate"] == "29"
+    assert soup.select_one(".wf-world") is None, "the scope section was removed"
+    flythrough = soup.select_one(".wf-flythrough [data-wf-plate]")
+    assert flythrough is not None
+    assert flythrough["data-wf-plate"] == "29"
     assert soup.select_one("main > .wf-tagline") is not None
 
 

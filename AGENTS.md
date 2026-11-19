@@ -266,8 +266,8 @@ so do not redraw, recolour, or re-encode them. The home page keeps its sections
 in their order; the identity restyles them in place. Its plates are Three.js
 scenes from `leynos/wireframe-3js`, vendored at a pin with their posters by
 `make wireframe-plates` (see `scripts/import_wireframe_plates.py` and its local
-patch). `plates.ts` plays them without a Play gate under ordinary motion, with
-a Pause control, and shows posters with a Play control under reduced motion.
+patch). `plates.ts` plays them without a Play gate or other controls under
+ordinary motion, and shows posters with a Play control under reduced motion.
 Every working example is cut, by mdBook `ANCHOR` markers, from the Cargo
 package under `templates/wireframe/samples/`, and `make wireframe-samples`
 compiles and runs it against the release named by `wireframe_version`. The site

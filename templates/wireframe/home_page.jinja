@@ -35,16 +35,16 @@
 <section class="wf-hero" aria-labelledby="hero-title">
   <div class="wf-shell wf-hero__grid">
     <div class="wf-hero__copy">
-      <p class="wf-marque"><span>wireframe</span><span aria-hidden="true">/</span><span>Common Signal</span></p>
-      <h1 id="hero-title" class="wf-hero__title"><span class="wf-hero__kicker">A Rust router for binary protocols</span><img src="/wireframe/assets/logos/wordmark-1400.webp" srcset="/wireframe/assets/logos/wordmark-700.webp 700w, /wireframe/assets/logos/wordmark-1400.webp 1400w" sizes="(width < 640px) 90vw, 38rem" alt="wireframe" width="1400" height="357" fetchpriority="high"></h1>
+      <p class="wf-marque"><span>Common Signal</span><span aria-hidden="true">·</span><span>A Rust router for binary protocols</span></p>
+      <h1 id="hero-title" class="wf-hero__title"><img src="/wireframe/assets/logos/wordmark-1400.webp" srcset="/wireframe/assets/logos/wordmark-700.webp 700w, /wireframe/assets/logos/wordmark-1400.webp 1400w" sizes="(width < 640px) 90vw, 38rem" alt="wireframe" width="1400" height="357" fetchpriority="high"></h1>
       <p class="wf-hero__line">What we connect, we should understand.</p>
       <p class="wf-hero__deck">wireframe is an experimental Rust library for building servers and clients for frame-based binary protocols. Frame the bytes, route messages by ID, and keep protocol behaviour open to inspection.</p>
+      <div class="wf-hero__actions">{{ ui.button('Get started', '/wireframe/getting-started/') }}{{ ui.button('Read the guides', '/wireframe/guides/', kind='quiet') }}</div>
       {%- if wireframe_published %}
       <p class="wf-hero__status"><strong>{{ wireframe_version }} is an alpha for early adopters</strong>, released {{ wireframe_released }}. Interfaces may change before 1.0, so pin the exact version.</p>
       {%- else %}
       <p class="wf-hero__status"><strong>{{ wireframe_version }} is an alpha that is not yet published.</strong> It was targeted for {{ wireframe_released }} and is not on crates.io yet. Interfaces may change before 1.0, so pin the exact version.</p>
       {%- endif %}
-      <div class="wf-hero__actions">{{ ui.button('Get started', '/wireframe/getting-started/') }}{{ ui.button('Read the guides', '/wireframe/guides/', kind='quiet') }}</div>
     </div>
     {{ ui.plate('27', eager=true, variant='hero') }}
   </div>
@@ -160,21 +160,7 @@
   </div>
 </section>
 
-<section class="wf-world" aria-labelledby="world-title">
-  {{ ui.plate('29', variant='wide') }}
-  <div class="wf-shell wf-world__body">
-    <h2 id="world-title">The scope</h2>
-    <p><strong>The visible city.</strong> Roads carry signals towards destinations, and crossings make a chosen path legible. The plates draw a library as a city so that its routes can be seen, but the city is only the setting: the stages are the library&rsquo;s own. A codec cuts the byte stream into frames, the router sends each envelope to the one handler its message ID names, and middleware stands at that junction, in and out.</p>
-    <ul class="wf-key-list" aria-label="How the plates use colour">
-      <li><span class="wf-key" aria-hidden="true"></span><span><strong>Cobalt</strong>, solid: structure, roads, and frames</span></li>
-      <li><span class="wf-key wf-key--signal" aria-hidden="true"></span><span><strong>Signal cyan</strong>, dashed: information and its labels</span></li>
-      <li><span class="wf-key wf-key--flow" aria-hidden="true"></span><span><strong>Flow green</strong>, heavy: the route actually taken</span></li>
-      <li><span class="wf-key wf-key--capacity" aria-hidden="true"></span><span><strong>Capacity magenta</strong>, dotted: budgets and allocation</span></li>
-    </ul>
-    <p>The city lights are illustration, not telemetry. Nothing on this site reports a live network.</p>
-    <a class="wf-arrow-link" href="/wireframe/scope/">How this site is drawn {{ ui.icon('arrow-right') }}</a>
-  </div>
-</section>
+<div class="wf-flythrough">{{ ui.plate('29', variant='wide') }}</div>
 
 <section class="wf-band" aria-labelledby="mxd-title">
   <div class="wf-shell wf-band__grid">

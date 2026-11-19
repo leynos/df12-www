@@ -35,7 +35,10 @@ PIN = "57be19c6183be36f5d4b811d31ea29bae3fdf251"
 REPOSITORY = "https://github.com/leynos/wireframe-3js"
 # The plates the sub-site shows. Their captions and roles live in
 # templates/wireframe/data/plates.jinja; a test holds the two together.
-POSTERS = ("06", "15", "21", "26", "27", "28", "29", "30")
+POSTERS = (
+    "03", "04", "06", "07", "08", "11", "12", "15", "17",
+    "18", "21", "25", "26", "27", "28", "29", "30",
+)  # fmt: skip
 PATCHES = Path("scripts/wireframe-plates")
 DESTINATION = Path("src/static/wireframe/assets/vendor/plates")
 

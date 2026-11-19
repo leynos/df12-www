@@ -18,7 +18,7 @@
   {'name': 'async_stream', 'layer': 'Streaming', 'note': 'Builds a Response::Stream of five frames with the async-stream crate, ready for a ConnectionActor to consume.', 'walkthrough': true},
   {'name': 'multi_packet', 'layer': 'Streaming', 'note': 'Splits a transcript across frames sent through a bounded channel by two producer tasks, with back-pressure keeping them in step with the consumer.', 'walkthrough': true},
 ] %}
-{{ ui.page_head([], 'Worked examples', 'The wireframe repository ships ten runnable examples at ' ~ wireframe_tag ~ '. mxd, a complete Hotline server, is the full-size one.') }}
+{{ ui.page_head([], 'Worked examples', 'The wireframe repository ships ten runnable examples at ' ~ wireframe_tag ~ '. mxd, a complete Hotline server, is the full-size one.', '30') }}
 <div class="wf-shell wf-landing">
   <p class="wf-landing__lede">Run them from a checkout of the release tag. Its lockfile pins dependencies that build, and its toolchain file names the nightly Rust it was tested with, which rustup installs on first use. Each example needs the <code>examples</code> feature.</p>
   <div class="wf-landing__setup">

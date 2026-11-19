@@ -126,7 +126,7 @@ def test_a_wireframe_page_fits_the_narrowest_phone(
 
 
 # Each plate's figure: its id, its live element's reported state, and its
-# toggle's label, for the playback tests to wait on.
+# controls' visibility, for the playback tests to wait on.
 PLATES = """JSON.stringify([...document.querySelectorAll('[data-wf-plate]')]
   .map((f) => {
   const live = f.querySelector('wireframe-plate');
@@ -134,14 +134,15 @@ PLATES = """JSON.stringify([...document.querySelectorAll('[data-wf-plate]')]
     id: f.dataset.wfPlate,
     live: live ? live.dataset.state || 'mounting' : null,
     motion: live ? live.hasAttribute('allow-motion') : false,
-    toggle: f.querySelector('[data-wf-plate-toggle]').textContent,
+    play: !f.querySelector('[data-wf-plate-play]').hidden,
+    still: !f.querySelector('[data-wf-plate-still]').hidden,
     hidden: f.querySelector('[data-wf-plate-controls]').hidden,
   };
 }))"""
 
 # Press the hero plate's playback button, as a visitor would.
 HERO_PLAY = (
-    "document.querySelector('[data-wf-plate=\"27\"] [data-wf-plate-toggle]').click()"
+    "document.querySelector('[data-wf-plate=\"27\"] [data-wf-plate-play]').click()"
 )
 
 # A plate the renderer is drawing and animating.
@@ -169,14 +170,13 @@ def _await_plate(
 def test_the_hero_plate_plays_without_a_play_gate(
     drive: cabc.Callable[..., str], served: str
 ) -> None:
-    """Under ordinary motion, Plate 27 starts on load and offers Pause."""
+    """Under ordinary motion, Plate 27 starts on load, with no controls."""
     _open(drive, served, "", DESKTOP)
     hero = _await_plate(drive, "27", PLAYING)
     assert hero["live"] in PLAYING, f"the hero never started: {hero}"
-    assert hero["toggle"] == "Pause illustration"
-    assert not hero["hidden"]
+    assert hero["hidden"], "ordinary motion shows no playback controls"
     assert not hero["motion"], "ordinary motion needs no opt-in"
-    below = _plates(drive)["29"]
+    below = _plates(drive)["15"]
     assert below["live"] is None, "a plate far below the fold rendered early"
 
 
@@ -191,12 +191,13 @@ def test_reduced_motion_is_posters_until_one_is_played(
         drive("wait", "1000")
         plates = _plates(drive)
         assert all(plate["live"] is None for plate in plates.values()), plates
-        assert all(plate["toggle"] == "Play illustration" for plate in plates.values())
+        assert all(plate["play"] for plate in plates.values()), plates
         drive("eval", HERO_PLAY)
         hero = _await_plate(drive, "27", PLAYING)
         assert hero["live"] in PLAYING, f"Play did not animate the plate: {hero}"
         assert hero["motion"], "the opt-in is not recorded on the element"
-        assert hero["toggle"] == "Pause illustration"
+        assert not hero["play"]
+        assert hero["still"], "an opted-in plate offers Show still"
         others = {id_: plate for id_, plate in _plates(drive).items() if id_ != "27"}
         assert all(plate["live"] is None for plate in others.values()), others
     finally:

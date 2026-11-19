@@ -306,7 +306,7 @@
 .wf-code pre {
   margin: 0;
   padding: 1rem 1.25rem 1.1rem;
-  font-size: 0.875rem;
+  font-size: 0.7rem;
   line-height: 1.55;
   tab-size: 4;
 }
@@ -811,6 +811,10 @@
   .wf-nav a[aria-current="page"]::after {
     filter: none;
     box-shadow: none;
+  }
+
+  .wf-track::after {
+    background-image: none;
   }
 
   .wf-btn:hover,

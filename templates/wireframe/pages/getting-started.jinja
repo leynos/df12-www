@@ -4,7 +4,7 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['getting-started'] %}
 {% set crumbs = [] %}
-{% set plate_key = none %}
+{% set plate_key = '04' %}
 {% block article_body %}
 <p class="wf-lede">The program on this page is a test in the site&rsquo;s sample crate. It starts a real server on a loopback port, connects a real client, sends a <code>Ping</code>, and checks the <code>Pong</code>. Every panel below is cut from that file, and the crate runs against {{ samples_verified_against }}, with Rust {{ rust_verified }}. wireframe needs Rust {{ rust_minimum }} or newer.</p>
 

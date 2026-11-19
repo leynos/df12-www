@@ -24,10 +24,12 @@ Regenerate a single page into a custom directory:
 
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 import subprocess
 import sys
+import time
 import typing as typ
 from concurrent.futures import ThreadPoolExecutor
 from itertools import batched
@@ -69,6 +71,13 @@ if typ.TYPE_CHECKING:
 
 DEFAULT_DOC_WORKERS = 8
 DEFAULT_CONFIG = Path("config/pages.yaml")
+
+_log = logging.getLogger(__name__)
+
+
+class PagesUsageError(ValueError):
+    """A command-line argument combination the generator cannot honour."""
+
 
 app = App(name="pages", config=cyclopts.config.Env("INPUT_", command=False))  # type: ignore[unknown-argument]
 
@@ -154,13 +163,13 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     """
     if doc_workers < 1:
         msg = "--doc-workers must be at least one"
-        raise ValueError(msg)
+        raise PagesUsageError(msg)
     if site and all_sites:
         msg = "--site and --all-sites are mutually exclusive"
-        raise ValueError(msg)
+        raise PagesUsageError(msg)
     if site and (source_url is not None or output_dir is not None):
         msg = "--source-url and --output-dir are not supported with --site"
-        raise ValueError(msg)
+        raise PagesUsageError(msg)
     if all_sites and (
         page is not None or source_url is not None or output_dir is not None
     ):
@@ -168,7 +177,7 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
             "--all-sites does not support partial render overrides"
             " (--page, --source-url, --output-dir)"
         )
-        raise ValueError(msg)
+        raise PagesUsageError(msg)
 
     site_config = load_site_config(config)
 
@@ -176,7 +185,7 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         if site not in site_config.sites:
             available = ", ".join(sorted(site_config.sites))
             msg = f"Unknown site '{site}'. Known sites: {available}"
-            raise ValueError(msg)
+            raise PagesUsageError(msg)
         _generate_subsite(
             site_config, site_config.sites[site], page=page, doc_workers=doc_workers
         )
@@ -204,25 +213,48 @@ def _write_documents(
     output_dir: Path | None = None,
 ) -> cabc.Iterator[Path]:
     """Render independent bundles and write potentially overlapping paths in order."""
+    started = time.perf_counter()
+    _log.info("rendering %d document bundle(s) with %d worker(s)", len(pages), workers)
 
     def render(page: PageConfig) -> RenderedDocument:
         """Keep each generator and its render state local to one job."""
-        return PageContentGenerator(
-            page,
-            templates_dir=templates_dir,
-            source_url=source_url,
-            output_dir=output_dir,
-        ).render()
+        bundle_started = time.perf_counter()
+        try:
+            document = PageContentGenerator(
+                page,
+                templates_dir=templates_dir,
+                source_url=source_url,
+                output_dir=output_dir,
+            ).render()
+        except Exception:
+            _log.exception("document bundle %r failed to render", page.key)
+            raise
+        _log.info(
+            "rendered document bundle %r in %.3f s",
+            page.key,
+            time.perf_counter() - bundle_started,
+        )
+        return document
 
     if workers == 1 or len(pages) <= 1:
         for page in pages:
             yield from render(page).write()
+        _log.info(
+            "wrote %d document bundle(s) in %.3f s",
+            len(pages),
+            time.perf_counter() - started,
+        )
         return
     with ThreadPoolExecutor(max_workers=workers) as pool:
         # Keep at most one worker-sized batch of rendered HTML in memory.
         for batch in batched(pages, min(workers, len(pages)), strict=False):
             for document in pool.map(render, batch):
                 yield from document.write()
+    _log.info(
+        "wrote %d document bundle(s) in %.3f s",
+        len(pages),
+        time.perf_counter() - started,
+    )
 
 
 def _generate_main_site(
@@ -687,6 +719,9 @@ def main() -> None:
     --------
     >>> main()  # doctest: +SKIP
     """
+    # Surface the generator's progress and timing records on stderr, leaving
+    # stdout for the machine-readable "wrote ..." paths.
+    logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
     if (
         sys.implementation.name != "cpython"
         or sys.version_info < (3, 15, 2)
@@ -700,6 +735,9 @@ def main() -> None:
         raise SystemExit(message)
     try:
         app()
+    except PagesUsageError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(1) from None
     except subprocess.CalledProcessError as exc:
         detail = (exc.stderr or "").strip()
         if detail:

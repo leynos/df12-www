@@ -21,10 +21,10 @@ Example
 
 from __future__ import annotations
 
-import contextlib
 import dataclasses as dc
 import datetime as dt
 import json
+import logging
 import os
 import re
 import typing as typ
@@ -45,6 +45,8 @@ from df12_pages.generator.models import NumberedStep, SectionModel
 from df12_pages.generator.renderer import CODE_BLOCK_PATTERN, HtmlContentRenderer
 from df12_pages.markdown_parser import Section, Subsection, parse_sections
 from df12_pages.templating import build_timestamp, template_environment
+
+_log = logging.getLogger(__name__)
 
 
 @dc.dataclass
@@ -71,8 +73,17 @@ class RenderedDocument:
             written.append(path)
         if written:
             metadata = {"first_file": written[0].name}
-            with contextlib.suppress(OSError):  # metadata is best effort
+            try:
                 self.metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+            except OSError:
+                # Metadata is best effort: the HTML is already published, and a
+                # failed pointer must not fail the bundle. Record it so a
+                # persistently unwritable destination is still diagnosable.
+                _log.warning(
+                    "could not write document metadata for %s",
+                    self.metadata_path,
+                    exc_info=True,
+                )
         return written
 
 

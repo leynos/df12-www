@@ -106,6 +106,18 @@ the GIL disabled at exit.
 | 4                | 6.13 s                 |
 | 8                | 5.34 s                 |
 
+Every run of `_write_documents` logs the effective worker count, the bundle
+count, each bundle's render time and the total write time at `INFO` on standard
+error. A maintainer can therefore reproduce the shape of these figures from a
+normal build without the benchmark harness:
+
+```bash
+uv run --locked --no-dev --python 3.15.2t pages generate --all-sites --doc-workers 8
+```
+
+The logged render time covers one bundle; the total covers the ordered writes
+plus the waits between batches, so it is the value to compare with the table.
+
 A separate interleaved run compared the previous MiniJinja commit with the
 worker implementation. The 3.15.2t controls used the same interpreter and
 locked dependencies, with `PYTHON_GIL=1` for the GIL-enabled cases. Each cell

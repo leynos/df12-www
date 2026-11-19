@@ -59,10 +59,10 @@ browser-backed tests) and requires additional tooling:
 
 * ``bun`` must be available on ``PATH`` to build CSS and run
   ``css-view``.
-* ``agent-browser`` must be on ``PATH`` with a browser installed, for
-  example via::
+* ``css-view`` captures through Playwright, so its browser engine must be
+  installed, for example via::
 
-    agent-browser install
+    bun x playwright install chromium
 
 Related test data lives entirely within the fixtures in this module;
 no external files from ``features/`` or other directories are
@@ -79,10 +79,11 @@ import datetime as dt
 import functools
 import http.server
 import json
-import os
+import logging
 import shutil
 import socketserver
 import subprocess
+import sys
 import threading
 import typing as typ
 from contextlib import contextmanager
@@ -94,10 +95,12 @@ import pytest
 import requests
 from bs4 import BeautifulSoup
 
+from df12_pages import cli
 from df12_pages._constants import PAGE_META_TEMPLATE
 from df12_pages.cli import _write_documents, generate
 from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.generator import PageContentGenerator
+from df12_pages.generator.page_generator import RenderedDocument
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INLINE_CODE_LABEL = "introctl"
@@ -548,13 +551,6 @@ def test_doc_prose_code_spans_have_expected_computed_style(
     shutil.copy2(css_build_artifact, assets_dir / "site.css")
 
     bun_exe = _require_executable("bun")
-    agent_browser = shutil.which("agent-browser")
-    if agent_browser is None:  # pragma: no cover - environment guard
-        pytest.skip("agent-browser is not installed; see `agent-browser install`.")
-    # css-view drives agent-browser, whose CDP backend leaves its session
-    # open; a per-process name keeps parallel runs apart, and the session is
-    # closed afterwards.
-    session = f"df12-doc-css-{os.getpid()}"
     with _http_serve(doc_path.parent) as port:
         url = f"http://127.0.0.1:{port}/{doc_path.name}"
         try:
@@ -563,11 +559,7 @@ def test_doc_prose_code_spans_have_expected_computed_style(
                     bun_exe,
                     "x",
                     "css-view",
-                    "--backend",
-                    "agent-browser",
-                    "--agent-browser-session",
-                    session,
-                    # The agent-browser backend captures in CDP mode only.
+                    # The assertions below read the flat CDP node list.
                     "--mode",
                     "cdp",
                     "--props",
@@ -581,13 +573,6 @@ def test_doc_prose_code_spans_have_expected_computed_style(
             )
         except subprocess.TimeoutExpired as exc:  # pragma: no cover - environment guard
             pytest.skip(f"css-view timed out: {exc}")
-        finally:
-            subprocess.run(  # noqa: S603 - fixed argv; the session name is ours
-                [agent_browser, "--session", session, "close"],
-                check=False,
-                capture_output=True,
-                timeout=30,
-            )
     payload = msgspec_json.decode(result.stdout)
     nodes = typ.cast("list[_CdpNode]", payload["payload"]["nodes"])
     inline_node = _cdp_element_with_text(nodes, "code", INLINE_CODE_LABEL)
@@ -714,18 +699,107 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     )
 
 
+def _stub_render_in_order(
+    monkeypatch: pytest.MonkeyPatch, *, reverse_completion: bool = False
+) -> None:
+    """Replace rendering with a stub that writes one identifiable section.
+
+    Parameters
+    ----------
+    monkeypatch
+        Fixture used to replace :meth:`PageContentGenerator.render`.
+    reverse_completion
+        Make the later bundle complete before the earlier one, so a writer that
+        published in completion order would invert them.
+    """
+    first_started = threading.Event()
+    later_completed = threading.Event()
+
+    def render(generator: PageContentGenerator) -> RenderedDocument:
+        """Return a document whose content names the bundle that produced it."""
+        key = generator.page.key
+        if reverse_completion:
+            if key == "first":
+                first_started.set()
+                assert later_completed.wait(timeout=5), "later bundle never finished"
+                content = "Content from first."
+            else:
+                assert first_started.wait(timeout=5), "first bundle never started"
+                content = "Content from second."
+                later_completed.set()
+        else:
+            content = f"Content from {key}."
+        filename = f"{generator.page.filename_prefix}shared-heading.html"
+        return RenderedDocument(
+            generator.page.output_dir,
+            generator.page.output_dir / PAGE_META_TEMPLATE.format(key=key),
+            [(filename, content)],
+        )
+
+    monkeypatch.setattr(PageContentGenerator, "render", render)
+
+
+def test_write_documents_serial_builds_publish_in_configuration_order(
+    page_config: PageConfig, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """With one worker, bundles publish in the order they are configured."""
+    _stub_render_in_order(monkeypatch)
+    keys = [f"page{index}" for index in range(3)]
+    pages = [
+        dc.replace(page_config, key=key, output_dir=tmp_path / key) for key in keys
+    ]
+
+    paths = list(_write_documents(pages, 1))
+
+    assert [path.parent.name for path in paths] == keys
+    assert [path.read_text() for path in paths] == [
+        f"Content from {key}." for key in keys
+    ]
+
+
+def test_write_documents_spanning_batches_publish_in_configuration_order(
+    page_config: PageConfig, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """More pages than workers still publish in configuration order per batch."""
+    _stub_render_in_order(monkeypatch)
+    keys = [f"page{index}" for index in range(5)]
+    pages = [
+        dc.replace(page_config, key=key, output_dir=tmp_path / key) for key in keys
+    ]
+
+    paths = list(_write_documents(pages, 2))
+
+    assert [path.parent.name for path in paths] == keys
+
+
+def test_write_documents_reports_the_effective_worker_count(
+    page_config: PageConfig,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """The concurrent path reports the worker count and per-bundle timing."""
+    _stub_render_in_order(monkeypatch)
+    pages = [
+        dc.replace(
+            page_config, key=f"page{index}", output_dir=tmp_path / f"page{index}"
+        )
+        for index in range(2)
+    ]
+
+    with caplog.at_level(logging.INFO, logger="df12_pages.cli"):
+        list(_write_documents(pages, 2))
+
+    assert "rendering 2 document bundle(s) with 2 worker(s)" in caplog.text
+    assert "rendered document bundle 'page0'" in caplog.text
+    assert "wrote 2 document bundle(s)" in caplog.text
+
+
 def test_document_workers_publish_overlaps_in_order(
     page_config: PageConfig, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Both renders overlap, but the later configured bundle wins a shared path."""
-    ready = threading.Barrier(2, timeout=5)
-
-    def markdown(generator: PageContentGenerator) -> str:
-        """Rendezvous in the workers and identify each bundle in the output."""
-        ready.wait()
-        return f"## Shared heading\n\nContent from {generator.page.key}.\n"
-
-    monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", markdown)
+    """The later bundle still wins a shared path when it finishes first."""
+    _stub_render_in_order(monkeypatch, reverse_completion=True)
     pages = [
         dc.replace(page_config, key=key, output_dir=tmp_path)
         for key in ("first", "second")
@@ -736,6 +810,104 @@ def test_document_workers_publish_overlaps_in_order(
     for page in pages:
         metadata = tmp_path / PAGE_META_TEMPLATE.format(key=page.key)
         assert json.loads(metadata.read_text()) == {"first_file": paths[0].name}
+
+
+def test_rendered_document_without_sections_writes_no_metadata(
+    tmp_path: Path,
+) -> None:
+    """An empty bundle publishes no files and therefore no index pointer."""
+    metadata_path = tmp_path / "metadata.json"
+
+    written = RenderedDocument(tmp_path, metadata_path, []).write()
+
+    assert written == []
+    assert not metadata_path.exists(), "an empty bundle must not claim a first file"
+
+
+def test_rendered_document_survives_an_unwritable_metadata_path(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A metadata failure is reported but must not fail the published HTML."""
+    metadata_path = tmp_path / "metadata"
+    metadata_path.mkdir()
+    document = RenderedDocument(tmp_path, metadata_path, [("page.html", "<p>ok</p>")])
+
+    with caplog.at_level(logging.WARNING):
+        written = document.write()
+
+    assert written == [tmp_path / "page.html"]
+    assert written[0].read_text() == "<p>ok</p>"
+    assert "could not write document metadata" in caplog.text
+
+
+def _record_generated_workers(
+    monkeypatch: pytest.MonkeyPatch, site_config: object
+) -> list[int]:
+    """Capture the worker counts that reach the shared document writer."""
+    recorded: list[int] = []
+    monkeypatch.setattr(cli, "load_site_config", lambda _path: site_config)
+
+    def record_workers(
+        pages: list[PageConfig], workers: int, **_kwargs: object
+    ) -> typ.Iterator[Path]:
+        """Record the worker count and write nothing."""
+        recorded.append(workers)
+        return iter(())
+
+    monkeypatch.setattr(cli, "_write_documents", record_workers)
+    return recorded
+
+
+def test_generate_forwards_doc_workers_to_the_main_site(
+    page_config: PageConfig, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The main-site path receives the configured worker count."""
+    page = dc.replace(page_config, key="main-page", output_dir=tmp_path)
+    site_config = SimpleNamespace(
+        pages={"main-page": page},
+        sites={},
+        docs_index_output=None,
+        get_page=lambda key: {"main-page": page}[key],
+    )
+    recorded = _record_generated_workers(monkeypatch, site_config)
+
+    generate(page="main-page", doc_workers=3)
+
+    assert recorded == [3]
+
+
+def test_generate_forwards_doc_workers_to_a_subsite(
+    page_config: PageConfig, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The sub-site path receives the configured worker count."""
+    page = dc.replace(page_config, key="sub-page", output_dir=tmp_path)
+    subsite = SimpleNamespace(
+        key="sub", templates_dir=tmp_path, pages={"sub-page": page}
+    )
+    site_config = SimpleNamespace(pages={}, sites={"sub": subsite})
+    recorded = _record_generated_workers(monkeypatch, site_config)
+
+    generate(site="sub", page="sub-page", doc_workers=5)
+
+    assert recorded == [5]
+
+
+# Cyclopts warns whenever it is called without explicit tokens under pytest;
+# ``main`` deliberately parses ``sys.argv`` and has no tokens to pass.
+@pytest.mark.filterwarnings(
+    "ignore:Cyclopts application invoked without tokens:UserWarning"
+)
+def test_pages_command_rejects_zero_doc_workers(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The console entry point exits non-zero with the usage error."""
+    monkeypatch.setattr(sys, "argv", ["pages", "generate", "--doc-workers", "0"])
+
+    with pytest.raises(SystemExit) as excinfo:
+        cli.main()
+
+    assert excinfo.value.code == 1, "a usage error must exit with status 1"
+    assert "--doc-workers must be at least one" in capsys.readouterr().err
 
 
 def test_generate_rejects_zero_document_workers() -> None:

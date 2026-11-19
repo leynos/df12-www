@@ -1,6 +1,6 @@
 cyclopts>=2.9
 minijinja>=3.1,<4
-MarkupSafe>=3.0
+MarkupSafe>=3.0,<4
 Markdown>=3.5
 Pygments>=2.20.0
 requests>=2.34.2

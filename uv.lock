@@ -218,7 +218,7 @@ requires-dist = [
     { name = "cyclopts", specifier = ">=2.9" },
     { name = "github3-py", specifier = ">=4.0" },
     { name = "markdown", specifier = ">=3.5" },
-    { name = "markupsafe", specifier = ">=3.0" },
+    { name = "markupsafe", specifier = ">=3.0,<4" },
     { name = "minijinja", specifier = ">=3.1,<4" },
     { name = "nh3", specifier = ">=0.2" },
     { name = "packaging", specifier = ">=25.0,<27" },

@@ -65,11 +65,13 @@ Adopt MiniJinja 3.1 with free-threaded CPython 3.15.2, and render documentation
 bundles through a thread pool that defaults to eight workers.
 
 - `.python-version` pins `cpython@3.15.2t`, which is what makes uv install and
-  select the free-threaded build in a checkout; `requires-python` states only
-  the minimum version, `>=3.15.2`, because a version specifier cannot express
-  "free-threaded". The CLI therefore also refuses to run when the interpreter
-  is older than 3.15.2, is not CPython, or reports the GIL enabled, since
-  package metadata cannot carry any of those three conditions.
+  select the free-threaded build in a checkout. `requires-python` states the
+  minimum version, `>=3.15.2`, so an installer refuses an older interpreter,
+  but it neither names CPython nor says anything about the GIL. The CLI guards
+  the other two conditions and re-checks the version, refusing to run when the
+  interpreter is older than 3.15.2, is not CPython, or reports the GIL enabled.
+  The guard matters because a free-threaded interpreter can still be started
+  with the GIL on, through `PYTHON_GIL=1` or `-X gil=1`.
 - `df12_pages/templating.py` owns the shared environment, the per-suffix
   escaping policy, the reproducible `SOURCE_DATE_EPOCH` timestamp and the
   `highlight` filter, so every builder renders through one configuration.

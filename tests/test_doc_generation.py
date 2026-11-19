@@ -834,13 +834,14 @@ class _RecordingExecutor(ThreadPoolExecutor):
         return future
 
 
-def _stub_render_in_order(
+def _stub_render_in_order(  # noqa: PLR0913 -- one knob per ordering scenario
     monkeypatch: pytest.MonkeyPatch,
     *,
     reverse_completion: bool = False,
     keys: list[str] | None = None,
     completion_order: list[int] | None = None,
     batch_size: int | None = None,
+    distinct_paths: bool = False,
 ) -> None:
     """Replace rendering with a stub that writes one identifiable section.
 
@@ -864,6 +865,11 @@ def _stub_render_in_order(
         bundle waits for the whole batch to be submitted before indexing the
         futures. The scheduler may start the first worker before ``submit``
         returns, so the record has to be complete before it is read.
+    distinct_paths
+        Give each bundle a file only it writes, ahead of the shared one. The
+        returned paths then name their bundle, so publication order can be
+        read from the path sequence instead of only from the shared file's
+        final owner.
     """
     if completion_order and batch_size is None:
         msg = "completion_order needs batch_size so the futures are all recorded"
@@ -909,11 +915,15 @@ def _stub_render_in_order(
             assert pool.submitted[successors[key]].result(timeout=5), (
                 f"bundle {key!r} waited on a future that returned nothing"
             )
-        filename = f"{generator.page.filename_prefix}shared-heading.html"
+        prefix = generator.page.filename_prefix
+        sections = []
+        if distinct_paths:
+            sections.append((f"{prefix}{key}.html", f"Content from {key}."))
+        sections.append((f"{prefix}shared-heading.html", f"Content from {key}."))
         return RenderedDocument(
             generator.page.output_dir,
             generator.page.output_dir / PAGE_META_TEMPLATE.format(key=key),
-            [(filename, f"Content from {key}.")],
+            sections,
         )
 
     monkeypatch.setattr(cli, "ThreadPoolExecutor", make_executor)
@@ -1096,6 +1106,7 @@ def test_any_completion_permutation_publishes_in_configuration_order(
         keys=keys,
         completion_order=completion_order,
         batch_size=page_count,
+        distinct_paths=True,
     )
     # One batch, so every bundle is submitted at once and the chain of
     # successor waits cannot outlast the pool.
@@ -1103,16 +1114,29 @@ def test_any_completion_permutation_publishes_in_configuration_order(
 
     paths = list(_write_documents(pages, page_count))
 
-    shared_name = f"{page_config.filename_prefix}shared-heading.html"
-    assert paths == [tmp_path / shared_name] * page_count, (
-        f"expected {page_count} paths in configuration order, got {paths!r}"
+    prefix = page_config.filename_prefix
+    shared_name = f"{prefix}shared-heading.html"
+    expected = [
+        tmp_path / filename
+        for key in keys
+        for filename in (f"{prefix}{key}.html", shared_name)
+    ]
+    assert paths == expected, (
+        "publication must follow configuration order, not completion order"
     )
+    for key in keys:
+        own = tmp_path / f"{prefix}{key}.html"
+        assert own.read_text() == f"Content from {key}.", (
+            "each bundle's own file must hold that bundle's document"
+        )
     assert paths[-1].read_text() == f"Content from {keys[-1]}.", (
         "the last-configured bundle must win the shared path"
     )
     for page in pages:
         metadata = tmp_path / PAGE_META_TEMPLATE.format(key=page.key)
-        assert json.loads(metadata.read_text()) == {"first_file": paths[0].name}
+        assert json.loads(metadata.read_text()) == {
+            "first_file": f"{prefix}{page.key}.html"
+        }
 
 
 def test_a_render_failure_names_the_bundle_and_is_raised(

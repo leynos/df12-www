@@ -1,4 +1,10 @@
-"""Render MiniJinja highlight filter blocks through Pygments."""
+"""Render MiniJinja highlight filter blocks through Pygments.
+
+:func:`highlight_code` is the public entry point: :mod:`df12_pages.templating`
+registers it as the ``highlight`` filter, so a template's
+``{% filter highlight(lexer, css_class) %}`` block reaches it. The remaining
+helpers are private to the rendering path.
+"""
 
 from __future__ import annotations
 

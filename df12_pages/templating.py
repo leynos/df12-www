@@ -1,4 +1,23 @@
-"""Configure the MiniJinja environment shared by the site builders."""
+"""Configure the MiniJinja environment shared by the site builders.
+
+Every page builder builds its environment here, so loading, escaping, filters
+and the reproducible build timestamp behave the same across the main site and
+its sub-sites. :func:`build_timestamp` returns the UTC build time, honouring
+``SOURCE_DATE_EPOCH`` for reproducible output and raising ``ValueError`` when
+that variable is not a base-ten integer.
+
+:func:`template_environment` returns a :class:`minijinja.Environment` that
+loads templates, includes and imports from one directory, exposes the site's
+``variables`` to imported macros, and installs the caller's escaping policy.
+``escape_by_suffix`` selects the document and index builders' rule — escape
+only ``.html`` and ``.xml`` templates — while the other builders escape every
+``.jinja`` template. Templates reach the remaining filters through this
+environment: ``highlight`` is
+:func:`df12_pages.jinja_highlight.highlight_code`, and ``forceescape`` and
+``index`` cover attribute interpolation and position lookups. A finalizer
+keeps URL-valued macro results comparable to raw ``href`` strings whenever
+HTML escaping is on.
+"""
 
 from __future__ import annotations
 

@@ -13,6 +13,9 @@ import datetime as dt
 import typing as typ
 
 import pytest
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
+from markupsafe import escape
 
 from df12_pages.jinja_highlight import DEFAULT_CSS_CLASS, highlight_code
 from df12_pages.templating import build_timestamp, template_environment
@@ -23,6 +26,16 @@ if typ.TYPE_CHECKING:
 #: The Unix timestamp used by the test fixtures: 2 October 2026, 00:00 UTC.
 REFERENCE_EPOCH = 1790899200
 REFERENCE_EPOCH_UTC = dt.datetime(2026, 10, 2, tzinfo=dt.UTC)
+
+#: Suffixes drawn for the escaping property, in both cases and both policies.
+ESCAPING_SUFFIXES = (
+    "page.html",
+    "page.xml",
+    "PAGE.HTML",
+    "page.jinja",
+    "page.txt",
+    "PAGE.JINJA",
+)
 
 
 def test_build_timestamp_returns_the_current_utc_time_when_unset(
@@ -93,6 +106,37 @@ def test_escape_by_suffix_false_escapes_every_suffix(
     rendered = environment.render_template(suffix, value="<b>x</b>")
 
     assert rendered == "&lt;b&gt;x&lt;/b&gt;", f"{suffix} rendered {rendered!r}"
+
+
+@given(
+    value=st.text(),
+    suffix=st.sampled_from(ESCAPING_SUFFIXES),
+    escape_by_suffix=st.booleans(),
+)
+@settings(
+    max_examples=25,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+def test_template_environment_escapes_any_value_according_to_the_policy(
+    tmp_path: Path, value: str, suffix: str, *, escape_by_suffix: bool
+) -> None:
+    """Escaping follows the suffix policy for every value, not just markup.
+
+    The policy is restated here rather than read from the implementation, so a
+    change to either the suffix test or the escaping itself fails the property.
+    """
+    (tmp_path / suffix).write_text("{{ value }}", encoding="utf-8")
+    environment = template_environment(tmp_path, escape_by_suffix=escape_by_suffix)
+
+    rendered = environment.render_template(suffix, value=value)
+
+    escapes = not escape_by_suffix or suffix.lower().endswith((".html", ".xml"))
+    expected = str(escape(value)) if escapes else value
+    assert rendered == expected, (
+        f"{suffix} with escape_by_suffix={escape_by_suffix} rendered "
+        f"{rendered!r}, expected {expected!r}"
+    )
 
 
 def test_highlight_code_rejects_an_unknown_lexer() -> None:

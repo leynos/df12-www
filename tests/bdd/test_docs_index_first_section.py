@@ -39,6 +39,10 @@ from pytest_bdd import given, scenarios, then, when
 from df12_pages.config import load_site_config
 from df12_pages.docs_index import DocsIndexBuilder
 from df12_pages.generator import PageContentGenerator
+from df12_pages.generator.page_generator import DocumentSource, FetchedMarkdown
+
+if typ.TYPE_CHECKING:
+    import datetime as dt
 
 FEATURE_FILE = (
     Path(__file__).resolve().parents[2]
@@ -123,9 +127,7 @@ def given_markdown_stub(scenario_state: dict[str, object]) -> None:
 
 
 @when("I render the docs and build the index")
-def when_render_and_index(
-    scenario_state: dict[str, object], monkeypatch: pytest.MonkeyPatch
-) -> None:
+def when_render_and_index(scenario_state: dict[str, object]) -> None:
     """Render the docs and build the index for the ordering scenario.
 
     Parameters
@@ -134,10 +136,6 @@ def when_render_and_index(
         Mutable state dictionary shared across BDD steps. This step reads the
         stored configuration path and updates it with the generated
         ``index_path`` for the docs index.
-    monkeypatch : pytest.MonkeyPatch
-        Pytest monkeypatch fixture used to stub out
-        ``PageContentGenerator._fetch_markdown`` so the page content comes
-        from the scenario state instead of the network.
 
     Returns
     -------
@@ -148,13 +146,20 @@ def when_render_and_index(
     config_path = typ.cast("Path", scenario_state["config_path"])
     config = load_site_config(config_path)
     page = config.get_page("ordering")
+    markdown = typ.cast("str", scenario_state["markdown"])
 
-    def _fake_fetch(self: PageContentGenerator) -> str:
-        """Fetch fake page content for the docs index tests."""
-        return typ.cast("str", scenario_state["markdown"])
+    def fake_fetch(
+        source: DocumentSource, *, updated_at: dt.datetime | None = None
+    ) -> FetchedMarkdown:
+        """Serve the scenario's markdown instead of reaching the network."""
+        return FetchedMarkdown(
+            text=markdown,
+            source_url=source.source_url,
+            version=source.version,
+            updated_at=updated_at,
+        )
 
-    monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", _fake_fetch)
-    generator = PageContentGenerator(page)
+    generator = PageContentGenerator(page, fetcher=fake_fetch)
     generator.run()
 
     builder = DocsIndexBuilder(config)

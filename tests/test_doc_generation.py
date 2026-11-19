@@ -88,6 +88,7 @@ import threading
 import typing as typ
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+from itertools import pairwise
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -100,10 +101,17 @@ from hypothesis import strategies as st
 
 from df12_pages import cli
 from df12_pages._constants import PAGE_META_TEMPLATE
-from df12_pages.cli import _write_documents, generate
+from df12_pages.cli import _publish_documents, _write_documents, generate
 from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.generator import PageContentGenerator
-from df12_pages.generator.page_generator import RenderedDocument
+from df12_pages.generator.page_generator import (
+    DocumentSource,
+    FetchedMarkdown,
+    RenderedDocument,
+    WrittenDocument,
+    fetch_document,
+    publish_document,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 INLINE_CODE_LABEL = "introctl"
@@ -656,10 +664,10 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
             self.headers = {"Last-Modified": "Mon, 01 Jan 2024 12:00:00 GMT"}
 
         def raise_for_status(self) -> None:
-            """Raise HTTPError for any status at or above 400."""
+            """Raise HTTPError, carrying this response, for 4xx and 5xx."""
             if self.status_code >= http.HTTPStatus.BAD_REQUEST:
                 msg = f"{self.status_code} for test"
-                raise requests.HTTPError(msg)
+                raise requests.HTTPError(msg, response=self)
 
     class _Session:
         """Stand-in for ``requests.Session`` that returns 404 for tag URLs."""
@@ -690,7 +698,10 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     )
     assert "refs/tags/v9.9.9" in calls[0]
     assert calls[1] == release_config.source_url
-    assert generator.doc_version is None, "version pin should be dropped on fallback"
+    assert generator.source.version == "v9.9.9", (
+        "the configured source still records the release pin; the fetched "
+        "provenance is what drops it"
+    )
 
     intro_path = next(
         path for path in written if path.name.endswith("introduction.html")
@@ -704,17 +715,107 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     )
 
 
+def _http_error(status_code: int) -> requests.HTTPError:
+    """Return an ``HTTPError`` carrying a response with *status_code*."""
+    response = SimpleNamespace(status_code=status_code)
+    return requests.HTTPError(f"{status_code} for test", response=response)
+
+
+class _ScriptedSession:
+    """A session that answers each URL from a script of outcomes."""
+
+    def __init__(self, outcomes: dict[str, str | requests.HTTPError]) -> None:
+        """Store the scripted outcome for each URL."""
+        self._outcomes = outcomes
+        self.requested: list[str] = []
+
+    def get(self, url: str, timeout: int = 30) -> SimpleNamespace:
+        """Record the URL, then return its body or raise its error."""
+        self.requested.append(url)
+        outcome = self._outcomes[url]
+        if isinstance(outcome, requests.HTTPError):
+            raise outcome
+        return SimpleNamespace(text=outcome, raise_for_status=lambda: None)
+
+
+def test_fetch_document_drops_the_pin_when_the_release_lacks_the_document() -> None:
+    """A 404 on the release URL falls back to the branch and drops the pin."""
+    branch_url = "https://example.test/main/docs/guide.md"
+    release_url = "https://example.test/refs/tags/v1.2.3/docs/guide.md"
+    source = DocumentSource(
+        source_url=branch_url, release_url=release_url, version="v1.2.3"
+    )
+    session = _ScriptedSession(
+        {release_url: _http_error(404), branch_url: "# Branch text"}
+    )
+    released = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
+
+    fetched = fetch_document(
+        source, updated_at=released, session=typ.cast("requests.Session", session)
+    )
+
+    assert session.requested == [release_url, branch_url]
+    assert fetched == FetchedMarkdown(
+        text="# Branch text",
+        source_url=branch_url,
+        version=None,
+        updated_at=None,
+    ), "the branch copy belongs to neither the release nor its date"
+
+
+def test_fetch_document_keeps_the_pin_when_the_release_answers() -> None:
+    """The release-pinned document keeps its URL, version pin, and date."""
+    branch_url = "https://example.test/main/docs/guide.md"
+    release_url = "https://example.test/refs/tags/v1.2.3/docs/guide.md"
+    source = DocumentSource(
+        source_url=branch_url, release_url=release_url, version="v1.2.3"
+    )
+    session = _ScriptedSession({release_url: "# Released text"})
+    released = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
+
+    fetched = fetch_document(
+        source, updated_at=released, session=typ.cast("requests.Session", session)
+    )
+
+    assert session.requested == [release_url], "the branch must not be consulted"
+    assert fetched == FetchedMarkdown(
+        text="# Released text",
+        source_url=release_url,
+        version="v1.2.3",
+        updated_at=released,
+    )
+
+
+def test_fetch_document_does_not_fall_back_on_an_unrelated_failure() -> None:
+    """Only a missing release document earns the branch fallback."""
+    branch_url = "https://example.test/main/docs/guide.md"
+    release_url = "https://example.test/refs/tags/v1.2.3/docs/guide.md"
+    source = DocumentSource(
+        source_url=branch_url, release_url=release_url, version="v1.2.3"
+    )
+    session = _ScriptedSession({release_url: _http_error(500), branch_url: "text"})
+
+    with pytest.raises(requests.HTTPError):
+        fetch_document(source, session=typ.cast("requests.Session", session))
+
+    assert session.requested == [release_url], (
+        "a server error must surface, not be masked by the branch copy"
+    )
+
+
 class _RecordingExecutor(ThreadPoolExecutor):
     """A worker pool that remembers the futures it submits, in submit order."""
 
     #: The ordering test submits exactly this many bundles in one batch.
     PAIR_SIZE = 2
 
-    def __init__(self, max_workers: int) -> None:
+    def __init__(self, max_workers: int, *, expected: int | None = None) -> None:
         """Start the pool with an empty record of what it has been given."""
         super().__init__(max_workers=max_workers)
         self.submitted: list[Future[RenderedDocument]] = []
         self.pair_submitted = threading.Event()
+        self._expected = expected
+        self.batch_submitted = threading.Event()
 
     def submit(
         self,
@@ -728,11 +829,18 @@ class _RecordingExecutor(ThreadPoolExecutor):
         self.submitted.append(future)
         if len(self.submitted) >= self.PAIR_SIZE:
             self.pair_submitted.set()
+        if self._expected is not None and len(self.submitted) >= self._expected:
+            self.batch_submitted.set()
         return future
 
 
 def _stub_render_in_order(
-    monkeypatch: pytest.MonkeyPatch, *, reverse_completion: bool = False
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    reverse_completion: bool = False,
+    keys: list[str] | None = None,
+    completion_order: list[int] | None = None,
+    batch_size: int | None = None,
 ) -> None:
     """Replace rendering with a stub that writes one identifiable section.
 
@@ -745,14 +853,35 @@ def _stub_render_in_order(
         Make the later bundle's future complete before the earlier bundle
         returns, so a writer that published in completion order would invert
         them.
+    keys
+        The page keys in configuration order, indexed by ``completion_order``.
+    completion_order
+        Configuration indices in the order the stub must let them finish. Each
+        bundle waits on the next one's future, so the drawn permutation is
+        forced rather than left to the scheduler.
+    batch_size
+        Bundles submitted in one batch; required with ``completion_order`` so a
+        bundle waits for the whole batch to be submitted before indexing the
+        futures. The scheduler may start the first worker before ``submit``
+        returns, so the record has to be complete before it is read.
     """
+    if completion_order and batch_size is None:
+        msg = "completion_order needs batch_size so the futures are all recorded"
+        raise ValueError(msg)
     pools: list[_RecordingExecutor] = []
 
     def make_executor(*, max_workers: int) -> _RecordingExecutor:
         """Record the pool so the stub can reach the futures it submits."""
-        pool = _RecordingExecutor(max_workers)
+        pool = _RecordingExecutor(max_workers, expected=batch_size)
         pools.append(pool)
         return pool
+
+    successors: dict[str, int] = {}
+    if completion_order and keys:
+        successors = {
+            keys[current]: following
+            for current, following in pairwise(completion_order)
+        }
 
     def render(generator: PageContentGenerator) -> RenderedDocument:
         """Return a document whose content names the bundle that produced it."""
@@ -768,6 +897,17 @@ def _stub_render_in_order(
             # writer that publishes on completion therefore inverts these two.
             assert pool.submitted[1].result(timeout=5), (
                 "the later bundle returned no document"
+            )
+        if key in successors:
+            assert pools, "the concurrent writer created no pool to wait on"
+            pool = pools[0]
+            assert pool.batch_submitted.wait(timeout=5), (
+                "the whole batch was never submitted to the pool"
+            )
+            # Waiting on the next bundle's future makes the completion order
+            # exactly the drawn permutation; publication must ignore it.
+            assert pool.submitted[successors[key]].result(timeout=5), (
+                f"bundle {key!r} waited on a future that returned nothing"
             )
         filename = f"{generator.page.filename_prefix}shared-heading.html"
         return RenderedDocument(
@@ -928,6 +1068,53 @@ def test_any_worker_count_publishes_in_configuration_order(
         assert json.loads(metadata.read_text()) == {"first_file": paths[0].name}
 
 
+@given(data=st.data())
+@settings(
+    max_examples=10,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+def test_any_completion_permutation_publishes_in_configuration_order(
+    data: st.DataObject,
+    page_config: PageConfig,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Publication order follows configuration, whatever order renders finish.
+
+    The drawn permutation is forced by making each bundle wait on the next
+    one's future, so this asserts against a known completion order rather than
+    against whatever the scheduler happened to produce.
+    """
+    page_count = data.draw(st.integers(min_value=2, max_value=5), label="page_count")
+    keys = [f"page{index}" for index in range(page_count)]
+    completion_order = list(
+        data.draw(st.permutations(range(page_count)), label="completion_order")
+    )
+    _stub_render_in_order(
+        monkeypatch,
+        keys=keys,
+        completion_order=completion_order,
+        batch_size=page_count,
+    )
+    # One batch, so every bundle is submitted at once and the chain of
+    # successor waits cannot outlast the pool.
+    pages = [dc.replace(page_config, key=key, output_dir=tmp_path) for key in keys]
+
+    paths = list(_write_documents(pages, page_count))
+
+    shared_name = f"{page_config.filename_prefix}shared-heading.html"
+    assert paths == [tmp_path / shared_name] * page_count, (
+        f"expected {page_count} paths in configuration order, got {paths!r}"
+    )
+    assert paths[-1].read_text() == f"Content from {keys[-1]}.", (
+        "the last-configured bundle must win the shared path"
+    )
+    for page in pages:
+        metadata = tmp_path / PAGE_META_TEMPLATE.format(key=page.key)
+        assert json.loads(metadata.read_text()) == {"first_file": paths[0].name}
+
+
 def test_a_render_failure_names_the_bundle_and_is_raised(
     page_config: PageConfig,
     tmp_path: Path,
@@ -980,8 +1167,78 @@ def test_render_writes_nothing_until_the_document_is_published(
 
     written = document.write()
 
-    assert written, "write() must publish the rendered sections"
-    assert all(path.exists() for path in written)
+    assert written.html_paths, "write() must publish the rendered sections"
+    assert written.metadata_written, "write() must publish the index pointer"
+    assert all(path.exists() for path in written.html_paths)
+
+
+def _forbid_fetch(
+    source: DocumentSource, *, updated_at: dt.datetime | None = None
+) -> FetchedMarkdown:
+    """Fail on use, proving the path under test reaches no network."""
+    msg = f"no document should be fetched from {source.source_url!r}"
+    raise AssertionError(msg)
+
+
+def test_render_document_renders_without_fetching_or_writing(
+    page_config: PageConfig,
+    sample_markdown: str,
+    tmp_path: Path,
+) -> None:
+    """The render seam takes markdown as a value: no fetch and no write."""
+    output_dir = tmp_path / "unpublished"
+    generator = PageContentGenerator(
+        page_config, output_dir=output_dir, fetcher=_forbid_fetch
+    )
+
+    document = generator.render_document(
+        sample_markdown,
+        source_url=page_config.source_url,
+        version_display=None,
+        page_description="Fixture description",
+    )
+
+    assert document.sections, "the fixture must render at least one section"
+    assert document.output_dir == output_dir
+    assert not output_dir.exists(), "render_document() must not touch the disk"
+
+
+def test_publish_documents_runs_only_the_injected_render(
+    page_config: PageConfig, sample_markdown: str, tmp_path: Path
+) -> None:
+    """The writer schedules the caller's render and fetches nothing itself."""
+    keys = ["first", "second"]
+    pages = [
+        dc.replace(page_config, key=key, output_dir=tmp_path / key) for key in keys
+    ]
+    rendered: list[str] = []
+
+    def render(page: PageConfig) -> RenderedDocument:
+        """Render a fixture with fetching forbidden and record the bundle."""
+        generator = PageContentGenerator(page, fetcher=_forbid_fetch)
+        rendered.append(page.key)
+        return generator.render_document(
+            sample_markdown,
+            source_url=page.source_url,
+            version_display=None,
+            page_description="Fixture description",
+        )
+
+    paths = list(_publish_documents(pages, len(pages), render))
+
+    assert sorted(rendered) == keys, "each bundle must be rendered exactly once"
+    per_bundle = len(paths) // len(pages)
+    assert per_bundle >= 1, "each bundle must publish at least one section"
+    assert len(paths) == per_bundle * len(pages), (
+        f"expected each bundle's paths to be contiguous, got {paths!r}"
+    )
+    for index, page in enumerate(pages):
+        group = paths[index * per_bundle : (index + 1) * per_bundle]
+        assert {path.parent for path in group} == {page.output_dir}, (
+            "publication must stay in configuration order"
+        )
+        metadata = page.output_dir / PAGE_META_TEMPLATE.format(key=page.key)
+        assert json.loads(metadata.read_text()) == {"first_file": group[0].name}
 
 
 def test_document_workers_publish_overlaps_in_order(
@@ -1009,23 +1266,33 @@ def test_rendered_document_without_sections_writes_no_metadata(
 
     written = RenderedDocument(tmp_path, metadata_path, []).write()
 
-    assert written == []
+    assert written == WrittenDocument(
+        html_paths=[], metadata_path=metadata_path, metadata_written=False
+    )
     assert not metadata_path.exists(), "an empty bundle must not claim a first file"
 
 
-def test_rendered_document_survives_an_unwritable_metadata_path(
+def test_rendered_document_reports_an_unwritable_metadata_path(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """A metadata failure is reported but must not fail the published HTML."""
+    """A metadata failure is visible in the result and must not fail the HTML."""
     metadata_path = tmp_path / "metadata"
     metadata_path.mkdir()
     document = RenderedDocument(tmp_path, metadata_path, [("page.html", "<p>ok</p>")])
 
-    with caplog.at_level(logging.WARNING):
-        written = document.write()
+    written = document.write()
 
-    assert written == [tmp_path / "page.html"]
-    assert written[0].read_text() == "<p>ok</p>"
+    assert written.html_paths == [tmp_path / "page.html"]
+    assert written.html_paths[0].read_text() == "<p>ok</p>"
+    assert written.metadata_path == metadata_path
+    assert not written.metadata_written, "the failed pointer must be reported"
+    assert isinstance(written.metadata_error, OSError)
+    assert caplog.records == [], "write() reports through its result, not the log"
+
+    with caplog.at_level(logging.WARNING):
+        published = publish_document(document)
+
+    assert published == written.html_paths
     assert "could not write document metadata" in caplog.text
 
 

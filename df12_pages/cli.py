@@ -58,6 +58,7 @@ from .deploy import (
 )
 from .docs_index import DocsIndexBuilder
 from .generator import PageContentGenerator
+from .generator.page_generator import publish_document
 from .homepage import HomePageBuilder
 from .releases import GitHubReleaseClient
 from .shared_content import SharedContentGenerator
@@ -185,13 +186,19 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     # the outside as well as from the per-site worker loop.
     started = time.perf_counter()
 
+    github_token = _github_token()
+
     if site:
         if site not in site_config.sites:
             available = ", ".join(sorted(site_config.sites))
             msg = f"Unknown site '{site}'. Known sites: {available}"
             raise PagesUsageError(msg)
         _generate_subsite(
-            site_config, site_config.sites[site], page=page, doc_workers=doc_workers
+            site_config,
+            site_config.sites[site],
+            page=page,
+            doc_workers=doc_workers,
+            github_token=github_token,
         )
         _log.info("generated site %r in %.3f s", site, time.perf_counter() - started)
         return
@@ -202,23 +209,90 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         source_url=source_url,
         output_dir=output_dir,
         doc_workers=doc_workers,
+        github_token=github_token,
     )
 
     if all_sites:
         for subsite in site_config.sites.values():
-            _generate_subsite(site_config, subsite, doc_workers=doc_workers)
+            _generate_subsite(
+                site_config, subsite, doc_workers=doc_workers, github_token=github_token
+            )
     _log.info("generated the requested sites in %.3f s", time.perf_counter() - started)
 
 
-def _write_documents(
+def _github_token() -> str | None:
+    """Return the GitHub token for commit-date lookups, read at the boundary."""
+    return os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+
+
+def _publish_documents(
+    pages: list[PageConfig],
+    workers: int,
+    render: cabc.Callable[[PageConfig], RenderedDocument],
+) -> cabc.Iterator[Path]:
+    """Render bundles and publish potentially overlapping paths in order.
+
+    Scheduling and publication live here and nowhere else: ``render`` is the
+    caller's command, so this unit makes no network request of its own. At
+    most one worker-sized batch of rendered HTML is held in memory, and each
+    batch publishes in configuration order whatever order its renders finish.
+
+    Parameters
+    ----------
+    pages : list[PageConfig]
+        Bundles in configuration order.
+    workers : int
+        Maximum concurrency; one bundle is published at a time regardless.
+    render : callable
+        Produces one bundle's :class:`RenderedDocument`; called from the pool.
+
+    Yields
+    ------
+    Path
+        Written HTML paths, in configuration order.
+    """
+    if workers == 1 or len(pages) <= 1:
+        for page in pages:
+            yield from publish_document(render(page))
+        return
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for batch in batched(pages, min(workers, len(pages)), strict=False):
+            for document in pool.map(render, batch):
+                yield from publish_document(document)
+
+
+def _write_documents(  # noqa: PLR0913 -- passes the single-bundle overrides through
     pages: list[PageConfig],
     workers: int,
     *,
     templates_dir: Path | None = None,
     source_url: str | None = None,
     output_dir: Path | None = None,
+    github_token: str | None = None,
 ) -> cabc.Iterator[Path]:
-    """Render independent bundles and write potentially overlapping paths in order."""
+    """Time and log a publication run, yielding its paths in configuration order.
+
+    Parameters
+    ----------
+    pages : list[PageConfig]
+        Bundles in configuration order.
+    workers : int
+        Configured concurrency limit; the effective count is the smaller of it
+        and the bundle count.
+    templates_dir : Path, optional
+        Template root for sub-site bundles.
+    source_url : str, optional
+        Source URL override; only valid for a single bundle.
+    output_dir : Path, optional
+        Output directory override; only valid for a single bundle.
+    github_token : str, optional
+        Token passed to each generator for its commit-date lookup.
+
+    Yields
+    ------
+    Path
+        Written HTML paths, in configuration order.
+    """
     started = time.perf_counter()
     # The pool never runs more bundles at once than there are bundles to run.
     effective_workers = min(workers, len(pages))
@@ -238,6 +312,7 @@ def _write_documents(
                 templates_dir=templates_dir,
                 source_url=source_url,
                 output_dir=output_dir,
+                github_token=github_token,
             ).render()
         except Exception:
             _log.exception("document bundle %r failed to render", page.key)
@@ -249,20 +324,7 @@ def _write_documents(
         )
         return document
 
-    if workers == 1 or len(pages) <= 1:
-        for page in pages:
-            yield from render(page).write()
-        _log.info(
-            "wrote %d document bundle(s) in %.3f s",
-            len(pages),
-            time.perf_counter() - started,
-        )
-        return
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        # Keep at most one worker-sized batch of rendered HTML in memory.
-        for batch in batched(pages, min(workers, len(pages)), strict=False):
-            for document in pool.map(render, batch):
-                yield from document.write()
+    yield from _publish_documents(pages, workers, render)
     _log.info(
         "wrote %d document bundle(s) in %.3f s",
         len(pages),
@@ -270,13 +332,14 @@ def _write_documents(
     )
 
 
-def _generate_main_site(
+def _generate_main_site(  # noqa: PLR0913 -- one keyword per generator override
     site_config: SiteConfig,
     *,
     doc_workers: int = DEFAULT_DOC_WORKERS,
     page: str | None = None,
     source_url: str | None = None,
     output_dir: Path | None = None,
+    github_token: str | None = None,
 ) -> None:
     """Generate the main df12 site pages."""
     shared_output_root = (
@@ -294,7 +357,11 @@ def _generate_main_site(
         raise ValueError(msg)
 
     for path in _write_documents(
-        target_pages, doc_workers, source_url=source_url, output_dir=output_dir
+        target_pages,
+        doc_workers,
+        source_url=source_url,
+        output_dir=output_dir,
+        github_token=github_token,
     ):
         print(f"wrote {_format_path(path)}")
 
@@ -349,6 +416,7 @@ def _generate_subsite(
     *,
     doc_workers: int = DEFAULT_DOC_WORKERS,
     page: str | None = None,
+    github_token: str | None = None,
 ) -> None:
     """Generate all pages for a single sub-site.
 
@@ -364,6 +432,9 @@ def _generate_subsite(
         Specific page key to render; when ``None`` (default) all pages,
         the docs index, homepage, about page, shared content, content
         pages, and static assets are rendered.
+    github_token : str or None, optional
+        Token passed to each documentation bundle for its commit-date
+        lookup; read from the environment by :func:`generate`.
 
     Raises
     ------
@@ -387,7 +458,10 @@ def _generate_subsite(
         target_pages = list(subsite.pages.values())
 
     for path in _write_documents(
-        target_pages, doc_workers, templates_dir=templates_dir
+        target_pages,
+        doc_workers,
+        templates_dir=templates_dir,
+        github_token=github_token,
     ):
         print(f"[{subsite.key}] wrote {_format_path(path)}")
 

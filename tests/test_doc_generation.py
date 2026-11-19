@@ -106,6 +106,7 @@ from df12_pages.cli import _publish_documents, _write_documents, generate
 from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.generator import PageContentGenerator
 from df12_pages.generator.page_generator import (
+    DEFAULT_TEMPLATES_DIR,
     DocumentSource,
     FetchedMarkdown,
     RenderedDocument,
@@ -1286,8 +1287,15 @@ def _watched(monkeypatch: pytest.MonkeyPatch) -> typ.Iterator[list[str]]:
         )
         raise AssertionError(msg)
 
+    def _no_metadata(*_args: object, **_kwargs: object) -> typ.NoReturn:
+        """Reject a path resolution or metadata lookup."""
+        msg = "the watched work must resolve no path and stat no file"
+        raise AssertionError(msg)
+
     monkeypatch.setattr(Path, "read_text", _record_read)
     monkeypatch.setattr(Path, "read_bytes", _record_read_bytes)
+    for name in ("resolve", "stat", "lstat"):
+        monkeypatch.setattr(Path, name, _no_metadata)
     for dotted in FORBIDDEN_IN_RENDER:
         monkeypatch.setattr(dotted, _forbidden, raising=False)
     yield reads
@@ -1298,13 +1306,22 @@ def test_construction_reaches_no_filesystem_environment_or_subprocess(
     page_config: PageConfig,
     tmp_path: Path,
 ) -> None:
-    """Building a generator reads no template and starts no Mermaid process."""
+    """Building a generator resolves no path and starts no Mermaid process.
+
+    Both forms are built: one that supplies a template directory and one that
+    takes the shipped default. Neither may resolve, stat or read anything, so
+    the default must already be resolved when the module loads.
+    """
     page = dc.replace(page_config, output_dir=tmp_path / "out")
+    supplied = tmp_path / "templates"
 
     with _watched(monkeypatch) as reads:
-        generator = PageContentGenerator(page)
+        explicit = PageContentGenerator(page, templates_dir=supplied)
+        defaulted = PageContentGenerator(page)
 
-    assert generator.source.source_url == page.source_url
+    assert explicit.templates_dir == supplied
+    assert defaulted.templates_dir == DEFAULT_TEMPLATES_DIR
+    assert explicit.source.source_url == page.source_url
     assert reads == [], f"construction opened {reads!r}"
 
 

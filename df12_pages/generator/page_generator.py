@@ -75,6 +75,10 @@ FETCH_TIMEOUT_SECONDS = 30
 DOCUMENT_TEMPLATE = "doc_page.jinja"
 _TEMPLATE_SUFFIX = ".jinja"
 
+#: Templates shipped with the package, resolved once when the module loads.
+#: Resolving here keeps construction free of filesystem metadata lookups.
+DEFAULT_TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "templates"
+
 
 @dc.dataclass(frozen=True)
 class DocumentSource:
@@ -571,7 +575,8 @@ class PageContentGenerator:
         """Initialize the generator with configuration and template context.
 
         Construction performs no I/O: no document is fetched, no template is
-        read, no commit date is looked up and no output directory is created.
+        read, no path is resolved, no commit date is looked up and no output
+        directory is created.
         The network is reached only by :meth:`render`; template and Mermaid
         I/O happens in :meth:`prepare_document`.
 
@@ -603,8 +608,7 @@ class PageContentGenerator:
         """
         self.page = page_config
         self.output_dir_override = output_dir
-        default_templates = Path(__file__).resolve().parents[1] / "templates"
-        self.templates_dir = templates_dir or default_templates
+        self.templates_dir = templates_dir or DEFAULT_TEMPLATES_DIR
         self.renderer = HtmlContentRenderer(
             page_config.pygments_style,
             link_extension=_build_link_rewriter(page_config),

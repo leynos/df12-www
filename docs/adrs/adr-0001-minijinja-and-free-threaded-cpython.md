@@ -52,15 +52,24 @@ _Table 1: Template engines and runtimes compared._
 | MiniJinja 3.1.0 on GIL CPython                  | 0.843 s per all-sites run             | Still serial                        | Small: syntax and filter wiring | Preserved                          |
 | MiniJinja 3.1.0 on free-threaded CPython 3.15.2 | 0.843 s per all-sites run             | Eight document bundles concurrently | Small, plus the runtime pin     | Preserved, including worker counts |
 
+The 0.843 s entries are the template-processing step of the Jinja2-to-MiniJinja
+comparison, which ran both engines on CPython 3.13.11. It measures the engine
+change alone, so the free-threaded row reuses that number rather than claiming
+a separately measured 3.15.2t value; the runtime change is measured by the
+page-generation sweep in the [benchmark report](../minijinja-benchmark.md),
+8.70 s serial against 5.63 s with eight workers on CPython 3.15.2t.
+
 ## Decision outcome
 
 Adopt MiniJinja 3.1 with free-threaded CPython 3.15.2, and render documentation
 bundles through a thread pool that defaults to eight workers.
 
-- The uv baseline (`.python-version`, `requires-python`) selects the
-  free-threaded interpreter, and the CLI refuses to run when the GIL is enabled
-  or the interpreter is older than 3.15.2, because package metadata cannot
-  express that requirement.
+- `.python-version` pins `cpython@3.15.2t`, which is what makes uv install and
+  select the free-threaded build in a checkout; `requires-python` states only
+  the minimum version, `>=3.15.2`, because a version specifier cannot express
+  "free-threaded". The CLI therefore also refuses to run when the interpreter
+  is older than 3.15.2, is not CPython, or reports the GIL enabled, since
+  package metadata cannot carry any of those three conditions.
 - `df12_pages/templating.py` owns the shared environment, the per-suffix
   escaping policy, the reproducible `SOURCE_DATE_EPOCH` timestamp and the
   `highlight` filter, so every builder renders through one configuration.

@@ -82,19 +82,25 @@ def test_escape_by_suffix_escapes_only_markup_documents(
     assert rendered == expected, f"{suffix} rendered {rendered!r}"
 
 
-def test_escape_by_suffix_false_escapes_every_suffix(tmp_path: Path) -> None:
-    """The other builders enable HTML escaping for their own ``.jinja`` files."""
-    (tmp_path / "page.jinja").write_text("{{ value }}", encoding="utf-8")
+@pytest.mark.parametrize("suffix", ["page.html", "page.xml", "page.jinja", "page.txt"])
+def test_escape_by_suffix_false_escapes_every_suffix(
+    tmp_path: Path, suffix: str
+) -> None:
+    """The other builders escape every template, whatever its suffix."""
+    (tmp_path / suffix).write_text("{{ value }}", encoding="utf-8")
     environment = template_environment(tmp_path, escape_by_suffix=False)
 
-    rendered = environment.render_template("page.jinja", value="<b>x</b>")
+    rendered = environment.render_template(suffix, value="<b>x</b>")
 
-    assert rendered == "&lt;b&gt;x&lt;/b&gt;", f"rendered {rendered!r}"
+    assert rendered == "&lt;b&gt;x&lt;/b&gt;", f"{suffix} rendered {rendered!r}"
 
 
 def test_highlight_code_rejects_an_unknown_lexer() -> None:
     """A typo in a template's lexer name must fail the build, not pass through."""
-    with pytest.raises(RuntimeError, match="names an unknown Pygments lexer"):
+    with pytest.raises(
+        RuntimeError,
+        match=r"highlight\('no-such-lexer'\) names an unknown Pygments lexer",
+    ):
         highlight_code("x = 1", "no-such-lexer")
 
 

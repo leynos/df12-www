@@ -25,6 +25,13 @@ def build_timestamp() -> dt.datetime:
     datetime.datetime
         The instant specified by ``SOURCE_DATE_EPOCH`` in Unix seconds,
         or the current UTC time when the variable is unset.
+
+    Raises
+    ------
+    ValueError
+        If ``SOURCE_DATE_EPOCH`` is set but is not a base-ten integer. A
+        malformed epoch is reported rather than ignored, so a reproducible
+        build cannot silently fall back to the wall clock.
     """
     epoch = os.environ.get("SOURCE_DATE_EPOCH")
     if epoch is None:

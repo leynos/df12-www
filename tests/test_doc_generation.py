@@ -86,6 +86,7 @@ import subprocess
 import sys
 import threading
 import typing as typ
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
@@ -94,6 +95,8 @@ import msgspec.json as msgspec_json
 import pytest
 import requests
 from bs4 import BeautifulSoup
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 
 from df12_pages import cli
 from df12_pages._constants import PAGE_META_TEMPLATE
@@ -113,6 +116,8 @@ CODE_SPAN_PROPS = (
 )
 
 if typ.TYPE_CHECKING:
+    from concurrent.futures import Future
+
     from pytest_mock import MockerFixture
 else:  # pragma: no cover - typing fallback
     MockerFixture = typ.Any
@@ -699,6 +704,33 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     )
 
 
+class _RecordingExecutor(ThreadPoolExecutor):
+    """A worker pool that remembers the futures it submits, in submit order."""
+
+    #: The ordering test submits exactly this many bundles in one batch.
+    PAIR_SIZE = 2
+
+    def __init__(self, max_workers: int) -> None:
+        """Start the pool with an empty record of what it has been given."""
+        super().__init__(max_workers=max_workers)
+        self.submitted: list[Future[RenderedDocument]] = []
+        self.pair_submitted = threading.Event()
+
+    def submit(
+        self,
+        fn: typ.Callable[..., RenderedDocument],
+        /,
+        *args: object,
+        **kwargs: object,
+    ) -> Future[RenderedDocument]:
+        """Record the future so a stub can wait for another bundle to finish."""
+        future = super().submit(fn, *args, **kwargs)
+        self.submitted.append(future)
+        if len(self.submitted) >= self.PAIR_SIZE:
+            self.pair_submitted.set()
+        return future
+
+
 def _stub_render_in_order(
     monkeypatch: pytest.MonkeyPatch, *, reverse_completion: bool = False
 ) -> None:
@@ -707,35 +739,44 @@ def _stub_render_in_order(
     Parameters
     ----------
     monkeypatch
-        Fixture used to replace :meth:`PageContentGenerator.render`.
+        Fixture used to replace :meth:`PageContentGenerator.render` and the
+        pool class it runs in.
     reverse_completion
-        Make the later bundle complete before the earlier one, so a writer that
-        published in completion order would invert them.
+        Make the later bundle's future complete before the earlier bundle
+        returns, so a writer that published in completion order would invert
+        them.
     """
-    first_started = threading.Event()
-    later_completed = threading.Event()
+    pools: list[_RecordingExecutor] = []
+
+    def make_executor(*, max_workers: int) -> _RecordingExecutor:
+        """Record the pool so the stub can reach the futures it submits."""
+        pool = _RecordingExecutor(max_workers)
+        pools.append(pool)
+        return pool
 
     def render(generator: PageContentGenerator) -> RenderedDocument:
         """Return a document whose content names the bundle that produced it."""
         key = generator.page.key
-        if reverse_completion:
-            if key == "first":
-                first_started.set()
-                assert later_completed.wait(timeout=5), "later bundle never finished"
-                content = "Content from first."
-            else:
-                assert first_started.wait(timeout=5), "first bundle never started"
-                content = "Content from second."
-                later_completed.set()
-        else:
-            content = f"Content from {key}."
+        if reverse_completion and key == "first":
+            assert pools, "the concurrent writer created no pool to wait on"
+            pool = pools[0]
+            assert pool.pair_submitted.wait(timeout=5), (
+                "both bundles were never submitted"
+            )
+            # The later-configured bundle's future completing is a fact about
+            # that bundle's return, not a race the scheduler can reorder. A
+            # writer that publishes on completion therefore inverts these two.
+            assert pool.submitted[1].result(timeout=5), (
+                "the later bundle returned no document"
+            )
         filename = f"{generator.page.filename_prefix}shared-heading.html"
         return RenderedDocument(
             generator.page.output_dir,
             generator.page.output_dir / PAGE_META_TEMPLATE.format(key=key),
-            [(filename, content)],
+            [(filename, f"Content from {key}.")],
         )
 
+    monkeypatch.setattr(cli, "ThreadPoolExecutor", make_executor)
     monkeypatch.setattr(PageContentGenerator, "render", render)
 
 
@@ -790,9 +831,157 @@ def test_write_documents_reports_the_effective_worker_count(
     with caplog.at_level(logging.INFO, logger="df12_pages.cli"):
         list(_write_documents(pages, 2))
 
-    assert "rendering 2 document bundle(s) with 2 worker(s)" in caplog.text
+    assert "rendering 2 document bundle(s) with 2 effective worker(s)" in caplog.text
+    assert "(limit 2)" in caplog.text
     assert "rendered document bundle 'page0'" in caplog.text
     assert "wrote 2 document bundle(s)" in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("page_count", "workers", "effective"),
+    [
+        pytest.param(0, 8, 0, id="empty"),
+        pytest.param(1, 8, 1, id="single-page"),
+        pytest.param(3, 1, 1, id="serial"),
+        pytest.param(3, 8, 3, id="bundle-limited"),
+    ],
+)
+def test_write_documents_reports_the_effective_concurrency(  # noqa: PLR0913, PLR0917
+    page_config: PageConfig,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    page_count: int,
+    workers: int,
+    effective: int,
+) -> None:
+    """The configured limit is reported beside what can actually run."""
+    _stub_render_in_order(monkeypatch)
+    pages = [
+        dc.replace(
+            page_config, key=f"page{index}", output_dir=tmp_path / f"page{index}"
+        )
+        for index in range(page_count)
+    ]
+
+    with caplog.at_level(logging.INFO, logger="df12_pages.cli"):
+        list(_write_documents(pages, workers))
+
+    assert (
+        f"rendering {page_count} document bundle(s) with {effective} effective"
+        f" worker(s) (limit {workers})" in caplog.text
+    )
+
+
+#: The documented default concurrency for documentation bundles.
+EXPECTED_DEFAULT_WORKERS = 8
+
+
+def test_the_doc_worker_default_is_eight(
+    page_config: PageConfig, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The CLI default reaches the writer unchanged."""
+    assert cli.DEFAULT_DOC_WORKERS == EXPECTED_DEFAULT_WORKERS
+    page = dc.replace(page_config, key="main-page", output_dir=tmp_path)
+    site_config = SimpleNamespace(
+        pages={"main-page": page},
+        sites={},
+        docs_index_output=None,
+        get_page=lambda key: {"main-page": page}[key],
+    )
+    recorded = _record_generated_workers(monkeypatch, site_config)
+
+    generate(page="main-page")
+
+    assert recorded == [cli.DEFAULT_DOC_WORKERS]
+
+
+@given(
+    page_count=st.integers(min_value=1, max_value=6),
+    workers=st.integers(min_value=1, max_value=4),
+)
+@settings(
+    max_examples=10,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+def test_any_worker_count_publishes_in_configuration_order(
+    page_count: int,
+    workers: int,
+    page_config: PageConfig,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Overlapping paths follow configuration order whatever the pool size."""
+    _stub_render_in_order(monkeypatch)
+    keys = [f"page{index}" for index in range(page_count)]
+    pages = [dc.replace(page_config, key=key, output_dir=tmp_path) for key in keys]
+
+    paths = list(_write_documents(pages, workers))
+
+    assert [path.name for path in paths] == ["docs-test-shared-heading.html"] * (
+        page_count
+    )
+    assert paths[-1].read_text() == f"Content from {keys[-1]}."
+    for page in pages:
+        metadata = tmp_path / PAGE_META_TEMPLATE.format(key=page.key)
+        assert json.loads(metadata.read_text()) == {"first_file": paths[0].name}
+
+
+def test_a_render_failure_names_the_bundle_and_is_raised(
+    page_config: PageConfig,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A failing worker reports its page key before the error escapes."""
+    pages = [
+        dc.replace(page_config, key=key, output_dir=tmp_path / key)
+        for key in ("good", "bad")
+    ]
+
+    def render(generator: PageContentGenerator) -> RenderedDocument:
+        """Fail for one bundle so the writer's error path runs."""
+        if generator.page.key == "bad":
+            msg = "upstream document is unreadable"
+            raise RuntimeError(msg)
+        return RenderedDocument(
+            generator.page.output_dir,
+            generator.page.output_dir / "metadata.json",
+            [("page.html", "ok")],
+        )
+
+    monkeypatch.setattr(PageContentGenerator, "render", render)
+
+    with (
+        caplog.at_level(logging.ERROR, logger="df12_pages.cli"),
+        pytest.raises(RuntimeError, match="upstream document is unreadable"),
+    ):
+        list(_write_documents(pages, 1))
+
+    assert "document bundle 'bad' failed to render" in caplog.text
+
+
+def test_render_writes_nothing_until_the_document_is_published(
+    page_config: PageConfig,
+    markdown_response: MarkdownResponseState,
+    tmp_path: Path,
+) -> None:
+    """Rendering is pure: the output directory is untouched until write()."""
+    # A directory of this test's own: ``page_config`` is module-scoped, and the
+    # other tests in the module have already published into its directory.
+    fresh = dc.replace(page_config, output_dir=tmp_path / "unpublished")
+    generator = PageContentGenerator(fresh)
+
+    document = generator.render()
+
+    assert not fresh.output_dir.exists(), "render() must not create the output dir"
+    assert document.sections, "render() must produce the sections to publish"
+
+    written = document.write()
+
+    assert written, "write() must publish the rendered sections"
+    assert all(path.exists() for path in written)
 
 
 def test_document_workers_publish_overlaps_in_order(

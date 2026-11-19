@@ -106,17 +106,26 @@ the GIL disabled at exit.
 | 4                | 6.13 s                 |
 | 8                | 5.34 s                 |
 
-Every run of `_write_documents` logs the effective worker count, the bundle
-count, each bundle's render time and the total write time at `INFO` on standard
-error. A maintainer can therefore reproduce the shape of these figures from a
-normal build without the benchmark harness:
+Every run of `_write_documents` logs the effective worker count beside the
+configured limit, the bundle count, each bundle's render time and that site's
+total write time at `INFO` on standard error. `generate` adds one further line
+for the whole invocation, so a maintainer can follow a normal build without the
+benchmark harness:
 
 ```bash
 uv run --locked --no-dev --python 3.15.2t pages generate --all-sites --doc-workers 8
 ```
 
-The logged render time covers one bundle; the total covers the ordered writes
-plus the waits between batches, so it is the value to compare with the table.
+These log lines describe the work inside one process; they are not the
+fresh-process figures in the tables above. `_write_documents` runs once per
+site, so its total covers that site's ordered writes plus the waits between
+batches, and its worker count is the smaller of the limit and that site's
+bundle count. The `generate` total spans every requested site, but starts after
+configuration is loaded and stops before the process exits. Comparing either
+with the sweep means accounting for interpreter start-up, configuration loading
+and the sites that have no document bundles; the sweep remains the recorded
+measurement, and these lines are a sanity check on its shape rather than a
+reproduction of it.
 
 A separate interleaved run compared the previous MiniJinja commit with the
 worker implementation. The 3.15.2t controls used the same interpreter and

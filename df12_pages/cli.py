@@ -181,6 +181,10 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
 
     site_config = load_site_config(config)
 
+    # One total per invocation, so a whole `--all-sites` run can be timed from
+    # the outside as well as from the per-site worker loop.
+    started = time.perf_counter()
+
     if site:
         if site not in site_config.sites:
             available = ", ".join(sorted(site_config.sites))
@@ -189,6 +193,7 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         _generate_subsite(
             site_config, site_config.sites[site], page=page, doc_workers=doc_workers
         )
+        _log.info("generated site %r in %.3f s", site, time.perf_counter() - started)
         return
 
     _generate_main_site(
@@ -202,6 +207,7 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     if all_sites:
         for subsite in site_config.sites.values():
             _generate_subsite(site_config, subsite, doc_workers=doc_workers)
+    _log.info("generated the requested sites in %.3f s", time.perf_counter() - started)
 
 
 def _write_documents(
@@ -214,7 +220,14 @@ def _write_documents(
 ) -> cabc.Iterator[Path]:
     """Render independent bundles and write potentially overlapping paths in order."""
     started = time.perf_counter()
-    _log.info("rendering %d document bundle(s) with %d worker(s)", len(pages), workers)
+    # The pool never runs more bundles at once than there are bundles to run.
+    effective_workers = min(workers, len(pages))
+    _log.info(
+        "rendering %d document bundle(s) with %d effective worker(s) (limit %d)",
+        len(pages),
+        effective_workers,
+        workers,
+    )
 
     def render(page: PageConfig) -> RenderedDocument:
         """Keep each generator and its render state local to one job."""

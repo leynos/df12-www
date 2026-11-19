@@ -2569,9 +2569,14 @@ configuration order and every `RenderedDocument` is written as it is yielded,
 so a later-configured bundle always wins a path that two bundles share, even
 when it finished rendering first. Tests in `tests/test_doc_generation.py` pin
 the serial, multi-batch and reverse-completion cases. The effective worker
-count, the bundle count, and each bundle's render and total elapsed time are
-logged at `INFO` through the `df12_pages.cli` logger; a worker failure is
-logged with the page key and re-raised.
+count is logged beside the configured limit — it is the smaller of the limit
+and the bundle count, so a site with two bundles never claims eight workers —
+together with each bundle's render time and the site's total elapsed time, all
+at `INFO` through the `df12_pages.cli` logger. `generate()` adds a total for
+the whole invocation once every requested site is written. A worker failure is
+logged with the page key and re-raised. These figures are log lines from one
+process, not the fresh-process measurements in the
+[benchmark report](minijinja-benchmark.md), which remain the recorded numbers.
 
 The CLI requires free-threaded CPython 3.15.2 or newer with the GIL disabled.
 `main()` checks the interpreter and GIL state before parsing arguments, because

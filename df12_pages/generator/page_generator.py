@@ -7,12 +7,16 @@ It exposes :class:`PageContentGenerator`, which consumes a
 ``HtmlContentRenderer``, and persists both HTML and metadata that power
 ``public/docs-*.html`` and ``docs.html``.
 
-Fetching and rendering are separate steps. :func:`fetch_document` resolves a
-:class:`DocumentSource` to a :class:`FetchedMarkdown`, returning the URL and
-version that actually answered as values; :meth:`PageContentGenerator.render_document`
-turns markdown it is given into html and performs no I/O. Only
-:meth:`PageContentGenerator.render` reaches the network, which keeps the
-rendering rule testable with a fixture and no HTTP.
+Fetching, preparation and rendering are separate steps. :func:`fetch_document`
+resolves a :class:`DocumentSource` to a :class:`FetchedMarkdown`, returning the
+URL and version that actually answered as values.
+:meth:`PageContentGenerator.prepare_document` is the preparation command: it
+registers the page's template graph in the environment and compiles the
+document's Mermaid figures. :meth:`PageContentGenerator.render_document` is the
+query that follows it, turning prepared markdown into html without reading the
+filesystem, consulting the environment or starting a subprocess. Only
+:meth:`PageContentGenerator.render` reaches the network and selects the build
+timestamp, which keeps the rendering rule testable with a fixture and no HTTP.
 
 Example
 -------
@@ -30,6 +34,7 @@ from __future__ import annotations
 
 import dataclasses as dc
 import datetime as dt
+import email.utils
 import json
 import logging
 import re
@@ -47,14 +52,28 @@ from df12_pages.config import PageConfig, SectionLayout
 from df12_pages.docs_index import ManifestDescriptionResolver
 from df12_pages.generator.link_rewriter import _build_link_rewriter
 from df12_pages.generator.models import NumberedStep, SectionModel
-from df12_pages.generator.renderer import CODE_BLOCK_PATTERN, HtmlContentRenderer
+from df12_pages.generator.renderer import (
+    CODE_BLOCK_PATTERN,
+    HtmlContentRenderer,
+    MermaidRenderer,
+    PreparedMarkdown,
+)
 from df12_pages.markdown_parser import Section, Subsection, parse_sections
 from df12_pages.templating import build_timestamp, template_environment
+
+if typ.TYPE_CHECKING:
+    import collections.abc as cabc
+
+    from minijinja import Environment
 
 _log = logging.getLogger(__name__)
 
 #: Seconds to wait for one markdown response before the fetch fails.
 FETCH_TIMEOUT_SECONDS = 30
+
+#: Template that renders one documentation section, and its relative suffix.
+DOCUMENT_TEMPLATE = "doc_page.jinja"
+_TEMPLATE_SUFFIX = ".jinja"
 
 
 @dc.dataclass(frozen=True)
@@ -86,12 +105,55 @@ class DocumentSource:
 
 @dc.dataclass(frozen=True)
 class FetchedMarkdown:
-    """A markdown body and the provenance that actually answered for it."""
+    """A markdown body and the provenance that actually answered for it.
+
+    ``updated_at`` is the date to display for the document, if any. It is the
+    caller's release or commit date when that applies to the URL that
+    answered, and otherwise the response's ``Last-Modified`` date.
+    """
 
     text: str
     source_url: str
     version: str | None = None
     updated_at: dt.datetime | None = None
+
+
+@dc.dataclass(frozen=True)
+class MarkdownResponse:
+    """A markdown response body with the source date it carried, if any."""
+
+    text: str
+    updated_at: dt.datetime | None = None
+
+
+class DocumentTemplate(typ.Protocol):
+    """The slice of a template environment a document render needs.
+
+    Registering the template graph is preparation; rendering then needs only
+    these two calls, so a recorded template can stand in for the environment.
+    """
+
+    def add_template(self, name: str, source: str) -> None:
+        """Register ``source`` under ``name``."""
+        ...
+
+    def render_template(self, template_name: str, /, **context: object) -> str:
+        """Render the registered template ``template_name`` with ``context``."""
+        ...
+
+
+@dc.dataclass(frozen=True)
+class PreparedDocument:
+    """A document prepared for rendering without further preparation work.
+
+    ``sections`` is the parsed document whose markdown has already been
+    prepared, and ``template`` renders it. Both are values, so rendering the
+    document reads no file, consults no environment and starts no subprocess.
+    """
+
+    sections: list[Section]
+    template: DocumentTemplate
+    markdown: PreparedMarkdown
 
 
 class DocumentFetcher(typ.Protocol):
@@ -242,8 +304,8 @@ def _retrying_session() -> requests.Session:
 
 def fetch_markdown(
     url: str, *, session: requests.Session, timeout: int = FETCH_TIMEOUT_SECONDS
-) -> str:
-    """Download one URL and return its body as text.
+) -> MarkdownResponse:
+    """Download one URL and return its body with the date it last changed.
 
     Parameters
     ----------
@@ -256,8 +318,10 @@ def fetch_markdown(
 
     Returns
     -------
-    str
-        The response body.
+    MarkdownResponse
+        The response body and its parsed ``Last-Modified`` date. The date is
+        ``None`` when the response omits the header or sends one that cannot be
+        parsed, so a malformed header can never fail the build.
 
     Raises
     ------
@@ -268,7 +332,23 @@ def fetch_markdown(
     """
     response = session.get(url, timeout=timeout)
     response.raise_for_status()
-    return response.text
+    return MarkdownResponse(
+        text=response.text,
+        updated_at=_last_modified(response.headers.get("Last-Modified")),
+    )
+
+
+def _last_modified(value: str | None) -> dt.datetime | None:
+    """Parse an HTTP ``Last-Modified`` value into a UTC datetime, if valid."""
+    if not value:
+        return None
+    try:
+        parsed = email.utils.parsedate_to_datetime(value)
+    except TypeError, ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=dt.UTC)
+    return parsed.astimezone(dt.UTC)
 
 
 def _http_status(error: requests.HTTPError) -> int | None:
@@ -288,14 +368,17 @@ def fetch_document(
     A release-pinned URL that returns HTTP 404 falls back to the branch source
     URL. The version pin is dropped with it, and so is ``updated_at``: a guide
     added after the release was cut should still render, but neither it nor
-    its date may claim to belong to that release.
+    its date may claim to belong to that release. The branch response's own
+    ``Last-Modified`` date takes its place, so the page still shows when the
+    document it displays last changed.
 
     Parameters
     ----------
     source : DocumentSource
         Candidate URLs, pinned release first.
     updated_at : datetime, optional
-        Date already known for the document, carried into the result.
+        Date already known for the document, used only when the release-pinned
+        attempt is the one that answered.
     session : requests.Session, optional
         Session to fetch through; a retrying session is created and closed
         when omitted.
@@ -318,17 +401,18 @@ def fetch_document(
         attempts = source.attempts()
         for index, (url, version) in enumerate(attempts):
             try:
-                text = fetch_markdown(url, session=active)
+                response = fetch_markdown(url, session=active)
             except requests.HTTPError as error:
                 last_attempt = index == len(attempts) - 1
                 if last_attempt or _http_status(error) != requests.codes.not_found:
                     raise
                 continue
+            known_date = updated_at if index == 0 else None
             return FetchedMarkdown(
-                text=text,
+                text=response.text,
                 source_url=url,
                 version=version,
-                updated_at=updated_at if index == 0 else None,
+                updated_at=known_date or response.updated_at,
             )
     finally:
         if owned:
@@ -482,12 +566,14 @@ class PageContentGenerator:
         github_client: GitHub | None = None,
         doc_updated_at: dt.datetime | None = None,
         fetcher: DocumentFetcher = fetch_document,
+        mermaid: MermaidRenderer | None = None,
     ) -> None:
         """Initialize the generator with configuration and template context.
 
-        Construction performs no I/O: no document is fetched, no commit date
-        is looked up and no output directory is created. The network is
-        reached only by :meth:`render`.
+        Construction performs no I/O: no document is fetched, no template is
+        read, no commit date is looked up and no output directory is created.
+        The network is reached only by :meth:`render`; template and Mermaid
+        I/O happens in :meth:`prepare_document`.
 
         Parameters
         ----------
@@ -511,16 +597,23 @@ class PageContentGenerator:
         fetcher : DocumentFetcher, optional
             Callable that turns a :class:`DocumentSource` into markdown. Tests
             inject one that fails if called, to prove a path never fetches.
+        mermaid : MermaidRenderer, optional
+            Renderer for the document's fenced diagrams. Tests inject one that
+            fails if called, to prove a path compiles no diagram.
         """
         self.page = page_config
         self.output_dir_override = output_dir
         default_templates = Path(__file__).resolve().parents[1] / "templates"
         self.templates_dir = templates_dir or default_templates
         self.renderer = HtmlContentRenderer(
-            page_config.pygments_style, link_extension=_build_link_rewriter(page_config)
+            page_config.pygments_style,
+            link_extension=_build_link_rewriter(page_config),
+            mermaid=mermaid,
         )
         self._description_resolver = ManifestDescriptionResolver()
-        self.env = template_environment(self.templates_dir, escape_by_suffix=True)
+        self.env: Environment = template_environment(
+            self.templates_dir, escape_by_suffix=True
+        )
         self.source = resolve_document_source(page_config, source_url)
         self.doc_updated_at = page_config.latest_release_published_at or doc_updated_at
         self._github_token = github_token
@@ -552,10 +645,11 @@ class PageContentGenerator:
     def render(self) -> RenderedDocument:
         """Fetch the page's markdown and render it into an unpublished bundle.
 
-        This is the command that reaches the network: it fetches the document
-        and, when no release date is configured, asks GitHub for the latest
-        commit date. Rendering itself is delegated to :meth:`render_document`,
-        which is handed the markdown and performs no I/O.
+        This is the command that reaches the network and the clock: it fetches
+        the document, selects the build timestamp and, when no release date is
+        configured, asks GitHub for the latest commit date. It then hands the
+        markdown to :meth:`prepare_document` and the prepared result to
+        :meth:`render_document`.
 
         Returns
         -------
@@ -574,34 +668,82 @@ class PageContentGenerator:
             self.page, token=self._github_token, client=self._github_client
         )
         fetched = self._fetcher(self.source, updated_at=updated_at)
+        prepared = self.prepare_document(fetched.text)
         return self.render_document(
-            fetched.text,
+            prepared,
             source_url=fetched.source_url,
             version_display=_strip_version_prefix(fetched.version),
-            updated_at=fetched.updated_at,
             page_description=self._resolve_description(),
+            updated_at=fetched.updated_at,
+            generated_at=build_timestamp(),
         )
 
-    def render_document(
+    def prepare_document(self, markdown: str) -> PreparedDocument:
+        """Do the document's side-effecting work ahead of rendering.
+
+        This is a command, not a query. It registers every template in
+        :attr:`templates_dir` with the environment, so rendering never returns
+        to the filesystem, and it compiles the document's Mermaid fences to
+        figures. What it returns is therefore safe to render anywhere.
+
+        Parameters
+        ----------
+        markdown : str
+            The document body as fetched.
+
+        Returns
+        -------
+        PreparedDocument
+            The parsed sections, the prepared markdown backing them, and the
+            template that renders a section.
+
+        Raises
+        ------
+        OSError
+            If a template file cannot be read.
+        """
+        self._register_templates()
+        content = self.renderer.prepare_markdown(markdown)
+        return PreparedDocument(
+            sections=parse_sections(content.markdown),
+            template=self.env,
+            markdown=content,
+        )
+
+    def _register_templates(self) -> None:
+        """Register every template file so rendering never reads the disk.
+
+        MiniJinja exposes no way to load a template without rendering it, so
+        the whole directory is registered ahead of the first render. Registering
+        an include as well as the document template is what keeps a lazy import
+        from reaching back to the filesystem mid-render.
+        """
+        for path in sorted(self.templates_dir.rglob(f"*{_TEMPLATE_SUFFIX}")):
+            name = path.relative_to(self.templates_dir).as_posix()
+            self.env.add_template(name, path.read_text(encoding="utf-8"))
+
+    def render_document(  # noqa: PLR0913 -- provenance and timestamp are values
         self,
-        markdown: str,
+        prepared: PreparedDocument,
         *,
         source_url: str,
         version_display: str | None,
         page_description: str,
         updated_at: dt.datetime | None = None,
+        generated_at: dt.datetime,
     ) -> RenderedDocument:
-        """Render already-fetched markdown into an unpublished bundle.
+        """Render a prepared document into an unpublished bundle.
 
-        The method performs no I/O: it parses ``markdown``, builds the section
-        models and renders the templates against the supplied provenance. A
-        caller can therefore render a fixture, or re-render a cached document,
-        without a network call or an output write.
+        The method performs no I/O: it builds the section models from the
+        supplied sections and renders the template against the supplied
+        provenance. A caller can therefore render a fixture, or re-render a
+        cached document, without a network call, a filesystem read, an
+        environment lookup or an output write.
 
         Parameters
         ----------
-        markdown : str
-            The document body to render.
+        prepared : PreparedDocument
+            The document returned by :meth:`prepare_document`.
         source_url : str
             URL the document was fetched from, shown in the page chrome.
         version_display : str or None
@@ -610,8 +752,12 @@ class PageContentGenerator:
         page_description : str
             Description used in the page's metadata tags.
         updated_at : datetime, optional
-            Date shown as the document's "Updated" badge; the build time is
+            Date shown as the document's "Updated" badge; ``generated_at`` is
             used when omitted.
+        generated_at : datetime
+            The build timestamp to stamp the page with. It is a parameter
+            rather than a lookup, so the same prepared document renders
+            identically on every call.
 
         Returns
         -------
@@ -621,21 +767,22 @@ class PageContentGenerator:
         Raises
         ------
         RuntimeError
-            If the markdown has no second-level sections.
+            If the prepared document has no second-level sections.
         """
-        sections = parse_sections(markdown)
+        sections = prepared.sections
         if not sections:
             msg = "No second-level sections were found in the upstream markdown."
             raise RuntimeError(msg)
 
         out_dir = self.output_dir_override or self.page.output_dir
 
-        generated_at = build_timestamp()
         doc_updated_at = updated_at or generated_at
         section_bundle: list[tuple[Section, SectionModel, str]] = []
         for section in sections:
             layout = self._resolve_layout(section.slug)
-            section_model = self._build_section_model(section, layout)
+            section_model = self._build_section_model(
+                section, layout, prepared.markdown.figures
+            )
             html_title = self._format_page_title(section)
             section_bundle.append((section, section_model, html_title))
 
@@ -657,7 +804,7 @@ class PageContentGenerator:
                 "html_title": html_title,
                 "footer_note": self.page.footer_note,
             }
-            html = self.env.render_template("doc_page.jinja", **context)
+            html = prepared.template.render_template(DOCUMENT_TEMPLATE, **context)
             filename = f"{self.page.filename_prefix}{section.slug}.html"
             rendered.append((filename, html))
         return RenderedDocument(out_dir, self._metadata_path(), rendered)
@@ -710,14 +857,17 @@ class PageContentGenerator:
         return self.page.layouts.get(slug, SectionLayout())
 
     def _build_section_model(
-        self, section: Section, layout: SectionLayout
+        self,
+        section: Section,
+        layout: SectionLayout,
+        figures: cabc.Mapping[str, str],
     ) -> SectionModel:
         """Construct a SectionModel with rendered HTML and layout metadata."""
-        intro_html = self.renderer.markdown(section.intro_markdown)
-        default_html = self.renderer.markdown(section.markdown)
+        intro_html = self.renderer.markdown(section.intro_markdown, figures=figures)
+        default_html = self.renderer.markdown(section.markdown, figures=figures)
         numbered_steps: list[NumberedStep] = []
         split_panel = {"primary_html": "", "secondary_html": ""}
-        subsections = self._build_subsection_blocks(section)
+        subsections = self._build_subsection_blocks(section, figures)
         toc_items = [
             {"label": block["title"], "anchor": block["anchor"]}
             for block in subsections
@@ -727,7 +877,10 @@ class PageContentGenerator:
         if layout.device == "numbered_steps":
             subsection_anchors = {b["title"]: b["anchor"] for b in subsections}
             numbered_steps = self._prepare_numbered_steps(
-                section, layout, subsection_anchors=subsection_anchors
+                section,
+                layout,
+                figures=figures,
+                subsection_anchors=subsection_anchors,
             )
             if not numbered_steps:
                 resolved_layout = "default"
@@ -737,7 +890,7 @@ class PageContentGenerator:
                     for step in numbered_steps
                 ]
         elif layout.device == "split_panel":
-            split_panel = self._prepare_split_panel(section, layout)
+            split_panel = self._prepare_split_panel(section, layout, figures)
             if not split_panel.get("secondary_html"):
                 resolved_layout = "default"
 
@@ -760,6 +913,7 @@ class PageContentGenerator:
         section: Section,
         layout: SectionLayout,
         *,
+        figures: cabc.Mapping[str, str],
         subsection_anchors: dict[str, str] | None = None,
     ) -> list[NumberedStep]:
         """Return numbered step data for ``section`` based on the provided layout.
@@ -770,6 +924,8 @@ class PageContentGenerator:
             The parsed markdown section containing subsections.
         layout : SectionLayout
             Layout configuration that may specify a custom step ordering.
+        figures : Mapping[str, str]
+            Compiled Mermaid figures for the document, by placeholder token.
         subsection_anchors : dict[str, str] or None, optional
             Mapping of subsection title to content-based anchor string, as
             produced by :meth:`_build_subsection_blocks`.  When provided, each
@@ -795,7 +951,7 @@ class PageContentGenerator:
         anchors = subsection_anchors or {}
         steps: list[NumberedStep] = []
         for idx, sub in enumerate(subsections, start=1):
-            html = self.renderer.markdown(sub.markdown)
+            html = self.renderer.markdown(sub.markdown, figures=figures)
             step_anchor = f"{section.slug}-step-{idx}"
             content_anchor = anchors.get(sub.title, step_anchor)
             steps.append(
@@ -810,13 +966,18 @@ class PageContentGenerator:
         return steps
 
     def _prepare_split_panel(
-        self, section: Section, layout: SectionLayout
+        self,
+        section: Section,
+        layout: SectionLayout,
+        figures: cabc.Mapping[str, str],
     ) -> dict[str, str]:
         """Render split-panel HTML blocks for the section based on layout hints."""
         matches = list(CODE_BLOCK_PATTERN.finditer(section.markdown))
         if not matches:
             return {
-                "primary_html": self.renderer.markdown(section.markdown),
+                "primary_html": self.renderer.markdown(
+                    section.markdown, figures=figures
+                ),
                 "secondary_html": "",
             }
 
@@ -830,7 +991,7 @@ class PageContentGenerator:
         after = section.markdown[match.end() :]
         primary_md = (before + "\n\n" + after).strip()
         return {
-            "primary_html": self.renderer.markdown(primary_md),
+            "primary_html": self.renderer.markdown(primary_md, figures=figures),
             "secondary_html": self.renderer.code_block(code, lang),
         }
 
@@ -840,7 +1001,9 @@ class PageContentGenerator:
         suffix = self.page.page_title_suffix
         return f"{site_name} — {section.short_title} | {suffix}"
 
-    def _build_subsection_blocks(self, section: Section) -> list[dict[str, str]]:
+    def _build_subsection_blocks(
+        self, section: Section, figures: cabc.Mapping[str, str]
+    ) -> list[dict[str, str]]:
         """Return rendered subsection blocks with unique anchors for ``section``."""
         if not section.subsections:
             return []
@@ -849,7 +1012,7 @@ class PageContentGenerator:
         used: set[str] = set()
         for idx, sub in enumerate(section.subsections, start=1):
             anchor = self._section_anchor(section.slug, sub.title, idx, used)
-            html = self.renderer.markdown(sub.markdown)
+            html = self.renderer.markdown(sub.markdown, figures=figures)
             blocks.append({"title": sub.title, "anchor": anchor, "html": html})
         return blocks
 

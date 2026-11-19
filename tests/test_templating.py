@@ -27,15 +27,12 @@ if typ.TYPE_CHECKING:
 REFERENCE_EPOCH = 1790899200
 REFERENCE_EPOCH_UTC = dt.datetime(2026, 10, 2, tzinfo=dt.UTC)
 
-#: Suffixes drawn for the escaping property, in both cases and both policies.
-ESCAPING_SUFFIXES = (
-    "page.html",
-    "page.xml",
-    "PAGE.HTML",
-    "page.jinja",
-    "page.txt",
-    "PAGE.JINJA",
+#: Suffixes the escaping property draws from, in both cases.
+ESCAPING_SUFFIXES = st.sampled_from(
+    ("html", "xml", "jinja", "txt", "HTML", "XML", "Jinja", "TXT")
 )
+#: Path-safe template names, so a generated name is legal on every filesystem.
+TEMPLATE_STEMS = st.from_regex(r"[a-z][a-z0-9_-]{0,11}", fullmatch=True)
 
 
 def test_build_timestamp_returns_the_current_utc_time_when_unset(
@@ -110,22 +107,31 @@ def test_escape_by_suffix_false_escapes_every_suffix(
 
 @given(
     value=st.text(),
-    suffix=st.sampled_from(ESCAPING_SUFFIXES),
+    stem=TEMPLATE_STEMS,
+    extension=ESCAPING_SUFFIXES,
     escape_by_suffix=st.booleans(),
 )
 @settings(
-    max_examples=25,
+    max_examples=50,
     deadline=None,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
 )
 def test_template_environment_escapes_any_value_according_to_the_policy(
-    tmp_path: Path, value: str, suffix: str, *, escape_by_suffix: bool
+    tmp_path: Path,
+    value: str,
+    stem: str,
+    extension: str,
+    *,
+    escape_by_suffix: bool,
 ) -> None:
-    """Escaping follows the suffix policy for every value, not just markup.
+    """Escaping follows the suffix policy for every value and every name.
 
-    The policy is restated here rather than read from the implementation, so a
-    change to either the suffix test or the escaping itself fails the property.
+    Both the value and the template name are generated, so the property covers
+    mixed-case suffixes and names the fixed examples never reach. The policy is
+    restated here rather than read from the implementation, so a change to
+    either the suffix test or the escaping itself fails the property.
     """
+    suffix = f"{stem}.{extension}"
     (tmp_path / suffix).write_text("{{ value }}", encoding="utf-8")
     environment = template_environment(tmp_path, escape_by_suffix=escape_by_suffix)
 

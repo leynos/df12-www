@@ -88,7 +88,7 @@ import threading
 import typing as typ
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
-from itertools import pairwise
+from itertools import batched, pairwise
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -96,6 +96,7 @@ import msgspec.json as msgspec_json
 import pytest
 import requests
 from bs4 import BeautifulSoup
+from github3 import exceptions as gh_exc
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
@@ -112,8 +113,11 @@ from df12_pages.generator.page_generator import (
     fetch_document,
     publish_document,
 )
+from df12_pages.generator.renderer import MermaidRenderer
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+#: The build timestamp the rendering tests stamp prepared documents with.
+BUILD_TIMESTAMP = dt.datetime(2026, 10, 2, tzinfo=dt.UTC)
 INLINE_CODE_LABEL = "introctl"
 #: The DOM node type of a text node, as CDP reports it.
 TEXT_NODE = 3
@@ -315,7 +319,11 @@ def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
         """Set the author date reported by the mocked latest commit."""
         author.date = value
 
-    return {"set_date": set_date}
+    def fail_commits() -> None:
+        """Make the commit lookup fail, as an unreadable repository would."""
+        mock_repo.commits.side_effect = gh_exc.GitHubException("unavailable")
+
+    return {"set_date": set_date, "fail_commits": fail_commits}
 
 
 @pytest.fixture
@@ -442,6 +450,30 @@ def test_doc_meta_uses_commit_date(
     ]
     assert meta_items == ["Updated Oct 09, 2025"], (
         f"unexpected meta_items: {meta_items!r} (expected ['Updated Oct 09, 2025'])"
+    )
+
+
+def test_doc_meta_uses_the_source_date_when_no_release_or_commit_exists(
+    page_config: PageConfig,
+    markdown_response: MarkdownResponseState,
+    github_commit_mock: dict[str, typ.Any],
+) -> None:
+    """Without a release or readable commits, the response date decorates the page."""
+    github_commit_mock["fail_commits"]()
+    markdown_response["set_last_modified"]("Sat, 04 Jan 2025 18:30:00 GMT")
+
+    generator = PageContentGenerator(page_config)
+    written = generator.run()
+    intro_path = next(
+        path for path in written if path.name.endswith("introduction.html")
+    )
+    soup = BeautifulSoup(intro_path.read_text(encoding="utf-8"), "html.parser")
+    meta_items = [
+        span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
+    ]
+    assert meta_items == ["Updated Jan 04, 2025"], (
+        "the page must show when the document it displays last changed, "
+        f"got {meta_items!r}"
     )
 
 
@@ -722,20 +754,30 @@ def _http_error(status_code: int) -> requests.HTTPError:
 
 
 class _ScriptedSession:
-    """A session that answers each URL from a script of outcomes."""
+    """A session that answers each URL from a script of outcomes.
 
-    def __init__(self, outcomes: dict[str, str | requests.HTTPError]) -> None:
+    An outcome is a body string, an ``HTTPError`` to raise, or a
+    ``(body, headers)`` pair when the response's headers matter.
+    """
+
+    def __init__(
+        self,
+        outcomes: dict[str, str | requests.HTTPError | tuple[str, dict[str, str]]],
+    ) -> None:
         """Store the scripted outcome for each URL."""
         self._outcomes = outcomes
         self.requested: list[str] = []
 
     def get(self, url: str, timeout: int = 30) -> SimpleNamespace:
-        """Record the URL, then return its body or raise its error."""
+        """Record the URL, then return its body and headers or raise its error."""
         self.requested.append(url)
         outcome = self._outcomes[url]
         if isinstance(outcome, requests.HTTPError):
             raise outcome
-        return SimpleNamespace(text=outcome, raise_for_status=lambda: None)
+        text, headers = outcome if isinstance(outcome, tuple) else (outcome, {})
+        return SimpleNamespace(
+            text=text, headers=headers, raise_for_status=lambda: None
+        )
 
 
 def test_fetch_document_drops_the_pin_when_the_release_lacks_the_document() -> None:
@@ -745,10 +787,17 @@ def test_fetch_document_drops_the_pin_when_the_release_lacks_the_document() -> N
     source = DocumentSource(
         source_url=branch_url, release_url=release_url, version="v1.2.3"
     )
-    session = _ScriptedSession(
-        {release_url: _http_error(404), branch_url: "# Branch text"}
-    )
     released = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
+    branch_changed = dt.datetime(2024, 12, 30, 9, 0, tzinfo=dt.UTC)
+    session = _ScriptedSession(
+        {
+            release_url: _http_error(404),
+            branch_url: (
+                "# Branch text",
+                {"Last-Modified": "Mon, 30 Dec 2024 09:00:00 GMT"},
+            ),
+        }
+    )
 
     fetched = fetch_document(
         source, updated_at=released, session=typ.cast("requests.Session", session)
@@ -759,8 +808,8 @@ def test_fetch_document_drops_the_pin_when_the_release_lacks_the_document() -> N
         text="# Branch text",
         source_url=branch_url,
         version=None,
-        updated_at=None,
-    ), "the branch copy belongs to neither the release nor its date"
+        updated_at=branch_changed,
+    ), "the branch copy keeps its own Last-Modified but not the release date"
 
 
 def test_fetch_document_keeps_the_pin_when_the_release_answers() -> None:
@@ -770,8 +819,15 @@ def test_fetch_document_keeps_the_pin_when_the_release_answers() -> None:
     source = DocumentSource(
         source_url=branch_url, release_url=release_url, version="v1.2.3"
     )
-    session = _ScriptedSession({release_url: "# Released text"})
     released = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
+    session = _ScriptedSession(
+        {
+            release_url: (
+                "# Released text",
+                {"Last-Modified": "Mon, 30 Dec 2024 09:00:00 GMT"},
+            )
+        }
+    )
 
     fetched = fetch_document(
         source, updated_at=released, session=typ.cast("requests.Session", session)
@@ -783,7 +839,45 @@ def test_fetch_document_keeps_the_pin_when_the_release_answers() -> None:
         source_url=release_url,
         version="v1.2.3",
         updated_at=released,
+    ), "the known release date outranks the response's Last-Modified"
+
+
+def test_fetch_document_falls_back_to_a_response_date_without_a_known_one() -> None:
+    """With no release or commit date, the response's Last-Modified is used."""
+    url = "https://example.test/main/docs/guide.md"
+    session = _ScriptedSession(
+        {url: ("# Text", {"Last-Modified": "Sat, 04 Jan 2025 18:30:00 GMT"})}
     )
+
+    fetched = fetch_document(
+        DocumentSource(url), session=typ.cast("requests.Session", session)
+    )
+
+    assert fetched.updated_at == dt.datetime(2025, 1, 4, 18, 30, tzinfo=dt.UTC)
+
+
+@pytest.mark.parametrize(
+    "headers",
+    [
+        {},
+        {"Last-Modified": ""},
+        {"Last-Modified": "not a date"},
+    ],
+    ids=["absent", "empty", "malformed"],
+)
+def test_fetch_document_ignores_a_missing_or_unparseable_source_date(
+    headers: dict[str, str],
+) -> None:
+    """A header that is absent, empty or malformed leaves the date unset."""
+    url = "https://example.test/main/docs/guide.md"
+    session = _ScriptedSession({url: ("# Text", headers)})
+
+    fetched = fetch_document(
+        DocumentSource(url), session=typ.cast("requests.Session", session)
+    )
+
+    assert fetched.updated_at is None
+    assert fetched.text == "# Text", "the body is served regardless of the header"
 
 
 def test_fetch_document_does_not_fall_back_on_an_unrelated_failure() -> None:
@@ -806,16 +900,11 @@ def test_fetch_document_does_not_fall_back_on_an_unrelated_failure() -> None:
 class _RecordingExecutor(ThreadPoolExecutor):
     """A worker pool that remembers the futures it submits, in submit order."""
 
-    #: The ordering test submits exactly this many bundles in one batch.
-    PAIR_SIZE = 2
-
-    def __init__(self, max_workers: int, *, expected: int | None = None) -> None:
+    def __init__(self, max_workers: int) -> None:
         """Start the pool with an empty record of what it has been given."""
         super().__init__(max_workers=max_workers)
-        self.submitted: list[Future[RenderedDocument]] = []
-        self.pair_submitted = threading.Event()
-        self._expected = expected
-        self.batch_submitted = threading.Event()
+        self._submitted: list[Future[RenderedDocument]] = []
+        self._submitted_changed = threading.Condition()
 
     def submit(
         self,
@@ -826,12 +915,26 @@ class _RecordingExecutor(ThreadPoolExecutor):
     ) -> Future[RenderedDocument]:
         """Record the future so a stub can wait for another bundle to finish."""
         future = super().submit(fn, *args, **kwargs)
-        self.submitted.append(future)
-        if len(self.submitted) >= self.PAIR_SIZE:
-            self.pair_submitted.set()
-        if self._expected is not None and len(self.submitted) >= self._expected:
-            self.batch_submitted.set()
+        with self._submitted_changed:
+            self._submitted.append(future)
+            self._submitted_changed.notify_all()
         return future
+
+    def future_at(
+        self, index: int, timeout: float = 5
+    ) -> Future[RenderedDocument] | None:
+        """Wait for the future submitted at ``index`` and return it.
+
+        Returns ``None`` when nothing is submitted at that index within
+        ``timeout``, so a stub can fail an assertion rather than hang.
+        """
+        with self._submitted_changed:
+            self._submitted_changed.wait_for(
+                lambda: len(self._submitted) > index, timeout
+            )
+            if index >= len(self._submitted):
+                return None
+            return self._submitted[index]
 
 
 def _stub_render_in_order(  # noqa: PLR0913 -- one knob per ordering scenario
@@ -839,7 +942,7 @@ def _stub_render_in_order(  # noqa: PLR0913 -- one knob per ordering scenario
     *,
     reverse_completion: bool = False,
     keys: list[str] | None = None,
-    completion_order: list[int] | None = None,
+    completion_orders: list[list[int]] | None = None,
     batch_size: int | None = None,
     distinct_paths: bool = False,
 ) -> None:
@@ -855,66 +958,63 @@ def _stub_render_in_order(  # noqa: PLR0913 -- one knob per ordering scenario
         returns, so a writer that published in completion order would invert
         them.
     keys
-        The page keys in configuration order, indexed by ``completion_order``.
-    completion_order
-        Configuration indices in the order the stub must let them finish. Each
-        bundle waits on the next one's future, so the drawn permutation is
-        forced rather than left to the scheduler.
+        The page keys in configuration order, indexed by ``completion_orders``.
+    completion_orders
+        One permutation per batch, giving the batch-local indices in the order
+        the stub must let them finish. Each bundle waits on the next one's
+        future, so the drawn permutation is forced rather than left to the
+        scheduler. A batch's chain never leaves that batch, so several batches
+        can each have their own.
     batch_size
-        Bundles submitted in one batch; required with ``completion_order`` so a
-        bundle waits for the whole batch to be submitted before indexing the
-        futures. The scheduler may start the first worker before ``submit``
-        returns, so the record has to be complete before it is read.
+        Bundles submitted in one batch; required with ``completion_orders`` so
+        each batch's futures can be mapped back to their global submission
+        position.
     distinct_paths
         Give each bundle a file only it writes, ahead of the shared one. The
         returned paths then name their bundle, so publication order can be
         read from the path sequence instead of only from the shared file's
         final owner.
     """
-    if completion_order and batch_size is None:
-        msg = "completion_order needs batch_size so the futures are all recorded"
-        raise ValueError(msg)
     pools: list[_RecordingExecutor] = []
 
     def make_executor(*, max_workers: int) -> _RecordingExecutor:
         """Record the pool so the stub can reach the futures it submits."""
-        pool = _RecordingExecutor(max_workers, expected=batch_size)
+        pool = _RecordingExecutor(max_workers)
         pools.append(pool)
         return pool
 
     successors: dict[str, int] = {}
-    if completion_order and keys:
-        successors = {
-            keys[current]: following
-            for current, following in pairwise(completion_order)
-        }
+    if completion_orders and keys:
+        if batch_size is None:
+            msg = "completion_orders needs batch_size so batch futures are known"
+            raise ValueError(msg)
+        for batch_index, order in enumerate(completion_orders):
+            start = batch_index * batch_size
+            batch = keys[start : start + batch_size]
+            for current, following in pairwise(order):
+                successors[batch[current]] = start + following
+
+    def wait_for_future(pool: _RecordingExecutor, index: int, key: str) -> None:
+        """Block until the future at ``index`` has returned a document."""
+        future = pool.future_at(index)
+        assert future is not None, (
+            f"bundle {key!r} waited on a future that was never submitted"
+        )
+        # A future completing is a fact about that bundle's return, not a race
+        # the scheduler can reorder, so the drawn order really happens.
+        assert future.result(timeout=5), (
+            f"bundle {key!r} waited on a future that returned nothing"
+        )
 
     def render(generator: PageContentGenerator) -> RenderedDocument:
         """Return a document whose content names the bundle that produced it."""
         key = generator.page.key
         if reverse_completion and key == "first":
             assert pools, "the concurrent writer created no pool to wait on"
-            pool = pools[0]
-            assert pool.pair_submitted.wait(timeout=5), (
-                "both bundles were never submitted"
-            )
-            # The later-configured bundle's future completing is a fact about
-            # that bundle's return, not a race the scheduler can reorder. A
-            # writer that publishes on completion therefore inverts these two.
-            assert pool.submitted[1].result(timeout=5), (
-                "the later bundle returned no document"
-            )
+            wait_for_future(pools[0], 1, key)
         if key in successors:
             assert pools, "the concurrent writer created no pool to wait on"
-            pool = pools[0]
-            assert pool.batch_submitted.wait(timeout=5), (
-                "the whole batch was never submitted to the pool"
-            )
-            # Waiting on the next bundle's future makes the completion order
-            # exactly the drawn permutation; publication must ignore it.
-            assert pool.submitted[successors[key]].result(timeout=5), (
-                f"bundle {key!r} waited on a future that returned nothing"
-            )
+            wait_for_future(pools[0], successors[key], key)
         prefix = generator.page.filename_prefix
         sections = []
         if distinct_paths:
@@ -1080,7 +1180,7 @@ def test_any_worker_count_publishes_in_configuration_order(
 
 @given(data=st.data())
 @settings(
-    max_examples=10,
+    max_examples=15,
     deadline=None,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
 )
@@ -1092,27 +1192,36 @@ def test_any_completion_permutation_publishes_in_configuration_order(
 ) -> None:
     """Publication order follows configuration, whatever order renders finish.
 
-    The drawn permutation is forced by making each bundle wait on the next
-    one's future, so this asserts against a known completion order rather than
-    against whatever the scheduler happened to produce.
+    Both the worker count and the bundle count are drawn, so the run spans one
+    or more worker-sized batches, and each batch is given its own drawn
+    completion permutation. Every permutation is forced by making each bundle
+    wait on the next one's future, so this asserts against a known completion
+    order rather than against whatever the scheduler happened to produce.
     """
-    page_count = data.draw(st.integers(min_value=2, max_value=5), label="page_count")
-    keys = [f"page{index}" for index in range(page_count)]
-    completion_order = list(
-        data.draw(st.permutations(range(page_count)), label="completion_order")
+    workers = data.draw(st.integers(min_value=2, max_value=3), label="workers")
+    minimum_pages = workers + 1
+    page_count = data.draw(
+        st.integers(min_value=minimum_pages, max_value=workers * 3),
+        label="page_count",
     )
+    keys = [f"page{index}" for index in range(page_count)]
+    batches = [
+        list(batch) for batch in batched(range(page_count), workers, strict=False)
+    ]
+    completion_orders = [
+        list(data.draw(st.permutations(range(len(batch))), label=f"order{batch[0]}"))
+        for batch in batches
+    ]
     _stub_render_in_order(
         monkeypatch,
         keys=keys,
-        completion_order=completion_order,
-        batch_size=page_count,
+        completion_orders=completion_orders,
+        batch_size=workers,
         distinct_paths=True,
     )
-    # One batch, so every bundle is submitted at once and the chain of
-    # successor waits cannot outlast the pool.
     pages = [dc.replace(page_config, key=key, output_dir=tmp_path) for key in keys]
 
-    paths = list(_write_documents(pages, page_count))
+    paths = list(_write_documents(pages, workers))
 
     prefix = page_config.filename_prefix
     shared_name = f"{prefix}shared-heading.html"
@@ -1137,6 +1246,136 @@ def test_any_completion_permutation_publishes_in_configuration_order(
         assert json.loads(metadata.read_text()) == {
             "first_file": f"{prefix}{page.key}.html"
         }
+
+
+#: The calls the no-I/O tests forbid: the build clock and the Mermaid CLI.
+FORBIDDEN_IN_RENDER = (
+    "df12_pages.generator.page_generator.build_timestamp",
+    "df12_pages.generator.renderer.subprocess.run",
+    "os.getenv",
+)
+
+#: Repository root, so a project file opened during rendering stands out.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _is_project_file(path: Path) -> bool:
+    """Return whether ``path`` is repository source rather than an installed file.
+
+    Markdown resolves its extensions through :mod:`importlib.metadata`, which
+    reads the ``entry_points.txt`` of every installed distribution each time a
+    :class:`markdown.Markdown` instance is built. That is library import
+    machinery, not document I/O, so installed files and distribution metadata
+    are excluded from the recording. Everything else the repository owns stays
+    in scope.
+    """
+    resolved = path.resolve()
+    if ".venv" in resolved.parts or "site-packages" in resolved.parts:
+        return False
+    if any(part.endswith((".egg-info", ".dist-info")) for part in resolved.parts):
+        return False
+    return resolved.is_relative_to(PROJECT_ROOT)
+
+
+@contextmanager
+def _watched(monkeypatch: pytest.MonkeyPatch) -> typ.Iterator[list[str]]:
+    """Record project-file reads and reject the build clock and the Mermaid CLI.
+
+    Yields the list of repository files opened, so a test can assert on it once
+    the watched work has returned. Installed packages are left out of the
+    recording, since building a Markdown parser reads their metadata; see
+    :func:`_is_project_file`.
+    """
+    reads: list[str] = []
+    original_read_text = Path.read_text
+    original_read_bytes = Path.read_bytes
+
+    def _record_read(
+        self: Path, encoding: str | None = None, errors: str | None = None
+    ) -> str:
+        """Record a project-file text read and still perform it."""
+        if _is_project_file(self):
+            reads.append(str(self))
+        return original_read_text(self, encoding=encoding, errors=errors)
+
+    def _record_read_bytes(self: Path) -> bytes:
+        """Record a project-file byte read and still perform it."""
+        if _is_project_file(self):
+            reads.append(str(self))
+        return original_read_bytes(self)
+
+    def _forbidden(*_args: object, **_kwargs: object) -> typ.NoReturn:
+        """Reject an unexpected clock, environment or subprocess lookup."""
+        msg = (
+            "the watched work must read no clock or environment and start no subprocess"
+        )
+        raise AssertionError(msg)
+
+    monkeypatch.setattr(Path, "read_text", _record_read)
+    monkeypatch.setattr(Path, "read_bytes", _record_read_bytes)
+    for dotted in FORBIDDEN_IN_RENDER:
+        monkeypatch.setattr(dotted, _forbidden, raising=False)
+    yield reads
+
+
+def test_construction_reaches_no_filesystem_environment_or_subprocess(
+    monkeypatch: pytest.MonkeyPatch,
+    page_config: PageConfig,
+    tmp_path: Path,
+) -> None:
+    """Building a generator reads no template and starts no Mermaid process."""
+    page = dc.replace(page_config, output_dir=tmp_path / "out")
+
+    with _watched(monkeypatch) as reads:
+        generator = PageContentGenerator(page)
+
+    assert generator.source.source_url == page.source_url
+    assert reads == [], f"construction opened {reads!r}"
+
+
+def test_preparation_needs_no_network_or_rendering(
+    monkeypatch: pytest.MonkeyPatch,
+    page_config: PageConfig,
+    tmp_path: Path,
+) -> None:
+    """Preparing a document fetches nothing and renders no HTML."""
+    page = dc.replace(page_config, output_dir=tmp_path / "out")
+    generator = PageContentGenerator(page, fetcher=_forbid_fetch)
+
+    def _forbidden(*_args: object, **_kwargs: object) -> typ.NoReturn:
+        """Reject any attempt to render a template."""
+        msg = "preparing a document must not render"
+        raise AssertionError(msg)
+
+    monkeypatch.setattr(generator.env, "render_template", _forbidden)
+
+    prepared = generator.prepare_document("# Guide\n\n## Intro\nBody\n")
+
+    assert [section.title for section in prepared.sections] == ["Intro"]
+
+
+def test_rendering_reaches_no_filesystem_environment_or_subprocess(
+    monkeypatch: pytest.MonkeyPatch,
+    page_config: PageConfig,
+    tmp_path: Path,
+) -> None:
+    """A prepared document renders with no read, environment lookup or process."""
+    page = dc.replace(page_config, output_dir=tmp_path / "out")
+    generator = PageContentGenerator(page, fetcher=_forbid_fetch)
+    prepared = generator.prepare_document("# Guide\n\n## Intro\nBody\n")
+
+    with _watched(monkeypatch) as reads:
+        document = generator.render_document(
+            prepared,
+            source_url=page.source_url,
+            version_display=None,
+            page_description="Fixture description",
+            generated_at=BUILD_TIMESTAMP,
+        )
+
+    assert document.sections, "the prepared document must still render"
+    assert document.sections[0][1], "the rendered section must not be empty"
+    assert reads == [], f"rendering opened {reads!r}"
 
 
 def test_a_render_failure_names_the_bundle_and_is_raised(
@@ -1178,7 +1417,7 @@ def test_render_writes_nothing_until_the_document_is_published(
     markdown_response: MarkdownResponseState,
     tmp_path: Path,
 ) -> None:
-    """Rendering is pure: the output directory is untouched until write()."""
+    """Rendering publishes nothing: the output dir waits until write()."""
     # A directory of this test's own: ``page_config`` is module-scoped, and the
     # other tests in the module have already published into its directory.
     fresh = dc.replace(page_config, output_dir=tmp_path / "unpublished")
@@ -1204,27 +1443,69 @@ def _forbid_fetch(
     raise AssertionError(msg)
 
 
-def test_render_document_renders_without_fetching_or_writing(
+class _UnusedMermaid(MermaidRenderer):
+    """Fail on use, proving the path under test compiles no diagram."""
+
+    def render(self, source: str) -> str | None:
+        """Reject any attempt to start the Mermaid CLI."""
+        msg = f"no diagram should be compiled from {source!r}"
+        raise AssertionError(msg)
+
+
+def test_render_document_renders_prepared_markdown_without_publishing(
     page_config: PageConfig,
     sample_markdown: str,
     tmp_path: Path,
 ) -> None:
-    """The render seam takes markdown as a value: no fetch and no write."""
+    """Preparation and rendering take values: no fetch and no output write."""
     output_dir = tmp_path / "unpublished"
     generator = PageContentGenerator(
-        page_config, output_dir=output_dir, fetcher=_forbid_fetch
+        page_config,
+        output_dir=output_dir,
+        fetcher=_forbid_fetch,
+        mermaid=_UnusedMermaid(),
     )
 
+    prepared = generator.prepare_document(sample_markdown)
     document = generator.render_document(
-        sample_markdown,
+        prepared,
         source_url=page_config.source_url,
         version_display=None,
         page_description="Fixture description",
+        generated_at=BUILD_TIMESTAMP,
     )
 
     assert document.sections, "the fixture must render at least one section"
     assert document.output_dir == output_dir
     assert not output_dir.exists(), "render_document() must not touch the disk"
+
+
+def test_render_document_reads_no_file_once_the_document_is_prepared(
+    page_config: PageConfig,
+    sample_markdown: str,
+    tmp_path: Path,
+) -> None:
+    """Rendering stays possible after its templates are gone, so it reads none."""
+    templates = tmp_path / "templates"
+    shutil.copytree(REPO_ROOT / "df12_pages" / "templates", templates)
+    generator = PageContentGenerator(
+        page_config, templates_dir=templates, output_dir=tmp_path / "unpublished"
+    )
+
+    prepared = generator.prepare_document(sample_markdown)
+    shutil.rmtree(templates)
+    document = generator.render_document(
+        prepared,
+        source_url=page_config.source_url,
+        version_display=None,
+        page_description="Fixture description",
+        generated_at=BUILD_TIMESTAMP,
+    )
+
+    assert document.sections, "a prepared document must still render its sections"
+    assert all(html for _name, html in document.sections), (
+        "every prepared section must render non-empty HTML without its templates"
+    )
 
 
 def test_publish_documents_runs_only_the_injected_render(
@@ -1239,13 +1520,17 @@ def test_publish_documents_runs_only_the_injected_render(
 
     def render(page: PageConfig) -> RenderedDocument:
         """Render a fixture with fetching forbidden and record the bundle."""
-        generator = PageContentGenerator(page, fetcher=_forbid_fetch)
+        generator = PageContentGenerator(
+            page, fetcher=_forbid_fetch, mermaid=_UnusedMermaid()
+        )
         rendered.append(page.key)
+        prepared = generator.prepare_document(sample_markdown)
         return generator.render_document(
-            sample_markdown,
+            prepared,
             source_url=page.source_url,
             version_display=None,
             page_description="Fixture description",
+            generated_at=BUILD_TIMESTAMP,
         )
 
     paths = list(_publish_documents(pages, len(pages), render))

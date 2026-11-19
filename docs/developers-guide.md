@@ -2526,7 +2526,10 @@ Escaping is decided per template name, not globally:
 site-wide values as the page template that imports them; this is how a
 sub-site's `template_vars` reach both. `render_template(name, **context)`
 renders one named template from that environment and is the only entry point
-the builders use; nothing constructs a standalone `Template` object.
+the builders use. MiniJinja exposes no way to load a template without rendering
+it, so the document builder registers its whole template directory with
+`add_template` before its first render; that is what keeps a lazy `{% from %}`
+import from reaching back to the filesystem mid-render.
 
 ### 9.2. Reproducible build timestamps
 
@@ -2538,23 +2541,37 @@ than silently falling back to the wall clock. The browser capture fixtures set
 the reference epoch (`1790899200`, 2 October 2026) so date-bearing headings
 keep a stable width.
 
-### 9.3. The render and write split
+### 9.3. Fetch, prepare, render and write
 
 A documentation bundle used to be fetched, rendered and written in one step.
-`PageContentGenerator` now separates the two halves:
+`PageContentGenerator` now separates the four, so the rule that decides what a
+page contains is a query over values:
 
-- `PageContentGenerator.render()` fetches the upstream Markdown, parses it into
-  sections, builds the navigation model and renders every section into memory.
-  It returns a `RenderedDocument` and touches no output file.
+- `PageContentGenerator.render()` is the command that reaches the outside
+  world. It fetches the upstream Markdown, asks GitHub for the latest commit
+  date when no release date is configured, and selects the build timestamp. It
+  hands the result to the two steps below.
+- `PageContentGenerator.prepare_document(markdown)` does the remaining
+  side-effecting work: it registers the template directory with the environment
+  and compiles the document's Mermaid fences to SVG figures through
+  `MermaidRenderer`. It returns a `PreparedDocument` holding the parsed
+  sections, the prepared Markdown, and the template that will render them.
+- `PageContentGenerator.render_document(prepared, ...)` is the query. It takes
+  the prepared document, the provenance to display and the timestamp as
+  parameters, builds the navigation model and renders every section into
+  memory. It reads no file, consults no environment variable, starts no
+  subprocess and touches no output file. `tests/test_doc_generation.py` deletes
+  the template directory between preparation and rendering to show that.
 - `RenderedDocument.write()` creates the output directory, writes the HTML
   sections in order, then writes the metadata JSON that points the docs index
-  at the first section. Metadata is best effort: an `OSError` there is logged
-  and the published HTML is still returned, because the pointer is a
-  convenience rather than the page itself. A bundle with no sections writes
-  neither HTML nor metadata.
+  at the first section. It returns a `WrittenDocument` describing what it
+  published, including any `OSError` that stopped the metadata.
+  `publish_document()` logs that outcome, because the HTML is already published
+  and a failed pointer must not fail the bundle. A bundle with no sections
+  writes neither HTML nor metadata.
 
-`PageContentGenerator.run()` remains the convenience entry point that calls
-`render().write()` for a single bundle.
+`PageContentGenerator.run()` remains the convenience entry point; it is
+`publish_document(self.render())` for a single bundle.
 
 ### 9.4. Concurrent document workers
 

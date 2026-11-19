@@ -75,10 +75,14 @@ bundles through a thread pool that defaults to eight workers.
 - `df12_pages/templating.py` owns the shared environment, the per-suffix
   escaping policy, the reproducible `SOURCE_DATE_EPOCH` timestamp and the
   `highlight` filter, so every builder renders through one configuration.
-- `PageContentGenerator` splits render from write: `render()` produces an
-  in-memory `RenderedDocument`, and `RenderedDocument.write()` publishes it.
-  `_write_documents` renders batches concurrently but writes in configuration
-  order, so a later bundle still wins a shared path.
+- `PageContentGenerator` splits fetching, preparation, rendering and writing.
+  `prepare_document()` is the remaining command: it registers the template
+  directory and compiles Mermaid figures. `render_document()` is then a query
+  over the prepared values and the provenance it is handed, including the build
+  timestamp, so it reads no file, environment variable or subprocess;
+  `RenderedDocument.write()` publishes the result. `_write_documents` renders
+  batches concurrently but writes in configuration order, so a later bundle
+  still wins a shared path.
 - `--doc-workers` and `INPUT_DOC_WORKERS` override the default of eight; one
   worker gives the serial behaviour for comparison.
 

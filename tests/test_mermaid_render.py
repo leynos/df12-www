@@ -2,7 +2,8 @@
 
 These tests stub the Mermaid CLI layer so no external process runs. They
 cover the fence-to-figure replacement, the fallback to highlighted code when
-rendering fails, and the per-diagram SVG id uniquification.
+rendering fails, the per-diagram SVG id uniquification, and the split between
+preparing a document's diagrams and rendering it once they are prepared.
 
 Usage
 -----
@@ -17,6 +18,22 @@ from df12_pages.generator.renderer import HtmlContentRenderer, MermaidRenderer
 
 if typ.TYPE_CHECKING:
     import pytest
+
+
+class _CountingMermaid(MermaidRenderer):
+    """A Mermaid renderer whose output is a stub and whose calls are counted."""
+
+    def __init__(self, svg: str | None = "<svg>diagram</svg>") -> None:
+        """Store the SVG to answer with, or ``None`` to fail every diagram."""
+        super().__init__(executable="unused")
+        self._svg = svg
+        self.sources: list[str] = []
+
+    def render(self, source: str) -> str | None:
+        """Record the diagram source and return the stub SVG."""
+        self.sources.append(source)
+        return self._svg
+
 
 SAMPLE_MARKDOWN = """Intro paragraph.
 
@@ -96,3 +113,47 @@ def test_render_failures_cached_and_reported(
     assert renderer.render("flowchart LR\n A-->B") is None
     err = capsys.readouterr().err
     assert err.count("mermaid rendering failed") == 1, "second call must hit the cache"
+
+
+def test_preparing_a_document_compiles_each_diagram_exactly_once() -> None:
+    """Preparation owns the subprocess; rendering the result starts none."""
+    mermaid = _CountingMermaid()
+    renderer = HtmlContentRenderer(mermaid=mermaid)
+
+    prepared = renderer.prepare_markdown(SAMPLE_MARKDOWN)
+    first = renderer.render_prepared(prepared)
+    second = renderer.render_prepared(prepared)
+
+    assert len(mermaid.sources) == 1, (
+        f"preparation must compile the diagram once, got {mermaid.sources!r}"
+    )
+    assert first == second, "a prepared document must render deterministically"
+    assert '<figure class="doc-mermaid"><svg>diagram</svg></figure>' in first
+    assert "df12-mermaid-placeholder" not in first
+
+
+def test_preparation_keeps_an_uncompilable_fence_for_the_fallback() -> None:
+    """A diagram that failed to compile is left as a fence in the prepared text."""
+    renderer = HtmlContentRenderer(mermaid=_CountingMermaid(svg=None))
+
+    prepared = renderer.prepare_markdown(SAMPLE_MARKDOWN)
+    html = renderer.render_prepared(prepared)
+
+    assert "```mermaid" in prepared.markdown, (
+        "the fence must survive preparation so rendering can highlight it"
+    )
+    assert not prepared.figures, "a failed diagram contributes no figure"
+    assert 'data-language="mermaid"' in html
+
+
+def test_the_cli_override_is_read_when_invoked_not_when_constructed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Constructing a renderer must not capture ambient configuration."""
+    monkeypatch.setenv("DF12_MERMAID_CLI", "/first/mermaid")
+    renderer = MermaidRenderer()
+    monkeypatch.setenv("DF12_MERMAID_CLI", "/second/mermaid")
+
+    assert renderer.executable == "/second/mermaid", (
+        "the override belongs to the invocation, not to construction"
+    )

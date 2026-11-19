@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses as dc
 import hashlib
 import os
 import re
@@ -17,6 +18,8 @@ from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
 if typ.TYPE_CHECKING:
+    import collections.abc as cabc
+
     from markdown.extensions import Extension
 else:  # pragma: no cover - type-checking fallback
     Extension = typ.Any
@@ -28,6 +31,20 @@ FENCE_LABEL_PATTERN = re.compile(
 )
 CODEHILITE_OPEN_TAG = re.compile(r'<div class="codehilite">')
 MERMAID_BLOCK_PATTERN = re.compile(r"```mermaid[^\n]*\n(.*?)```", re.DOTALL)
+
+
+@dc.dataclass(frozen=True)
+class PreparedMarkdown:
+    """Markdown whose Mermaid figures were compiled ahead of rendering.
+
+    ``markdown`` holds placeholder tokens where renderable diagrams sat, and
+    ``figures`` maps each token to the ``<figure>`` markup that replaces it
+    once the document has been converted. A fence that failed to render is
+    left in the markdown, so it falls through to code highlighting.
+    """
+
+    markdown: str
+    figures: dict[str, str] = dc.field(default_factory=dict)
 
 
 class MermaidRenderer:
@@ -48,10 +65,18 @@ class MermaidRenderer:
             Mermaid CLI to invoke. Defaults to the ``DF12_MERMAID_CLI``
             environment variable, then ``"merman-cli"``.
         """
-        self.executable = (
-            executable or os.environ.get("DF12_MERMAID_CLI") or "merman-cli"
-        )
+        self._executable = executable
         self._cache: dict[str, str | None] = {}
+
+    @property
+    def executable(self) -> str:
+        """Return the CLI to invoke, reading the override only when needed.
+
+        The environment is consulted per invocation so constructing a
+        renderer is free of ambient configuration. A caller that wants a fixed
+        command, such as a test, passes it to the constructor.
+        """
+        return self._executable or os.getenv("DF12_MERMAID_CLI") or "merman-cli"
 
     def render(self, source: str) -> str | None:
         """Return inline SVG for ``source`` or ``None`` when rendering fails.
@@ -99,7 +124,10 @@ class HtmlContentRenderer:
     """Render markdown and code snippets with consistent styling."""
 
     def __init__(
-        self, pygments_style: str = "monokai", link_extension: Extension | None = None
+        self,
+        pygments_style: str = "monokai",
+        link_extension: Extension | None = None,
+        mermaid: MermaidRenderer | None = None,
     ) -> None:
         """Initialize a renderer with optional pygments style and link extension.
 
@@ -111,28 +139,56 @@ class HtmlContentRenderer:
         link_extension : Extension, optional
             Markdown extension used when rewriting links; pass ``None`` to skip
             link rewriting.
+        mermaid : MermaidRenderer, optional
+            Renderer for fenced Mermaid diagrams. Tests inject one that fails
+            if a path under test starts a subprocess.
         """
         self.pygments_style = pygments_style
         self._formatter = HtmlFormatter(style=pygments_style, cssclass="codehilite")
         self._link_extension = link_extension
-        self._mermaid = MermaidRenderer()
+        self._mermaid = mermaid or MermaidRenderer()
 
     @property
     def stylesheet(self) -> str:
         """Return the CSS used for highlighted code blocks."""
         return self._formatter.get_style_defs(".codehilite")
 
-    def markdown(self, text: str) -> str:
+    def prepare_markdown(self, text: str) -> PreparedMarkdown:
+        """Compile a document's Mermaid fences and rewrite them as placeholders.
+
+        This is the step that may start the Mermaid CLI, so a caller that needs
+        an I/O-free render runs it first and hands the result to
+        :meth:`render_prepared`. A fence whose diagram fails to render is left
+        in place, so it falls through to a highlighted code block.
+        """
+        normalized = self._normalize_fenced_blocks(text)
+        if not normalized.strip():
+            return PreparedMarkdown("")
+        normalized, figures = self._extract_mermaid_blocks(normalized)
+        return PreparedMarkdown(normalized, figures)
+
+    def render_prepared(self, prepared: PreparedMarkdown) -> str:
+        """Convert already-prepared markdown to HTML without compiling fences."""
+        return self._convert(prepared.markdown, prepared.figures)
+
+    def markdown(
+        self, text: str, *, figures: cabc.Mapping[str, str] | None = None
+    ) -> str:
         """Render markdown into HTML using the configured extensions.
 
         Mermaid fences are compiled to inline SVG figures at build time; a
         fence whose diagram fails to render falls back to a highlighted code
-        block.
+        block. When ``figures`` is supplied, ``text`` is markdown already
+        prepared by :meth:`prepare_markdown` and no fence is compiled here.
         """
-        normalized = self._normalize_fenced_blocks(text)
+        if figures is None:
+            return self.render_prepared(self.prepare_markdown(text))
+        return self._convert(text, figures)
+
+    def _convert(self, normalized: str, figures: cabc.Mapping[str, str]) -> str:
+        """Convert prepared markdown and restore its Mermaid figures."""
         if not normalized.strip():
             return ""
-        normalized, mermaid_figures = self._extract_mermaid_blocks(normalized)
         extensions: list[Extension | str] = [
             "fenced_code",
             "codehilite",
@@ -154,7 +210,7 @@ class HtmlContentRenderer:
         )
         html = md.convert(normalized)
         html = self._annotate_codehilite(html, normalized)
-        return self._restore_mermaid_blocks(html, mermaid_figures)
+        return self._restore_mermaid_blocks(html, figures)
 
     def _extract_mermaid_blocks(self, text: str) -> tuple[str, dict[str, str]]:
         """Swap renderable Mermaid fences for placeholder tokens.
@@ -177,7 +233,7 @@ class HtmlContentRenderer:
         return MERMAID_BLOCK_PATTERN.sub(_replace, text), figures
 
     @staticmethod
-    def _restore_mermaid_blocks(html: str, figures: dict[str, str]) -> str:
+    def _restore_mermaid_blocks(html: str, figures: cabc.Mapping[str, str]) -> str:
         """Replace placeholder tokens with their rendered Mermaid figures."""
         for token, figure in figures.items():
             wrapped = f"<p>{token}</p>"
@@ -256,4 +312,9 @@ class HtmlContentRenderer:
         return FENCE_LABEL_PATTERN.sub(_strip_labels, without_indent)
 
 
-__all__ = ["CODE_BLOCK_PATTERN", "HtmlContentRenderer", "MermaidRenderer"]
+__all__ = [
+    "CODE_BLOCK_PATTERN",
+    "HtmlContentRenderer",
+    "MermaidRenderer",
+    "PreparedMarkdown",
+]

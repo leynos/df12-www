@@ -1920,13 +1920,19 @@ sites:
       samples_verified_against: "wireframe 0.4.0-alpha1 built from source at commit cd634074"
       # The crate's declared minimum, enforced upstream by a weekly build.
       rust_minimum: "1.95"
-      rust_verified: "1.99.1"
-      samples_verified_on: "2026-11-07"
+      rust_verified: "1.100.0"
+      samples_verified_on: "2026-11-19"
       # mxd moves on its own schedule, so its claims do not follow the release.
       mxd_wireframe_version: "0.3.0"
       repository_url: "https://github.com/leynos/wireframe"
       source_base: "https://github.com/leynos/wireframe/blob/v0.4.0-alpha1"
       docs_url: "https://docs.rs/wireframe/0.4.0-alpha1/wireframe/"
+      # The development revision the Common Signal copy was checked against.
+      # It is not a release: it anchors the proposal (RFC) links and the notes
+      # on what main has changed since the candidate the samples ran against.
+      main_revision: "7351347"
+      main_source_base: "https://github.com/leynos/wireframe/blob/7351347e1965260a4f6b5292a44e8ca1af9d8364"
+      main_checked_on: "18 November 2026"
     nav_links:
       - {label: Overview, href: /wireframe/}
       - {label: Get started, href: /wireframe/getting-started/}

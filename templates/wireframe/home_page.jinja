@@ -35,21 +35,21 @@
 <section class="wf-hero" aria-labelledby="hero-title">
   <div class="wf-shell wf-hero__grid">
     <div class="wf-hero__copy">
+      <p class="wf-marque"><span>wireframe</span><span aria-hidden="true">/</span><span>Common Signal</span></p>
       <h1 id="hero-title" class="wf-hero__title"><span class="wf-hero__kicker">A Rust router for binary protocols</span><img src="/wireframe/assets/logos/wordmark-1400.webp" srcset="/wireframe/assets/logos/wordmark-700.webp 700w, /wireframe/assets/logos/wordmark-1400.webp 1400w" sizes="(width < 640px) 90vw, 38rem" alt="wireframe" width="1400" height="357" fetchpriority="high"></h1>
-      <p class="wf-hero__line">Binary protocols. <span class="wf-glitch" data-text="Clear routes.">Clear routes.</span></p>
-      <p class="wf-hero__deck">Frame the bytes, route each message by ID, and wrap the work in middleware. Actix Web&rsquo;s shape, for protocols that aren&rsquo;t HTTP.</p>
-      <p class="wf-hero__status"><strong>{{ wireframe_version }} is an alpha for early adopters</strong>, {{ 'released' if wireframe_published else 'targeted for' }} {{ wireframe_released }}. Interfaces may change before 1.0, so pin the exact version.</p>
+      <p class="wf-hero__line">What we connect, we should understand.</p>
+      <p class="wf-hero__deck">wireframe is an experimental Rust library for building servers and clients for frame-based binary protocols. Frame the bytes, route messages by ID, and keep protocol behaviour open to inspection.</p>
+      {%- if wireframe_published %}
+      <p class="wf-hero__status"><strong>{{ wireframe_version }} is an alpha for early adopters</strong>, released {{ wireframe_released }}. Interfaces may change before 1.0, so pin the exact version.</p>
+      {%- else %}
+      <p class="wf-hero__status"><strong>{{ wireframe_version }} is an alpha that is not yet published.</strong> It was targeted for {{ wireframe_released }} and is not on crates.io yet. Interfaces may change before 1.0, so pin the exact version.</p>
+      {%- endif %}
       <div class="wf-hero__actions">{{ ui.button('Get started', '/wireframe/getting-started/') }}{{ ui.button('Read the guides', '/wireframe/guides/', kind='quiet') }}</div>
     </div>
-    <figure class="wf-scope" data-wf-scope aria-labelledby="scope-caption">
-      <div class="wf-scope__field">
-        <canvas class="wf-scope__beam" aria-hidden="true"></canvas>
-        {% include '_scope.svg.jinja' %}
-      </div>
-      <figcaption id="scope-caption" class="wf-scope__caption">One request&rsquo;s path: bytes become frames, a frame becomes an envelope, and its message ID selects one handler. The magenta marks are the correlation ID, carried out and back.</figcaption>
-    </figure>
+    {{ ui.plate('27', eager=true, variant='hero') }}
   </div>
   <div class="wf-shell">
+    <p class="wf-foundation"><strong>A common foundation for unfamiliar traffic.</strong> Every protocol brings its own rules. wireframe provides the framing and routing machinery, so an application can concentrate on the messages it handles.</p>
     <ul class="wf-capability-row">
       {%- for c in capabilities %}
       <li><a href="{{ c.href }}"><span class="wf-capability-row__icon">{{ ui.icon(c.icon) }}</span><span class="wf-label">{{ c.name }}</span><span>{{ c.line }}</span></a></li>
@@ -57,7 +57,7 @@
     </ul>
     <dl class="wf-readout" aria-label="At a glance">
       <div><dt>Release</dt><dd>{{ wireframe_version }}</dd></div>
-      <div><dt>Status</dt><dd>Alpha</dd></div>
+      <div><dt>Status</dt><dd>{{ 'Alpha' if wireframe_published else 'Alpha, unpublished' }}</dd></div>
       <div><dt>{{ 'crates.io' if wireframe_published else 'Target' }}</dt><dd>{{ wireframe_released }}</dd></div>
       <div><dt>Rust</dt><dd>{{ rust_minimum }} or newer</dd></div>
       <div><dt>Runtime</dt><dd>Tokio</dd></div>
@@ -80,10 +80,7 @@
       </li>
       <li class="wf-panel wf-panel--reduction">
         <h3 class="wf-panel__title"><span>3</span> Complexity, reduced</h3>
-        <figure class="wf-reduction" data-wf-scope>
-          <div class="wf-scope__field"><canvas class="wf-scope__beam" aria-hidden="true"></canvas>{% include '_reduction.svg.jinja' %}</div>
-          <figcaption class="wf-reduction__legend"><span><strong>By hand</strong> framing, parsing, dispatch, state</span><span><strong>With wireframe</strong> a codec, routes, middleware</span></figcaption>
-        </figure>
+        {{ ui.plate('28') }}
       </li>
     </ol>
     <p class="wf-steps__proof">Both panels are cut from <a href="/wireframe/getting-started/">the getting-started program</a>, compiled and run against {{ samples_verified_against }} on {{ samples_verified_on }}. A routed handler returns nothing; the program&rsquo;s middleware writes the <code>Pong</code>.</p>
@@ -94,7 +91,7 @@
   <div class="wf-shell wf-journey__grid">
     <div class="wf-journey__intro">
       <h2 id="journey-title">Frame. Route. Handle.</h2>
-      <p>Every request takes the same path. A codec cuts the bytes into frames, the router reads each envelope&rsquo;s message ID, and that route&rsquo;s middleware wraps its handler. The reply retraces the way it came.</p>
+      <p><strong>Follow the message.</strong> A codec identifies frame boundaries. The routing layer selects a handler by message ID. Middleware surrounds the application work. The reply retraces the way it came, and the architecture guide explains each boundary.</p>
       <p class="wf-journey__note">Fragment reassembly is a transport step and optional. Message assembly, for protocols that spread one message across several frames, is a separate step that runs after it.</p>
       <a class="wf-arrow-link" href="/wireframe/architecture/">The stack, layer by layer {{ ui.icon('arrow-right') }}</a>
     </div>
@@ -132,10 +129,10 @@
         <h3>Answer in middleware</h3>
         <p>A <code>Transform</code> wraps every route&rsquo;s handler. Setup and teardown hooks carry per-connection state.</p>
       </a>
-      <a class="wf-bento__cell wf-bento__cell--raised" href="/wireframe/guides/large-messages/">
-        <span class="wf-bento__icon">{{ ui.icon('budget') }}</span>
-        <h3>Large messages, bounded</h3>
-        <p>Fragmentation, message assembly, and per-connection memory budgets that count fragment and assembly bytes together, slow reads at 80%, and close the connection past the cap.</p>
+      <a class="wf-bento__cell wf-bento__cell--raised" href="/wireframe/guides/streaming/">
+        <span class="wf-bento__icon">{{ ui.icon('pulses') }}</span>
+        <h3>Push and streams, as parts</h3>
+        <p>Priority push queues, a fair connection actor, and multi-frame responses. Tested, and not driven by <code>WireframeServer</code> in this alpha; main has since wired streaming responses.</p>
       </a>
       <a class="wf-bento__cell" href="/wireframe/guides/client/">
         <span class="wf-bento__icon">{{ ui.icon('outbound') }}</span>
@@ -147,25 +144,35 @@
         <h3>Test at the frame</h3>
         <p>Feed frames one byte at a time, fragment a payload, or pace a slow reader under paused time.</p>
       </a>
-      <a class="wf-bento__cell wf-bento__cell--image" href="/wireframe/guides/streaming/">
-        {{ ui.plate('queues', sizes='(width < 768px) 100vw, 40vw', caption=false) }}
+      <div class="wf-bento__cell wf-bento__cell--image">
+        {{ ui.plate('15') }}
         <div class="wf-bento__copy">
-          <span class="wf-bento__icon">{{ ui.icon('pulses') }}</span>
-          <h3>Push and streams, as parts</h3>
-          <p>Priority push queues, a fair connection actor, and multi-frame responses. Tested, and not yet driven by <code>WireframeServer</code>.</p>
+          <span class="wf-bento__icon">{{ ui.icon('budget') }}</span>
+          <h3><a href="/wireframe/guides/large-messages/">Large messages, bounded</a></h3>
+          <p>Fragmentation, message assembly, and per-connection memory budgets that count fragment and assembly bytes together, slow reads at 80%, and close the connection past the cap.</p>
+          <div class="wf-proposal">
+            <p class="wf-proposal__label">Proposed · RFC 0007</p>
+            <p><strong>Capacity is part of the design.</strong> A message leaving a queue has not necessarily left memory. The proposed budget contract accounts for retained data and admitted work by scope. <a href="{{ main_source_base }}/docs/rfcs/rfc-0007-budgets-scheduling-and-assembly.md">Review the proposal</a></p>
+          </div>
         </div>
-      </a>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="wf-world" aria-labelledby="world-title">
-  <div class="wf-world__plate">{{ ui.plate('scope', sizes='100vw', caption=false) }}</div>
+  {{ ui.plate('29', variant='wide') }}
   <div class="wf-shell wf-world__body">
     <h2 id="world-title">The scope</h2>
-    <p>Every frame is a stroke. A vector display draws only lines: the beam is steered from point to point, lit where it means something and blanked where it doesn&rsquo;t. wireframe steers messages the same way. The codec cuts the byte stream into frames, the router deflects each one to exactly one handler, and where the beam stops, the trace burns brightest.</p>
-    <p class="wf-world__key">On every plate: <span class="wf-key wf-key--mint">mint</span> is structure and the route in use, <span class="wf-key wf-key--cyan">cyan</span> is a frame, <span class="wf-key wf-key--amber">amber</span> is traffic on the move, and <span class="wf-key wf-key--magenta">magenta</span> marks the one message being followed.</p>
-    <a class="wf-arrow-link" href="/wireframe/scope/">How the scope is drawn {{ ui.icon('arrow-right') }}</a>
+    <p><strong>The visible city.</strong> Roads carry signals towards destinations, and crossings make a chosen path legible. The plates draw a library as a city so that its routes can be seen, but the city is only the setting: the stages are the library&rsquo;s own. A codec cuts the byte stream into frames, the router sends each envelope to the one handler its message ID names, and middleware stands at that junction, in and out.</p>
+    <ul class="wf-key-list" aria-label="How the plates use colour">
+      <li><span class="wf-key" aria-hidden="true"></span><span><strong>Cobalt</strong>, solid: structure, roads, and frames</span></li>
+      <li><span class="wf-key wf-key--signal" aria-hidden="true"></span><span><strong>Signal cyan</strong>, dashed: information and its labels</span></li>
+      <li><span class="wf-key wf-key--flow" aria-hidden="true"></span><span><strong>Flow green</strong>, heavy: the route actually taken</span></li>
+      <li><span class="wf-key wf-key--capacity" aria-hidden="true"></span><span><strong>Capacity magenta</strong>, dotted: budgets and allocation</span></li>
+    </ul>
+    <p>The city lights are illustration, not telemetry. Nothing on this site reports a live network.</p>
+    <a class="wf-arrow-link" href="/wireframe/scope/">How this site is drawn {{ ui.icon('arrow-right') }}</a>
   </div>
 </section>
 
@@ -197,6 +204,5 @@
     </div>
   </div>
 </section>
-<div class="wf-tagline"><p class="wf-shell"><span>Binary protocols</span><span aria-hidden="true">→</span><span>clear routes</span></p></div>
+<div class="wf-tagline"><p class="wf-shell">What we connect, we should understand.</p></div>
 {% endblock %}
-{% block scripts %}<script src="/wireframe/assets/js/scope.js" defer></script>{% endblock %}

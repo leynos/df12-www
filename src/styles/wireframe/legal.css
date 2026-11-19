@@ -3,7 +3,7 @@
  * Netsuke legal pages are: a breadcrumb, then one reading panel with an
  * eyebrow, the title, a summary, and the body. The body is Markdown rendered
  * by the shared-content generator, so element selectors style it, along with
- * the contents list, sections, and badge cards it is wrapped in. No beam
+ * the contents list, sections, and badge cards it is wrapped in. No plate
  * art and no glow: a legal notice is plain text on a quiet panel.
  */
 
@@ -20,12 +20,12 @@
 .wf-legal-page__panel {
   padding: clamp(1.25rem, 5vw, 3rem);
   border: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-legal-page__eyebrow {
   margin: 0;
-  color: var(--color-mint);
+  color: var(--color-signal);
   font: 700 0.8125rem / 1.45 var(--font-sans);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
@@ -92,13 +92,13 @@
 }
 
 .wf-legal li::marker {
-  color: var(--color-mint);
+  color: var(--color-cobalt);
 }
 
 .wf-legal blockquote {
   margin-inline: 0;
   padding-left: 1.25rem;
-  border-left: 3px solid var(--color-mint);
+  border-left: 3px solid var(--color-cobalt);
   color: var(--color-ink-muted);
 }
 
@@ -125,7 +125,7 @@
 .wf-legal .content-toc {
   padding: 1.25rem 1.5rem;
   border: 1px solid var(--color-rule);
-  background: var(--color-night);
+  background: var(--color-void);
 }
 
 .wf-legal .content-toc ul {
@@ -156,7 +156,7 @@
   align-items: flex-start;
   padding: 1.25rem 1.5rem;
   border: 1px solid var(--color-rule);
-  background: var(--color-night);
+  background: var(--color-void);
 }
 
 .wf-legal .content-card__badge {
@@ -166,15 +166,15 @@
   width: 2.5rem;
   height: 2.5rem;
   margin-top: 0.125rem;
-  border: 1px solid var(--color-mint);
-  color: var(--color-mint);
+  border: 1px solid var(--color-signal);
+  color: var(--color-signal);
   font: 700 0.8125rem / 1 var(--font-sans);
   text-transform: uppercase;
 }
 
 .wf-legal .content-card--accent .content-card__badge {
-  border-color: var(--color-amber);
-  color: var(--color-amber);
+  border-color: var(--color-notice);
+  color: var(--color-notice);
 }
 
 .wf-legal .content-card__body {

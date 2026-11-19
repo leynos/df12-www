@@ -1,12 +1,14 @@
 """Invariants the published wireframe sub-site must hold.
 
-The wireframe pages make promises the identity specification holds them to:
-every working example is code the sample crate compiles and runs, the
+The wireframe pages make promises the Common Signal identity (v0.4) holds them
+to: every working example is code the sample crate compiles and runs, the
 release a page names is the release that crate pins, the logo is the supplied
-artwork rather than a redrawing, the syntax colours are generated rather than
-drawn by hand, scrolling code can be
-reached from the keyboard, and legal pages carry no art. Each promise a
-template edit could quietly break is asserted against the built tree here.
+artwork, byte for byte, the syntax colours are generated rather than drawn by
+hand, every plate is the vendored scene with a complete poster that stands
+without script, the home page keeps its sections in their order, a proposal is
+labelled where it is named, scrolling code can be reached from the keyboard,
+and legal pages carry no art. Each promise a template edit could quietly break
+is asserted against the built tree here.
 
 The ``built_site`` fixture in ``conftest.py`` runs the full ``bun run
 build``. Running the samples themselves needs a Rust toolchain and the
@@ -15,6 +17,7 @@ network, so it is ``make wireframe-samples`` rather than a test here.
 
 from __future__ import annotations
 
+import hashlib
 import re
 import textwrap
 import tomllib
@@ -26,7 +29,7 @@ from bs4 import BeautifulSoup, Tag
 from PIL import Image
 
 from df12_pages.config import load_site_config
-from scripts import generate_wireframe_scope
+from scripts import import_wireframe_plates
 from scripts.generate_wireframe_pygments_css import STYLESHEET, build_css
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -36,11 +39,38 @@ TEMPLATES = REPO_ROOT / "templates" / "wireframe"
 SAMPLES = TEMPLATES / "samples"
 STYLESHEET_HREF = "/wireframe/assets/styles/wireframe.css"
 LEGAL_PAGES = ("privacy-policy", "terms-of-use", "code-of-conduct")
+LOGOS = REPO_ROOT / "src" / "static" / "wireframe" / "assets" / "logos"
+LOGO_HASHES = REPO_ROOT / "tests" / "fixtures" / "wireframe-logos.sha256"
+VENDOR = REPO_ROOT / import_wireframe_plates.DESTINATION
+TAGLINE = "What we connect, we should understand."
+#: The home page's sections, by heading id, in the order they must keep.
+HOME_SECTIONS = (
+    "hero-title",
+    "steps-title",
+    "journey-title",
+    "capabilities-title",
+    "world-title",
+    "mxd-title",
+    "install-title",
+)
+#: The journey's station anchors, which other pages and readers link to.
+STATIONS = (
+    "input",
+    "framing",
+    "envelope",
+    "reassembly",
+    "deflection",
+    "modulation",
+    "dwell",
+    "retrace",
+)
 #: The home page, fourteen content pages, and the three shared legal pages.
 PUBLISHED_PAGES = 18
 #: A floor on the sample panels checked, so a selector that stops matching
 #: fails rather than passing vacuously.
 MIN_SAMPLE_PANELS = 30
+#: Likewise for the links to proposals: seven on the roadmap, and more beside.
+MIN_RFC_LINKS = 10
 
 #: daisyUI component names. daisyUI emits every component into the utilities
 #: layer, so any of these as a class token would restyle the element and beat
@@ -275,20 +305,163 @@ def test_the_logo_is_the_supplied_artwork() -> None:
         )
 
 
-def test_the_scope_scene_is_generated() -> None:
-    """The hero scene matches its generator, in the grammar the beam reads."""
-    committed = generate_wireframe_scope.OUTPUT.read_text(encoding="utf-8")
-    assert committed == generate_wireframe_scope.render(), (
-        "the scope scene is stale; rerun scripts/generate_wireframe_scope.py"
-    )
-    roles = set(re.findall(r'data-beam="([a-z]+)"', committed))
-    assert {"route", "mint", "magenta", "dim"} <= roles
-    for d in re.findall(r' d="([^"]+)"', committed):
-        assert re.fullmatch(r"M[-\d. ]+( L[-\d. ]+)+", d), d
+def test_the_protected_logos_are_unchanged() -> None:
+    """The supplied logo, symbol, and favicons match their recorded bytes.
+
+    The identity keeps them exactly as supplied: not redrawn, recoloured,
+    cropped, or re-encoded. A changed file fails here by name.
+    """
+    recorded: dict[str, str] = {}
+    for line in LOGO_HASHES.read_text(encoding="utf-8").splitlines():
+        digest, name = line.split(maxsplit=1)
+        recorded[name] = digest
+    assert set(recorded) == {path.name for path in LOGOS.iterdir()}
+    for name, digest in recorded.items():
+        actual = hashlib.sha256((LOGOS / name).read_bytes()).hexdigest()
+        assert actual == digest, f"{name} differs from the supplied artwork"
+
+
+def test_the_vendored_plates_match_their_provenance() -> None:
+    """The plate runtime and posters are the recorded build of the pin.
+
+    ``make check-wireframe-plates`` rebuilds from source; this cheaper check
+    holds the committed files to the record that build wrote.
+    """
+    lines = (VENDOR / "PROVENANCE.txt").read_text(encoding="utf-8").splitlines()
+    assert f"commit {import_wireframe_plates.PIN}" in lines
+    patches = [line.split() for line in lines if line.startswith("patch ")]
+    files = [line.split() for line in lines if line.startswith("file ")]
+    assert patches, "the local patch is not recorded"
+    for _, digest, path in patches:
+        actual = hashlib.sha256((REPO_ROOT / path).read_bytes()).hexdigest()
+        assert actual == digest, f"{path} changed since the plates were built"
+    recorded = {name for _, _, name in files}
+    expected = {"wireframe-plate.js", "three-LICENSE.txt"} | {
+        f"posters/{plate}.webp" for plate in import_wireframe_plates.POSTERS
+    }
+    assert recorded == expected
+    for _, digest, name in files:
+        actual = hashlib.sha256((VENDOR / name).read_bytes()).hexdigest()
+        assert actual == digest, f"{name} differs from the recorded build"
+
+
+def test_every_vendored_poster_is_shown_and_every_plate_vendored(
+    built_site: Path,
+) -> None:
+    """The pages show exactly the plates the import vendors."""
+    assert built_site.is_dir()
+    shown = {
+        str(figure["data-wf-plate"])
+        for page in _pages()
+        for figure in _soup(page).select("[data-wf-plate]")
+    }
+    assert shown == set(import_wireframe_plates.POSTERS)
+
+
+def test_a_plate_is_whole_without_script(built_site: Path) -> None:
+    """Every plate is a poster, a caption, and controls the script reveals.
+
+    No live element is in the markup, so nothing renders until plates.js
+    decides it may; the controls start hidden, so a browser without the
+    script is never offered a button that does nothing.
+    """
+    assert built_site.is_dir()
+    for page in _pages():
+        soup = _soup(page)
+        assert not soup.select("wireframe-plate"), f"{page}: a live plate in markup"
+        for figure in soup.select("figure.wf-plate"):
+            plate = str(figure["data-wf-plate"])
+            poster = figure.select_one(
+                "[data-wf-plate-stage] img[data-wf-plate-poster]"
+            )
+            assert poster is not None, f"{page}: plate {plate} has no poster"
+            assert str(poster["src"]).endswith(f"/posters/{plate}.webp"), page
+            controls = figure.select_one("[data-wf-plate-controls]")
+            assert controls is not None
+            assert controls.has_attr("hidden"), f"{page}: plate {plate} controls"
+            caption = figure.select_one("figcaption")
+            assert caption is not None
+            title = caption.select_one(".wf-plate__title")
+            assert title is not None
+            assert title.get_text(strip=True), f"{page}: plate {plate} untitled"
+            for button in controls.select("button"):
+                assert button.get("type") == "button"
+                assert button.get("aria-describedby") == title["id"]
+            assert figure.get("data-wf-plate-runtime") == (
+                "/wireframe/assets/vendor/plates/wireframe-plate.js"
+            )
+
+
+def test_the_home_page_keeps_its_sections_in_order(built_site: Path) -> None:
+    """The identity restyles the home page in place; it does not reorder it."""
+    assert built_site.is_dir()
+    soup = _soup(PUBLIC_SITE / "index.html")
+    sections = [
+        str(section["aria-labelledby"])
+        for section in soup.select("main > section[aria-labelledby]")
+    ]
+    assert tuple(sections) == HOME_SECTIONS
+    stations = [stop["id"] for stop in soup.select(".wf-track__stop")]
+    assert stations == [f"station-{station}" for station in STATIONS]
+    hero = soup.select_one(".wf-hero figure.wf-plate")
+    assert hero is not None
+    assert hero["data-wf-plate"] == "27"
+    assert hero.has_attr("data-wf-plate-eager")
+    panels = soup.select(".wf-steps__grid > li")
+    assert len(panels) == len(("messages", "app", "reduction"))
+    assert panels[2].select_one("[data-wf-plate='28']") is not None
+    assert len(panels[0].select("[data-wf-sample]")) == 1
+    assert len(panels[1].select("[data-wf-sample]")) == 1
+    world = soup.select_one(".wf-world [data-wf-plate]")
+    assert world is not None
+    assert world["data-wf-plate"] == "29"
+    assert soup.select_one("main > .wf-tagline") is not None
+
+
+def test_the_marque_and_tagline_are_text(built_site: Path) -> None:
+    """Common Signal and the exact tagline are selectable text in the hero."""
+    assert built_site.is_dir()
+    soup = _soup(PUBLIC_SITE / "index.html")
+    hero = soup.select_one(".wf-hero")
+    assert hero is not None
+    assert "Common Signal" in hero.get_text(" ")
+    line = hero.select_one(".wf-hero__line")
+    assert line is not None
+    assert line.get_text(strip=True) == TAGLINE
+    strip = soup.select_one(".wf-tagline")
+    assert strip is not None
+    assert strip.get_text(strip=True) == TAGLINE
+    assert len(soup.select("h1")) == 1
+    wordmark = soup.select_one("h1 img")
+    assert wordmark is not None
+    assert wordmark["alt"] == "wireframe"
+
+
+def test_a_proposal_is_labelled_where_it_is_named(built_site: Path) -> None:
+    """Every link to an RFC sits in a block that says the RFC is proposed."""
+    assert built_site.is_dir()
+    checked = 0
+    for page in _pages():
+        for link in _soup(page).select("a[href*='/docs/rfcs/']"):
+            holder = link.find_parent(["li", "aside", "div", "figcaption", "p"])
+            while holder is not None and "Proposed" not in holder.get_text(" "):
+                holder = holder.find_parent(["li", "aside", "div", "section", "figure"])
+            assert holder is not None, f"{page}: {link['href']} is not labelled"
+            checked += 1
+    assert checked >= MIN_RFC_LINKS, f"expected the RFC links checked, saw {checked}"
+
+
+def test_the_retired_scope_is_gone(built_site: Path) -> None:
+    """No page draws with the old scope, its glitch, or the old palette's art."""
+    assert built_site.is_dir()
+    for page in _pages():
+        text = page.read_text(encoding="utf-8")
+        for retired in ("data-wf-scope", "wf-glitch", "scope.js", "/assets/images/"):
+            assert retired not in text, f"{page} still uses {retired}"
 
 
 def test_the_syntax_partial_is_generated() -> None:
-    """The committed syntax colours match ScopeStyle."""
+    """The committed syntax colours match SignalStyle."""
     assert STYLESHEET.read_text(encoding="utf-8") == build_css(), (
         f"{STYLESHEET} is stale; rerun scripts/generate_wireframe_pygments_css.py"
     )
@@ -346,16 +519,21 @@ def test_every_guide_is_listed_and_configured(built_site: Path) -> None:
 
 
 def test_pages_load_their_scripts(built_site: Path) -> None:
-    """Every page loads the copy script; only pages with a scope load the beam."""
+    """Every page loads the copy and plate scripts, both classic and deferred.
+
+    The plate script returns at once on a page without plates. The plate
+    runtime is not a script tag: plates.js imports it on demand, so a page
+    whose plates stay posters never fetches it.
+    """
     assert built_site.is_dir()
+    expected = ["/wireframe/assets/js/copy-code.js", "/wireframe/assets/js/plates.js"]
     for page in _pages():
         soup = _soup(page)
-        scripts = [script.get("src") for script in soup.select("script[src]")]
-        expected = ["/wireframe/assets/js/copy-code.js"]
-        if soup.select("[data-wf-scope]"):
-            expected.append("/wireframe/assets/js/scope.js")
-        assert scripts == expected, page
-    for name in ("copy-code.js", "scope.js"):
+        scripts = soup.select("script[src]")
+        assert [script.get("src") for script in scripts] == expected, page
+        assert all(script.has_attr("defer") for script in scripts), page
+        assert not any(script.get("type") == "module" for script in scripts), page
+    for name in ("copy-code.js", "plates.js"):
         assert (PUBLIC_SITE / "assets" / "js" / name).is_file()
 
 

@@ -6,7 +6,7 @@
 .wf-page-head {
   padding-block: 2.5rem 3rem;
   border-bottom: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-page-head__grid {
@@ -106,7 +106,7 @@
 
 .wf-aside__menu {
   border: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-aside__menu summary {
@@ -139,12 +139,12 @@
 }
 
 .wf-toc a:hover {
-  border-left-color: var(--color-mint);
+  border-left-color: var(--color-signal);
   color: var(--color-ink);
 }
 
 .wf-toc a[aria-current="page"] {
-  border-left: 2px solid var(--color-magenta);
+  border-left: 2px solid var(--color-flow);
   color: var(--color-ink);
   font-weight: 700;
 }
@@ -203,7 +203,7 @@
 }
 
 .wf-article li::marker {
-  color: var(--color-mint);
+  color: var(--color-cobalt);
 }
 
 .wf-lede {
@@ -264,7 +264,7 @@
   min-width: 0;
   margin: 0;
   border: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-code__bar {
@@ -286,13 +286,13 @@
 }
 
 .wf-code__kind {
-  color: var(--color-mint);
+  color: var(--color-signal);
   font-size: 0.8125rem;
   font-weight: 700;
 }
 
 .wf-code--illustration .wf-code__kind {
-  color: var(--color-amber);
+  color: var(--color-notice);
 }
 
 .wf-code__slot {
@@ -336,8 +336,8 @@
 }
 
 .wf-copy:hover {
-  border-color: var(--color-mint);
-  color: var(--color-mint);
+  border-color: var(--color-signal);
+  color: var(--color-signal);
 }
 
 /* Callouts: text first, a left rule, and the kind in words. */
@@ -345,32 +345,32 @@
   max-width: 72ch;
   padding: 1rem 1.25rem;
   border: 1px solid var(--color-rule);
-  border-left: 3px solid var(--color-cyan);
-  background: var(--color-panel);
+  border-left: 3px solid var(--color-signal);
+  background: var(--color-surface);
 }
 
 .wf-callout--warning {
-  border-left-color: var(--color-amber);
+  border-left-color: var(--color-notice);
 }
 
 .wf-callout--fact {
-  border-left-color: var(--color-mint);
+  border-left-color: var(--color-cobalt);
 }
 
 .wf-callout__kind {
   margin: 0;
-  color: var(--color-cyan);
+  color: var(--color-signal);
   font: 700 0.75rem / 1.45 var(--font-sans);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 
 .wf-callout--warning .wf-callout__kind {
-  color: var(--color-amber);
+  color: var(--color-notice);
 }
 
 .wf-callout--fact .wf-callout__kind {
-  color: var(--color-mint);
+  color: var(--color-cobalt-text);
 }
 
 .wf-callout__title {
@@ -385,6 +385,43 @@
 
 .wf-install .wf-callout {
   margin-top: 1.5rem;
+}
+
+/* A note on what main has changed since the candidate, and a proposal
+   named where it is relevant. Each says what it is in words; the rule's
+   style tells them apart without colour. */
+.wf-main-note,
+.wf-proposal-note {
+  max-width: 72ch;
+  margin-top: 1rem;
+  padding: 0.6rem 0 0.6rem 1rem;
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+.wf-main-note {
+  border-left: 4px double var(--color-signal);
+}
+
+.wf-proposal-note {
+  border-left: 2px dashed var(--color-notice);
+}
+
+.wf-main-note p,
+.wf-proposal-note p {
+  margin: 0;
+}
+
+.wf-proposal-note p + p {
+  margin-top: 0.25rem;
+}
+
+.wf-main-note__label {
+  margin-right: 0.35rem;
+  color: var(--color-signal);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
 }
 
 /* A list of routes: the guide index and section landing pages. */
@@ -417,7 +454,7 @@
 
 .wf-route-list a > .wf-icon:first-child {
   margin-top: 0.15rem;
-  color: var(--color-mint);
+  color: var(--color-signal);
   font-size: 1.5rem;
 }
 
@@ -427,7 +464,7 @@
 }
 
 .wf-route-list a:hover > .wf-icon:last-child {
-  color: var(--color-mint);
+  color: var(--color-flow);
 }
 
 .wf-route-list strong {
@@ -481,7 +518,7 @@
 .wf-mxd-case {
   padding: 2rem;
   border: 1px solid var(--color-rule);
-  border-left: 3px solid var(--color-mint);
+  border-left: 3px solid var(--color-cobalt);
   background: var(--color-raised);
 }
 
@@ -494,7 +531,7 @@
 
 .wf-defs > div {
   padding-left: 1rem;
-  border-left: 2px solid var(--color-cyan);
+  border-left: 2px solid var(--color-signal);
 }
 
 .wf-defs dt {
@@ -511,7 +548,7 @@
 }
 
 .wf-steps li::marker {
-  color: var(--color-mint);
+  color: var(--color-signal);
   font-weight: 700;
 }
 
@@ -524,7 +561,7 @@
   margin-top: 1.5rem;
   padding: 2rem;
   border: 1px solid var(--color-rule);
-  background: var(--color-night);
+  background: var(--color-void);
 }
 
 .wf-field__marks img:first-child {
@@ -593,7 +630,7 @@
   min-width: 0;
   padding: 1.5rem;
   border: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-example h2 {
@@ -612,7 +649,7 @@
 }
 
 .wf-example__layer {
-  color: var(--color-mint);
+  color: var(--color-signal);
 }
 
 /* The roadmap: three horizons, the built, the in progress, and the planned,
@@ -626,16 +663,26 @@
 .wf-horizon {
   padding: 1.5rem;
   border: 1px solid var(--color-rule);
-  border-left: 3px solid var(--color-mint);
-  background: var(--color-panel);
+  border-left: 3px solid var(--color-flow);
+  background: var(--color-surface);
 }
 
 .wf-horizon--next {
-  border-left: 3px dashed var(--color-amber);
+  border-left: 3px dashed var(--color-notice);
 }
 
 .wf-horizon--later {
-  border-left: 3px dotted var(--color-cyan);
+  border-left: 3px dotted var(--color-cobalt);
+}
+
+/* What main has done since the candidate: a doubled signal rule. */
+.wf-horizon--main {
+  border-left: 4px double var(--color-signal);
+}
+
+/* Proposals: the notice colour, dotted, with "Proposed" in the label. */
+.wf-horizon--proposed {
+  border-left: 3px dotted var(--color-notice);
 }
 
 .wf-horizon h3 {
@@ -652,7 +699,7 @@
 }
 
 .wf-horizon li::marker {
-  color: var(--color-mint);
+  color: var(--color-cobalt);
 }
 
 .wf-horizon > p {
@@ -666,7 +713,7 @@
   white-space: nowrap;
 }
 
-/* The field guide: beam swatches. */
+/* The field guide: the palette of responsibility, as swatches. */
 .wf-swatches {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
@@ -678,7 +725,7 @@
 
 .wf-swatch {
   border: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-swatch__chip {
@@ -686,44 +733,48 @@
   border-bottom: 1px solid var(--color-rule);
 }
 
-.wf-swatch__chip--night {
-  background: var(--color-night);
+.wf-swatch__chip--void {
+  background: var(--color-void);
 }
 
 .wf-swatch__chip--surface {
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-swatch__chip--raised {
   background: var(--color-raised);
 }
 
-.wf-swatch__chip--text {
+.wf-swatch__chip--ink {
   background: var(--color-ink);
 }
 
-.wf-swatch__chip--muted {
+.wf-swatch__chip--ink-muted {
   background: var(--color-ink-muted);
 }
 
-.wf-swatch__chip--mint {
-  background: var(--color-mint);
+.wf-swatch__chip--cobalt {
+  background: var(--color-cobalt);
 }
 
-.wf-swatch__chip--cyan {
-  background: var(--color-cyan);
+.wf-swatch__chip--signal {
+  background: var(--color-signal);
 }
 
-.wf-swatch__chip--amber {
-  background: var(--color-amber);
+.wf-swatch__chip--flow {
+  background: var(--color-flow);
 }
 
-.wf-swatch__chip--magenta {
-  background: var(--color-magenta);
+.wf-swatch__chip--capacity {
+  background: var(--color-capacity);
 }
 
-.wf-swatch__chip--error {
-  background: var(--color-error);
+.wf-swatch__chip--halt {
+  background: var(--color-halt);
+}
+
+.wf-swatch__chip--notice {
+  background: var(--color-notice);
 }
 
 .wf-swatch__body {
@@ -749,28 +800,21 @@
   margin-top: 0;
 }
 
-/* High contrast and low glow: the specification asks for a mode without
-   bloom. Every halo is decoration, so it goes, and the cores stay. */
+/* High contrast and low glow: the identity asks for a mode without bloom.
+   Every halo is decoration, so it goes, and the cores stay. The live plates
+   take their low-glow setting from the same preference in plates.js. */
 @media (prefers-contrast: more), (forced-colors: active) {
   .wf-brand img,
-  .wf-scope__svg path,
   .wf-capability-row__icon,
   .wf-track::after,
+  .wf-track__node,
   .wf-nav a[aria-current="page"]::after {
     filter: none;
     box-shadow: none;
   }
 
-  .wf-glitch::before,
-  .wf-glitch::after {
-    display: none;
-  }
-
-  .wf-track::after {
-    background-image: none;
-  }
-
   .wf-btn:hover,
+  .wf-plate__button:hover,
   :focus-visible {
     box-shadow: none;
   }

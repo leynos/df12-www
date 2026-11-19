@@ -1,25 +1,48 @@
-{#- The plate catalogue: every generated illustration on the sub-site, once.
-    Each raster was drawn with gpt-image-2 on 31 October 2026 as X-Y
-    vector-scan display art and carries no text: the label and the caption
-    are HTML. Every image has a `-half` file at half its linear size for
-    `srcset`. Provenance is in docs/wireframe-site.md. -#}
+{#- The plate catalogue: every illustration on the sub-site, once.
+
+    Each plate is a Three.js scene from leynos/wireframe-3js, vendored at the
+    pin in src/static/wireframe/assets/vendor/plates/PROVENANCE.txt by
+    scripts/import_wireframe_plates.py, with the matching poster that stands
+    in for it before the scene loads, under reduced motion, without WebGL,
+    and in print. Titles are the source catalogue's. Words that must be read
+    are here, in HTML, never only in the art.
+
+    `alt` is the poster's description, the plate's one accessible
+    representation; a civic setting that carries no technical claim is
+    decorative and has an empty one. `kind` says what sort of picture it is
+    (identity v0.4, section 11.1); `status` qualifies the claim it could be
+    read as making, with `href` as its source when it has one. -#}
 {% set plates = {
-  'scope': {'file': 'scope', 'width': 1600, 'height': 900, 'label': 'The scope',
-    'alt': 'A perspective grid floor drawn in glowing vector lines. A stream of cyan wireframe cubes flows in from the left through a tall mint rhombus gateway; beyond it, dim dashed paths lead to two distant terminal frames, while one amber path with travelling pulses of light carries the cubes, one of them magenta, to a third terminal that glows mint. A dashed return line curves back along the floor.',
-    'caption': 'One frame followed, one route lit. The other paths stay dark until a message ID names them.'},
-  'fragments': {'file': 'fragments', 'width': 1536, 'height': 1024, 'label': 'Fragments',
-    'alt': 'A long cyan wireframe slab, divided into four sections, separates into four short boxes that travel along a faint amber arc with blank gaps between them, and arrive inside a mint frame on the right, where they sit joined again as one long slab with glowing joints.',
-    'caption': 'Too long for one frame, so it crosses in pieces and is rejoined before any handler sees it.'},
-  'queues': {'file': 'queues', 'width': 1536, 'height': 1024, 'label': 'Two queues',
-    'alt': 'Two cyan beam tracks meet at a mint faceted rhombus. The upper track carries three closely spaced cubes, the lower two widely spaced ones; a single amber beam leaves the junction carrying three amber cubes with one cyan cube from the slow track let in between them.',
-    'caption': 'High and low priority share one connection, and the low queue still gets its turn.'},
-  'outbound': {'file': 'outbound', 'width': 1536, 'height': 1024, 'label': 'Outbound',
-    'alt': 'A mint wireframe stack of three planes on the left sends an amber beam carrying two cyan cubes and a small magenta rhombus to a tall mint terminal frame on the right; below it a dashed return line carries a matching magenta rhombus back.',
-    'caption': 'The client leaves with a mark and accepts only the reply that carries it back.'},
-  'calibration': {'file': 'calibration', 'width': 1536, 'height': 1024, 'label': 'Calibration',
-    'alt': 'On the left, an oscilloscope graticule holds a bright mint three-lobed Lissajous figure with a faint afterglow of the previous trace. On the right, an oval loop carries a cyan slab in several separate pieces along its far side and whole along its near side, with a small amber pulse where the pieces rejoin.',
-    'caption': 'Feed it round in pieces on the far side; check it arrives whole on the near side.'},
-  'construction': {'file': 'construction', 'width': 1536, 'height': 1024, 'label': 'Still being drawn',
-    'alt': 'A large mint wireframe structure in perspective: the left part is fully lit, with a faceted junction at its centre; in the middle an amber beam tip is tracing a new edge; to the right, further frames exist only as faint dashed construction lines with calibration ticks.',
-    'caption': 'Lit lines are shipped. Dashed lines are plans, not promises.'},
+  '06': {'id': '06', 'title': 'Seven proposals', 'kind': 'Concept artwork',
+    'alt': 'Seven hexagonal nodes, each labelled with an RFC number, are linked to a central node labelled PR 845.',
+    'caption': 'Seven requests for comments gathered around one shared core.',
+    'status': 'Proposed · RFCs 0003 to 0009. None has a runtime at ' ~ main_revision ~ '.',
+    'href': main_source_base ~ '/docs/roadmap.md'},
+  '15': {'id': '15', 'title': 'Independent budgets', 'kind': 'Concept artwork',
+    'alt': 'Three channel gauges labelled A, B, and C, each above a box holding a frame. Channel B is drawn in red, at its limit.',
+    'caption': 'Separate gauges make the proposed resource scopes visible.',
+    'status': 'Proposed · RFC 0007. The values are illustrative.',
+    'href': main_source_base ~ '/docs/rfcs/rfc-0007-budgets-scheduling-and-assembly.md'},
+  '21': {'id': '21', 'title': 'Conformance harness', 'kind': 'Concept artwork',
+    'alt': 'A bank of raw wire fixtures connects through a checking stage to a wireframe toy server.',
+    'caption': 'Fixtures pass through a checking stage to a toy server.',
+    'status': 'Proposed · RFC 0008. Concept artwork for the proposed harness, not a certification.',
+    'href': main_source_base ~ '/docs/rfcs/rfc-0008-external-adapter-conformance-harness.md'},
+  '26': {'id': '26', 'title': 'The common signal', 'kind': 'Civic setting', 'alt': '',
+    'caption': 'Bridges and civic landmarks link a multicoloured cityscape.',
+    'status': 'The title image of the Common Signal series.'},
+  '27': {'id': '27', 'title': 'One request’s path', 'kind': 'Technical diagram',
+    'alt': 'A byte stream enters FrameCodec, which cuts it into frames. An envelope carrying message ID 2 and correlation ID 7 reaches the router, which sends it through middleware to the Telemetry handler; the Login and Control handlers stay unlit. A dashed reply path labelled correlation 7 runs back to the start.',
+    'caption': 'Bytes become frames, a frame becomes an envelope, and its message ID selects one handler. The reply keeps the request’s correlation ID.',
+    'status': 'Simplified: optional fragment reassembly and message assembly are not drawn. The handler names are illustrative.'},
+  '28': {'id': '28', 'title': 'Complexity, reduced', 'kind': 'Technical diagram',
+    'alt': 'A tangled wireframe cube labelled By hand, framing, parsing, dispatch, and state, leads by an arrow to three stacked layers labelled codec, routes, and middleware, under the heading With wireframe.',
+    'caption': 'Framing, parsing, dispatch, and state, written by hand, give way to three named layers.',
+    'status': 'A comparison, not a measurement.'},
+  '29': {'id': '29', 'title': 'Avenue fly-through', 'kind': 'Civic setting', 'alt': '',
+    'caption': 'A cobalt avenue connects a city of illuminated crossings.',
+    'status': 'Civic setting for the Common Signal series.'},
+  '30': {'id': '30', 'title': 'Transit panorama', 'kind': 'Civic setting', 'alt': '',
+    'caption': 'Packets travel the interchange as the view pulls back to the whole network.',
+    'status': 'Civic setting. The packets are illustration, not traffic data.'},
 } %}

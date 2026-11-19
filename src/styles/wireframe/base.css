@@ -1,4 +1,4 @@
-/* Element defaults for the scope, beside Tailwind's preflight.
+/* Element defaults for the wireframe site, beside Tailwind's preflight.
  *
  * These describe an element before any class touches it: the ground, the
  * running text, the focus ring, and inline code. The sticky masthead is
@@ -6,7 +6,7 @@
  */
 
 html {
-  background: var(--color-night);
+  background: var(--color-void);
   color: var(--color-ink);
   color-scheme: dark;
   scroll-padding-top: 5.5rem;
@@ -15,7 +15,7 @@ html {
 
 body {
   min-height: 100dvh;
-  background: var(--color-night);
+  background: var(--color-void);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 1.0625rem;
@@ -42,7 +42,7 @@ dd {
 }
 
 a {
-  color: var(--color-mint);
+  color: var(--color-flow);
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
@@ -52,17 +52,17 @@ a:hover {
   text-decoration-thickness: 2px;
 }
 
-/* The focus ring is the brightest beam on the page, with a halo, and it
+/* The focus ring is signal cyan, the brightest line on the page, and it
    never depends on colour alone: it is a 2px outline offset from the box. */
 :focus-visible {
-  outline: 2px solid var(--color-mint);
+  outline: 2px solid var(--color-signal);
   outline-offset: 3px;
-  box-shadow: 0 0 14px -2px color-mix(in oklab, var(--color-mint) 60%, transparent);
+  box-shadow: 0 0 14px -2px color-mix(in oklab, var(--color-signal) 60%, transparent);
 }
 
 ::selection {
-  background: var(--color-mint);
-  color: var(--color-night);
+  background: var(--color-signal);
+  color: var(--color-void);
 }
 
 code,
@@ -76,8 +76,8 @@ pre {
 :not(pre) > code {
   padding: 0.05em 0.35em;
   border: 1px solid var(--color-rule);
-  background: var(--color-panel);
-  color: var(--color-cyan);
+  background: var(--color-surface);
+  color: var(--color-signal);
   font-size: 0.85em;
   overflow-wrap: anywhere;
 }

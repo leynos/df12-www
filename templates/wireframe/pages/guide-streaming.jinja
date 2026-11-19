@@ -4,10 +4,12 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-streaming'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = 'queues' %}
+{% set plate_key = none %}
 {% block article_body %}
 <section aria-labelledby="scope"><h2 id="scope">What the server wires up</h2>
 <p>Start with the boundary, because it decides what can be built today. In {{ wireframe_version }}, a connection served by <code>WireframeServer</code> answers each routed request with one reply, split across frames only by fragmentation. The types on this page, which are <code>Response</code>, <code>PushQueues</code>, <code>ConnectionActor</code>, and <code>SessionRegistry</code>, ship, are tested, and work together. <code>WireframeServer</code> does not drive them, so adopting one means writing the glue.</p>
+{% call ui.main_note() %}The server runs a <code>ConnectionActor</code> for every connection, and a handler registered with <code>route_response</code> returns a <code>Response</code>, so streamed and multi-packet replies reach the wire. Push queues and <code>SessionRegistry</code> are still not exposed by the server.{% endcall %}
+{% call ui.proposal('0004', 'rfc-0004-duplex-session-driver', 'Give each direction room to move.') %}The proposed session driver coordinates reads, writes, application work, and cancellation, subject to finite capacity and explicit progress assumptions.{% endcall %}
 {% call ui.callout('fact', 'Building blocks, not yet a server feature') %}<p>Server-initiated pushes and multi-frame replies on a <code>WireframeServer</code> connection need a connection loop that runs the actor. That integration is upstream roadmap work, tracked for <a href="https://github.com/leynos/wireframe/issues/874">the actor and streaming responses</a> and for <a href="https://github.com/leynos/wireframe/issues/875">push queues and the session registry</a>. <a href="{{ source_base }}/docs/users-guide.md#building-blocks-not-yet-wired-into-the-server">The users&rsquo; guide</a> says how far each part goes. The client side is further along: <a href="/wireframe/guides/client/#streams"><code>call_streaming</code></a> already reads a multi-frame reply from any server that sends one.</p>{% endcall %}
 </section>
 

@@ -37,6 +37,7 @@
 <p>The client shares the server&rsquo;s defaults: the same length-delimited framing, the same bincode serializer, the same envelope. <code>call_correlated</code> stamps a fresh correlation ID on the request, sends it, reads the reply, and fails with <code>ClientError::CorrelationMismatch</code> if the reply carries a different one.</p>
 {{ code.code('tests/first_server.rs', 'call', title='first_server.rs · the client') }}
 <p>The server reads before it writes, so it never speaks first, and a client that connects and says nothing is disconnected after 10 seconds. Once the client has closed, the test stops the server. <code>stop</code> requests shutdown, and <code>drained</code> waits for it to finish. Shutdown waits for open connections and does not tell them to close, which is why the client goes first.</p>
+{% call ui.main_note() %}<code>stop()</code> ends idle connections at their read boundary, so <code>drained</code> no longer waits for a quiet client.{% endcall %}
 {{ code.code('tests/first_server.rs', 'stop', title='first_server.rs · stopping') }}
 <p>Run the program with the rest of the sample crate:</p>
 {% call code.command('Run the samples') %}cargo test --test first_server{% endcall %}

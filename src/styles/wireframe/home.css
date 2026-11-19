@@ -1,10 +1,14 @@
-/* The home page: hero and its scope, the three steps, the journey, the
+/* The home page: the hero and its plate, the three steps, the journey, the
  * capabilities, the scope world, the mxd band, installation, and the
- * tagline. Every rule is scoped by a section class, because every page
- * shares this one sheet. */
+ * tagline, in that order. Every rule is scoped by a section class, because
+ * every page shares this one sheet.
+ *
+ * The sections are the site's own; the Common Signal identity (v0.4)
+ * restyles them in place. The four movements of the mood book are a visual
+ * vocabulary across these sections, not new ones. */
 
-/* The hero. The proposition on the left; the scope on the right, lit from
-   behind by a wide, faint phosphor bloom. The bloom sits behind the scene,
+/* The hero. The proposition on the left; Plate 27 on the right, lit from
+   behind by a wide, faint cobalt bloom. The bloom sits behind the plate,
    never behind the copy. */
 .wf-hero {
   position: relative;
@@ -14,10 +18,10 @@
   background:
     radial-gradient(
       ellipse 55% 60% at 78% 42%,
-      color-mix(in oklab, var(--color-mint) 9%, transparent),
+      color-mix(in oklab, var(--color-cobalt) 10%, transparent),
       transparent 70%
     ),
-    var(--color-night);
+    var(--color-void);
 }
 
 .wf-hero__grid {
@@ -37,12 +41,31 @@
   }
 }
 
+/* The editorial marque: real text, small, beside the product mark rather
+   than competing with it. */
+.wf-marque {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
+  align-items: center;
+  margin: 0 0 1rem;
+  color: var(--color-ink-muted);
+  font: 700 0.8125rem / 1.4 var(--font-sans);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.wf-marque span:last-child {
+  color: var(--color-signal);
+}
+
 .wf-hero__title {
   display: grid;
   gap: 0.75rem;
   margin: 0;
 }
 
+/* The wordmark is the supplied artwork, unchanged and unanimated. */
 .wf-hero__title img {
   width: min(100%, 38rem);
   height: auto;
@@ -53,12 +76,13 @@
 }
 
 .wf-hero__kicker {
-  color: var(--color-mint);
+  color: var(--color-ink-muted);
   font: 700 0.875rem / 1.4 var(--font-sans);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
+/* The principal tagline, set as a statement. */
 .wf-hero__line {
   margin: 1.25rem 0 0;
   color: var(--color-ink);
@@ -73,11 +97,12 @@
   font-size: 1.125rem;
 }
 
+/* The release status is a deliberate notice, so it takes the notice rule. */
 .wf-hero__status {
   max-width: 34rem;
   margin: 1rem 0 0;
   padding-left: 0.75rem;
-  border-left: 2px solid var(--color-amber);
+  border-left: 2px solid var(--color-notice);
   color: var(--color-ink-muted);
   font-size: 0.9375rem;
 }
@@ -93,197 +118,15 @@
   margin-top: 2rem;
 }
 
-/* Phosphor ignition: the wordmark strikes, flickers, and settles, once. */
-@media (prefers-reduced-motion: no-preference) {
-  .wf-hero__title img {
-    animation: wf-ignite 1100ms steps(1, end) both;
-  }
+/* The foundation line above the capability row. */
+.wf-foundation {
+  max-width: 48rem;
+  margin: 3rem 0 0;
+  color: var(--color-ink-muted);
 }
 
-@keyframes wf-ignite {
-  0% {
-    opacity: 0;
-  }
-
-  8% {
-    opacity: 0.85;
-    filter: brightness(2.2);
-  }
-
-  14% {
-    opacity: 0.1;
-  }
-
-  22% {
-    opacity: 1;
-    filter: brightness(1.8);
-  }
-
-  30% {
-    opacity: 0.45;
-  }
-
-  42%,
-  100% {
-    opacity: 1;
-    filter: none;
-  }
-}
-
-/* The scope: labelled SVG, with a canvas behind it that the scope script
-   lights. Once lit, the SVG keeps its words and gives its strokes to the
-   beam. Without the script, the SVG draws everything itself. */
-.wf-scope,
-.wf-reduction {
-  margin: 0;
-}
-
-.wf-scope__field {
-  position: relative;
-}
-
-.wf-scope__beam {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.wf-scope__svg {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.is-lit .wf-scope__strokes {
-  visibility: hidden;
-}
-
-.wf-scope__svg path {
-  fill: none;
-  stroke-width: 1.25;
-  stroke-linejoin: round;
-}
-
-.wf-scope__svg [data-beam="grid"] {
-  stroke: var(--color-structure);
-}
-
-.wf-scope__svg [data-beam="faint"] {
-  stroke: var(--color-rule);
-}
-
-.wf-scope__svg [data-beam="cyan"],
-.wf-scope__svg [data-beam="bits"] {
-  stroke: var(--color-cyan);
-}
-
-.wf-scope__svg [data-beam="mint"] {
-  stroke: var(--color-mint);
-}
-
-.wf-scope__svg [data-beam="amber"],
-.wf-scope__svg [data-beam="route"] {
-  stroke: var(--color-amber);
-}
-
-.wf-scope__svg [data-beam="magenta"] {
-  stroke: var(--color-magenta);
-}
-
-.wf-scope__svg [data-beam="dim"],
-.wf-scope__svg [data-beam="return"] {
-  stroke: var(--color-tick);
-}
-
-.wf-scope__svg [data-dashed="true"] {
-  stroke-dasharray: 4 4;
-}
-
-.wf-scope__svg [data-beam="bits"] {
-  stroke-dasharray: 2 7;
-}
-
-/* The static scene's halo. The script's beam brings its own. */
-.wf-scope__svg [data-beam="mint"],
-.wf-scope__svg [data-beam="route"],
-.wf-scope__svg [data-beam="magenta"] {
-  filter: drop-shadow(0 0 3px currentcolor);
-  color: color-mix(in oklab, var(--color-mint) 60%, transparent);
-}
-
-/* A label knocks out the line beneath it with a stroke of the ground, as a
-   map label does, so no route ever runs through a word. */
-.wf-scope__svg text {
-  fill: var(--color-ink);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  paint-order: stroke;
-  stroke: var(--color-night);
-  stroke-linejoin: round;
-  stroke-width: 4px;
-}
-
-.wf-scope__svg .wf-scope__name {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.wf-scope__svg .wf-scope__small {
-  fill: var(--color-ink-muted);
-}
-
-.wf-scope__svg .wf-scope__dim {
-  fill: var(--color-ink-dim);
-}
-
-.wf-scope__svg .wf-scope__bits {
-  fill: var(--color-cyan);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  stroke-width: 0;
-}
-
-/* Below 640px the labels would shrink past reading size; the caption and
-   the journey below carry the same facts in full-size text. */
-@media (width < 640px) {
-  .wf-scope .wf-scope__labels,
-  .wf-scope .wf-scope__bitstream {
-    display: none;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .wf-scope__bits {
-    animation: wf-bits 2.4s steps(2, jump-none) infinite;
-  }
-
-  .wf-scope__bits:nth-child(2n) {
-    animation-delay: -0.9s;
-  }
-
-  .wf-scope__bits:nth-child(3n) {
-    animation-delay: -1.7s;
-  }
-}
-
-@keyframes wf-bits {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0.55;
-  }
-}
-
-.wf-scope__caption {
-  margin-top: 0.75rem;
-  color: var(--color-ink-dim);
-  font-size: 0.875rem;
+.wf-foundation strong {
+  color: var(--color-ink);
 }
 
 /* The capability row: four API nouns with their glyphs, as links. */
@@ -291,7 +134,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem 1rem;
-  margin: 3rem 0 0;
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
 }
@@ -311,7 +154,7 @@
 }
 
 .wf-capability-row .wf-label {
-  color: var(--color-mint);
+  color: var(--color-signal);
 }
 
 .wf-capability-row a:hover .wf-label {
@@ -319,10 +162,10 @@
 }
 
 .wf-capability-row__icon {
-  color: var(--color-mint);
+  color: var(--color-signal);
   font-size: 2.25rem;
   line-height: 1;
-  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-mint) 55%, transparent));
+  filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-signal) 45%, transparent));
 }
 
 /* The readout: release facts as instrument data, in the code face. */
@@ -347,11 +190,11 @@
 
 .wf-readout dd {
   margin: 0;
-  color: var(--color-cyan);
+  color: var(--color-signal);
 }
 
-/* The three steps: numbered panels with corner ticks, as on an instrument
-   bezel. Two hold working examples; the third, a drawing. */
+/* The three steps: numbered panels with cobalt corner ticks, as on an
+   instrument bezel. Two hold working examples; the third, Plate 28. */
 .wf-steps {
   padding-block: 4rem;
   border-bottom: 1px solid var(--color-rule);
@@ -373,7 +216,7 @@
 }
 
 .wf-panel {
-  --wf-tick: var(--color-mint);
+  --wf-tick: var(--color-cobalt);
 
   display: flex;
   flex-direction: column;
@@ -389,7 +232,7 @@
     linear-gradient(var(--wf-tick), var(--wf-tick)) bottom left / 1px 12px no-repeat,
     linear-gradient(var(--wf-tick), var(--wf-tick)) bottom right / 12px 1px no-repeat,
     linear-gradient(var(--wf-tick), var(--wf-tick)) bottom right / 1px 12px no-repeat,
-    var(--color-panel);
+    var(--color-surface);
 }
 
 .wf-panel__title {
@@ -404,7 +247,7 @@
 }
 
 .wf-panel__title span {
-  color: var(--color-mint);
+  color: var(--color-signal);
   font-family: var(--font-mono);
 }
 
@@ -412,28 +255,13 @@
   flex: 1;
 }
 
-.wf-reduction {
-  display: grid;
+/* The third panel's plate fills the panel; its caption carries the legend
+   the old drawing kept beneath it. */
+.wf-panel--reduction .wf-plate {
+  display: flex;
   flex: 1;
-  gap: 0.75rem;
-  align-content: center;
-  padding: 0.5rem;
-}
-
-.wf-reduction__legend {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  color: var(--color-ink-muted);
-  font-size: 0.8125rem;
-}
-
-.wf-reduction__legend strong {
-  display: block;
-  color: var(--color-ink);
-  font-size: 0.75rem;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .wf-steps__proof {
@@ -444,8 +272,10 @@
 }
 
 /* The journey: a sticky introduction beside a vertical track of stations.
-   The rail lights up as the section scrolls past, where the browser
-   supports scroll-driven animation; elsewhere it is lit from the start. */
+   The rail is the route a request takes, so it is drawn in flow. It lights
+   as the section scrolls past, where the browser supports scroll-driven
+   animation and motion is welcome; elsewhere it is lit from the start. It
+   never moves on its own. */
 .wf-journey {
   padding-block: 5rem;
 }
@@ -484,7 +314,7 @@
 
 .wf-journey__intro .wf-journey__note {
   padding-left: 1rem;
-  border-left: 2px solid var(--color-cyan);
+  border-left: 2px solid var(--color-signal);
   font-size: 0.9375rem;
 }
 
@@ -516,65 +346,35 @@
   content: "";
 }
 
-/* The rail, lit: amber, the active traffic direction, with a hot core, a
-   phosphor halo, and a brighter pulse that runs down it. */
+/* The rail, lit: the selected route, a flow core with a local halo. */
 .wf-track::after {
   position: absolute;
   top: 0.6rem;
   bottom: 0.6rem;
   left: 0.6rem;
   width: 2px;
-  background-color: var(--color-amber);
-  background-image: linear-gradient(
-    to bottom,
-    transparent,
-    color-mix(in oklab, var(--color-amber) 30%, white) 50%,
-    transparent
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 7rem;
+  background-color: var(--color-flow);
   box-shadow:
-    0 0 4px color-mix(in oklab, var(--color-amber) 90%, transparent),
-    0 0 14px color-mix(in oklab, var(--color-amber) 55%, transparent),
-    0 0 32px color-mix(in oklab, var(--color-amber) 25%, transparent);
+    0 0 4px color-mix(in oklab, var(--color-flow) 85%, transparent),
+    0 0 14px color-mix(in oklab, var(--color-flow) 45%, transparent);
   content: "";
   transform-origin: top;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .wf-track::after {
-    animation: wf-rail-pulse 2.8s linear infinite;
-  }
 }
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .wf-track::after {
-      animation:
-        wf-rail-pulse 2.8s linear infinite,
-        wf-light-rail linear both;
-      animation-range:
-        normal,
-        entry 40% cover 70%;
-      animation-timeline: auto, view();
+      animation: wf-light-rail linear both;
+      animation-range: entry 40% cover 70%;
+      animation-timeline: view();
     }
 
-    /* Each station ignites as it crosses the middle of the viewport. */
+    /* Each station lights as it crosses the middle of the viewport. */
     .wf-track__node {
       animation: wf-node-ignite linear both;
       animation-range: cover 30% cover 50%;
       animation-timeline: view();
     }
-  }
-}
-
-@keyframes wf-rail-pulse {
-  from {
-    background-position: 0 -7rem;
-  }
-
-  to {
-    background-position: 0 calc(100% + 7rem);
   }
 }
 
@@ -590,13 +390,13 @@
 
 @keyframes wf-node-ignite {
   0% {
-    border-color: var(--color-mint);
+    border-color: var(--color-cobalt);
     box-shadow: 0 0 0 transparent;
   }
 
   100% {
-    border-color: var(--color-amber);
-    box-shadow: 0 0 10px var(--color-amber);
+    border-color: var(--color-flow);
+    box-shadow: 0 0 10px color-mix(in oklab, var(--color-flow) 70%, transparent);
   }
 }
 
@@ -610,7 +410,8 @@
   padding-bottom: 0;
 }
 
-/* A station node: a small rhombus, the routing-junction shape. */
+/* A station node: a small rhombus, the routing-junction shape, lit in flow
+   (or, while the rail lights, drawn in structure first). */
 .wf-track__node {
   position: absolute;
   top: 0.35rem;
@@ -618,26 +419,27 @@
   z-index: 1;
   width: 0.85rem;
   height: 0.85rem;
-  border: 2px solid var(--color-mint);
-  background: var(--color-night);
+  border: 2px solid var(--color-flow);
+  background: var(--color-void);
   transform: rotate(45deg);
 }
 
+/* An optional station is dashed, so it reads as optional without colour. */
 .wf-track__stop--optional .wf-track__node {
   border-style: dashed;
-  border-color: var(--color-cyan);
+  border-color: var(--color-signal);
 }
 
 .wf-track__stop .wf-label {
   margin: 0;
-  color: var(--color-mint);
+  color: var(--color-signal);
 }
 
 .wf-track__tag {
   margin-left: 0.4rem;
   padding: 0 0.35rem;
-  border: 1px dashed var(--color-cyan);
-  color: var(--color-cyan);
+  border: 1px dashed var(--color-signal);
+  color: var(--color-signal);
 }
 
 .wf-track__stop h3 {
@@ -652,8 +454,10 @@
 }
 
 /* Capabilities: a bento of six cells with exactly six cells of content.
-   Text cells, raised cells, a diagram, and an image keep it from reading
-   as six identical cards. */
+   Text cells, raised cells, a byte diagram, and one plate keep it from
+   reading as six identical cards. Five cells are links in their entirety;
+   the plate cell holds playback buttons, which cannot sit inside a link,
+   so its heading carries the link instead. */
 .wf-capabilities {
   padding-block: 5rem;
 }
@@ -664,9 +468,9 @@
   margin-top: 2rem;
 }
 
-/* Six cells, exactly filled: at two columns the codec and image cells span
+/* Six cells, exactly filled: at two columns the codec and plate cells span
    the row; at four, the codec cell takes a 2 x 2 block beside four single
-   cells, and the image cell spans the last row. */
+   cells, and the plate cell spans the last row. */
 @media (width >= 768px) {
   .wf-bento {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -694,9 +498,10 @@
     align-items: center;
   }
 
-  .wf-bento .wf-bento__cell--image .wf-plate img {
-    border-right: 1px solid var(--color-rule);
-    border-bottom: 0;
+  .wf-bento .wf-bento__cell--image .wf-plate__stage,
+  .wf-bento .wf-bento__cell--image .wf-plate__controls,
+  .wf-bento .wf-bento__cell--image .wf-plate__caption {
+    border-left: 0;
   }
 
   .wf-bento .wf-bento__cell--image .wf-bento__copy {
@@ -711,14 +516,15 @@
   min-width: 0;
   padding: 1.5rem;
   border: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
   color: var(--color-ink);
   text-decoration: none;
   transition: border-color 160ms ease-out;
 }
 
-.wf-bento__cell:hover {
-  border-color: var(--color-mint);
+a.wf-bento__cell:hover,
+.wf-bento__cell:has(h3 a:hover) {
+  border-color: var(--color-signal);
 }
 
 .wf-bento__cell--raised {
@@ -730,6 +536,11 @@
   font-size: 1.1875rem;
 }
 
+.wf-bento__cell h3 a {
+  color: var(--color-ink);
+  text-decoration-color: var(--color-flow);
+}
+
 .wf-bento__cell p {
   margin: 0;
   color: var(--color-ink-muted);
@@ -737,7 +548,7 @@
 }
 
 .wf-bento__icon {
-  color: var(--color-mint);
+  color: var(--color-signal);
   font-size: 1.75rem;
   line-height: 1;
 }
@@ -747,26 +558,50 @@
   overflow: hidden;
 }
 
-.wf-bento__cell--image .wf-plate img {
-  border: 0;
-  border-bottom: 1px solid var(--color-rule);
-  aspect-ratio: 16 / 7;
-  object-fit: cover;
+.wf-bento__cell--image .wf-plate__stage,
+.wf-bento__cell--image .wf-plate__controls,
+.wf-bento__cell--image .wf-plate__caption {
+  border-right: 0;
+  border-left: 0;
+}
+
+.wf-bento__cell--image .wf-plate__stage {
+  border-top: 0;
 }
 
 .wf-bento__copy {
   display: grid;
   gap: 0.6rem;
-  padding: 0 1.5rem 1.5rem;
+  padding: 1.5rem;
 }
 
-/* The default frame drawn as bytes: the length prefix in cyan, the
+/* A proposal named at the point of use: a dashed notice rule and the word
+   "Proposed", so the status never depends on colour. */
+.wf-proposal {
+  margin-top: 0.4rem;
+  padding-left: 0.85rem;
+  border-left: 2px dashed var(--color-notice);
+}
+
+.wf-bento__cell .wf-proposal p {
+  margin-top: 0.25rem;
+  font-size: 0.9375rem;
+}
+
+.wf-proposal__label {
+  color: var(--color-notice);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+/* The default frame drawn as bytes: the length prefix in signal, the
    payload beyond it. Real values: 12 bytes of bincode envelope follow. */
 .wf-frame-diagram {
   display: flex;
   margin-top: auto;
   overflow: hidden;
-  border: 1px solid var(--color-cyan);
+  border: 1px solid var(--color-signal);
   font: 400 0.8125rem / 1 var(--font-mono);
   white-space: nowrap;
 }
@@ -774,9 +609,9 @@
 .wf-frame-diagram__len {
   flex: none;
   padding: 0.7rem 0.75rem;
-  border-right: 1px solid var(--color-cyan);
-  background: color-mix(in oklab, var(--color-cyan) 12%, var(--color-panel));
-  color: var(--color-cyan);
+  border-right: 1px solid var(--color-signal);
+  background: color-mix(in oklab, var(--color-signal) 12%, var(--color-surface));
+  color: var(--color-signal);
 }
 
 .wf-frame-diagram__body {
@@ -813,18 +648,10 @@
   color: var(--color-ink);
 }
 
-/* The scope: a full-bleed plate, then the metaphor and its key. */
+/* The scope: a full-bleed civic plate, then the explanation and its key. */
 .wf-world {
   padding-bottom: 5rem;
   border-top: 1px solid var(--color-rule);
-}
-
-.wf-world__plate .wf-plate img {
-  max-height: 38rem;
-  border: 0;
-  border-bottom: 1px solid var(--color-rule);
-  object-fit: cover;
-  object-position: center 35%;
 }
 
 .wf-world__body {
@@ -838,24 +665,49 @@
   font-size: 1.0625rem;
 }
 
+/* The key: each role named in words, with a mark that differs in line
+   style as well as hue, so it survives greyscale. */
+.wf-key-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 0.6rem 1.5rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-key-list li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+.wf-key-list strong {
+  color: var(--color-ink);
+}
+
 .wf-key {
-  font-weight: 700;
+  flex: none;
+  width: 1.5rem;
+  height: 0;
+  border-top: 2px solid var(--color-cobalt);
+  transform: translateY(-0.25em);
 }
 
-.wf-key--mint {
-  color: var(--color-mint);
+.wf-key--signal {
+  border-top-style: dashed;
+  border-top-color: var(--color-signal);
 }
 
-.wf-key--cyan {
-  color: var(--color-cyan);
+.wf-key--flow {
+  border-top-width: 4px;
+  border-top-color: var(--color-flow);
 }
 
-.wf-key--amber {
-  color: var(--color-amber);
-}
-
-.wf-key--magenta {
-  color: var(--color-magenta);
+.wf-key--capacity {
+  border-top: 4px dotted var(--color-capacity);
 }
 
 /* The mxd band. */
@@ -891,7 +743,7 @@
 
 .wf-band__facts div {
   padding-left: 1rem;
-  border-left: 2px solid var(--color-mint);
+  border-left: 2px solid var(--color-cobalt);
 }
 
 .wf-band__facts dt {
@@ -938,7 +790,8 @@
   margin-top: 1.5rem;
 }
 
-/* The tagline: the preferred brand line, set wide between crosshairs. */
+/* The tagline: the principal line, once more, between crosshairs. It is
+   sentence case, as written, and not tracked. */
 .wf-tagline {
   padding-block: 2.5rem;
   border-top: 1px solid var(--color-rule);
@@ -951,10 +804,9 @@
   align-items: center;
   justify-content: center;
   margin-block: 0;
-  color: var(--color-mint);
-  font: 400 0.875rem / 1.4 var(--font-sans);
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
+  color: var(--color-ink);
+  font: 700 clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem) / 1.4 var(--font-sans);
+  text-align: center;
 }
 
 .wf-tagline p::before,
@@ -962,98 +814,13 @@
   flex: 1 1 4rem;
   height: 1px;
   background:
-    linear-gradient(var(--color-mint), var(--color-mint)) left center / 1px 9px no-repeat,
+    linear-gradient(var(--color-signal), var(--color-signal)) left center / 1px 9px no-repeat,
     linear-gradient(var(--color-rule), var(--color-rule)) center / 100% 1px no-repeat;
   content: "";
 }
 
 .wf-tagline p::after {
   background:
-    linear-gradient(var(--color-mint), var(--color-mint)) right center / 1px 9px no-repeat,
+    linear-gradient(var(--color-signal), var(--color-signal)) right center / 1px 9px no-repeat,
     linear-gradient(var(--color-rule), var(--color-rule)) center / 100% 1px no-repeat;
-}
-
-/* A deflection glitch on the hero line: for a few frames every few seconds
-   the beam throws two ghosts of the words sideways, in the identity's own
-   mint and cyan rather than a raster's red and blue, then snaps back. The
-   ghosts are copies drawn from the data attribute, so the words themselves
-   never move and never change. */
-.wf-glitch {
-  position: relative;
-  display: inline-block;
-}
-
-.wf-glitch::before,
-.wf-glitch::after {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
-  content: attr(data-text);
-}
-
-.wf-glitch::before {
-  color: var(--color-mint);
-}
-
-.wf-glitch::after {
-  color: var(--color-cyan);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .wf-glitch::before {
-    animation: wf-ghost-a 7s steps(1, end) infinite 2s;
-  }
-
-  .wf-glitch::after {
-    animation: wf-ghost-b 7s steps(1, end) infinite 2s;
-  }
-}
-
-@keyframes wf-ghost-a {
-  0%,
-  91%,
-  100% {
-    opacity: 0;
-    transform: none;
-  }
-
-  92% {
-    opacity: 0.7;
-    transform: translateX(-6px);
-  }
-
-  93.5% {
-    opacity: 0.5;
-    transform: translateX(3px);
-  }
-
-  95% {
-    opacity: 0.6;
-    transform: translateX(-2px) skewX(-8deg);
-  }
-}
-
-@keyframes wf-ghost-b {
-  0%,
-  91%,
-  100% {
-    opacity: 0;
-    transform: none;
-  }
-
-  92% {
-    opacity: 0.6;
-    transform: translateX(7px);
-  }
-
-  93.5% {
-    opacity: 0.45;
-    transform: translateX(-4px);
-  }
-
-  95% {
-    opacity: 0.5;
-    transform: translateX(2px) skewX(6deg);
-  }
 }

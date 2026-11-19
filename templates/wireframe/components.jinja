@@ -1,7 +1,7 @@
 {#- Shared macros for the wireframe sub-site. Each pairs with a `wf-` class in
     src/styles/wireframe/, so a call site says what a thing is rather than
     how it is drawn. -#}
-{% from 'data/plates.jinja' import plates %}
+{% from 'data/plates.jinja' import plates with context %}
 
 {% macro icon(name) -%}
 <svg class="wf-icon" aria-hidden="true" focusable="false" width="24" height="24"><use href="/wireframe/assets/icons/sprite.svg#{{ name }}"></use></svg>
@@ -13,19 +13,39 @@
 <a class="wf-btn{% if kind == 'quiet' %} wf-btn--quiet{% endif %}" href="{{ href }}">{{ label }}{{ icon('external' if external else 'arrow-right') }}</a>
 {%- endmacro %}
 
-{#- A plate: one generated illustration from the catalogue in
-    data/plates.jinja, with its HTML caption. The raster carries no text. -#}
-{% macro plate(key, eager=false, sizes='100vw', caption=true) -%}
+{#- A plate: one Three.js scene from the catalogue in data/plates.jinja.
+
+    The server renders it whole: the matching poster, the caption, and the
+    status line. plates.js adds the live scene over the poster and un-hides
+    the controls, which stay out of the artwork; without the script, WebGL, or
+    motion, the poster is the plate. `eager` marks the one plate a page should
+    start loading at once (the hero) and fetches its poster first. `variant`
+    names a layout modifier on `wf-plate`. -#}
+{% macro plate(key, eager=false, variant=none) -%}
 {%- set p = plates[key] -%}
-<figure class="wf-plate">
-  <img src="/wireframe/assets/images/{{ p.file }}.webp" srcset="/wireframe/assets/images/{{ p.file }}-half.webp {{ p.width // 2 }}w, /wireframe/assets/images/{{ p.file }}.webp {{ p.width }}w" sizes="{{ sizes }}" alt="{{ p.alt }}" width="{{ p.width }}" height="{{ p.height }}" decoding="async" loading="{{ 'eager' if eager else 'lazy' }}"{% if eager %} fetchpriority="high"{% endif %}>
-  {%- if caption %}<figcaption><span class="wf-label">{{ p.label }}</span><span>{{ p.caption }}</span></figcaption>{% endif %}
+{%- set title_id = 'plate-' ~ p.id ~ '-title' -%}
+<figure class="wf-plate{% if variant %} wf-plate--{{ variant }}{% endif %}" data-wf-plate="{{ p.id }}" data-wf-plate-runtime="/wireframe/assets/vendor/plates/wireframe-plate.js"{% if eager %} data-wf-plate-eager{% endif %}>
+  <div class="wf-plate__stage" data-wf-plate-stage><img class="wf-plate__poster" data-wf-plate-poster src="/wireframe/assets/vendor/plates/posters/{{ p.id }}.webp" alt="{{ p.alt }}" width="929" height="494" decoding="async"{% if eager %} fetchpriority="high"{% else %} loading="lazy"{% endif %}></div>
+  <div class="wf-plate__controls" data-wf-plate-controls hidden><button type="button" class="wf-plate__button" data-wf-plate-toggle aria-describedby="{{ title_id }}">Play illustration</button><button type="button" class="wf-plate__button" data-wf-plate-still aria-describedby="{{ title_id }}" hidden>Show still</button><button type="button" class="wf-plate__button wf-plate__button--quiet" data-wf-plate-glow aria-describedby="{{ title_id }}" hidden>Reduce glow</button><span class="wf-plate__status" data-wf-plate-status></span></div>
+  <figcaption class="wf-plate__caption"><span class="wf-plate__number">Plate {{ p.id }} · {{ p.kind }}</span> <strong id="{{ title_id }}" class="wf-plate__title">{{ p.title }}.</strong> {{ p.caption }} <span class="wf-plate__source">{% if p.href %}<a href="{{ p.href }}">{{ p.status }}</a>{% else %}{{ p.status }}{% endif %}</span></figcaption>
 </figure>
 {%- endmacro %}
 
 {#- A callout: a text-first panel with a left rule, its kind in words. -#}
 {% macro callout(kind, title) -%}
 <aside class="wf-callout wf-callout--{{ kind }}" aria-label="{{ title }}"><p class="wf-callout__kind">{{ {'note': 'Note', 'warning': 'Warning', 'fact': 'In ' ~ wireframe_version}[kind] }}</p><p class="wf-callout__title">{{ title }}</p>{{ caller() }}</aside>
+{%- endmacro %}
+
+{#- A note at the point of use on what the library's main branch has done
+    since the candidate the samples run against. The page's claim stays true
+    of the candidate; the note says where main differs. -#}
+{% macro main_note() -%}
+<aside class="wf-main-note" aria-label="On main since the candidate"><p><span class="wf-main-note__label">On main since the candidate</span> {{ caller() }} <a href="/wireframe/roadmap/#main">What main has changed</a></p></aside>
+{%- endmacro %}
+
+{#- A proposal at the point of use: what it says, its status, and its source. -#}
+{% macro proposal(number, slug, title) -%}
+<aside class="wf-proposal-note" aria-label="Proposed: RFC {{ number }}"><p class="wf-proposal__label">Proposed · RFC {{ number }}</p><p><strong>{{ title }}</strong> {{ caller() }} <a href="{{ main_source_base }}/docs/rfcs/{{ slug }}.md">Review the proposal</a></p></aside>
 {%- endmacro %}
 
 {#- The head of an article page. -#}
@@ -38,7 +58,7 @@
       <p class="wf-deck">{{ intro }}</p>
       <p class="wf-version">wireframe {{ wireframe_version }} · samples verified {{ samples_verified_on }}</p>
     </div>
-    {%- if plate_key %}{{ plate(plate_key, eager=true, sizes='(width < 1024px) 100vw, 560px') }}{% endif %}
+    {%- if plate_key %}{{ plate(plate_key, eager=true, variant='head') }}{% endif %}
   </div>
 </header>
 {%- endmacro %}

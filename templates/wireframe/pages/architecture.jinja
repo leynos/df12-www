@@ -50,9 +50,11 @@
   <li><code>middleware::from_fn</code> cannot be passed to <code>WireframeApp::wrap</code>.</li>
   <li>The routed server path sends one reply per request. Push queues, the connection actor, and streaming responses are not driven by it, and of the <code>WireframeProtocol</code> hooks it runs only <code>before_send</code>.</li>
   <li>Codec recovery policies and the <code>on_eof</code> hook are defined but not consulted.</li>
+
   <li>The read timeout does not close idle connections, and shutdown waits for them with no deadline.</li>
   <li>There is no built-in TLS.</li>
 </ul>
+{% call ui.main_note() %}Every server connection runs a <code>ConnectionActor</code>, <code>route_response</code> handlers return a <code>Response</code> that can stream, and <code>on_command_end</code>, <code>handle_error</code>, and <code>stream_end_frame</code> run. ADR 0017 removes the extractors and <code>app_data</code>. <code>on_eof</code>, recovery policies, push queues, and request bodies are still not driven.{% endcall %}
 <p>The <a href="/wireframe/roadmap/">roadmap</a> says what is in progress.</p>
 </section>
 {% endblock %}

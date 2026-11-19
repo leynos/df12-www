@@ -20,6 +20,7 @@ extend-exclude = [
     "node_modules",
     "package-lock.json",
     "pnpm-lock.yaml",
+    "src/static/wireframe/assets/vendor/plates/wireframe-plate.js",
     "target",
     "typos.local.toml",
     "typos.toml",

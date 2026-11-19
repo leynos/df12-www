@@ -41,6 +41,7 @@
 <section aria-labelledby="shutdown"><h2 id="shutdown">Readiness and shutdown</h2>
 <p><code>ready_signal</code> takes a oneshot sender that fires once the workers are accepting, which is what a test or an orchestration probe should wait for. There are three ways to run and stop a server: <code>run</code> serves until Ctrl+C; <code>run_with_shutdown</code> serves until the future it is given completes, and dropping that future cancels the accept loops, so keep it alive for as long as the server should run; and <code>spawn</code> runs in the background and returns a cloneable <code>ServerShutdown</code>, whose <code>stop</code> requests shutdown and whose <code>drained</code> waits for it to finish. Dropping the last clone also requests shutdown.</p>
 {% call ui.callout('warning', 'Shutdown has no deadline') %}<p>Shutdown waits for open connections, and it does not tell them to close. A single idle peer holds up <code>run</code>, <code>run_with_shutdown</code>, and <code>drained</code> until it disconnects. Bound the wait, or have the protocol close quiet connections:</p>{% endcall %}
+{% call ui.main_note() %}<code>stop()</code> ends a connection at its read boundary, so an idle peer no longer holds up <code>drained</code>, and <code>wireframe_connections_active</code> counts accepted sockets. The sample below shows the candidate&rsquo;s behaviour.{% endcall %}
 {{ code.code('tests/production.rs', 'drain', title='production.rs · a drain with a deadline') }}
 </section>
 

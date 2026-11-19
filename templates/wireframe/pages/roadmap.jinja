@@ -3,19 +3,30 @@
 {% block title %}Roadmap · wireframe{% endblock %}
 {% block description %}What wireframe {{ wireframe_version }} provides, what changed since 0.3.0, what ships ahead of the wiring, and what the road to 1.0 holds.{% endblock %}
 {% block content %}
+{#- The candidate's unwired parts, each with what main has done since, where
+    it has done anything. `main` notes are checked at main_revision. -#}
 {% set unwired = [
-  ('ConnectionActor, streaming and multi-packet responses', 874),
-  ('Push queues and SessionRegistry', 875),
-  ('Streaming request bodies', 876),
-  ('Extractors and app_data', 877),
-  ('Recovery policies and the codec error metric', 878),
-  ('on_eof and the other protocol hooks', 879),
+  ('ConnectionActor, streaming and multi-packet responses', 874, 'wired on main: the server runs an actor per connection, and route_response handlers can stream'),
+  ('Push queues and SessionRegistry', 875, none),
+  ('Streaming request bodies', 876, none),
+  ('Extractors and app_data', 877, 'removed on main by ADR 0017'),
+  ('Recovery policies and the codec error metric', 878, none),
+  ('on_eof and the other protocol hooks', 879, 'partly wired on main: on_command_end, handle_error, and stream_end_frame now run; on_eof does not'),
 ] %}
-{{ ui.page_head([], 'This alpha, what changed, and what is next', wireframe_version ~ ' is an alpha for early adopters: expect interfaces to change before 1.0, and pin the version. Beyond it, the upstream roadmap is a plan, not a promise.', 'construction') }}
+{% set rfcs = [
+  ('0003', 'rfc-0003-native-message-adapter-boundary', 'Native message adapter boundary', 'Keep the protocol’s identity: a typed boundary between native frames, application operations, and native replies, in place of mandatory envelope mapping.'),
+  ('0004', 'rfc-0004-duplex-session-driver', 'Duplex session driver', 'Give each direction room to move: a full-duplex lifecycle for reads, dispatch, unsolicited output, streams, and bounded termination.'),
+  ('0005', 'rfc-0005-negotiated-transport-entry-points', 'Negotiated transport entry points', 'Establish and transition connections, including negotiated upgrades and supplied streams, while keeping buffered bytes and transport ownership intact.'),
+  ('0006', 'rfc-0006-configurable-framing-primitives', 'Configurable framing primitives', 'Small, bounded framing primitives for native codecs, such as fixed-width lengths, short headers, and delimiters, without protocol state machines in core.'),
+  ('0007', 'rfc-0007-budgets-scheduling-and-assembly', 'Budgets, scheduling, and assembly', 'Capacity is part of the design: bound native frames, retained data, assembly, admitted work, and queued output across connections and streams.'),
+  ('0008', 'rfc-0008-external-adapter-conformance-harness', 'External adapter conformance harness', 'Show the working: test generic APIs and bounded protocol toys through public connectors and independent byte oracles. It is explicitly not certification.'),
+  ('0009', 'rfc-0009-datagram-session-transport', 'Datagram session transport', 'Expose packet boundaries and peer metadata to datagram adapters. Datagram boundaries and duplex progress are separate questions.'),
+] %}
+{{ ui.page_head([], 'This alpha, what changed, and what is next', wireframe_version ~ (' is an alpha for early adopters' if wireframe_published else ' is an alpha that is not yet published') ~ ': expect interfaces to change before 1.0, and pin the version. Beyond it, the upstream roadmap is a plan, and the proposals are proposals.', '06') }}
 <div class="wf-shell wf-landing">
   <div class="wf-horizons">
     <section class="wf-horizon" aria-labelledby="now">
-      <p class="wf-label">{{ 'Released' if wireframe_published else 'Target release' }} {{ wireframe_released }}</p>
+      <p class="wf-label">{{ ('Released ' ~ wireframe_released) if wireframe_published else ('Not yet published · targeted for ' ~ wireframe_released) }}</p>
       <h2 id="now">In {{ wireframe_version }}</h2>
       <ul>
         <li>Routing by message ID, the bundled <code>Envelope</code> and custom <code>Packet</code> types, and correlation IDs.</li>
@@ -50,23 +61,42 @@
       <h2 id="boundary">Ahead of the server</h2>
       <p>These parts ship and are tested on their own, but <code>WireframeServer</code> does not drive them, so adopting one means writing the glue. <a href="{{ source_base }}/docs/users-guide.md#building-blocks-not-yet-wired-into-the-server">The users&rsquo; guide</a> says how far each goes, and each has a tracking issue:</p>
       <ul>
-        {%- for name, issue in unwired %}
-        <li><a href="{{ repository_url }}/issues/{{ issue }}">{{ name }} (#{{ issue }})</a></li>
+        {%- for name, issue, main_note in unwired %}
+        <li><a href="{{ repository_url }}/issues/{{ issue }}">{{ name }} (#{{ issue }})</a>{% if main_note %}. Since the candidate, {{ main_note }}.{% endif %}</li>
         {%- endfor %}
       </ul>
+    </section>
+    <section class="wf-horizon wf-horizon--main" aria-labelledby="main">
+      <p class="wf-label">On main at <code>{{ main_revision }}</code> · checked {{ main_checked_on }} · not in a release</p>
+      <h2 id="main">Since the candidate</h2>
+      <p>The samples on this site run against the {{ wireframe_version }} candidate at <code>cd634074</code>. The library&rsquo;s main branch has moved on since, and these changes will reach a release only when one is cut from it:</p>
+      <ul>
+        <li><strong>Streaming handlers.</strong> <code>WireframeApp::route_response</code> takes a <code>ResponseHandler</code> that returns a <code>Response</code>, and every server connection now runs a <code>ConnectionActor</code>, so streamed and multi-packet replies reach the wire. <code>on_command_end</code>, <code>handle_error</code>, and <code>stream_end_frame</code> now run.</li>
+        <li><strong>Extractors and <code>app_data</code> removed.</strong> <a href="{{ main_source_base }}/docs/adrs/adr-0017-remove-route-extractors-and-app-data.md">ADR 0017</a> removes the unwired extractor and application-data APIs; shared state travels in the handler&rsquo;s closure, as an <code>Arc</code>.</li>
+        <li><strong>Shutdown reaches idle connections.</strong> <code>stop()</code> now ends a connection at its read boundary, so an idle peer no longer holds up <code>drained</code>.</li>
+        <li><strong>A connection-local runtime.</strong> Teardown runs exactly once, including on panic and cancellation, and the active-connection gauge counts accepted sockets.</li>
+      </ul>
+    </section>
+    <section class="wf-horizon wf-horizon--proposed" aria-labelledby="proposed">
+      <p class="wf-label">Proposed · none implemented at <code>{{ main_revision }}</code></p>
+      <h2 id="proposed">Seven proposals</h2>
+      <p>Seven requests for comments describe where the runtime could go next. Their documents have merged; their runtime has not, and the roadmap calls them &ldquo;proposed work, not shipped guarantees&rdquo;. Each link is the proposal at the checked revision.</p>
+      <ul>
+        {%- for number, slug, title, summary in rfcs %}
+        <li><a href="{{ main_source_base }}/docs/rfcs/{{ slug }}.md">RFC {{ number }}, {{ title }}</a>. {{ summary }}</li>
+        {%- endfor %}
+      </ul>
+      <p>The first consumers proposed for these contracts are mxd serving Hotline, Modbus TCP, and a toy for the Agent Client Protocol. The toy is a prospective consumer test of bounded framing and duplex progress; it is not shipped, and the protocol&rsquo;s own semantics stay outside wireframe.</p>
     </section>
     <section class="wf-horizon wf-horizon--later" aria-labelledby="later">
       <p class="wf-label">Planned · upstream roadmap</p>
       <h2 id="later">Toward 1.0</h2>
       <ul>
-        <li>Streaming request extraction in the handler dispatch path.</li>
-        <li>Connection-local runtime ownership and lifecycle finalization.</li>
-        <li>Protocol-neutral adapters for the first consumers, starting with mxd serving Hotline through generic public primitives.</li>
         <li>Zero-copy payloads through the public byte APIs. This is not in the alpha: <code>Serializer::serialize</code> still returns <code>Vec&lt;u8&gt;</code>.</li>
         <li>Alternative transports beyond raw TCP, a formal message versioning system, and built-in middleware or guides for TLS.</li>
         <li>Formal verification of message assembly and dispatch: bounded model checks with Kani, model checks with Stateright, and proofs with Verus.</li>
       </ul>
-      <p>Track the detail in the <a href="{{ repository_url }}/blob/main/docs/roadmap.md">upstream roadmap</a> and the <a href="{{ repository_url }}/blob/main/CHANGELOG.md">changelog</a>.</p>
+      <p>Track the detail in the <a href="{{ main_source_base }}/docs/roadmap.md">upstream roadmap</a> and the <a href="{{ repository_url }}/blob/main/CHANGELOG.md">changelog</a>.</p>
     </section>
   </div>
 </div>

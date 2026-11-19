@@ -26,8 +26,8 @@
   left: 0.5rem;
   z-index: 60;
   padding: 0.5rem 1rem;
-  background: var(--color-mint);
-  color: var(--color-night);
+  background: var(--color-signal);
+  color: var(--color-void);
   font: 700 0.9375rem / 1.4 var(--font-sans);
   transform: translateY(-200%);
 }
@@ -47,7 +47,7 @@
 }
 
 .wf-eyebrow {
-  color: var(--color-mint);
+  color: var(--color-signal);
   font: 700 0.8125rem / 1.45 var(--font-sans);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
@@ -59,7 +59,7 @@
   top: 0;
   z-index: 40;
   border-bottom: 1px solid var(--color-rule);
-  background: color-mix(in oklab, var(--color-night) 92%, transparent);
+  background: color-mix(in oklab, var(--color-void) 92%, transparent);
   backdrop-filter: blur(8px);
 }
 
@@ -112,7 +112,7 @@
   color: var(--color-ink);
 }
 
-/* The current page is the selected item, so it takes the selected beam. */
+/* The current page is the route taken, so it is marked in flow. */
 .wf-nav a[aria-current="page"] {
   color: var(--color-ink);
 }
@@ -123,8 +123,8 @@
   bottom: 0.1rem;
   left: 0.7rem;
   height: 2px;
-  background: var(--color-magenta);
-  box-shadow: 0 0 8px var(--color-magenta);
+  background: var(--color-flow);
+  box-shadow: 0 0 8px var(--color-flow);
   content: "";
 }
 
@@ -202,8 +202,8 @@
 }
 
 .wf-mobile[open] summary {
-  border-color: var(--color-mint);
-  color: var(--color-mint);
+  border-color: var(--color-signal);
+  color: var(--color-signal);
 }
 
 .wf-mobile nav {
@@ -214,7 +214,7 @@
   max-height: calc(100dvh - 4rem);
   overflow-y: auto;
   border-bottom: 1px solid var(--color-rule);
-  background: var(--color-night);
+  background: var(--color-void);
 }
 
 .wf-mobile ul {
@@ -227,20 +227,20 @@
 .wf-mobile li a {
   display: block;
   padding: 0.8rem 0;
-  border-bottom: 1px solid var(--color-structure);
+  border-bottom: 1px solid var(--color-grid);
   color: var(--color-ink);
   font: 400 1rem / 1.4 var(--font-sans);
   text-decoration: none;
 }
 
 .wf-mobile li a[aria-current="page"] {
-  color: var(--color-magenta);
+  color: var(--color-flow);
 }
 
-/* Buttons. The identity specification's CTAs: the primary is a dark
-   surface with a bright mint outline in Sintony Bold, whose core brightens
-   and gains a small halo on hover; the secondary is a quiet border with light
-   text that brightens without a halo. Both stay on one line. */
+/* Buttons. The identity's actions (v0.4, section 9.3): the primary is a
+   quiet dark surface with clear text and a signal edge, which gains a small
+   halo on hover; the secondary is a quiet border with light text that
+   brightens without a halo. Both stay on one line. */
 .wf-btn {
   display: inline-flex;
   gap: 0.6rem;
@@ -248,9 +248,9 @@
   justify-content: center;
   min-height: 2.75rem;
   padding: 0.65rem 1.25rem;
-  border: 2px solid var(--color-mint);
-  background: var(--color-panel);
-  color: var(--color-mint);
+  border: 2px solid var(--color-signal);
+  background: var(--color-surface);
+  color: var(--color-ink);
   font: 700 0.9375rem / 1.35 var(--font-sans);
   text-decoration: none;
   white-space: nowrap;
@@ -261,7 +261,6 @@
 }
 
 .wf-btn:hover {
-  color: var(--color-ink);
   box-shadow: var(--shadow-halo);
 }
 
@@ -298,10 +297,10 @@
    drawn as eight background strokes so no extra markup is needed. */
 .wf-ticked {
   --tick-length: 0.65rem;
-  --tick-colour: var(--color-mint);
+  --tick-colour: var(--color-cobalt);
 
   border: 1px solid var(--color-rule);
-  background-color: var(--color-panel);
+  background-color: var(--color-surface);
   background-image:
     linear-gradient(var(--tick-colour), var(--tick-colour)),
     linear-gradient(var(--tick-colour), var(--tick-colour)),
@@ -332,40 +331,155 @@
     1px var(--tick-length);
 }
 
-/* A plate: one generated illustration with an HTML caption. The raster
-   carries no text; anything that must be read is in the caption. */
+/* A plate: one Three.js scene with its poster, controls, and caption.
+
+   The stage keeps the poster's aspect ratio, so nothing moves when the live
+   scene replaces it. The scene sits over the poster; the controls and the
+   caption sit below the art on opaque surfaces, so their contrast never
+   depends on a frame of the animation. Without the script the controls stay
+   hidden and the poster is the plate. */
 .wf-plate {
+  min-width: 0;
   margin: 0;
 }
 
-.wf-plate img {
-  display: block;
-  width: 100%;
-  height: auto;
+.wf-plate__stage {
+  position: relative;
+  aspect-ratio: 929 / 494;
+  overflow: hidden;
   border: 1px solid var(--color-rule);
-  background: var(--color-night);
+  background: var(--color-void);
 }
 
-.wf-plate figcaption {
+.wf-plate__poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The vendored element styles its own host at 16:9; the stage decides. */
+.wf-plate__live {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.wf-plate__controls {
   display: flex;
-  gap: 0.75rem;
-  align-items: baseline;
-  margin-top: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-rule);
+  border-top: 0;
+  background: var(--color-surface);
+}
+
+.wf-plate__controls[hidden],
+.wf-plate__button[hidden] {
+  display: none;
+}
+
+/* Playback controls meet the 44px target and draw their edge in the
+   tick colour, which holds 3:1 on every ground. */
+.wf-plate__button {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--color-tick);
+  background: var(--color-void);
+  color: var(--color-ink);
+  font: 700 0.875rem / 1.2 var(--font-sans);
+  cursor: pointer;
+}
+
+.wf-plate__button:hover {
+  border-color: var(--color-signal);
+}
+
+.wf-plate__button--quiet {
+  font-weight: 400;
+}
+
+.wf-plate__status {
+  margin-left: auto;
   color: var(--color-ink-dim);
+  font: 400 0.8125rem / 1.4 var(--font-mono);
+}
+
+.wf-plate[data-wf-plate-state="fallback"] .wf-plate__status {
+  margin-left: 0;
+  color: var(--color-ink-muted);
+  font-family: var(--font-sans);
+}
+
+.wf-plate__caption {
+  padding: 0.75rem;
+  border: 1px solid var(--color-rule);
+  border-top: 0;
+  background: var(--color-surface);
+  color: var(--color-ink-muted);
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
-.wf-plate figcaption .wf-label {
-  flex: none;
-  color: var(--color-mint);
+.wf-plate__number {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--color-signal);
+  font: 700 0.75rem / 1.45 var(--font-sans);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.wf-plate__title {
+  color: var(--color-ink);
+}
+
+.wf-plate__source {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--color-ink-dim);
+  font-size: 0.8125rem;
+}
+
+/* Civic scenes run edge to edge with a shorter stage; the live scene and
+   the poster crop to it rather than squeezing. */
+.wf-plate--wide .wf-plate__stage {
+  aspect-ratio: auto;
+  height: clamp(16rem, 42vw, 36rem);
+  border-inline: 0;
+}
+
+/* Its controls and caption still line up with the page column. */
+.wf-plate--wide .wf-plate__controls,
+.wf-plate--wide .wf-plate__caption {
+  padding-inline: max(1rem, calc((100% - 78rem) / 2 + 2rem));
+  border-inline: 0;
+}
+
+@media (forced-colors: active) {
+  .wf-plate__button {
+    border-color: ButtonText;
+  }
+}
+
+/* Print the poster and its caption; a printed page cannot press Play. */
+@media print {
+  .wf-plate__controls,
+  .wf-plate__live {
+    display: none !important;
+  }
 }
 
 /* The footer. */
 .wf-footer {
   margin-top: 6rem;
   border-top: 1px solid var(--color-rule);
-  background: var(--color-panel);
+  background: var(--color-surface);
 }
 
 .wf-footer__grid {
@@ -403,7 +517,7 @@
 }
 
 .wf-footer li a:hover {
-  color: var(--color-mint);
+  color: var(--color-flow);
   text-decoration: underline;
 }
 
@@ -420,7 +534,7 @@
   gap: 0.5rem 2rem;
   justify-content: space-between;
   padding-block: 1.25rem;
-  border-top: 1px solid var(--color-structure);
+  border-top: 1px solid var(--color-grid);
   color: var(--color-ink-dim);
   font: 400 0.8125rem / 1.45 var(--font-sans);
 }

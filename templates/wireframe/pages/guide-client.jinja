@@ -4,7 +4,7 @@
 {% from 'data/pages.jinja' import catalogue %}
 {% set article = catalogue['guide-client'] %}
 {% set crumbs = [('Guides', '/wireframe/guides/')] %}
-{% set plate_key = 'outbound' %}
+{% set plate_key = none %}
 {% block article_body %}
 <section aria-labelledby="connect"><h2 id="connect">Build and connect</h2>
 <p><code>WireframeClient::builder()</code> starts from the server&rsquo;s defaults: a 4-byte big-endian length prefix, 1,024-byte frames, and the bincode serializer. The builder changes them before connecting. <code>codec_config</code> must agree with the server&rsquo;s <code>buffer_capacity</code>: if small requests work and larger ones fail, the two limits disagree. The client shares the server&rsquo;s definitions with one exception: it has no fragmentation support, so against a fragmenting server it sees <code>FRAG</code> payloads.</p>
@@ -28,6 +28,7 @@
 {{ code.code('tests/streaming_client.rs', 'call', title='streaming_client.rs · reading the rows') }}
 <p>The stream checks every frame&rsquo;s correlation ID and ends with <code>ClientError::StreamCorrelationMismatch</code> on the first that does not match. It borrows the client mutably, so no other request can go out until it is drained or dropped. <code>StreamingResponseExt::typed_with</code> maps frames to domain values and can skip control frames along the way.</p>
 <p>The server in this sample is a few lines of plain Tokio, because a {{ wireframe_version }} <code>WireframeServer</code> answers each routed request with one reply. See <a href="/wireframe/guides/streaming/#scope">what the server wires up</a>.</p>
+{% call ui.main_note() %}A <code>route_response</code> handler can return a streamed reply from <code>WireframeServer</code> itself.{% endcall %}
 </section>
 
 <section aria-labelledby="hooks"><h2 id="hooks">Hooks and tracing</h2>

@@ -102,16 +102,22 @@ SHARED_CONTENT = _shared_content()
 # it is checked for fitting the viewport and for nothing about navigation.
 STANDALONE = frozenset({"icon-replacements/"})
 
-# Pages that lay out wider than the narrowest viewport today, before the
-# migration touched anything, keyed to the width each was measured at. The
-# migration is meant to be inert, so it neither fixes nor worsens these; the
-# waiver is asserted to still fire, so it cannot outlive the defect. See the
-# decision log in `docs/execplans/netsuke-daisy-migration.md`.
+# Pages that lay out wider than the narrowest viewport today, keyed to the
+# width each was measured at with the reference build date that the capture
+# fixtures set. A waived page is asserted to still overflow, but by no more
+# than the recorded width, so the waiver cannot outlive the defect and a page
+# that grows fails here by name. The widths are a property of this host's
+# text metrics as much as of the markup: `examples/static-site-pipeline/` is
+# only two pixels over, which is within what a changed fallback font moves.
+# Re-measure the whole set on the host that records the snapshots rather than
+# trusting these numbers on another machine. See the decision log in
+# `docs/execplans/netsuke-daisy-migration.md`.
 KNOWN_OVERFLOW = {
-    "design/": 607,
-    "examples/batch-photo-processing/": 363,
-    "examples/multi-format-documentation/": 372,
-    "examples/visual-design-assets/": 385,
+    "design/": 590,
+    "examples/batch-photo-processing/": 384,
+    "examples/multi-format-documentation/": 362,
+    "examples/static-site-pipeline/": 362,
+    "examples/visual-design-assets/": 405,
 }
 
 # What the two layouts are distinguished by, measured the same way at both

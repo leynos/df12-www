@@ -40,6 +40,22 @@ _ORIGIN_POSITIONS = frozenset({"0px 0px", "0% 0%", "0px", "0%"})
 # that cycles its colour, leaves its box where it is, and the box stays in
 # the comparison.
 _MOVING_ANIMATIONS = frozenset({"spin", "ping", "bounce"})
+# Chromium 158 reports `flex-start` and `flex-end` as `flow-start` and
+# `flow-end`. The two spellings name one value -- the browser accepts either
+# and computes both identically -- so a record taken under one dialect has to
+# compare equal to a capture taken under the other.
+_ALIGNMENT_ALIASES = {"flow-start": "flex-start", "flow-end": "flex-end"}
+# The properties whose computed value can be one of those keywords.
+_ALIGNMENT_PROPERTIES = frozenset(
+    {
+        "align-content",
+        "align-items",
+        "align-self",
+        "justify-content",
+        "justify-items",
+        "justify-self",
+    }
+)
 
 
 def _drop_invisible_border_colours(style: Style) -> None:
@@ -118,6 +134,8 @@ def _canonical_style(style_diff: Style | None) -> Style:
       :func:`_capped_radius`.
     - A background positioned at its origin, and ``color-scheme: light``,
       neither of which a light page renders any differently for.
+    - The alignment keyword Chromium 158 renamed. See
+      :func:`_canonical_alignment`.
 
     :func:`_normalize` handles three more that need the node rather than its
     styles alone: the individual transform properties are composed into the
@@ -168,8 +186,23 @@ def _canonical_style(style_diff: Style | None) -> Style:
     for key, value in style.items():
         if key.endswith("-radius") and isinstance(value, str):
             style[key] = _capped_radius(value)
+    _canonical_alignment(style)
     _drop_invisible_border_colours(style)
     return style
+
+
+def _canonical_alignment(style: Style) -> None:
+    """Spell a renamed alignment keyword the way older Chromium did.
+
+    Parameters
+    ----------
+    style
+        A node's computed styles, modified in place.
+    """
+    for key in _ALIGNMENT_PROPERTIES & style.keys():
+        value = style[key]
+        if isinstance(value, str):
+            style[key] = _ALIGNMENT_ALIASES.get(value, value)
 
 
 def _is_animated(style: Style) -> bool:

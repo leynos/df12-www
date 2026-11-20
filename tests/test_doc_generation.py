@@ -289,7 +289,7 @@ def markdown_response(
 
     state["set_last_modified"] = set_last_modified
     monkeypatch.setattr(
-        "df12_pages.generator.page_generator.requests.Session", _Session
+        "df12_pages.generator.document_fetch.requests.Session", _Session
     )
     return state
 
@@ -298,7 +298,7 @@ def markdown_response(
 def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
     """Mock GitHub client and repo commits for all tests.
 
-    This autouse fixture stubs ``df12_pages.generator.page_generator.GitHub``
+    This autouse fixture stubs ``df12_pages.generator.commit_date.GitHub``
     with a client that exposes a single "latest" commit and returns a small helper
     dictionary containing ``set_date`` so individual tests can adjust the
     commit timestamp used in metadata badges without calling the real GitHub
@@ -314,7 +314,7 @@ def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
     mock_repo.commits.return_value = iter([latest_commit])
     mock_client = mocker.Mock()
     mock_client.repository.return_value = mock_repo
-    mocker.patch("df12_pages.generator.page_generator.GitHub", return_value=mock_client)
+    mocker.patch("df12_pages.generator.commit_date.GitHub", return_value=mock_client)
 
     def set_date(value: dt.datetime) -> None:
         """Set the author date reported by the mocked latest commit."""
@@ -719,7 +719,7 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
             """Do nothing; the stub session holds no resources."""
 
     monkeypatch.setattr(
-        "df12_pages.generator.page_generator.requests.Session", _Session
+        "df12_pages.generator.document_fetch.requests.Session", _Session
     )
 
     generator = PageContentGenerator(release_config)

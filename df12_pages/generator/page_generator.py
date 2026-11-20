@@ -7,6 +7,13 @@ It exposes :class:`PageContentGenerator`, which consumes a
 ``HtmlContentRenderer``, and persists both HTML and metadata that power
 ``public/docs-*.html`` and ``docs.html``.
 
+The work either side of the generator has its own module.
+:mod:`df12_pages.generator.document_fetch` resolves and fetches a document,
+returning the URL, version and date that actually answered as values, and
+:mod:`df12_pages.generator.commit_date` resolves the date a page displays. Both
+sets of names are re-exported here, so a caller can keep importing them from
+this module.
+
 Fetching, preparation and rendering are separate steps. :func:`fetch_document`
 resolves a :class:`DocumentSource` to a :class:`FetchedMarkdown`, returning the
 URL and version that actually answered as values.
@@ -33,43 +40,48 @@ Example
 from __future__ import annotations
 
 import dataclasses as dc
-import datetime as dt
-import email.utils
 import json
 import logging
 import re
 import typing as typ
 from pathlib import Path
 
-import requests
-from github3 import GitHub
-from github3 import exceptions as gh_exc
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-
 from df12_pages._constants import PAGE_META_TEMPLATE
 from df12_pages.config import PageConfig, SectionLayout
 from df12_pages.docs_index import ManifestDescriptionResolver
+from df12_pages.generator.commit_date import resolve_doc_updated_at
+from df12_pages.generator.document_fetch import (
+    FETCH_TIMEOUT_SECONDS,
+    DocumentFetcher,
+    DocumentSource,
+    FetchedMarkdown,
+    MarkdownResponse,
+    fetch_document,
+    fetch_markdown,
+    resolve_document_source,
+)
 from df12_pages.generator.link_rewriter import _build_link_rewriter
 from df12_pages.generator.models import NumberedStep, SectionModel
 from df12_pages.generator.renderer import (
-    CODE_BLOCK_PATTERN,
     HtmlContentRenderer,
     MermaidRenderer,
     PreparedMarkdown,
 )
-from df12_pages.markdown_parser import Section, Subsection, parse_sections
+from df12_pages.generator.section_render import (
+    prepare_numbered_steps,
+    prepare_split_panel,
+)
+from df12_pages.markdown_parser import Section, parse_sections
 from df12_pages.templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
+    import datetime as dt
 
+    from github3 import GitHub
     from minijinja import Environment
 
 _log = logging.getLogger(__name__)
-
-#: Seconds to wait for one markdown response before the fetch fails.
-FETCH_TIMEOUT_SECONDS = 30
 
 #: Template that renders one documentation section, and its relative suffix.
 DOCUMENT_TEMPLATE = "doc_page.jinja"
@@ -78,56 +90,6 @@ _TEMPLATE_SUFFIX = ".jinja"
 #: Templates shipped with the package, resolved once when the module loads.
 #: Resolving here keeps construction free of filesystem metadata lookups.
 DEFAULT_TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "templates"
-
-
-@dc.dataclass(frozen=True)
-class DocumentSource:
-    """The URL a documentation page's markdown is fetched from."""
-
-    source_url: str
-    #: Raw URL of the same document inside the tagged release, when pinned.
-    release_url: str | None = None
-    #: Release tag the document is pinned to, without any rewriting.
-    version: str | None = None
-
-    @property
-    def version_display(self) -> str | None:
-        """Return the release version without its leading ``v``, if any."""
-        return _strip_version_prefix(self.version)
-
-    def attempts(self) -> list[tuple[str, str | None]]:
-        """Return the URLs to try in order, each paired with its version pin.
-
-        The pinned release is tried first. The branch source follows it with
-        no version, so a guide added after the release was cut can still be
-        rendered without claiming to belong to that release.
-        """
-        if self.release_url and self.release_url != self.source_url:
-            return [(self.release_url, self.version), (self.source_url, None)]
-        return [(self.source_url, self.version)]
-
-
-@dc.dataclass(frozen=True)
-class FetchedMarkdown:
-    """A markdown body and the provenance that actually answered for it.
-
-    ``updated_at`` is the date to display for the document, if any. It is the
-    caller's release or commit date when that applies to the URL that
-    answered, and otherwise the response's ``Last-Modified`` date.
-    """
-
-    text: str
-    source_url: str
-    version: str | None = None
-    updated_at: dt.datetime | None = None
-
-
-@dc.dataclass(frozen=True)
-class MarkdownResponse:
-    """A markdown response body with the source date it carried, if any."""
-
-    text: str
-    updated_at: dt.datetime | None = None
 
 
 class DocumentTemplate(typ.Protocol):
@@ -158,16 +120,6 @@ class PreparedDocument:
     sections: list[Section]
     template: DocumentTemplate
     markdown: PreparedMarkdown
-
-
-class DocumentFetcher(typ.Protocol):
-    """A callable that fetches one document source."""
-
-    def __call__(
-        self, source: DocumentSource, *, updated_at: dt.datetime | None = None
-    ) -> FetchedMarkdown:
-        """Fetch ``source``, returning its text and provenance."""
-        ...
 
 
 @dc.dataclass(frozen=True)
@@ -247,313 +199,6 @@ def publish_document(document: RenderedDocument) -> list[Path]:
             exc_info=written.metadata_error,
         )
     return written.html_paths
-
-
-def _strip_version_prefix(tag: str | None) -> str | None:
-    """Strip a leading ``v`` or ``V`` if more follows; ``None`` if empty."""
-    if not tag:
-        return None
-    if tag.upper().startswith("V") and len(tag) > 1:
-        return tag[1:]
-    return tag
-
-
-def resolve_document_source(
-    page: PageConfig, override: str | None = None
-) -> DocumentSource:
-    """Return the URLs a page's markdown may be fetched from.
-
-    Parameters
-    ----------
-    page : PageConfig
-        Page configuration carrying the repository, release and source URL.
-    override : str, optional
-        Explicit source URL that replaces any release pin.
-
-    Returns
-    -------
-    DocumentSource
-        The pinned release URL when the page names a release, otherwise the
-        configured branch source URL.
-    """
-    if override:
-        return DocumentSource(override)
-    if page.repo and page.latest_release:
-        return DocumentSource(
-            source_url=page.source_url,
-            release_url=_build_release_url(
-                page.repo, page.latest_release, page.doc_path
-            ),
-            version=page.latest_release,
-        )
-    return DocumentSource(page.source_url)
-
-
-def _retrying_session() -> requests.Session:
-    """Return a session that retries transient failures with backoff."""
-    session = requests.Session()
-    retry = Retry(
-        total=5,
-        read=5,
-        connect=3,
-        backoff_factor=0.5,
-        status_forcelist=(500, 502, 503, 504),
-        allowed_methods=("GET", "HEAD"),
-    )
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
-    return session
-
-
-def fetch_markdown(
-    url: str, *, session: requests.Session, timeout: int = FETCH_TIMEOUT_SECONDS
-) -> MarkdownResponse:
-    """Download one URL and return its body with the date it last changed.
-
-    Parameters
-    ----------
-    url : str
-        Absolute URL of the markdown document.
-    session : requests.Session
-        Session carrying the retry policy; the caller owns its lifetime.
-    timeout : int, optional
-        Seconds to wait for the response.
-
-    Returns
-    -------
-    MarkdownResponse
-        The response body and its parsed ``Last-Modified`` date. The date is
-        ``None`` when the response omits the header or sends one that cannot be
-        parsed, so a malformed header can never fail the build.
-
-    Raises
-    ------
-    requests.RequestException
-        If the request fails at the transport level, or if the response is an
-        HTTP error. Failures are raised rather than replaced with empty text,
-        so a missing document cannot be published as a blank page.
-    """
-    response = session.get(url, timeout=timeout)
-    response.raise_for_status()
-    return MarkdownResponse(
-        text=response.text,
-        updated_at=_last_modified(response.headers.get("Last-Modified")),
-    )
-
-
-def _last_modified(value: str | None) -> dt.datetime | None:
-    """Parse an HTTP ``Last-Modified`` value into a UTC datetime, if valid."""
-    if not value:
-        return None
-    try:
-        parsed = email.utils.parsedate_to_datetime(value)
-    except TypeError, ValueError:
-        return None
-    if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=dt.UTC)
-    return parsed.astimezone(dt.UTC)
-
-
-def _http_status(error: requests.HTTPError) -> int | None:
-    """Return the status of the response that raised ``error``, if attached."""
-    response = getattr(error, "response", None)
-    return getattr(response, "status_code", None)
-
-
-def fetch_document(
-    source: DocumentSource,
-    *,
-    updated_at: dt.datetime | None = None,
-    session: requests.Session | None = None,
-) -> FetchedMarkdown:
-    """Fetch the first URL of ``source`` that answers.
-
-    A release-pinned URL that returns HTTP 404 falls back to the branch source
-    URL. The version pin is dropped with it, and so is ``updated_at``: a guide
-    added after the release was cut should still render, but neither it nor
-    its date may claim to belong to that release. The branch response's own
-    ``Last-Modified`` date takes its place, so the page still shows when the
-    document it displays last changed.
-
-    Parameters
-    ----------
-    source : DocumentSource
-        Candidate URLs, pinned release first.
-    updated_at : datetime, optional
-        Date already known for the document, used only when the release-pinned
-        attempt is the one that answered.
-    session : requests.Session, optional
-        Session to fetch through; a retrying session is created and closed
-        when omitted.
-
-    Returns
-    -------
-    FetchedMarkdown
-        The body plus the URL and version that actually answered.
-
-    Raises
-    ------
-    requests.RequestException
-        If a candidate fails for a reason other than a missing pinned release,
-        or if every candidate fails. The error from the failing request is
-        allowed to escape rather than being replaced by an empty document.
-    """
-    owned = session is None
-    active = session or _retrying_session()
-    try:
-        attempts = source.attempts()
-        for index, (url, version) in enumerate(attempts):
-            try:
-                response = fetch_markdown(url, session=active)
-            except requests.HTTPError as error:
-                last_attempt = index == len(attempts) - 1
-                if last_attempt or _http_status(error) != requests.codes.not_found:
-                    raise
-                continue
-            known_date = updated_at if index == 0 else None
-            return FetchedMarkdown(
-                text=response.text,
-                source_url=url,
-                version=version,
-                updated_at=known_date or response.updated_at,
-            )
-    finally:
-        if owned:
-            active.close()
-    msg = "a document source must offer at least one URL"
-    raise AssertionError(msg)
-
-
-def resolve_doc_updated_at(
-    page: PageConfig,
-    *,
-    token: str | None = None,
-    client: GitHub | None = None,
-) -> dt.datetime | None:
-    """Return the date to show for ``page``'s document, or ``None``.
-
-    The configured release date wins. Otherwise the latest commit touching
-    ``doc_path`` is read from GitHub. A malformed repository slug, an API error
-    and an unparseable timestamp all yield ``None``, so a failure to decorate
-    the page cannot stop it rendering.
-
-    Parameters
-    ----------
-    page : PageConfig
-        Page whose release and repository details are consulted.
-    token : str, optional
-        GitHub token for the lookup. The caller reads it from the environment,
-        so this module never depends on ambient credentials.
-    client : github3.GitHub, optional
-        Client to query through; a fresh unauthenticated-or-token client is
-        created when omitted.
-    """
-    if page.latest_release_published_at:
-        return page.latest_release_published_at
-    return _fetch_doc_commit_date(page, client=client, token=token)
-
-
-def _fetch_doc_commit_date(
-    page: PageConfig, *, client: GitHub | None = None, token: str | None = None
-) -> dt.datetime | None:
-    """Return the latest commit timestamp for the page repository or None."""
-    result: dt.datetime | None = None
-    repo_slug = page.repo
-    if repo_slug:
-        try:
-            owner, name = repo_slug.split("/", 1)
-        except ValueError:
-            owner = name = None
-
-        if owner and name:
-            branch = page.branch or "main"
-            doc_path = page.doc_path.lstrip("/")
-            github = client or GitHub(token=token)
-            try:
-                repository = github.repository(owner, name)
-            except gh_exc.GitHubException:
-                repository = None
-
-            if repository is not None:
-                try:
-                    commits = repository.commits(path=doc_path, sha=branch)
-                except gh_exc.GitHubException:
-                    commits = None
-
-                if commits is not None:
-                    try:
-                        latest_commit = next(iter(commits), None)
-                    except gh_exc.GitHubException:
-                        latest_commit = None
-                    if latest_commit:
-                        result = _extract_commit_timestamp(latest_commit)
-
-    return result
-
-
-def _extract_commit_timestamp(commit: object) -> dt.datetime | None:
-    """Extract a commit datetime from github3 objects or dict payloads.
-
-    Parameters
-    ----------
-    commit : object
-        Commit object or dictionary exposing ``commit.author``/``committer``
-        with ``date`` attributes.
-
-    Returns
-    -------
-    datetime | None
-        The first normalized commit timestamp, or ``None`` when unavailable.
-    """
-    commit_payload = getattr(commit, "commit", None)
-    if commit_payload is None and isinstance(commit, dict):
-        commit_payload = typ.cast("dict[str, typ.Any]", commit).get("commit")
-    if commit_payload is None:
-        return None
-
-    actors: list[typ.Any] = []
-    for attr in ("author", "committer"):
-        actor = getattr(commit_payload, attr, None)
-        if actor is None and isinstance(commit_payload, dict):
-            actor = commit_payload.get(attr)
-        if actor is not None:
-            actors.append(actor)
-
-    for actor in actors:
-        date_value = getattr(actor, "date", None)
-        if date_value is None and isinstance(actor, dict):
-            date_value = actor.get("date")
-        normalized = _normalize_commit_date(date_value)
-        if normalized:
-            return normalized
-    return None
-
-
-def _normalize_commit_date(value: object) -> dt.datetime | None:
-    """Normalize a commit timestamp value into a UTC datetime, if possible."""
-    result: dt.datetime | None = None
-    if value is None:
-        result = None
-    elif isinstance(value, dt.datetime):
-        if value.tzinfo is None:
-            result = value.replace(tzinfo=dt.UTC)
-        else:
-            result = value.astimezone(dt.UTC)
-    elif isinstance(value, str):
-        sanitized = value.strip()
-        if sanitized:
-            sanitized = sanitized.replace("Z", "+00:00")
-            try:
-                parsed = dt.datetime.fromisoformat(sanitized)
-            except ValueError:
-                parsed = None
-            if parsed is not None:
-                if parsed.tzinfo is None:
-                    result = parsed.replace(tzinfo=dt.UTC)
-                else:
-                    result = parsed.astimezone(dt.UTC)
-    return result
 
 
 class PageContentGenerator:
@@ -676,7 +321,11 @@ class PageContentGenerator:
         return self.render_document(
             prepared,
             source_url=fetched.source_url,
-            version_display=_strip_version_prefix(fetched.version),
+            # A fetcher reports a release tag, so it is displayed the way the
+            # configured release pin is.
+            version_display=DocumentSource(
+                fetched.source_url, version=fetched.version
+            ).version_display,
             page_description=self._resolve_description(),
             updated_at=fetched.updated_at,
             generated_at=build_timestamp(),
@@ -880,7 +529,8 @@ class PageContentGenerator:
 
         if layout.device == "numbered_steps":
             subsection_anchors = {b["title"]: b["anchor"] for b in subsections}
-            numbered_steps = self._prepare_numbered_steps(
+            numbered_steps = prepare_numbered_steps(
+                self.renderer,
                 section,
                 layout,
                 figures=figures,
@@ -894,7 +544,7 @@ class PageContentGenerator:
                     for step in numbered_steps
                 ]
         elif layout.device == "split_panel":
-            split_panel = self._prepare_split_panel(section, layout, figures)
+            split_panel = prepare_split_panel(self.renderer, section, layout, figures)
             if not split_panel.get("secondary_html"):
                 resolved_layout = "default"
 
@@ -911,93 +561,6 @@ class PageContentGenerator:
             subsections=subsections,
             toc_items=toc_items,
         )
-
-    def _prepare_numbered_steps(
-        self,
-        section: Section,
-        layout: SectionLayout,
-        *,
-        figures: cabc.Mapping[str, str],
-        subsection_anchors: dict[str, str] | None = None,
-    ) -> list[NumberedStep]:
-        """Return numbered step data for ``section`` based on the provided layout.
-
-        Parameters
-        ----------
-        section : Section
-            The parsed markdown section containing subsections.
-        layout : SectionLayout
-            Layout configuration that may specify a custom step ordering.
-        figures : Mapping[str, str]
-            Compiled Mermaid figures for the document, by placeholder token.
-        subsection_anchors : dict[str, str] or None, optional
-            Mapping of subsection title to content-based anchor string, as
-            produced by :meth:`_build_subsection_blocks`.  When provided, each
-            step's ``content_anchor`` is set to the corresponding value so that
-            nav links and in-page anchors remain consistent.
-        """
-        subsections = list(section.subsections)
-        if not subsections:
-            return []
-
-        if layout.step_order:
-            ordered: list[Subsection] = []
-            lower_map = {sub.title.lower(): sub for sub in subsections}
-            for desired in layout.step_order:
-                match = lower_map.get(desired.lower())
-                if match and match not in ordered:
-                    ordered.append(match)
-            for sub in subsections:
-                if sub not in ordered:
-                    ordered.append(sub)
-            subsections = ordered
-
-        anchors = subsection_anchors or {}
-        steps: list[NumberedStep] = []
-        for idx, sub in enumerate(subsections, start=1):
-            html = self.renderer.markdown(sub.markdown, figures=figures)
-            step_anchor = f"{section.slug}-step-{idx}"
-            content_anchor = anchors.get(sub.title, step_anchor)
-            steps.append(
-                NumberedStep(
-                    title=sub.title,
-                    number=idx,
-                    html=html,
-                    anchor=step_anchor,
-                    content_anchor=content_anchor,
-                )
-            )
-        return steps
-
-    def _prepare_split_panel(
-        self,
-        section: Section,
-        layout: SectionLayout,
-        figures: cabc.Mapping[str, str],
-    ) -> dict[str, str]:
-        """Render split-panel HTML blocks for the section based on layout hints."""
-        matches = list(CODE_BLOCK_PATTERN.finditer(section.markdown))
-        if not matches:
-            return {
-                "primary_html": self.renderer.markdown(
-                    section.markdown, figures=figures
-                ),
-                "secondary_html": "",
-            }
-
-        index = layout.emphasized_code_block or 0
-        if index >= len(matches):
-            index = 0
-        match = matches[index]
-        lang = match.group(1) or "text"
-        code = match.group(2).strip("\n")
-        before = section.markdown[: match.start()]
-        after = section.markdown[match.end() :]
-        primary_md = (before + "\n\n" + after).strip()
-        return {
-            "primary_html": self.renderer.markdown(primary_md, figures=figures),
-            "secondary_html": self.renderer.code_block(code, lang),
-        }
 
     def _format_page_title(self, section: Section) -> str:
         """Compose the HTML title using site name, section, and configured suffix."""
@@ -1053,7 +616,22 @@ class PageContentGenerator:
         return label.strip().rstrip(":").strip()
 
 
-def _build_release_url(repo: str, tag: str, path: str) -> str:
-    """Return the raw GitHub URL for the file at ``path`` within a tagged release."""
-    normalized = path.lstrip("/")
-    return f"https://raw.githubusercontent.com/{repo}/refs/tags/{tag}/{normalized}"
+__all__ = [
+    "DEFAULT_TEMPLATES_DIR",
+    "DOCUMENT_TEMPLATE",
+    "FETCH_TIMEOUT_SECONDS",
+    "DocumentFetcher",
+    "DocumentSource",
+    "DocumentTemplate",
+    "FetchedMarkdown",
+    "MarkdownResponse",
+    "PageContentGenerator",
+    "PreparedDocument",
+    "RenderedDocument",
+    "WrittenDocument",
+    "fetch_document",
+    "fetch_markdown",
+    "publish_document",
+    "resolve_doc_updated_at",
+    "resolve_document_source",
+]

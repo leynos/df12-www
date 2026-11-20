@@ -128,8 +128,12 @@ def test_preparing_a_document_compiles_each_diagram_exactly_once() -> None:
         f"preparation must compile the diagram once, got {mermaid.sources!r}"
     )
     assert first == second, "a prepared document must render deterministically"
-    assert '<figure class="doc-mermaid"><svg>diagram</svg></figure>' in first
-    assert "df12-mermaid-placeholder" not in first
+    assert '<figure class="doc-mermaid"><svg>diagram</svg></figure>' in first, (
+        "a compiled diagram must be restored as a figure"
+    )
+    assert "df12-mermaid-placeholder" not in first, (
+        "every placeholder token must be replaced by its figure"
+    )
 
 
 def test_preparation_keeps_an_uncompilable_fence_for_the_fallback() -> None:
@@ -143,7 +147,9 @@ def test_preparation_keeps_an_uncompilable_fence_for_the_fallback() -> None:
         "the fence must survive preparation so rendering can highlight it"
     )
     assert not prepared.figures, "a failed diagram contributes no figure"
-    assert 'data-language="mermaid"' in html
+    assert 'data-language="mermaid"' in html, (
+        "a failed diagram must fall back to a highlighted code block"
+    )
 
 
 def test_the_cli_override_is_read_when_invoked_not_when_constructed(

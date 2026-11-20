@@ -804,7 +804,9 @@ def test_fetch_document_drops_the_pin_when_the_release_lacks_the_document() -> N
         source, updated_at=released, session=typ.cast("requests.Session", session)
     )
 
-    assert session.requested == [release_url, branch_url]
+    assert session.requested == [release_url, branch_url], (
+        "the release URL must be tried before the branch"
+    )
     assert fetched == FetchedMarkdown(
         text="# Branch text",
         source_url=branch_url,
@@ -854,7 +856,9 @@ def test_fetch_document_falls_back_to_a_response_date_without_a_known_one() -> N
         DocumentSource(url), session=typ.cast("requests.Session", session)
     )
 
-    assert fetched.updated_at == dt.datetime(2025, 1, 4, 18, 30, tzinfo=dt.UTC)
+    assert fetched.updated_at == dt.datetime(2025, 1, 4, 18, 30, tzinfo=dt.UTC), (
+        "the response Last-Modified date stands in for a missing known date"
+    )
 
 
 @pytest.mark.parametrize(
@@ -877,7 +881,9 @@ def test_fetch_document_ignores_a_missing_or_unparseable_source_date(
         DocumentSource(url), session=typ.cast("requests.Session", session)
     )
 
-    assert fetched.updated_at is None
+    assert fetched.updated_at is None, (
+        "an absent, empty or malformed header must leave the date unset"
+    )
     assert fetched.text == "# Text", "the body is served regardless of the header"
 
 
@@ -1319,9 +1325,15 @@ def test_construction_reaches_no_filesystem_environment_or_subprocess(
         explicit = PageContentGenerator(page, templates_dir=supplied)
         defaulted = PageContentGenerator(page)
 
-    assert explicit.templates_dir == supplied
-    assert defaulted.templates_dir == DEFAULT_TEMPLATES_DIR
-    assert explicit.source.source_url == page.source_url
+    assert explicit.templates_dir == supplied, (
+        "a supplied template directory must be kept as given"
+    )
+    assert defaulted.templates_dir == DEFAULT_TEMPLATES_DIR, (
+        "an omitted template directory must fall back to the shipped one"
+    )
+    assert explicit.source.source_url == page.source_url, (
+        "construction must resolve the page source without fetching it"
+    )
     assert reads == [], f"construction opened {reads!r}"
 
 
@@ -1569,7 +1581,7 @@ def test_rendered_document_without_sections_writes_no_metadata(
 
     assert written == WrittenDocument(
         html_paths=[], metadata_path=metadata_path, metadata_written=False
-    )
+    ), "an empty bundle writes no HTML and reports no metadata pointer"
     assert not metadata_path.exists(), "an empty bundle must not claim a first file"
 
 
@@ -1585,9 +1597,13 @@ def test_rendered_document_reports_an_unwritable_metadata_path(
 
     assert written.html_paths == [tmp_path / "page.html"]
     assert written.html_paths[0].read_text() == "<p>ok</p>"
-    assert written.metadata_path == metadata_path
+    assert written.metadata_path == metadata_path, (
+        "the result must name the destination it could not write"
+    )
     assert not written.metadata_written, "the failed pointer must be reported"
-    assert isinstance(written.metadata_error, OSError)
+    assert isinstance(written.metadata_error, OSError), (
+        "the result must carry the error that stopped the pointer"
+    )
     assert caplog.records == [], "write() reports through its result, not the log"
 
     with caplog.at_level(logging.WARNING):

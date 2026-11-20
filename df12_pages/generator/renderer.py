@@ -21,6 +21,8 @@ from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
+from df12_pages.generator.link_rewriter import RelativeLinkExtension
+
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
 
@@ -156,6 +158,24 @@ class HtmlContentRenderer:
     def stylesheet(self) -> str:
         """Return the CSS used for highlighted code blocks."""
         return self._formatter.get_style_defs(".codehilite")
+
+    def retarget_links(self, ref: str | None) -> None:
+        """Aim relative-link rewriting at the ref that answered the fetch.
+
+        The link extension is built from configuration, which names the
+        release the page hopes to display. A fetch that falls back to the
+        branch answered from a different ref, and the links inside the
+        document then have to point into the tree it actually came from.
+
+        Parameters
+        ----------
+        ref : str or None
+            Ref the fetched document came from. ``None`` leaves the
+            configured ref alone, which is right when the source was an
+            explicit override with no ref to name.
+        """
+        if ref and isinstance(self._link_extension, RelativeLinkExtension):
+            self._link_extension.ref = ref
 
     def prepare_markdown(self, text: str) -> PreparedMarkdown:
         """Compile a document's Mermaid fences and rewrite them as placeholders.

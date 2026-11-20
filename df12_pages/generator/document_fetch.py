@@ -38,6 +38,9 @@ class DocumentSource:
     release_url: str | None = None
     #: Release tag the document is pinned to, without any rewriting.
     version: str | None = None
+    #: Branch the un-pinned URL points at. Relative links in a document that
+    #: answered from it must resolve inside that branch, not the release tag.
+    branch: str | None = None
 
     @property
     def version_display(self) -> str | None:
@@ -63,12 +66,17 @@ class FetchedMarkdown:
     ``updated_at`` is the date to display for the document, if any. It is the
     caller's release or commit date when that applies to the URL that
     answered, and otherwise the response's ``Last-Modified`` date.
+
+    ``ref`` is the git ref the answering document came from: the release tag
+    when the pinned attempt answered, and the branch otherwise. Relative links
+    in the document are rewritten against it.
     """
 
     text: str
     source_url: str
     version: str | None = None
     updated_at: dt.datetime | None = None
+    ref: str | None = None
 
 
 @dc.dataclass(frozen=True)
@@ -131,8 +139,9 @@ def resolve_document_source(
                 page.repo, page.latest_release, page.doc_path
             ),
             version=page.latest_release,
+            branch=page.branch or "main",
         )
-    return DocumentSource(page.source_url)
+    return DocumentSource(page.source_url, branch=page.branch or "main")
 
 
 def _retrying_session() -> requests.Session:
@@ -236,7 +245,7 @@ def fetch_document(
     Returns
     -------
     FetchedMarkdown
-        The body plus the URL and version that actually answered.
+        The body plus the URL, version and git ref that actually answered.
 
     Raises
     ------
@@ -263,6 +272,7 @@ def fetch_document(
                 source_url=url,
                 version=version,
                 updated_at=known_date or response.updated_at,
+                ref=version or source.branch,
             )
     finally:
         if owned:

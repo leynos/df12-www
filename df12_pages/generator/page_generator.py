@@ -331,6 +331,25 @@ class PageContentGenerator:
             generated_at=build_timestamp(),
         )
 
+    def _resolve_commit_date(self) -> dt.datetime | None:
+        """Ask GitHub for the document's latest commit date, best effort.
+
+        The client is built here, at the command boundary that reaches the
+        network, rather than inside the query. A failed lookup is logged with
+        the page key and reported as no date, so a page still publishes when
+        its date cannot be read.
+        """
+        client = self._github_client or GitHub(token=self._github_token)
+        try:
+            return resolve_doc_updated_at(self.page, client=client)
+        except gh_exc.GitHubException as error:
+            _log.warning(
+                "could not resolve the commit date for page %s: %s",
+                self.page.key,
+                error,
+            )
+            return None
+
     def prepare_document(self, markdown: str) -> PreparedDocument:
         """Do the document's side-effecting work ahead of rendering.
 

@@ -747,6 +747,12 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
         f"fallback content must not claim the release version, got {meta_items!r}"
     )
 
+    hrefs = [anchor.get("href", "") for anchor in soup.select("a[href*='cli.md']")]
+    assert hrefs == ["https://github.com/octo/tool/blob/main/cli.md#flags"], (
+        "a link inside branch content must point into the branch that answered, "
+        f"got {hrefs!r}"
+    )
+
 
 def _http_error(status_code: int) -> requests.HTTPError:
     """Return an ``HTTPError`` carrying a response with *status_code*."""
@@ -786,7 +792,10 @@ def test_fetch_document_drops_the_pin_when_the_release_lacks_the_document() -> N
     branch_url = "https://example.test/main/docs/guide.md"
     release_url = "https://example.test/refs/tags/v1.2.3/docs/guide.md"
     source = DocumentSource(
-        source_url=branch_url, release_url=release_url, version="v1.2.3"
+        source_url=branch_url,
+        release_url=release_url,
+        version="v1.2.3",
+        branch="main",
     )
     released = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
     branch_changed = dt.datetime(2024, 12, 30, 9, 0, tzinfo=dt.UTC)
@@ -812,6 +821,7 @@ def test_fetch_document_drops_the_pin_when_the_release_lacks_the_document() -> N
         source_url=branch_url,
         version=None,
         updated_at=branch_changed,
+        ref="main",
     ), "the branch copy keeps its own Last-Modified but not the release date"
 
 
@@ -820,7 +830,10 @@ def test_fetch_document_keeps_the_pin_when_the_release_answers() -> None:
     branch_url = "https://example.test/main/docs/guide.md"
     release_url = "https://example.test/refs/tags/v1.2.3/docs/guide.md"
     source = DocumentSource(
-        source_url=branch_url, release_url=release_url, version="v1.2.3"
+        source_url=branch_url,
+        release_url=release_url,
+        version="v1.2.3",
+        branch="main",
     )
     released = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
     session = _ScriptedSession(
@@ -842,6 +855,7 @@ def test_fetch_document_keeps_the_pin_when_the_release_answers() -> None:
         source_url=release_url,
         version="v1.2.3",
         updated_at=released,
+        ref="v1.2.3",
     ), "the known release date outranks the response's Last-Modified"
 
 

@@ -80,15 +80,20 @@ bundles through a thread pool that defaults to eight workers.
   directory and compiles Mermaid figures. `render_document()` is then a query
   over the prepared values and the provenance it is handed, including the build
   timestamp, so it reads no file, environment variable or subprocess;
-  `RenderedDocument.write()` publishes the result. `_write_documents` renders
-  batches concurrently but writes in configuration order, so a later bundle
-  still wins a shared path.
+  `RenderedDocument.write()` publishes the result. `_publish_documents` owns
+  the pool and the ordered publication: it renders a worker-sized batch
+  concurrently but writes each bundle in configuration order, so a later bundle
+  still wins a shared path. `_write_documents` builds the render closure, logs
+  the timing and delegates to it.
 - `--doc-workers` and `INPUT_DOC_WORKERS` override the default of eight; one
   worker gives the serial behaviour for comparison.
 
-Measured against the serial MiniJinja commit, eight workers cut page generation
-from 7.58 s to 5.63 s and the complete warm build from 22.56 s to 20.50 s. The
-engine change alone cut all-sites page generation from 33.56 s to 7.23 s.
+On one interpreter, CPython 3.15.2t with the GIL disabled, eight workers cut
+all-sites page generation from 8.70 s to 5.63 s, 25.8% against the committed
+serial generator. The interpreter change did not pay for itself on its own: the
+same sweep took 7.58 s on CPython 3.13.11 and 8.70 s on 3.15.2t. The complete
+warm build fell from 22.56 s to 20.50 s, and the engine change alone cut
+all-sites page generation from 33.56 s to 7.23 s.
 
 ## Known risks and limitations
 

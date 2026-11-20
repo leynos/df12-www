@@ -109,11 +109,12 @@ checked-in configuration record that guarantees reproducible builds.
 
 `PageContentGenerator.render()` renders a bundle into memory as a
 `RenderedDocument`, and `RenderedDocument.write()` publishes it. The
-`_write_documents` helper in `df12_pages/cli.py` renders batches of bundles
-through a `ThreadPoolExecutor` and writes each document in configuration order,
-so the published output does not depend on which worker finished first. The
-pool size comes from `--doc-workers` or `INPUT_DOC_WORKERS` and defaults to
-eight.
+`_publish_documents` helper in `df12_pages/cli.py` owns the scheduling: it
+renders a worker-sized batch of bundles through a `ThreadPoolExecutor` and
+writes each document in configuration order, so the published output does not
+depend on which worker finished first. `_write_documents` builds the render
+closure, logs the timing and delegates to it. The pool size comes from
+`--doc-workers` or `INPUT_DOC_WORKERS` and defaults to eight.
 
 ### Runtime requirement
 

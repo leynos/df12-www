@@ -38,6 +38,16 @@ pins free-threaded CPython 3.15.2 and the CLI requires the GIL to be disabled.
 A fresh Linux x86-64 development environment needs a C compiler for the locked
 `msgspec` test dependency.
 
+`make build-release` builds the sdist and wheel through `scripts/uv_gate.py`,
+running `pyproject-build` from the pinned `build==1.6.1`, on the interpreter
+named by `.python-version`. The Makefile reads that file into `PROJECT_PYTHON`
+once and passes it to both `build-release` and `interrogate`, so the packaging
+and docstring gates use the same interpreter a checkout selects for the site.
+`MarkupSafe` is pinned to `>=3.0,<4` in `pyproject.toml`. The template layer
+calls it directly for HTML escaping, so the upper bound keeps an unlocked
+install from picking up a future major release whose escaping behaviour has not
+been reviewed.
+
 `bun run build` runs the full pipeline in a fixed order, because each step
 depends on the last:
 
@@ -2575,11 +2585,12 @@ page contains is a query over values:
 
 ### 9.4. Concurrent document workers
 
-`df12_pages.cli._write_documents` renders one site's bundles through a
+`df12_pages.cli._publish_documents` renders one site's bundles through a
 `ThreadPoolExecutor` when `--doc-workers` (or `INPUT_DOC_WORKERS`) is greater
 than one. Each worker renders a whole bundle, and the pool is given at most one
 worker-sized batch of pages at a time, so only that many rendered documents are
-held in memory.
+held in memory. `df12_pages.cli._write_documents` builds the render closure,
+logs the timing and delegates to it.
 
 Rendering order is not publication order. The pool maps each batch in
 configuration order and every `RenderedDocument` is written as it is yielded,

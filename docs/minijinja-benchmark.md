@@ -138,11 +138,14 @@ is the mean of three all-sites page-generation runs.
 | CPython 3.15.2t, GIL enabled      | 8.80 s     | 10.01 s       |
 | CPython 3.15.2t, GIL disabled     | 8.70 s     | 5.63 s        |
 
-Eight workers with the GIL disabled cut page-generation time by 25.8% against
-the committed serial generator. Switching interpreters alone made the serial
-run slower. For the complete warm `bun run build`, which also compiles CSS and
-scripts, processes assets, and indexes search, the mean fell from 22.56 s to
-20.50 s (9.1%) over three measured builds per version.
+Eight workers with the GIL disabled cut page-generation time by 35.3% against
+the one-worker run on the same interpreter, from 8.70 s to 5.63 s. Against the
+committed serial generator at 7.58 s the same run is 25.8% faster, but that
+comparison spans the interpreter change as well; switching interpreters alone
+made the serial run slower, from 7.58 s to 8.70 s. For the complete warm
+`bun run build`, which also compiles CSS and scripts, processes assets, and
+indexes search, the mean fell from 22.56 s to 20.50 s (9.1%) over three
+measured builds per version.
 
 Scalene 2.4.0 enabled the GIL for its native extensions. py-spy 0.4.3 could not
 locate the interpreter. CPython's sampling profiler captured the main thread

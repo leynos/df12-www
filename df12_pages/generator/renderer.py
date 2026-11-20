@@ -237,14 +237,27 @@ class HtmlContentRenderer:
 
     @staticmethod
     def _restore_mermaid_blocks(html: str, figures: cabc.Mapping[str, str]) -> str:
-        """Replace placeholder tokens with their rendered Mermaid figures."""
-        for token, figure in figures.items():
-            wrapped = f"<p>{token}</p>"
-            if wrapped in html:
-                html = html.replace(wrapped, figure)
-            else:  # pragma: no cover - defensive: token outside a paragraph
-                html = html.replace(token, figure)
-        return html
+        """Replace placeholder tokens with their rendered Mermaid figures.
+
+        A token standing alone in a paragraph replaces the paragraph, since a
+        ``<figure>`` may not sit inside a ``<p>``. The alternation lists longer
+        tokens first, so one token that prefixes another -- ``-1`` of ``-10``
+        -- can never consume part of the longer one when a section holds only
+        some of the document's diagrams.
+        """
+        if not figures:
+            return html
+        alternation = "|".join(
+            re.escape(token) for token in sorted(figures, key=len, reverse=True)
+        )
+        pattern = re.compile(rf"<p>({alternation})</p>|({alternation})")
+
+        def _replace(match: re.Match[str]) -> str:
+            """Return the figure for whichever alternative matched."""
+            token = match.group(1) or match.group(2)
+            return figures[token]
+
+        return pattern.sub(_replace, html)
 
     def code_block(self, code: str, language: str | None = None) -> str:
         """Render ``code`` into highlighted HTML with an optional language tag.

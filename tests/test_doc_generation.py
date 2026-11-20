@@ -113,6 +113,7 @@ from df12_pages.generator.page_generator import (
     WrittenDocument,
     fetch_document,
     publish_document,
+    resolve_doc_updated_at,
 )
 from df12_pages.generator.renderer import MermaidRenderer
 
@@ -131,6 +132,7 @@ CODE_SPAN_PROPS = (
 if typ.TYPE_CHECKING:
     from concurrent.futures import Future
 
+    from github3 import GitHub
     from pytest_mock import MockerFixture
 else:  # pragma: no cover - typing fallback
     MockerFixture = typ.Any
@@ -298,11 +300,11 @@ def markdown_response(
 def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
     """Mock GitHub client and repo commits for all tests.
 
-    This autouse fixture stubs ``df12_pages.generator.commit_date.GitHub``
-    with a client that exposes a single "latest" commit and returns a small helper
-    dictionary containing ``set_date`` so individual tests can adjust the
-    commit timestamp used in metadata badges without calling the real GitHub
-    API.
+    This autouse fixture stubs ``df12_pages.generator.page_generator.GitHub``
+    -- the command boundary that builds the client -- with one that exposes a
+    single "latest" commit. It returns a small helper dictionary so individual
+    tests can adjust the commit timestamp used in metadata badges, or make the
+    lookup fail, without calling the real GitHub API.
     """
     commit_date = dt.datetime(2025, 10, 5, 14, 30, tzinfo=dt.UTC)
     author = SimpleNamespace(date=commit_date)
@@ -314,7 +316,7 @@ def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
     mock_repo.commits.return_value = iter([latest_commit])
     mock_client = mocker.Mock()
     mock_client.repository.return_value = mock_repo
-    mocker.patch("df12_pages.generator.commit_date.GitHub", return_value=mock_client)
+    mocker.patch("df12_pages.generator.page_generator.GitHub", return_value=mock_client)
 
     def set_date(value: dt.datetime) -> None:
         """Set the author date reported by the mocked latest commit."""
@@ -324,7 +326,15 @@ def github_commit_mock(mocker: MockerFixture) -> dict[str, typ.Any]:
         """Make the commit lookup fail, as an unreadable repository would."""
         mock_repo.commits.side_effect = gh_exc.GitHubException("unavailable")
 
-    return {"set_date": set_date, "fail_commits": fail_commits}
+    def fail_repository() -> None:
+        """Make the repository lookup fail, as an unknown repository would."""
+        mock_client.repository.side_effect = gh_exc.GitHubException("unavailable")
+
+    return {
+        "set_date": set_date,
+        "fail_commits": fail_commits,
+        "fail_repository": fail_repository,
+    }
 
 
 @pytest.fixture
@@ -475,6 +485,72 @@ def test_doc_meta_uses_the_source_date_when_no_release_or_commit_exists(
     assert meta_items == ["Updated Jan 04, 2025"], (
         "the page must show when the document it displays last changed, "
         f"got {meta_items!r}"
+    )
+
+
+def test_a_failed_commit_lookup_is_logged_and_the_page_still_renders(
+    page_config: PageConfig,
+    markdown_response: MarkdownResponseState,
+    github_commit_mock: dict[str, typ.Any],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A GitHub error is reported against the page and never stops the render."""
+    github_commit_mock["fail_repository"]()
+    markdown_response["set_last_modified"]("Sat, 04 Jan 2025 18:30:00 GMT")
+
+    with caplog.at_level(logging.WARNING, logger="df12_pages.generator.page_generator"):
+        written = PageContentGenerator(page_config).run()
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any(page_config.key in message for message in messages), (
+        f"the failure must name page {page_config.key!r}: {messages!r}"
+    )
+
+    intro_path = next(
+        path for path in written if path.name.endswith("introduction.html")
+    )
+    soup = BeautifulSoup(intro_path.read_text(encoding="utf-8"), "html.parser")
+    meta_items = [
+        span.get_text(strip=True) for span in soup.select(".doc-meta-list__item")
+    ]
+    assert meta_items == ["Updated Jan 04, 2025"], (
+        f"a failed lookup must fall through to the response date, got {meta_items!r}"
+    )
+
+
+def test_resolve_doc_updated_at_reads_a_naive_commit_date_as_utc(
+    page_config: PageConfig,
+) -> None:
+    """A commit date without a timezone is UTC, which is what GitHub means."""
+    naive = dt.datetime(2025, 10, 9, 9, 0)  # noqa: DTZ001 -- naive is the input under test
+    latest = SimpleNamespace(
+        commit=SimpleNamespace(
+            author=SimpleNamespace(date=naive),
+            committer=SimpleNamespace(date=None),
+        )
+    )
+    repository = SimpleNamespace(commits=lambda **_: iter([latest]))
+    client = SimpleNamespace(repository=lambda *_: repository)
+
+    resolved = resolve_doc_updated_at(page_config, client=typ.cast("GitHub", client))
+
+    assert resolved == naive.replace(tzinfo=dt.UTC), (
+        f"a naive commit date must be read as UTC, got {resolved!r}"
+    )
+
+
+def test_resolve_doc_updated_at_reports_no_date_for_a_malformed_slug(
+    page_config: PageConfig,
+) -> None:
+    """A slug that names no repository is a page with no date, not a lookup."""
+    page = dc.replace(page_config, repo="not-a-slug")
+
+    resolved = resolve_doc_updated_at(
+        page, client=typ.cast("GitHub", SimpleNamespace())
+    )
+
+    assert resolved is None, (
+        "a malformed slug must yield no date without querying GitHub"
     )
 
 

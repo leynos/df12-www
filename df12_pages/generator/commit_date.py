@@ -6,9 +6,12 @@ of the latest commit touching the document, or the fetched response's own
 ``Last-Modified`` header. This module owns the first two; the third is read
 while fetching, in :mod:`df12_pages.generator.document_fetch`.
 
-Every lookup here is best effort. A malformed repository slug, a GitHub error
-and an unparseable timestamp all yield ``None``, so failing to decorate a page
-with a date can never stop it rendering.
+The lookup is a query with a value result, not a best-effort command. A page
+with no repository, a malformed slug and an unparseable timestamp yield
+``None``; a GitHub error is raised, so the caller knows the difference between
+"there is no date" and "the date could not be read". The caller that reaches
+the network owns the policy that a failed lookup must not stop a page
+rendering, and logs it where the page key is known.
 """
 
 from __future__ import annotations
@@ -16,78 +19,89 @@ from __future__ import annotations
 import datetime as dt
 import typing as typ
 
-from github3 import GitHub
-from github3 import exceptions as gh_exc
-
 if typ.TYPE_CHECKING:
+    from github3 import GitHub
+
     from df12_pages.config import PageConfig
 
 
 def resolve_doc_updated_at(
     page: PageConfig,
     *,
-    token: str | None = None,
-    client: GitHub | None = None,
+    client: GitHub,
 ) -> dt.datetime | None:
     """Return the date to show for ``page``'s document, or ``None``.
 
     The configured release date wins. Otherwise the latest commit touching
-    ``doc_path`` is read from GitHub. A malformed repository slug, an API error
-    and an unparseable timestamp all yield ``None``, so a failure to decorate
-    the page cannot stop it rendering.
+    ``doc_path`` is read through ``client``. A page without a repository, a
+    malformed slug and an unparseable timestamp all yield ``None``.
 
     Parameters
     ----------
     page : PageConfig
         Page whose release and repository details are consulted.
-    token : str, optional
-        GitHub token for the lookup. The caller reads it from the environment,
-        so this module never depends on ambient credentials.
-    client : github3.GitHub, optional
-        Client to query through; a fresh unauthenticated-or-token client is
-        created when omitted.
+    client : github3.GitHub
+        Client to query through. The caller constructs it at the command
+        boundary, so this module never reaches for ambient credentials.
+
+    Returns
+    -------
+    datetime or None
+        The date to display, or ``None`` when the page has no date to show.
+
+    Raises
+    ------
+    github3.exceptions.GitHubException
+        If GitHub cannot answer the lookup. Whether that is fatal is the
+        caller's decision; this query reports it rather than hiding it.
     """
     if page.latest_release_published_at:
         return page.latest_release_published_at
-    return _fetch_doc_commit_date(page, client=client, token=token)
+    return _fetch_doc_commit_date(page, client=client)
 
 
-def _fetch_doc_commit_date(
-    page: PageConfig, *, client: GitHub | None = None, token: str | None = None
-) -> dt.datetime | None:
+def _fetch_doc_commit_date(page: PageConfig, *, client: GitHub) -> dt.datetime | None:
     """Return the latest commit timestamp for the page repository or None."""
-    result: dt.datetime | None = None
-    repo_slug = page.repo
-    if repo_slug:
-        try:
-            owner, name = repo_slug.split("/", 1)
-        except ValueError:
-            owner = name = None
+    owner, name = _repository_parts(page.repo)
+    if owner is None or name is None:
+        return None
+    latest_commit = _latest_commit(
+        client,
+        owner,
+        name,
+        path=page.doc_path.lstrip("/"),
+        branch=page.branch or "main",
+    )
+    if latest_commit is None:
+        return None
+    return _extract_commit_timestamp(latest_commit)
 
-        if owner and name:
-            branch = page.branch or "main"
-            doc_path = page.doc_path.lstrip("/")
-            github = client or GitHub(token=token)
-            try:
-                repository = github.repository(owner, name)
-            except gh_exc.GitHubException:
-                repository = None
 
-            if repository is not None:
-                try:
-                    commits = repository.commits(path=doc_path, sha=branch)
-                except gh_exc.GitHubException:
-                    commits = None
+def _repository_parts(slug: str | None) -> tuple[str | None, str | None]:
+    """Split an ``owner/name`` slug, returning two ``None``s when malformed."""
+    if not slug:
+        return None, None
+    owner, _, name = slug.partition("/")
+    if not owner or not name:
+        return None, None
+    return owner, name
 
-                if commits is not None:
-                    try:
-                        latest_commit = next(iter(commits), None)
-                    except gh_exc.GitHubException:
-                        latest_commit = None
-                    if latest_commit:
-                        result = _extract_commit_timestamp(latest_commit)
 
-    return result
+def _latest_commit(
+    client: GitHub, owner: str, name: str, *, path: str, branch: str
+) -> object | None:
+    """Return the newest commit touching ``path`` on ``branch``, if any.
+
+    The repository lookup, the commit listing and the first item of that
+    listing share one boundary. A GitHub error in any of them escapes as a
+    single failure, which the caller can report once instead of reconciling
+    three separately swallowed ones.
+    """
+    repository = client.repository(owner, name)
+    if repository is None:
+        return None
+    commits = repository.commits(path=path, sha=branch)
+    return next(iter(commits), None)
 
 
 def _extract_commit_timestamp(commit: object) -> dt.datetime | None:

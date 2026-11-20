@@ -46,6 +46,9 @@ import re
 import typing as typ
 from pathlib import Path
 
+from github3 import GitHub
+from github3 import exceptions as gh_exc
+
 from df12_pages._constants import PAGE_META_TEMPLATE
 from df12_pages.config import PageConfig, SectionLayout
 from df12_pages.docs_index import ManifestDescriptionResolver
@@ -78,7 +81,6 @@ if typ.TYPE_CHECKING:
     import collections.abc as cabc
     import datetime as dt
 
-    from github3 import GitHub
     from minijinja import Environment
 
 _log = logging.getLogger(__name__)
@@ -296,9 +298,11 @@ class PageContentGenerator:
 
         This is the command that reaches the network and the clock: it fetches
         the document, selects the build timestamp and, when no release date is
-        configured, asks GitHub for the latest commit date. It then hands the
-        markdown to :meth:`prepare_document` and the prepared result to
-        :meth:`render_document`.
+        configured, asks GitHub for the latest commit date. A failed commit
+        date lookup is logged with the page key and the page renders without
+        that date, since decoration must never stop a page being published. It
+        then hands the markdown to :meth:`prepare_document` and the prepared
+        result to :meth:`render_document`.
 
         Returns
         -------
@@ -313,10 +317,12 @@ class PageContentGenerator:
         RuntimeError
             If the upstream document has no second-level sections.
         """
-        updated_at = self.doc_updated_at or resolve_doc_updated_at(
-            self.page, token=self._github_token, client=self._github_client
-        )
+        updated_at = self.doc_updated_at or self._resolve_commit_date()
         fetched = self._fetcher(self.source, updated_at=updated_at)
+        # A release-pinned fetch that falls back to the branch answered from a
+        # different tree, so the document's relative links follow the ref that
+        # answered rather than the configured pin.
+        self.renderer.retarget_links(fetched.ref)
         prepared = self.prepare_document(fetched.text)
         return self.render_document(
             prepared,

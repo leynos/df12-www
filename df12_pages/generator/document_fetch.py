@@ -16,6 +16,7 @@ from __future__ import annotations
 import dataclasses as dc
 import datetime as dt
 import email.utils
+import logging
 import typing as typ
 
 import requests
@@ -24,6 +25,8 @@ from urllib3.util.retry import Retry
 
 if typ.TYPE_CHECKING:
     from df12_pages.config import PageConfig
+
+_log = logging.getLogger(__name__)
 
 #: Seconds to wait for one markdown response before the fetch fails.
 FETCH_TIMEOUT_SECONDS = 30
@@ -231,6 +234,9 @@ def fetch_document(
     ``Last-Modified`` date takes its place, so the page still shows when the
     document it displays last changed.
 
+    The fallback is logged at INFO with the release tag and branch name, which
+    say which tree answered without putting either URL in the build log.
+
     Parameters
     ----------
     source : DocumentSource
@@ -265,6 +271,12 @@ def fetch_document(
                 last_attempt = index == len(attempts) - 1
                 if last_attempt or _http_status(error) != requests.codes.not_found:
                     raise
+                _log.info(
+                    "release %s does not contain the document at its pinned "
+                    "path; falling back to branch %s",
+                    source.version,
+                    source.branch,
+                )
                 continue
             known_date = updated_at if index == 0 else None
             return FetchedMarkdown(

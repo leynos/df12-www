@@ -751,6 +751,7 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     page_config: PageConfig,
     sample_markdown: str,
     monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     """A 404 on the release-pinned guide URL falls back to the branch source."""
     release_config = dc.replace(
@@ -799,7 +800,20 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
     )
 
     generator = PageContentGenerator(release_config)
-    written = generator.run()
+    with caplog.at_level(logging.INFO, logger="df12_pages.generator.document_fetch"):
+        written = generator.run()
+
+    fallback_logs = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "df12_pages.generator.document_fetch"
+    ]
+    assert any("v9.9.9" in message for message in fallback_logs), (
+        f"the release-to-branch fallback must be logged, got {fallback_logs!r}"
+    )
+    assert all(url not in message for message in fallback_logs for url in calls), (
+        f"the fallback log must not name either URL, got {fallback_logs!r}"
+    )
 
     expected_fetches = 2
     assert len(calls) == expected_fetches, (

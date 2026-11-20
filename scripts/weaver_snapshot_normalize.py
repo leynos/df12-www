@@ -56,6 +56,8 @@ _ALIGNMENT_PROPERTIES = frozenset(
         "justify-self",
     }
 )
+# The modifiers that may qualify an alignment keyword, as in `safe center`.
+_ALIGNMENT_MODIFIERS = frozenset({"safe", "unsafe"})
 
 
 def _drop_invisible_border_colours(style: Style) -> None:
@@ -194,6 +196,10 @@ def _canonical_style(style_diff: Style | None) -> Style:
 def _canonical_alignment(style: Style) -> None:
     """Spell a renamed alignment keyword the way older Chromium did.
 
+    A keyword may carry a ``safe`` or ``unsafe`` modifier, which the alias
+    keeps while renaming the keyword it qualifies. A value with any other
+    modifier is left exactly as the browser spelled it.
+
     Parameters
     ----------
     style
@@ -202,7 +208,17 @@ def _canonical_alignment(style: Style) -> None:
     for key in _ALIGNMENT_PROPERTIES & style.keys():
         value = style[key]
         if isinstance(value, str):
-            style[key] = _ALIGNMENT_ALIASES.get(value, value)
+            style[key] = _canonical_alignment_value(value)
+
+
+def _canonical_alignment_value(value: str) -> str:
+    """Rename an alignment keyword, preserving a ``safe``/``unsafe`` modifier."""
+    modifier, _, keyword = value.partition(" ")
+    if keyword and modifier in _ALIGNMENT_MODIFIERS:
+        return f"{modifier} {_ALIGNMENT_ALIASES.get(keyword, keyword)}"
+    if not keyword:
+        return _ALIGNMENT_ALIASES.get(modifier, modifier)
+    return value
 
 
 def _is_animated(style: Style) -> bool:

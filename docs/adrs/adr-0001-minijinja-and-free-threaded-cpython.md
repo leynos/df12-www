@@ -91,11 +91,13 @@ bundles through a thread pool that defaults to eight workers.
 On one interpreter, CPython 3.15.2t with the GIL disabled, eight workers cut
 all-sites page generation from 8.70 s to 5.63 s, a 35.3% reduction. The
 eight-worker run is also 25.8% faster than the committed serial generator,
-which took 7.58 s on CPython 3.13.11, but that comparison spans both changes
-and the interpreter change did not pay for itself on its own: the same serial
-sweep took 8.70 s on 3.15.2t. The complete warm build fell from 22.56 s to
-20.50 s, and the engine change alone cut all-sites page generation from 33.56 s
-to 7.23 s.
+which took 7.58 s on CPython 3.13.11, but that comparison spans two changes at
+once -- the runtime and the worker pool -- and the benchmark does not separate
+their shares. The serial sweep on the same 3.15.2t interpreter took 8.70 s, so
+the pool's own contribution is the 35.3% measured above, while the 25.8% is
+reported as the combined measurement it is. The complete warm build fell from
+22.56 s to 20.50 s, and the engine change alone cut all-sites page generation
+from 33.56 s to 7.23 s.
 
 ## Known risks and limitations
 

@@ -141,8 +141,11 @@ is the mean of three all-sites page-generation runs.
 Eight workers with the GIL disabled cut page-generation time by 35.3% against
 the one-worker run on the same interpreter, from 8.70 s to 5.63 s. Against the
 committed serial generator at 7.58 s the same run is 25.8% faster, but that
-comparison spans the interpreter change as well; switching interpreters alone
-made the serial run slower, from 7.58 s to 8.70 s. For the complete warm
+comparison spans two changes at once: the 7.58 s run used CPython 3.13.11, and
+the eight-worker run uses 3.15.2t with the worker pool and its own locked
+dependencies. The table records those measurements; it does not separate the
+interpreter's share of the difference from the worker pool's. The 35.3% figure
+above is the one taken on a single interpreter. For the complete warm
 `bun run build`, which also compiles CSS and scripts, processes assets, and
 indexes search, the mean fell from 22.56 s to 20.50 s (9.1%) over three
 measured builds per version.

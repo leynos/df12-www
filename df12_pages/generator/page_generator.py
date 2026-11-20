@@ -528,13 +528,12 @@ class PageContentGenerator:
         resolved_layout = layout.device
 
         if layout.device == "numbered_steps":
-            subsection_anchors = {b["title"]: b["anchor"] for b in subsections}
             numbered_steps = prepare_numbered_steps(
                 self.renderer,
                 section,
                 layout,
                 figures=figures,
-                subsection_anchors=subsection_anchors,
+                subsection_anchors=[block["anchor"] for block in subsections],
             )
             if not numbered_steps:
                 resolved_layout = "default"

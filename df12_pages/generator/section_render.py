@@ -26,7 +26,7 @@ def prepare_numbered_steps(
     layout: SectionLayout,
     *,
     figures: cabc.Mapping[str, str],
-    subsection_anchors: dict[str, str] | None = None,
+    subsection_anchors: cabc.Sequence[str] | None = None,
 ) -> list[NumberedStep]:
     """Return numbered step data for ``section`` based on the provided layout.
 
@@ -40,38 +40,45 @@ def prepare_numbered_steps(
         Layout configuration that may specify a custom step ordering.
     figures : Mapping[str, str]
         Compiled Mermaid figures for the document, by placeholder token.
-    subsection_anchors : dict[str, str] or None, optional
-        Mapping of subsection title to content-based anchor string, as
-        produced by :meth:`PageContentGenerator._build_subsection_blocks`. When
-        provided, each step's ``content_anchor`` is set to the corresponding
-        value so that nav links and in-page anchors remain consistent.
+    subsection_anchors : Sequence[str] or None, optional
+        One content-based anchor per subsection, in the section's original
+        order, as produced by
+        :meth:`PageContentGenerator._build_subsection_blocks`. An anchor
+        travels with the subsection it was built for, so reordering the
+        steps does not re-point them, and two subsections that share a title
+        keep the distinct anchors their content earned. A subsection with no
+        entry falls back to its ``{slug}-step-{n}`` anchor.
     """
-    subsections = list(section.subsections)
-    if not subsections:
+    indexed = list(enumerate(section.subsections, start=1))
+    if not indexed:
         return []
 
     if layout.step_order:
-        ordered: list[Subsection] = []
-        lower_map = {sub.title.lower(): sub for sub in subsections}
+        ordered: list[tuple[int, Subsection]] = []
+        remaining = list(indexed)
         for desired in layout.step_order:
-            match = lower_map.get(desired.lower())
-            if match and match not in ordered:
+            wanted = desired.lower()
+            match = next(
+                (item for item in remaining if item[1].title.lower() == wanted),
+                None,
+            )
+            if match is not None:
                 ordered.append(match)
-        for sub in subsections:
-            if sub not in ordered:
-                ordered.append(sub)
-        subsections = ordered
+                remaining.remove(match)
+        indexed = ordered + remaining
 
-    anchors = subsection_anchors or {}
+    anchors = list(subsection_anchors) if subsection_anchors is not None else []
     steps: list[NumberedStep] = []
-    for idx, sub in enumerate(subsections, start=1):
+    for number, (position, sub) in enumerate(indexed, start=1):
         html = renderer.markdown(sub.markdown, figures=figures)
-        step_anchor = f"{section.slug}-step-{idx}"
-        content_anchor = anchors.get(sub.title, step_anchor)
+        step_anchor = f"{section.slug}-step-{number}"
+        content_anchor = (
+            anchors[position - 1] if position <= len(anchors) else step_anchor
+        )
         steps.append(
             NumberedStep(
                 title=sub.title,
-                number=idx,
+                number=number,
                 html=html,
                 anchor=step_anchor,
                 content_anchor=content_anchor,
@@ -86,7 +93,31 @@ def prepare_split_panel(
     layout: SectionLayout,
     figures: cabc.Mapping[str, str],
 ) -> dict[str, str]:
-    """Render split-panel HTML blocks for the section based on layout hints."""
+    """Render split-panel HTML blocks for the section based on layout hints.
+
+    The block named by ``layout.emphasized_code_block`` moves into the
+    secondary panel and is removed from the primary markdown. An index
+    outside the section's blocks -- including a negative one, which Python
+    would otherwise read from the end -- falls back to the first block.
+
+    Parameters
+    ----------
+    renderer : HtmlContentRenderer
+        Renderer that converts markdown and highlights the selected block.
+    section : Section
+        The parsed section whose code blocks are split out.
+    layout : SectionLayout
+        Layout configuration naming the emphasized block.
+    figures : Mapping[str, str]
+        Compiled Mermaid figures for the document, by placeholder token.
+
+    Returns
+    -------
+    dict
+        ``primary_html`` and ``secondary_html``. The secondary panel is empty
+        when the section holds no code block, which the caller reads as a
+        reason to fall back to the default layout.
+    """
     matches = list(CODE_BLOCK_PATTERN.finditer(section.markdown))
     if not matches:
         return {
@@ -95,7 +126,7 @@ def prepare_split_panel(
         }
 
     index = layout.emphasized_code_block or 0
-    if index >= len(matches):
+    if not 0 <= index < len(matches):
         index = 0
     match = matches[index]
     lang = match.group(1) or "text"

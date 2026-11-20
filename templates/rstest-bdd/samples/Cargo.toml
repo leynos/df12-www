@@ -7,7 +7,7 @@ publish = false
 description = "Every code sample on the df12 rstest-bdd site, compiled and run against the published crates."
 
 [dev-dependencies]
-rstest = "0.26.1"
+rstest = "0.28.0"
 rstest-bdd = "0.6.0"
 rstest-bdd-macros = "0.6.0"
 rstest-bdd-harness = "0.6.0"

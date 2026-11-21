@@ -20,12 +20,13 @@ if typ.TYPE_CHECKING:
     from df12_pages.markdown_parser import Section, Subsection
 
 
-def prepare_numbered_steps(
+def prepare_numbered_steps(  # noqa: PLR0913 -- layout, figures and ref are values
     renderer: HtmlContentRenderer,
     section: Section,
     layout: SectionLayout,
     *,
     figures: cabc.Mapping[str, str],
+    link_ref: str | None = None,
     subsection_anchors: cabc.Sequence[str] | None = None,
 ) -> list[NumberedStep]:
     """Return numbered step data for ``section`` based on the provided layout.
@@ -40,6 +41,9 @@ def prepare_numbered_steps(
         Layout configuration that may specify a custom step ordering.
     figures : Mapping[str, str]
         Compiled Mermaid figures for the document, by placeholder token.
+    link_ref : str, optional
+        Git ref the document's fetch answered from, so each step's relative
+        links point into the tree it came from.
     subsection_anchors : Sequence[str] or None, optional
         One content-based anchor per subsection, in the section's original
         order, as produced by
@@ -70,7 +74,7 @@ def prepare_numbered_steps(
     anchors = list(subsection_anchors) if subsection_anchors is not None else []
     steps: list[NumberedStep] = []
     for number, (position, sub) in enumerate(indexed, start=1):
-        html = renderer.markdown(sub.markdown, figures=figures)
+        html = renderer.markdown(sub.markdown, figures=figures, link_ref=link_ref)
         step_anchor = f"{section.slug}-step-{number}"
         content_anchor = (
             anchors[position - 1] if position <= len(anchors) else step_anchor
@@ -92,6 +96,8 @@ def prepare_split_panel(
     section: Section,
     layout: SectionLayout,
     figures: cabc.Mapping[str, str],
+    *,
+    link_ref: str | None = None,
 ) -> dict[str, str]:
     """Render split-panel HTML blocks for the section based on layout hints.
 
@@ -110,6 +116,9 @@ def prepare_split_panel(
         Layout configuration naming the emphasized block.
     figures : Mapping[str, str]
         Compiled Mermaid figures for the document, by placeholder token.
+    link_ref : str, optional
+        Git ref the document's fetch answered from, so the panels' relative
+        links point into the tree it came from.
 
     Returns
     -------
@@ -121,7 +130,9 @@ def prepare_split_panel(
     matches = list(CODE_BLOCK_PATTERN.finditer(section.markdown))
     if not matches:
         return {
-            "primary_html": renderer.markdown(section.markdown, figures=figures),
+            "primary_html": renderer.markdown(
+                section.markdown, figures=figures, link_ref=link_ref
+            ),
             "secondary_html": "",
         }
 
@@ -135,7 +146,9 @@ def prepare_split_panel(
     after = section.markdown[match.end() :]
     primary_md = (before + "\n\n" + after).strip()
     return {
-        "primary_html": renderer.markdown(primary_md, figures=figures),
+        "primary_html": renderer.markdown(
+            primary_md, figures=figures, link_ref=link_ref
+        ),
         "secondary_html": renderer.code_block(code, lang),
     }
 

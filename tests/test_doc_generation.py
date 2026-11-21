@@ -109,6 +109,7 @@ from df12_pages.generator.page_generator import (
     DEFAULT_TEMPLATES_DIR,
     DocumentSource,
     FetchedMarkdown,
+    PreparedDocument,
     RenderedDocument,
     WrittenDocument,
     fetch_document,
@@ -842,6 +843,46 @@ def test_release_fetch_falls_back_to_branch_when_tag_missing_doc(
         "a link inside branch content must point into the branch that answered, "
         f"got {hrefs!r}"
     )
+
+
+def test_a_retained_release_document_keeps_its_links_after_a_fallback(
+    page_config: PageConfig,
+    tmp_path: Path,
+) -> None:
+    """A prepared release document renders with its own ref after a fallback.
+
+    Preparation captures the ref that answered each fetch. Rendering the
+    branch-fallback document first must not retarget the retained release
+    document, whose links point at the release it was fetched from.
+    """
+    page = dc.replace(page_config, output_dir=tmp_path / "out")
+    generator = PageContentGenerator(page, fetcher=_forbid_fetch)
+    body = "## Intro\n\nSee [flags](./cli.md#flags).\n"
+    release = generator.prepare_document(body, link_ref="v1.0.0")
+    fallback = generator.prepare_document(body, link_ref="main")
+
+    def render_links(prepared: PreparedDocument) -> list[str]:
+        """Render ``prepared`` and return its rewritten link targets."""
+        document = generator.render_document(
+            prepared,
+            source_url=page.source_url,
+            version_display=None,
+            page_description="Fixture description",
+            generated_at=BUILD_TIMESTAMP,
+        )
+        soup = BeautifulSoup(document.sections[0][1], "html.parser")
+        return [
+            href
+            for anchor in soup.select("a[href*='cli.md']")
+            if isinstance(href := anchor.get("href"), str)
+        ]
+
+    assert render_links(fallback) == [
+        "https://github.com/df12/testdocs/blob/main/docs/cli.md#flags"
+    ]
+    assert render_links(release) == [
+        "https://github.com/df12/testdocs/blob/v1.0.0/docs/cli.md#flags"
+    ], "a retained document must keep the ref its own fetch answered from"
 
 
 def _http_error(status_code: int) -> requests.HTTPError:

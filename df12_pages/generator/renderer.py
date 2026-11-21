@@ -47,10 +47,16 @@ class PreparedMarkdown:
     ``figures`` maps each token to the ``<figure>`` markup that replaces it
     once the document has been converted. A fence that failed to render is
     left in the markdown, so it falls through to code highlighting.
+
+    ``link_ref`` is the git ref captured at preparation time for the
+    document's relative links. Carrying it with the document keeps a retained
+    document's links pointing at the tree that answered its own fetch, even
+    after another document's fetch has been retargeted.
     """
 
     markdown: str
     figures: dict[str, str] = dc.field(default_factory=dict)
+    link_ref: str | None = None
 
 
 class MermaidRenderer:
@@ -159,44 +165,68 @@ class HtmlContentRenderer:
         """Return the CSS used for highlighted code blocks."""
         return self._formatter.get_style_defs(".codehilite")
 
-    def retarget_links(self, ref: str | None) -> None:
-        """Aim relative-link rewriting at the ref that answered the fetch.
+    def _configured_ref(self) -> str | None:
+        """Return the git ref the link extension was configured with, if any."""
+        if isinstance(self._link_extension, RelativeLinkExtension):
+            return self._link_extension.ref
+        return None
 
-        The link extension is built from configuration, which names the
-        release the page hopes to display. A fetch that falls back to the
-        branch answered from a different ref, and the links inside the
-        document then have to point into the tree it actually came from.
+    def _link_extension_for(self, link_ref: str | None) -> Extension | None:
+        """Return the link extension that rewrites links for ``link_ref``.
 
-        Parameters
-        ----------
-        ref : str or None
-            Ref the fetched document came from. ``None`` leaves the
-            configured ref alone, which is right when the source was an
-            explicit override with no ref to name.
+        The configured extension is reused when it already names the ref, and a
+        fresh extension is built for a document whose fetch answered from a
+        different one. Returning a new instance rather than mutating the shared
+        extension keeps each prepared document bound to the ref that answered
+        its own fetch.
         """
-        if ref and isinstance(self._link_extension, RelativeLinkExtension):
-            self._link_extension.ref = ref
+        extension = self._link_extension
+        if not isinstance(extension, RelativeLinkExtension):
+            return extension
+        if link_ref is None or link_ref == extension.ref:
+            return extension
+        return RelativeLinkExtension(extension.repo, link_ref, extension.base_dir)
 
-    def prepare_markdown(self, text: str) -> PreparedMarkdown:
+    def prepare_markdown(
+        self, text: str, *, link_ref: str | None = None
+    ) -> PreparedMarkdown:
         """Compile a document's Mermaid fences and rewrite them as placeholders.
 
         This is the step that may start the Mermaid CLI, so a caller that needs
         an I/O-free render runs it first and hands the result to
         :meth:`render_prepared`. A fence whose diagram fails to render is left
         in place, so it falls through to a highlighted code block.
+
+        Parameters
+        ----------
+        text : str
+            The document body as fetched.
+        link_ref : str, optional
+            Git ref the document's fetch answered from. A fetch that falls back
+            to the branch answered from a different ref than the configured
+            release pin, and the links inside the document then have to point
+            into the tree it actually came from. ``None`` keeps the configured
+            ref, which is right when the source was an explicit override with
+            no ref to name. The ref is captured into the returned document, so
+            a later retarget cannot change how this one renders.
         """
+        effective_ref = link_ref if link_ref is not None else self._configured_ref()
         normalized = self._normalize_fenced_blocks(text)
         if not normalized.strip():
-            return PreparedMarkdown("")
+            return PreparedMarkdown("", link_ref=effective_ref)
         normalized, figures = self._extract_mermaid_blocks(normalized)
-        return PreparedMarkdown(normalized, figures)
+        return PreparedMarkdown(normalized, figures, link_ref=effective_ref)
 
     def render_prepared(self, prepared: PreparedMarkdown) -> str:
         """Convert already-prepared markdown to HTML without compiling fences."""
-        return self._convert(prepared.markdown, prepared.figures)
+        return self._convert(prepared.markdown, prepared.figures, prepared.link_ref)
 
     def markdown(
-        self, text: str, *, figures: cabc.Mapping[str, str] | None = None
+        self,
+        text: str,
+        *,
+        figures: cabc.Mapping[str, str] | None = None,
+        link_ref: str | None = None,
     ) -> str:
         """Render markdown into HTML using the configured extensions.
 
@@ -204,12 +234,22 @@ class HtmlContentRenderer:
         fence whose diagram fails to render falls back to a highlighted code
         block. When ``figures`` is supplied, ``text`` is markdown already
         prepared by :meth:`prepare_markdown` and no fence is compiled here.
+
+        ``link_ref`` names the git ref relative links point into. Section
+        markdown derived from a prepared document passes the ref that document
+        captured, so every conversion of one document agrees on the tree it
+        came from.
         """
         if figures is None:
-            return self.render_prepared(self.prepare_markdown(text))
-        return self._convert(text, figures)
+            return self.render_prepared(self.prepare_markdown(text, link_ref=link_ref))
+        return self._convert(text, figures, link_ref)
 
-    def _convert(self, normalized: str, figures: cabc.Mapping[str, str]) -> str:
+    def _convert(
+        self,
+        normalized: str,
+        figures: cabc.Mapping[str, str],
+        link_ref: str | None = None,
+    ) -> str:
         """Convert prepared markdown and restore its Mermaid figures."""
         if not normalized.strip():
             return ""
@@ -228,8 +268,9 @@ class HtmlContentRenderer:
             TableExtension(),
             SaneListExtension(),
         ]
-        if self._link_extension:
-            extensions.append(self._link_extension)
+        link_extension = self._link_extension_for(link_ref)
+        if link_extension:
+            extensions.append(link_extension)
         md = Markdown(extensions=extensions)
         html = md.convert(normalized)
         html = self._annotate_codehilite(html, normalized)

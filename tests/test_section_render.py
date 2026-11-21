@@ -31,10 +31,20 @@ if typ.TYPE_CHECKING:
 class _StubRenderer(HtmlContentRenderer):
     """A renderer whose output names the markdown it was handed."""
 
+    def __init__(self) -> None:
+        """Bind a renderer that records the ref each conversion was given."""
+        super().__init__()
+        self.seen_refs: list[str | None] = []
+
     def markdown(
-        self, text: str, *, figures: cabc.Mapping[str, str] | None = None
+        self,
+        text: str,
+        *,
+        figures: cabc.Mapping[str, str] | None = None,
+        link_ref: str | None = None,
     ) -> str:
         """Wrap the markdown in a paragraph, as a conversion would."""
+        self.seen_refs.append(link_ref)
         if figures is not None:
             for token, figure in figures.items():
                 text = text.replace(token, figure)
@@ -294,4 +304,41 @@ def test_the_primary_panel_carries_the_section_s_compiled_figure() -> None:
     )
     assert 'data-language="rust"' in panel["secondary_html"], (
         "the code block still moves out of the primary panel"
+    )
+
+
+def test_numbered_steps_forward_the_document_ref_to_every_conversion() -> None:
+    """Each step's markdown converts against the ref the document captured."""
+    subsections = [Subsection("Alpha", "a"), Subsection("Beta", "b")]
+    renderer = _StubRenderer()
+
+    prepare_numbered_steps(
+        renderer,
+        _section(subsections=subsections),
+        SectionLayout(device="numbered_steps"),
+        figures={},
+        link_ref="v1.0.0",
+    )
+
+    assert renderer.seen_refs == ["v1.0.0", "v1.0.0"], (
+        f"every step must convert against the document ref, got {renderer.seen_refs!r}"
+    )
+
+
+def test_split_panels_forward_the_document_ref_to_every_conversion() -> None:
+    """Both panels convert against the ref the document captured."""
+    renderer = _StubRenderer()
+    markdown = "Prose.\n\n```rust\nlet x = 1;\n```"
+
+    prepare_split_panel(
+        renderer,
+        _section(markdown=markdown),
+        SectionLayout(device="split_panel"),
+        {},
+        link_ref="main",
+    )
+
+    assert renderer.seen_refs == ["main"], (
+        f"the primary panel must convert against the document ref, "
+        f"got {renderer.seen_refs!r}"
     )

@@ -320,10 +320,9 @@ class PageContentGenerator:
         updated_at = self.doc_updated_at or self._resolve_commit_date()
         fetched = self._fetcher(self.source, updated_at=updated_at)
         # A release-pinned fetch that falls back to the branch answered from a
-        # different tree, so the document's relative links follow the ref that
+        # different tree, so the prepared document captures the ref that
         # answered rather than the configured pin.
-        self.renderer.retarget_links(fetched.ref)
-        prepared = self.prepare_document(fetched.text)
+        prepared = self.prepare_document(fetched.text, link_ref=fetched.ref)
         return self.render_document(
             prepared,
             source_url=fetched.source_url,
@@ -356,7 +355,9 @@ class PageContentGenerator:
             )
             return None
 
-    def prepare_document(self, markdown: str) -> PreparedDocument:
+    def prepare_document(
+        self, markdown: str, *, link_ref: str | None = None
+    ) -> PreparedDocument:
         """Do the document's side-effecting work ahead of rendering.
 
         This is a command, not a query. It registers every template in
@@ -368,6 +369,10 @@ class PageContentGenerator:
         ----------
         markdown : str
             The document body as fetched.
+        link_ref : str, optional
+            Git ref the fetch answered from. It is captured into the prepared
+            markdown, so a document prepared from a release keeps release
+            links even after another document's fetch falls back to a branch.
 
         Returns
         -------
@@ -381,7 +386,7 @@ class PageContentGenerator:
             If a template file cannot be read.
         """
         self._register_templates()
-        content = self.renderer.prepare_markdown(markdown)
+        content = self.renderer.prepare_markdown(markdown, link_ref=link_ref)
         return PreparedDocument(
             sections=parse_sections(content.markdown),
             template=self.env,
@@ -459,7 +464,7 @@ class PageContentGenerator:
         for section in sections:
             layout = self._resolve_layout(section.slug)
             section_model = self._build_section_model(
-                section, layout, prepared.markdown.figures
+                section, layout, prepared.markdown.figures, prepared.markdown.link_ref
             )
             html_title = self._format_page_title(section)
             section_bundle.append((section, section_model, html_title))
@@ -539,13 +544,18 @@ class PageContentGenerator:
         section: Section,
         layout: SectionLayout,
         figures: cabc.Mapping[str, str],
+        link_ref: str | None = None,
     ) -> SectionModel:
         """Construct a SectionModel with rendered HTML and layout metadata."""
-        intro_html = self.renderer.markdown(section.intro_markdown, figures=figures)
-        default_html = self.renderer.markdown(section.markdown, figures=figures)
+        intro_html = self.renderer.markdown(
+            section.intro_markdown, figures=figures, link_ref=link_ref
+        )
+        default_html = self.renderer.markdown(
+            section.markdown, figures=figures, link_ref=link_ref
+        )
         numbered_steps: list[NumberedStep] = []
         split_panel = {"primary_html": "", "secondary_html": ""}
-        subsections = self._build_subsection_blocks(section, figures)
+        subsections = self._build_subsection_blocks(section, figures, link_ref)
         toc_items = [
             {"label": block["title"], "anchor": block["anchor"]}
             for block in subsections
@@ -558,6 +568,7 @@ class PageContentGenerator:
                 section,
                 layout,
                 figures=figures,
+                link_ref=link_ref,
                 subsection_anchors=[block["anchor"] for block in subsections],
             )
             if not numbered_steps:
@@ -568,7 +579,9 @@ class PageContentGenerator:
                     for step in numbered_steps
                 ]
         elif layout.device == "split_panel":
-            split_panel = prepare_split_panel(self.renderer, section, layout, figures)
+            split_panel = prepare_split_panel(
+                self.renderer, section, layout, figures, link_ref=link_ref
+            )
             if not split_panel.get("secondary_html"):
                 resolved_layout = "default"
 
@@ -593,7 +606,10 @@ class PageContentGenerator:
         return f"{site_name} — {section.short_title} | {suffix}"
 
     def _build_subsection_blocks(
-        self, section: Section, figures: cabc.Mapping[str, str]
+        self,
+        section: Section,
+        figures: cabc.Mapping[str, str],
+        link_ref: str | None = None,
     ) -> list[dict[str, str]]:
         """Return rendered subsection blocks with unique anchors for ``section``."""
         if not section.subsections:
@@ -603,7 +619,9 @@ class PageContentGenerator:
         used: set[str] = set()
         for idx, sub in enumerate(section.subsections, start=1):
             anchor = self._section_anchor(section.slug, sub.title, idx, used)
-            html = self.renderer.markdown(sub.markdown, figures=figures)
+            html = self.renderer.markdown(
+                sub.markdown, figures=figures, link_ref=link_ref
+            )
             blocks.append({"title": sub.title, "anchor": anchor, "html": html})
         return blocks
 

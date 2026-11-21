@@ -52,7 +52,10 @@ from github3 import exceptions as gh_exc
 from df12_pages._constants import PAGE_META_TEMPLATE
 from df12_pages.config import PageConfig, SectionLayout
 from df12_pages.docs_index import ManifestDescriptionResolver
-from df12_pages.generator.commit_date import resolve_doc_updated_at
+from df12_pages.generator.commit_date import (
+    fetch_latest_doc_commit,
+    resolve_doc_updated_at,
+)
 from df12_pages.generator.document_fetch import (
     FETCH_TIMEOUT_SECONDS,
     DocumentFetcher,
@@ -340,20 +343,22 @@ class PageContentGenerator:
         """Ask GitHub for the document's latest commit date, best effort.
 
         The client is built here, at the command boundary that reaches the
-        network, rather than inside the query. A failed lookup is logged with
-        the page key and reported as no date, so a page still publishes when
-        its date cannot be read.
+        network, and the commit it fetches is offered to the pure date query.
+        This helper is reached only when no release or caller-supplied date is
+        already known. A failed lookup is logged with the page key and reported
+        as no date, so a page still publishes when its date cannot be read.
         """
         client = self._github_client or GitHub(token=self._github_token)
+        commit = None
         try:
-            return resolve_doc_updated_at(self.page, client=client)
+            commit = fetch_latest_doc_commit(self.page, client=client)
         except gh_exc.GitHubException as error:
             _log.warning(
                 "could not resolve the commit date for page %s: %s",
                 self.page.key,
                 error,
             )
-            return None
+        return resolve_doc_updated_at(self.page, commit=commit)
 
     def prepare_document(
         self, markdown: str, *, link_ref: str | None = None
@@ -672,6 +677,7 @@ __all__ = [
     "RenderedDocument",
     "WrittenDocument",
     "fetch_document",
+    "fetch_latest_doc_commit",
     "fetch_markdown",
     "publish_document",
     "resolve_doc_updated_at",

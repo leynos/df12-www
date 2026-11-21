@@ -1,4 +1,4 @@
-"""Resolve the date to display for a documentation page.
+"""Select the date to display for a documentation page.
 
 A page's date comes from one of three places, in order of preference: the
 release's publication date recorded in the site configuration, the timestamp
@@ -6,12 +6,19 @@ of the latest commit touching the document, or the fetched response's own
 ``Last-Modified`` header. This module owns the first two; the third is read
 while fetching, in :mod:`df12_pages.generator.document_fetch`.
 
-The lookup is a query with a value result, not a best-effort command. A page
-with no repository, a malformed slug and an unparseable timestamp yield
-``None``; a GitHub error is raised, so the caller knows the difference between
-"there is no date" and "the date could not be read". The caller that reaches
-the network owns the policy that a failed lookup must not stop a page
-rendering, and logs it where the page key is known.
+Selecting the date is a query and fetching the commit that supplies one is a
+command. :func:`resolve_doc_updated_at` reads only its arguments: the page
+configuration and a commit payload the caller has already fetched, or
+``None`` when there is none. :func:`fetch_latest_doc_commit` is the command
+that reaches GitHub for that payload. Keeping them apart lets the selection
+be exercised without a client, and makes the only code that talks to GitHub
+name the network call.
+
+A page with no repository, a malformed slug and an unparseable timestamp yield
+``None``; a GitHub error is raised by the command, so the caller knows the
+difference between "there is no date" and "the date could not be read". The
+caller that reaches the network owns the policy that a failed lookup must not
+stop a page rendering, and logs it where the page key is known.
 """
 
 from __future__ import annotations
@@ -28,53 +35,72 @@ if typ.TYPE_CHECKING:
 def resolve_doc_updated_at(
     page: PageConfig,
     *,
-    client: GitHub,
+    commit: object | None,
 ) -> dt.datetime | None:
-    """Return the date to show for ``page``'s document, or ``None``.
+    """Select the date to show for ``page``'s document, or ``None``.
 
-    The configured release date wins. Otherwise the latest commit touching
-    ``doc_path`` is read through ``client``. A page without a repository, a
-    malformed slug and an unparseable timestamp all yield ``None``.
+    This is a query. It reads the page configuration and the commit payload
+    it is given, and returns a value without reaching GitHub or any other
+    service. The configured release date wins over the commit date, and an
+    unparseable commit timestamp yields ``None``.
 
     Parameters
     ----------
     page : PageConfig
-        Page whose release and repository details are consulted.
-    client : github3.GitHub
-        Client to query through. The caller constructs it at the command
-        boundary, so this module never reaches for ambient credentials.
+        Page whose configured release date is preferred.
+    commit : object or None
+        Latest commit touching the document, as returned by
+        :func:`fetch_latest_doc_commit`, or ``None`` when there is none.
 
     Returns
     -------
     datetime or None
-        The date to display, or ``None`` when the page has no date to show.
+        The configured release date when there is one, otherwise the
+        commit's author, then committer, timestamp normalized to UTC.
+    """
+    if page.latest_release_published_at:
+        return page.latest_release_published_at
+    if commit is None:
+        return None
+    return _extract_commit_timestamp(commit)
+
+
+def fetch_latest_doc_commit(page: PageConfig, *, client: GitHub) -> object | None:
+    """Fetch the newest commit touching ``page``'s document, or ``None``.
+
+    This is the command that reaches GitHub; the caller builds ``client`` at
+    its own boundary and decides how to report a failure. A page whose
+    repository slug is missing or malformed yields ``None`` without a request.
+
+    Parameters
+    ----------
+    page : PageConfig
+        Page whose repository, document path and branch are read.
+    client : github3.GitHub
+        Client to query through.
+
+    Returns
+    -------
+    object or None
+        The latest commit object, or ``None`` when the page names no readable
+        repository or the repository has no commits for the document path.
 
     Raises
     ------
     github3.exceptions.GitHubException
         If GitHub cannot answer the lookup. Whether that is fatal is the
-        caller's decision; this query reports it rather than hiding it.
+        caller's decision; this command reports it rather than hiding it.
     """
-    if page.latest_release_published_at:
-        return page.latest_release_published_at
-    return _fetch_doc_commit_date(page, client=client)
-
-
-def _fetch_doc_commit_date(page: PageConfig, *, client: GitHub) -> dt.datetime | None:
-    """Return the latest commit timestamp for the page repository or None."""
     owner, name = _repository_parts(page.repo)
     if owner is None or name is None:
         return None
-    latest_commit = _latest_commit(
+    return _latest_commit(
         client,
         owner,
         name,
         path=page.doc_path.lstrip("/"),
         branch=page.branch or "main",
     )
-    if latest_commit is None:
-        return None
-    return _extract_commit_timestamp(latest_commit)
 
 
 def _repository_parts(slug: str | None) -> tuple[str | None, str | None]:
@@ -168,4 +194,4 @@ def _normalize_commit_date(value: object) -> dt.datetime | None:
     return result
 
 
-__all__ = ["resolve_doc_updated_at"]
+__all__ = ["fetch_latest_doc_commit", "resolve_doc_updated_at"]

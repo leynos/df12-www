@@ -2629,17 +2629,22 @@ holds: `PageContentGenerator` takes one as `fetcher`, defaulting to
 
 #### The document date and the section model
 
-`resolve_doc_updated_at(page, *, client)` in
-`df12_pages/generator/commit_date.py` is the date query. It returns the
-configured release date when the page has one and otherwise the timestamp of
-the latest commit touching `doc_path` on the page's branch, normalized to UTC.
-A page with no repository, a malformed slug or an unparsable timestamp yields
-`None`; a GitHub failure is raised rather than swallowed, so the module
-distinguishes "there is no date" from "the date could not be read".
+`df12_pages/generator/commit_date.py` splits the date into a query and a
+command. `resolve_doc_updated_at(page, *, commit)` is the query: it returns the
+configured release date when the page has one, otherwise the timestamp of the
+commit payload it is given, normalized to UTC, and `None` when it is given no
+commit or the timestamp cannot be parsed. It reads only its arguments, so it
+never reaches GitHub. `fetch_latest_doc_commit(page, *, client)` is the
+command: it reads the latest commit touching `doc_path` on the page's branch
+through the client, and returns `None` without a request when the page's
+repository slug is missing or malformed. A GitHub failure is raised rather than
+swallowed, so the caller distinguishes "there is no date" from "the date could
+not be read".
 
-That places it in the fetch step. `render()` resolves it through
-`_resolve_commit_date()` when no date is already known; that helper builds the
-`github3` client at that boundary unless one was injected, and catches
+That places the command in the fetch step. `render()` resolves the date through
+`_resolve_commit_date()` only when no release or caller-supplied date is
+already known; that helper builds the `github3` client at that boundary unless
+one was injected, asks `fetch_latest_doc_commit()` for the commit, and catches
 `github3.exceptions.GitHubException`. A failed lookup is logged as a warning
 naming the page key, and the page still renders: its date then comes from the
 fetch's `Last-Modified` header, or from the build timestamp when that is absent.

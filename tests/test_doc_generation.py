@@ -113,6 +113,7 @@ from df12_pages.generator.page_generator import (
     RenderedDocument,
     WrittenDocument,
     fetch_document,
+    fetch_latest_doc_commit,
     publish_document,
     resolve_doc_updated_at,
     resolve_document_source,
@@ -531,29 +532,37 @@ def test_resolve_doc_updated_at_reads_a_naive_commit_date_as_utc(
             committer=SimpleNamespace(date=None),
         )
     )
-    repository = SimpleNamespace(commits=lambda **_: iter([latest]))
-    client = SimpleNamespace(repository=lambda *_: repository)
 
-    resolved = resolve_doc_updated_at(page_config, client=typ.cast("GitHub", client))
+    resolved = resolve_doc_updated_at(page_config, commit=latest)
 
     assert resolved == naive.replace(tzinfo=dt.UTC), (
         f"a naive commit date must be read as UTC, got {resolved!r}"
     )
 
 
-def test_resolve_doc_updated_at_reports_no_date_for_a_malformed_slug(
+def test_resolve_doc_updated_at_prefers_the_release_without_a_commit(
     page_config: PageConfig,
+) -> None:
+    """The query reads only its arguments, so a release date needs no commit."""
+    release = dt.datetime(2025, 1, 2, tzinfo=dt.UTC)
+    page = dc.replace(page_config, latest_release_published_at=release)
+
+    assert resolve_doc_updated_at(page, commit=None) == release, (
+        "the configured release date must answer without a commit payload"
+    )
+
+
+def test_fetch_latest_doc_commit_rejects_a_malformed_slug_without_a_lookup(
+    page_config: PageConfig, mocker: MockerFixture
 ) -> None:
     """A slug that names no repository is a page with no date, not a lookup."""
     page = dc.replace(page_config, repo="not-a-slug")
+    client = mocker.Mock()
 
-    resolved = resolve_doc_updated_at(
-        page, client=typ.cast("GitHub", SimpleNamespace())
-    )
+    resolved = fetch_latest_doc_commit(page, client=typ.cast("GitHub", client))
 
-    assert resolved is None, (
-        "a malformed slug must yield no date without querying GitHub"
-    )
+    assert resolved is None, "a malformed slug must yield no commit"
+    client.repository.assert_not_called()
 
 
 def test_indented_fenced_block_renders_codehilite(

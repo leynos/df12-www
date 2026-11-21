@@ -2558,9 +2558,10 @@ A documentation bundle used to be fetched, rendered and written in one step.
 page contains is a query over values:
 
 - `PageContentGenerator.render()` is the command that reaches the outside
-  world. It fetches the upstream Markdown, asks GitHub for the latest commit
-  date when no release date is configured, and selects the build timestamp. It
-  hands the result to the two steps below.
+  world. It fetches the upstream Markdown through the injected `DocumentFetcher`
+  (`fetch_document` unless the constructor was given another), asks GitHub for
+  the latest commit date when no release date is configured, and selects the
+  build timestamp. It hands the result to the two steps below.
 - `PageContentGenerator.prepare_document(markdown)` does the remaining
   side-effecting work: it registers the template directory with the environment
   and compiles the document's Mermaid fences to SVG figures through
@@ -2582,6 +2583,111 @@ page contains is a query over values:
 
 `PageContentGenerator.run()` remains the convenience entry point; it is
 `publish_document(self.render())` for a single bundle.
+
+#### Fetching a document
+
+`df12_pages/generator/document_fetch.py` owns the network call.
+`resolve_document_source(page, override=None)` turns a `PageConfig` into a
+`DocumentSource`: the configured `source_url` and branch, plus the release tag
+and a raw URL pinned to that tag when the page names a repository and a latest
+release. An explicit source override replaces the pin and yields that URL alone.
+`PageContentGenerator` resolves it once in its constructor, passing the
+`source_url` override it was given.
+
+`DocumentSource.attempts()` orders the candidates: the release-pinned URL
+first, the configured branch source second, and only when the two differ. The
+branch attempt carries no version, so a document added after the release was
+cut cannot claim to belong to it.
+
+`fetch_document(source, *, updated_at=None, session=None)` returns a
+`FetchedMarkdown` for the first candidate that answers. Only a 404 on a
+non-final candidate earns the fallback; any other HTTP error, a transport
+failure, or a 404 on the branch source itself is raised, so a missing document
+is never published as a blank page.
+
+The result carries the provenance that answered: `source_url` is the URL that
+returned the body, `version` is the release tag or `None` for the branch, and
+`ref` is the tag when the pinned attempt answered and the branch otherwise.
+`updated_at` is the caller's known date only when it supplied one and the
+release-pinned attempt answered; otherwise the response's `Last-Modified` date
+stands in. A branch fallback drops the release date along with the pin, since
+neither the document nor its date may be attributed to a release that does not
+contain it.
+
+The fallback is logged at `INFO` with the release tag and the branch name
+rather than either URL, which says which tree answered without putting a fetch
+target in the build log.
+
+A caller-supplied `session` is used as given and left open; when none is passed,
+`fetch_document()` builds a session that retries transient failures with
+backoff and closes it before returning. `DocumentFetcher`, a protocol for
+`(source, *, updated_at=None) -> FetchedMarkdown`, is the seam the generator
+holds: `PageContentGenerator` takes one as `fetcher`, defaulting to
+`fetch_document`, so a test can supply a fetcher that never opens a socket.
+
+#### The document date and the section model
+
+`resolve_doc_updated_at(page, *, client)` in
+`df12_pages/generator/commit_date.py` is the date query. It returns the
+configured release date when the page has one and otherwise the timestamp of
+the latest commit touching `doc_path` on the page's branch, normalized to UTC.
+A page with no repository, a malformed slug or an unparsable timestamp yields
+`None`; a GitHub failure is raised rather than swallowed, so the module
+distinguishes "there is no date" from "the date could not be read".
+
+That places it in the fetch step. `render()` resolves it through
+`_resolve_commit_date()` when no date is already known; that helper builds the
+`github3` client at that boundary unless one was injected, and catches
+`github3.exceptions.GitHubException`. A failed lookup is logged as a warning
+naming the page key, and the page still renders: its date then comes from the
+fetch's `Last-Modified` header, or from the build timestamp when that is absent.
+
+`prepare_numbered_steps()` and `prepare_split_panel()` in
+`df12_pages/generator/section_render.py` are pure helpers, so they belong to
+the render step. `render_document()` calls the first when a section's layout is
+`numbered_steps` and the second when it is `split_panel`, while building the
+section model; each is a pure function of its arguments and returns template
+data rather than writing anything. Both forward the document's `figures`
+mapping and the `link_ref` captured at preparation to every markdown conversion
+they make, so a step, a panel and the section around them all point into the
+same tree.
+
+#### Two-phase markdown preparation
+
+`HtmlContentRenderer.prepare_markdown(text, *, link_ref=None)` returns a
+`PreparedMarkdown`: the document with each renderable Mermaid fence replaced by
+a placeholder token, and `figures` mapping that token to the `<figure>` markup
+that replaces it once the document is converted. It is the only step that may
+start the Mermaid CLI, and so the only side-effecting half of markdown
+rendering. `render_prepared(prepared)` converts an already-prepared document
+and compiles nothing, so a caller that needs an I/O-free render runs the first
+and hands its result to the second; `markdown(text)` is the one-shot form that
+does both. Passed a `figures` mapping, `markdown()` goes straight to
+conversion, which is how the section helpers render a slice of a prepared
+document.
+
+`prepare_markdown()` also captures a `link_ref` in the result. An explicit
+argument wins; otherwise it records the ref the renderer's link extension was
+configured with, if it had one. Carrying the ref with the document keeps a
+retained document's relative links pointing at the tree its own fetch answered
+from, even after another document's fetch has been retargeted to a different
+ref. `PreparedDocument.markdown` is the value `prepare_document()` stores, and
+`render_document()` reads its figures and ref from there.
+
+#### The Mermaid CLI
+
+`MermaidRenderer` invokes a headless Mermaid CLI to compile a fence's source to
+inline SVG. The executable is resolved per invocation, in order: the value
+passed to the constructor, then the `DF12_MERMAID_CLI` environment variable,
+then `merman-cli`. Reading the environment lazily keeps constructing a renderer
+free of ambient configuration, and a test can pin a command without exporting a
+variable.
+
+A CLI that is missing, exits non-zero or times out is reported as a warning on
+standard error, and the fence is left in the markdown so it falls through to a
+highlighted code block; one broken diagram does not abort a build. Results are
+cached per source text for the renderer's lifetime, including a failure, so a
+repeated diagram shells out once.
 
 ### 9.4. Concurrent document workers
 

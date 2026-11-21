@@ -89,9 +89,11 @@ flaky network-dependent tests.
      coverage) which re-syncs release info and rewrites `config/pages.yaml`.
 
 3. **MiniJinja Rendering from the Snapshot**
-   - `PageContentGenerator` reads `config/pages.yaml`, fetches the referenced
-     Markdown blob via GitHub (respecting releases or branches), and parses it
-     into sections.
+   - `PageContentGenerator` reads `config/pages.yaml` and parses the referenced
+     Markdown into sections. Fetching that Markdown belongs to
+     `df12_pages/generator/document_fetch.py`, which tries a release-pinned URL
+     first and falls back to the configured branch source on a 404. See
+     [Fetch, prepare, render and write](developers-guide.md#93-fetch-prepare-render-and-write).
    - MiniJinja templates (`doc_page.jinja`, `docs_index.jinja`,
      `home_page.jinja`) consume the snapshot data plus parsed Markdown to
      produce HTML in `public/`. Every builder renders through the shared

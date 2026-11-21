@@ -328,18 +328,17 @@
   nested beneath it, then the current page's sources.
 #}
 {% macro sidebar(key) -%}
-{%- set links = [{'href': '/netsuke/forthcoming/', 'label': 'All previews'}] -%}
-{%- set ns = namespace(sources=[]) -%}
+{%- set ns = namespace(links=[{'href': '/netsuke/forthcoming/', 'label': 'All previews'}], sources=[]) -%}
 {%- for p in previews -%}
-    {%- set _ = links.append({'href': '/netsuke/forthcoming/' ~ p.key ~ '/', 'label': p.short, 'active': p.key == key}) -%}
+    {%- set ns.links = ns.links + [{'href': '/netsuke/forthcoming/' ~ p.key ~ '/', 'label': p.short, 'active': p.key == key}] -%}
     {%- if p.key == key -%}
         {%- set ns.sources = p.sources -%}
-        {%- for s in p.sections %}{% set _ = links.append({'href': '#' ~ s.id, 'label': s.label, 'sub': true}) %}{% endfor -%}
+        {%- for s in p.sections %}{% set ns.links = ns.links + [{'href': '#' ~ s.id, 'label': s.label, 'sub': true}] %}{% endfor -%}
     {%- endif -%}
 {%- endfor -%}
 {%- if not ns.sources %}{{ raise_unknown_preview(key) }}{% endif -%}
 {{ docsnav.sidebar(sections=[
-    {'title': 'Forthcoming', 'links': links},
+    {'title': 'Forthcoming', 'links': ns.links},
     {'title': 'Sources', 'links': ns.sources},
 ], search=false, nav_label='Preview pages') }}
 {%- endmacro %}

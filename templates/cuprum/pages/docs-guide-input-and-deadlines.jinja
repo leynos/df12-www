@@ -20,7 +20,7 @@
     <code>TypeError</code> rather than turning them into child flags.
   </p>
 {% call ui.code_panel('input_and_context.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ExecutionContext, ProgramCatalogue, StdinInput, sh
@@ -36,7 +36,7 @@ result = command.run_sync(
     timeout=5,
 )
 assert result.stdout == "ready hello\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 </section>
 
@@ -49,7 +49,7 @@ assert result.stdout == "ready hello\n"
     with an async iterable instead:
   </p>
 {% call ui.code_panel('streaming_stdin.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 from collections.abc import AsyncIterator
 
@@ -67,7 +67,7 @@ async def rows() -> AsyncIterator[str]:
 count_lines = python("-c", "import sys; print(sum(1 for _ in sys.stdin))")
 result = count_lines.run_sync(stdin=StdinStream(chunks=rows()))
 assert result.stdout == "1000\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Cuprum pulls one chunk, writes it, and waits for the write to drain
@@ -104,7 +104,7 @@ assert result.stdout == "1000\n"
     environment, which an overlay could not do before.
   </p>
 {% call ui.code_panel('env_modes.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import os
 import sys
 
@@ -122,7 +122,7 @@ with env({"CUPRUM_DEMO": UNSET, "CUPRUM_KEEP": UNSET}):
     assert python(*show).run_sync().stdout == "None None\n"
 with env({"CUPRUM_DEMO": "only"}, mode=EnvMode.REPLACE):
     assert python(*show).run_sync().stdout == "only None\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Precedence, lowest first: the process's <code>os.environ</code>, read at
@@ -153,7 +153,7 @@ with env({"CUPRUM_DEMO": "only"}, mode=EnvMode.REPLACE):
     empty strings rather than <code>None</code> when capture is on.
   </p>
 {% call ui.code_panel('slow_command.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import ExecutionContext, Program, ProgramCatalogue, TimeoutExpired, sh
@@ -169,7 +169,7 @@ except TimeoutExpired as exc:
     assert exc.output == "" and exc.stderr == ""
 else:
     raise AssertionError("the command should have timed out")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Cancelling an async run starts the same teardown. Catch the timeout
@@ -187,7 +187,7 @@ else:
     <li>A {{ api.ref('ScopeConfig') }}<code>(timeout=...)</code> default from the enclosing <code>scoped()</code> block, which applies to every command run inside it.</li>
   </ol>
 {% call ui.code_panel('scope_timeout.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, ScopeConfig, TimeoutExpired, scoped, sh
@@ -205,7 +205,7 @@ with scoped(ScopeConfig(timeout=1.0)):
         assert exc.output in {"", "started\n"}
     else:
         raise AssertionError("the scope timeout should have expired")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Timeouts must be finite and non-negative; <code>None</code> means no
@@ -231,7 +231,7 @@ with scoped(ScopeConfig(timeout=1.0)):
     group and every descendant still in it:
   </p>
 {% call ui.code_panel('process_group.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import ExecutionContext, ProcessGroupPolicy, Program, ProgramCatalogue, sh
@@ -244,7 +244,7 @@ owned = ExecutionContext(process_group=ProcessGroupPolicy.OWN_GROUP)
 assert owned.process_group is ProcessGroupPolicy.OWN_GROUP
 assert command.run_sync(context=owned).stdout == "True\n"
 assert ExecutionContext().process_group is ProcessGroupPolicy.INHERIT
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     The last assertion is the compatibility promise: a context that says

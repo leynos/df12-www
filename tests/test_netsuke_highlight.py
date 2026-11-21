@@ -75,7 +75,7 @@ POWERSHELL_SOURCE = (
     'Write-Host "Installing Netsuke" -ForegroundColor Green\n'
 )
 
-#: Every lexer the sub-site's templates name in a ``{% highlight %}`` tag.
+#: Every lexer the sub-site's templates name in a ``highlight`` filter.
 SAMPLES = (
     ("netsuke", NETSUKEFILE_SOURCE),
     ("netsuke-console", CONSOLE_SOURCE),

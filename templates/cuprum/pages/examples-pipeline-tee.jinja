@@ -43,7 +43,7 @@
 
 {% block code %}
 {% call ui.code_panel('pipeline_tee.py', 'Complete', foot=[verified]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import (
@@ -75,7 +75,7 @@ print(f"ok={result.ok}")
 print(f"captured={result.stdout!r}")
 for index, stage in enumerate(result.stages):
     print(index, stage.exit_code, repr(stage.stdout))
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 <div class="mt-10">
   {{ ui.flow(pipeline_figure) }}
@@ -117,7 +117,7 @@ captured='ROUTED THROUGH TWO STAGES'
 </div>
 <div class="cu-pair mt-8">
   {% call ui.code_panel('fail_fast.py', 'Failure path', foot=[verified], flat=true) %}
-  {% highlight 'python', 'cuprum-syntax' %}
+  {% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import (
@@ -148,7 +148,7 @@ print(f"failure_index={result.failure_index}")
 print(f"failure exit={result.failure.exit_code if result.failure else None}")
 for index, stage in enumerate(result.stages):
     print(index, stage.exit_code)
-  {% endhighlight %}
+  {% endfilter %}
   {% endcall %}
   {% call ui.output('Observed output', 'stdout, Linux') %}
 ok=False

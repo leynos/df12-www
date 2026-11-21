@@ -79,7 +79,7 @@
 {% endraw %}                    Use <code>|</code> for a multi-line string that preserves line breaks, or <code>&gt;-</code> to fold lines
                     into one string.
                 </p>
-                {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile') %}{% filter highlight('netsuke') %}{% raw %}
 netsuke_version: "1.0.0"
 
 vars:
@@ -97,7 +97,7 @@ targets:
 
 defaults:
   - greeting.txt
-{% endraw %}{% endhighlight %}{% endcall %}
+{% endraw %}{% endfilter %}{% endcall %}
             </section>
 
             <!-- Rendering -->
@@ -146,7 +146,7 @@ defaults:
                     It works on <code>targets</code> and on top-level <code>actions</code> alike.
                 </p>
                 <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 vars:
   designs:
     - hero
@@ -162,7 +162,7 @@ targets:
     name: "site/{{ item | basename | with_suffix('.html') }}"
     rule: page
     sources: "{{ item }}"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
                 <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
                     <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
@@ -187,7 +187,7 @@ targets:
                     <a href="/netsuke/docs/standard-library/" class="hm-link"><code>command_available(...)</code></a>.
                 </p>
                 <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% highlight 'netsuke' %}
+{% filter highlight('netsuke') %}
 targets:
   - when: command_available('magick')
     name: "build/hero.png"
@@ -198,7 +198,7 @@ targets:
     name: "build/hero.png"
     rule: inkscape_convert
     sources: "design/hero.svg"
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
                     <span class="iconify text-warning mt-0.5" data-icon="carbon:warning-alt-filled" aria-hidden="true"></span>
@@ -221,7 +221,7 @@ targets:
 {% raw %}                    declared as data rather than written as <code>{% macro %}</code> statements, the YAML document stays a
 {% endraw %}                    document.
                 </p>
-                {% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile') %}{% filter highlight('netsuke') %}{% raw %}
 macros:
   - signature: "obj_name(src)"
     body: |
@@ -232,7 +232,7 @@ targets:
     name: "build/{{ obj_name(item) }}"
     rule: "compile"
     sources: "{{ item }}"
-{% endraw %}{% endhighlight %}{% endcall %}
+{% endraw %}{% endfilter %}{% endcall %}
             </section>
 
             <!-- Advanced Patterns -->
@@ -271,7 +271,7 @@ targets:
                             </p>
 
                             <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% highlight 'netsuke' %}
+{% filter highlight('netsuke') %}
 targets:
   - when: target_os == 'linux'
     name: "sys/linux.o"
@@ -282,7 +282,7 @@ targets:
     name: "sys/macos.o"
     rule: "compile"
     sources: "src/macos_utils.c"
-{% endhighlight %}
+{% endfilter %}
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
@@ -298,7 +298,7 @@ targets:
                             </p>
 
                             <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 targets:
   - name: test-report.txt
     command: "./run-tests > {{ outs }}"
@@ -308,7 +308,7 @@ targets:
 actions:
   - name: test
     command: "./app --self-test"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">
@@ -324,7 +324,7 @@ actions:
                             </p>
 
                             <div class="bg-base-content p-4 rounded-lg font-mono text-xs text-stone-light overflow-x-auto">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 rules:
   - name: protoc
     command: "protoc --c_out=gen {{ ins }}"
@@ -337,7 +337,7 @@ targets:
   - name: messages.o
     rule: compile
     sources: gen/messages.c
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                             </div>
 
                             <div class="mt-6 flex items-start space-x-3 text-sm text-charcoal-mid bg-stone-light/20 p-4 rounded border border-stone-light">

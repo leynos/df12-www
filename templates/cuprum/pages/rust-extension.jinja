@@ -123,17 +123,17 @@
         </div>
         <div class="cu-stack">
           {% call ui.code_panel('shell', 'Force a backend', flat=true, copy='console') %}
-          {% highlight 'console', 'cuprum-syntax' %}
+          {% filter highlight('console', 'cuprum-syntax') %}
 $ CUPRUM_STREAM_BACKEND=python python my_script.py
 $ CUPRUM_STREAM_BACKEND=rust python my_script.py
-          {% endhighlight %}
+          {% endfilter %}
           {% endcall %}
           {% call ui.code_panel('check_backend.py', 'Probe', foot=['Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · native and pure-Python wheels'], flat=true) %}
-          {% highlight 'python', 'cuprum-syntax' %}
+          {% filter highlight('python', 'cuprum-syntax') %}
 import cuprum
 
 print(cuprum.is_rust_available())
-          {% endhighlight %}
+          {% endfilter %}
           {% endcall %}
           {% call ui.output('Expected output', 'native wheel') %}
 True

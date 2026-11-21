@@ -114,8 +114,9 @@
 
 {#- A whole sample file, highlighted, in a code panel titled by its path. -#}
 {% macro sample(path, title=none) -%}
+{% set source %}{% include 'samples/' ~ path %}{% endset %}
 {% call code_panel(title or path, sample=path) %}
-{% highlight _lexer(path), 'lantern-syntax' %}{% include 'samples/' ~ path %}{% endhighlight %}
+{{ source | highlight(_lexer(path), 'lantern-syntax') }}
 {% endcall %}
 {%- endmacro %}
 

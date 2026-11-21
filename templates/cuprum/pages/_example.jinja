@@ -11,7 +11,7 @@
 {% from "data/examples.jinja" import examples, published_examples %}
 {% set example = (examples | selectattr('slug', 'equalto', example_slug) | first) %}
 {% set slugs = published_examples | map(attribute='slug') | list %}
-{% set position = slugs.index(example_slug) %}
+{% set position = (slugs | index(example_slug)) %}
 {% set verified = 'Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · Python ' ~ python_floor ~ ' · Linux' %}
 {% set sections = [
   {'id': 'problem', 'label': 'Problem', 'title': 'The job'},

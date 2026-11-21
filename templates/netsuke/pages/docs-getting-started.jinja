@@ -75,7 +75,7 @@
                         </button>
                     </div>
                     <div class="bg-base-content rounded-lg p-5 font-mono text-sm overflow-x-auto border border-charcoal-mid shadow-lg">
-                        {% highlight 'netsuke-console' %}$ {{ install_command }}{% endhighlight %}
+                        {% filter highlight('netsuke-console') %}$ {{ install_command }}{% endfilter %}
                     </div>
                 </div>
 
@@ -103,17 +103,17 @@
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">1. Create Project Directory</h3>
                         <p class="text-xs font-mono uppercase tracking-wide text-charcoal-light mb-2">macOS, Linux, or WSL2</p>
                         <div class="bg-base-content rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
-                            {% highlight 'netsuke-console' %}
+                            {% filter highlight('netsuke-console') %}
 $ mkdir my-first-build && cd my-first-build
 $ touch Netsukefile
-                            {% endhighlight %}
+                            {% endfilter %}
                         </div>
                         <p class="text-xs font-mono uppercase tracking-wide text-charcoal-light mb-2">Windows PowerShell</p>
                         <div class="bg-base-content rounded-lg p-5 font-mono text-sm border border-charcoal-mid shadow-lg mb-4">
-                            {% highlight 'powershell' %}
+                            {% filter highlight('powershell') %}
 mkdir my-first-build; cd my-first-build
 New-Item Netsukefile -ItemType File
-                            {% endhighlight %}
+                            {% endfilter %}
                         </div>
                         <p class="text-sm text-charcoal-mid">
                             This creates a clean workspace. The <code class="font-mono text-xs">Netsukefile</code> is where the build graph is declared. Windows PowerShell 5.1 has no <code class="font-mono text-xs">&amp;&amp;</code> operator, so the two commands are separated by a semicolon.
@@ -129,7 +129,7 @@ New-Item Netsukefile -ItemType File
                     <!-- Step 2: Content -->
                     <div>
                         <h3 class="font-bold text-base-content mb-3 text-sm uppercase tracking-wide">2. Define a Simple Rule</h3>
-                        {% call chrome.faux_window('Netsukefile', body_class='p-6 font-mono text-sm text-stone-light overflow-x-auto') %}{% highlight 'netsuke' %}{% raw %}
+                        {% call chrome.faux_window('Netsukefile', body_class='p-6 font-mono text-sm text-stone-light overflow-x-auto') %}{% filter highlight('netsuke') %}{% raw %}
 netsuke_version: "1.0.0"
 
 targets:
@@ -141,7 +141,7 @@ targets:
     sources: "hello.txt"
 
 defaults: ["shout.txt"]
-{% endraw %}{% endhighlight %}{% endcall %}
+{% endraw %}{% endfilter %}{% endcall %}
                     </div>
                 </div>
             </section>
@@ -156,13 +156,13 @@ defaults: ["shout.txt"]
                     Now invoke the CLI to build your target. Netsuke parses YAML first, resolves any templating, generates a Ninja plan, and then executes the required commands.
                 </p>
 
-                {% call chrome.faux_window('Terminal', outer_class='mb-8') %}{% highlight 'netsuke-console' %}
+                {% call chrome.faux_window('Terminal', outer_class='mb-8') %}{% filter highlight('netsuke-console') %}
 $ netsuke build shout.txt
 [1/2] printf 'Hello, Netsuke!\n' > hello.txt
 [2/2] tr 'a-z' 'A-Z' < hello.txt > shout.txt
 $ cat shout.txt
 HELLO, NETSUKE!
-{% endhighlight %}{% endcall %}
+{% endfilter %}{% endcall %}
 
                 <div class="flex p-4 bg-base-100 border border-base-300 rounded-lg">
                     <div class="shrink-0">

@@ -8,11 +8,15 @@ from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
-from jinja2 import Environment, FileSystemLoader
 
 import scripts.atomic_write as atomic_writer
+from df12_pages.templating import template_environment
 from scripts.build_episodic_roadmap_data import main
 from scripts.episodic_roadmap_parser import Task, parse_roadmap
+
+if typ.TYPE_CHECKING:
+    from syrupy.assertion import SnapshotAssertion
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -106,17 +110,14 @@ def test_first_note_dependency_sentence_preserves_the_remaining_note() -> None:
 
 def test_generated_dependency_fields_drive_the_roadmap_task_macro() -> None:
     """The four normalized tasks render dependency lines from ``task.requires``."""
-    environment = Environment(
-        autoescape=True,
-        loader=FileSystemLoader(REPO_ROOT / "templates/episodic"),
-    )
+    environment = template_environment(REPO_ROOT / "templates/episodic")
     roadmap_phases = typ.cast(
         "list[RoadmapPhaseRecord]",
         json.loads(
-            environment.from_string(
+            environment.render_str(
                 '{% from "data/roadmap.jinja" import roadmap_phases %}'
                 "{{ roadmap_phases | tojson }}"
-            ).render()
+            )
         ),
     )
     tasks: dict[str, RoadmapTaskRecord] = {
@@ -141,10 +142,11 @@ def test_generated_dependency_fields_drive_the_roadmap_task_macro() -> None:
         for task_id in expected
     ), "generated dependency sentences must be removed from titles and first notes"
 
-    rendered = environment.from_string(
+    rendered = environment.render_str(
         '{% import "records.jinja" as rec %}'
-        "{% for task in tasks %}{{ rec.roadmap_task(task) }}{% endfor %}"
-    ).render(tasks=[tasks[task_id] for task_id in expected])
+        "{% for task in tasks %}{{ rec.roadmap_task(task) }}{% endfor %}",
+        tasks=[tasks[task_id] for task_id in expected],
+    )
     rendered_dependencies = [
         dependency.get_text(" ", strip=True)
         for dependency in BeautifulSoup(rendered, "html.parser").select(
@@ -156,15 +158,13 @@ def test_generated_dependency_fields_drive_the_roadmap_task_macro() -> None:
     ], "records.roadmap_task must render each generated requires array"
 
 
-def test_roadmap_task_macro_matches_the_representative_snapshot() -> None:
+def test_roadmap_task_macro_matches_the_representative_snapshot(
+    snapshot: SnapshotAssertion,
+) -> None:
     """A fixed nested task fixture keeps the accessible roadmap markup stable."""
-    environment = Environment(
-        autoescape=True,
-        loader=FileSystemLoader(REPO_ROOT / "templates/episodic"),
-    )
-    rendered = environment.from_string(
-        '{% import "records.jinja" as rec %}{{ rec.roadmap_task(task) }}'
-    ).render(
+    environment = template_environment(REPO_ROOT / "templates/episodic")
+    rendered = environment.render_str(
+        '{% import "records.jinja" as rec %}{{ rec.roadmap_task(task) }}',
         task={
             "id": "7.2.1",
             "title": "Archive `sample`.",
@@ -174,12 +174,8 @@ def test_roadmap_task_macro_matches_the_representative_snapshot() -> None:
                 {"title": "Keep the source.", "done": True},
                 {"title": "Verify the copy.", "done": False},
             ],
-        }
+        },
     )
-    snapshot = (REPO_ROOT / "tests/snapshots/episodic-roadmap-task.snap").read_text(
-        encoding="utf-8"
-    )
-
     assert BeautifulSoup(rendered, "html.parser").prettify() == snapshot, (
         "the representative roadmap task macro must match its stable HTML snapshot"
     )
@@ -189,11 +185,11 @@ def _generated_roadmap_payload(
     output: Path,
 ) -> tuple[list[RoadmapPhaseRecord], RoadmapTotalsRecord]:
     """Render the generated Jinja declarations as JSON-compatible data."""
-    environment = Environment(autoescape=True, loader=FileSystemLoader(output.parent))
-    rendered = environment.from_string(
+    environment = template_environment(output.parent)
+    rendered = environment.render_str(
         '{% from "roadmap.jinja" import roadmap_phases, roadmap_totals %}'
         "{{ {'phases': roadmap_phases, 'totals': roadmap_totals} | tojson }}"
-    ).render()
+    )
     payload = json.loads(rendered)
     return (
         typ.cast("list[RoadmapPhaseRecord]", payload["phases"]),

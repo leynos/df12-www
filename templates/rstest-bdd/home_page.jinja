@@ -23,8 +23,6 @@
   {'patch': 'cranberry', 'title': 'Find the useful mismatch.', 'guide': 'binding-and-filtering',
    'body': 'Ordinary assertions check the result. A failure names the step, the function, the feature, and the scenario, so the broken promise is one read away.'},
 ] %}
-{% set guide_titles = {} %}
-{% for guide in guides %}{% set _ = guide_titles.update({guide.slug: guide.title}) %}{% endfor %}
 
       <section class="rb-hero rb-quilted" aria-labelledby="hero-title">
         <div class="rb-shell rb-hero__grid">
@@ -87,14 +85,14 @@
           <nav class="rb-story__tabs" aria-label="Chapters">
             <ol class="rb-story__tab-list">
               {% for chapter in chapters %}
-              <li><a class="rb-story__tab" href="#chapter-{{ '%02d' % loop.index }}" data-rb-chapter-tab><span class="rb-story__tab-num" aria-hidden="true">{{ '%02d' % loop.index }}</span>{{ chapter.tab }}</a></li>
+              <li><a class="rb-story__tab" href="#chapter-{{ '%02d' | format(loop.index) }}" data-rb-chapter-tab><span class="rb-story__tab-num" aria-hidden="true">{{ '%02d' | format(loop.index) }}</span>{{ chapter.tab }}</a></li>
               {% endfor %}
             </ol>
           </nav>
 
           <div class="rb-story__track" tabindex="0" role="region" aria-label="The lantern picnic, in eight chapters" data-rb-storybook>
             {% for chapter in chapters %}
-            {% set n = '%02d' % loop.index %}
+            {% set n = '%02d' | format(loop.index) %}
             <article id="chapter-{{ n }}" class="rb-chapter" aria-labelledby="chapter-{{ n }}-title" data-rb-chapter>
               {{ ui.figure({
                 'name': 'story/chapter-' ~ n,
@@ -114,14 +112,14 @@
                 {% call ui.output('cargo test', 'Real output') %}{{ snippets[loop.index0] }}{% endcall %}
                 {% elif chapter.code.lexer == 'console' %}
                 {% call ui.code_panel('Terminal', copy='console') %}
-                {% highlight 'console', 'lantern-syntax' %}{{ snippets[loop.index0] }}{% endhighlight %}
+                {% filter highlight('console', 'lantern-syntax') %}{{ snippets[loop.index0] }}{% endfilter %}
                 {% endcall %}
                 {% else %}
                 {% call ui.code_panel(chapter.code.file, sample=chapter.code.file) %}
-                {% highlight chapter.code.lexer, 'lantern-syntax' %}{{ snippets[loop.index0] }}{% endhighlight %}
+                {% filter highlight(chapter.code.lexer, 'lantern-syntax') %}{{ snippets[loop.index0] }}{% endfilter %}
                 {% endcall %}
                 {% endif %}
-                <p class="rb-chapter__count" aria-hidden="true">{{ n }} / {{ '%02d' % chapters | length }}</p>
+                <p class="rb-chapter__count" aria-hidden="true">{{ n }} / {{ '%02d' | format(chapters | length) }}</p>
               </div>
             </article>
             {% endfor %}
@@ -152,12 +150,12 @@
               </p>
             </div>
             {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
-            {% highlight 'toml', 'lantern-syntax' %}
+            {% filter highlight('toml', 'lantern-syntax') %}
 [dev-dependencies]
 rstest = "{{ rstest_version }}"
 rstest-bdd = "{{ rstest_bdd_version }}"
 rstest-bdd-macros = "{{ rstest_bdd_version }}"
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
           </div>
 
@@ -168,9 +166,9 @@ rstest-bdd-macros = "{{ rstest_bdd_version }}"
               <p class="rb-workbench__text">The scenario states an observable result. Rust supplies the implementation and the assertions.</p>
               <div class="rb-step-head">{{ ui.bead('3', 'lantern') }}<h3>Use the usual runner.</h3></div>
               {% call ui.code_panel('Terminal', copy='console') %}
-              {% highlight 'console', 'lantern-syntax' %}
+              {% filter highlight('console', 'lantern-syntax') %}
 $ cargo test lantern_delivery
-              {% endhighlight %}
+              {% endfilter %}
               {% endcall %}
               <p class="rb-workbench__text">
                 The scenario runs as <code>lantern_delivery</code>, beside the
@@ -202,7 +200,7 @@ $ cargo test lantern_delivery
               <span class="rb-notes__numeral" aria-hidden="true">{{ ['I.', 'II.', 'III.'][loop.index0] }}</span>
               <h3 class="rb-card__title">{{ note.title }}</h3>
               <p class="rb-card__body">{{ note.body | safe }}</p>
-              <a class="rb-card__meta" href="/rstest-bdd/guides/{{ note.guide }}/">{{ guide_titles[note.guide] }} {{ icons.icon('arrow-right') }}</a>
+              <a class="rb-card__meta" href="/rstest-bdd/guides/{{ note.guide }}/">{{ (guides | selectattr('slug', 'equalto', note.guide) | first).title }} {{ icons.icon('arrow-right') }}</a>
             </article>
             {% endfor %}
           </div>

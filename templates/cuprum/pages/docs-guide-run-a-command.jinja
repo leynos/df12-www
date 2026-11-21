@@ -16,7 +16,7 @@
     catalogue that names it:
   </p>
 {% call ui.code_panel('first_command.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -28,7 +28,7 @@ result = command.run_sync()
 assert result.ok
 assert result.stdout == "hello, cuprum!\n"
 assert result.stderr == ""
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     <code>run_sync()</code> suits a synchronous script; in an async
@@ -51,7 +51,7 @@ assert result.stderr == ""
     <li><strong>A result with <code>ok == False</code>.</strong> The child ran and exited non-zero. Cuprum does not raise; read <code>exit_code</code> and decide by the tool's own exit-code contract.</li>
   </ul>
 {% call ui.code_panel('failures.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, UnknownProgramError, sh
@@ -68,7 +68,7 @@ python = sh.make(Program(sys.executable), catalogue=catalogue)
 result = python("-c", "import sys; sys.exit(7)").run_sync()
 assert not result.ok
 assert result.exit_code == 7
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Read <code>stderr</code> for the tool's diagnostics, but never parse it
@@ -94,7 +94,7 @@ assert result.exit_code == 7
     spaces stays one argument.
   </p>
 {% call ui.code_panel('arguments.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -104,7 +104,7 @@ python = sh.make(Program(sys.executable), catalogue=catalogue)
 command = python("-c", "print('two words')")
 assert command.argv == ("-c", "print('two words')")
 assert command.argv_with_program == (sys.executable, *command.argv)
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Names that configure <em>how</em> a command runs are reserved: every
@@ -121,7 +121,7 @@ assert command.argv_with_program == (sys.executable, *command.argv)
     and run in the wrong directory:
   </p>
 {% call ui.code_panel('reserved_options.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -142,7 +142,7 @@ except TypeError as exc:
     assert str(exc) == "timeout is an execution option; pass timeout=... to run_sync"
 else:
     raise AssertionError("timeout should not become a child flag")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     A tool whose command line genuinely takes such a flag still receives it
@@ -170,7 +170,7 @@ else:
     running.
   </p>
 {% call ui.code_panel('hold_a_handle.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import asyncio
 import sys
 
@@ -192,7 +192,7 @@ async def stop_a_child() -> int | None:
 
 
 assert asyncio.run(stop_a_child()) == -15
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     A spawn that cannot start belongs to <code>start()</code> itself: it
@@ -230,7 +230,7 @@ assert asyncio.run(stop_a_child()) == -15
     and after:
   </p>
 {% call ui.code_panel('from_subprocess.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import subprocess
 import sys
 import tempfile
@@ -259,7 +259,7 @@ if not result.ok:
 
 assert result.stdout == before.stdout == f"{Path(workdir).name}\n"
 Path(workdir).rmdir()
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   {% call ui.matrix('subprocess-caption', 'Where each subprocess argument goes in Cuprum', ['subprocess', 'Cuprum']) %}
   {% for before, after in [

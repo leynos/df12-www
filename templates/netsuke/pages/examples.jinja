@@ -49,7 +49,7 @@
                             <span>basic-c/</span>
                         </div>
                         <div class="code-preview p-4 text-sm border border-white/10 shadow-2xl rounded-lg">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 netsuke_version: "1.0.0"
 
 rules:
@@ -64,7 +64,7 @@ targets:
   - name: "app"
     command: "gcc {{ ins }} -o {{ outs }}"
     sources: ["main.o", "utils.o"]
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>

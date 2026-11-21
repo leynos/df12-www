@@ -120,7 +120,7 @@ def when_render_docs(
             """Do nothing on close; the wrapped session is left as it is."""
 
     monkeypatch.setattr(
-        "df12_pages.generator.page_generator.requests.Session",
+        "df12_pages.generator.document_fetch.requests.Session",
         lambda: _RecordingSession(session),
     )
 

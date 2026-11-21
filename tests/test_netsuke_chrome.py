@@ -16,12 +16,12 @@ import pytest
 from bs4 import BeautifulSoup, Tag
 from hypothesis import given, settings
 from hypothesis import strategies as st
-from jinja2 import Environment, FileSystemLoader, TemplateSyntaxError
+from minijinja import TemplateError
 
 from df12_pages.config import ContentPageConfig, SubSiteHomepageConfig
 from df12_pages.content_page import ContentPageGenerator
-from df12_pages.jinja_highlight import HighlightExtension
 from df12_pages.subsite_homepage import SubSiteHomePageBuilder
+from df12_pages.templating import template_environment
 
 NETSUKE_TEMPLATES = Path("templates/netsuke").resolve()
 TEMPLATE_VARS: dict[str, object] = {
@@ -97,22 +97,13 @@ def _render_homepage(tmp_path: Path) -> BeautifulSoup:
 
 def _render_macro(source: str, **context: object) -> BeautifulSoup:
     """Render a template string that imports the Netsuke macro modules."""
-    env = Environment(
-        loader=FileSystemLoader(str(NETSUKE_TEMPLATES)),
-        autoescape=True,
-        trim_blocks=True,
-        lstrip_blocks=True,
-        extensions=[HighlightExtension],
-    )
-    # Jinja types `globals` as the literal of its default namespace; it is
-    # open by design.
-    typ.cast("dict[str, object]", env.globals).update(TEMPLATE_VARS)
+    env = template_environment(NETSUKE_TEMPLATES, variables=TEMPLATE_VARS)
     preamble = (
         '{% import "chrome.jinja" as chrome %}'
         '{% import "docs_nav.jinja" as docsnav %}'
         '{% import "examples_data.jinja" as exdata %}'
     )
-    html = env.from_string(preamble + source).render(**context)
+    html = env.render_str(preamble + source, **context)
     return BeautifulSoup(html, "html.parser")
 
 
@@ -292,7 +283,7 @@ class TestWindows:
         replaced: a missing closer was previously markup that rendered with
         an unbalanced ``div``, and is now caught before the page is built.
         """
-        with pytest.raises(TemplateSyntaxError, match="endcall"):
+        with pytest.raises(TemplateError, match="expected end of block"):
             _render_macro("{% call chrome." + call + " %}<p>body</p>")
 
 

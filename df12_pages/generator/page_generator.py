@@ -7,6 +7,24 @@ It exposes :class:`PageContentGenerator`, which consumes a
 ``HtmlContentRenderer``, and persists both HTML and metadata that power
 ``public/docs-*.html`` and ``docs.html``.
 
+The work either side of the generator has its own module.
+:mod:`df12_pages.generator.document_fetch` resolves and fetches a document,
+returning the URL, version and date that actually answered as values, and
+:mod:`df12_pages.generator.commit_date` resolves the date a page displays. Both
+sets of names are re-exported here, so a caller can keep importing them from
+this module.
+
+Fetching, preparation and rendering are separate steps. :func:`fetch_document`
+resolves a :class:`DocumentSource` to a :class:`FetchedMarkdown`, returning the
+URL and version that actually answered as values.
+:meth:`PageContentGenerator.prepare_document` is the preparation command: it
+registers the page's template graph in the environment and compiles the
+document's Mermaid figures. :meth:`PageContentGenerator.render_document` is the
+query that follows it, turning prepared markdown into html without reading the
+filesystem, consulting the environment or starting a subprocess. Only
+:meth:`PageContentGenerator.render` reaches the network and selects the build
+timestamp, which keeps the rendering rule testable with a fixture and no HTTP.
+
 Example
 -------
 >>> from pathlib import Path
@@ -21,42 +39,193 @@ Example
 
 from __future__ import annotations
 
-import datetime as dt
+import dataclasses as dc
 import json
-import os
+import logging
 import re
 import typing as typ
-from email.utils import parsedate_to_datetime
 from pathlib import Path
 
-import requests
 from github3 import GitHub
 from github3 import exceptions as gh_exc
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 from df12_pages._constants import PAGE_META_TEMPLATE
 from df12_pages.config import PageConfig, SectionLayout
 from df12_pages.docs_index import ManifestDescriptionResolver
+from df12_pages.generator.commit_date import resolve_doc_updated_at
+from df12_pages.generator.document_fetch import (
+    FETCH_TIMEOUT_SECONDS,
+    DocumentFetcher,
+    DocumentSource,
+    FetchedMarkdown,
+    MarkdownResponse,
+    fetch_document,
+    fetch_markdown,
+    resolve_document_source,
+)
 from df12_pages.generator.link_rewriter import _build_link_rewriter
 from df12_pages.generator.models import NumberedStep, SectionModel
-from df12_pages.generator.renderer import CODE_BLOCK_PATTERN, HtmlContentRenderer
-from df12_pages.markdown_parser import Section, Subsection, parse_sections
+from df12_pages.generator.renderer import (
+    HtmlContentRenderer,
+    MermaidRenderer,
+    PreparedMarkdown,
+)
+from df12_pages.generator.section_render import (
+    prepare_numbered_steps,
+    prepare_split_panel,
+)
+from df12_pages.markdown_parser import Section, parse_sections
+from df12_pages.templating import build_timestamp, template_environment
+
+if typ.TYPE_CHECKING:
+    import collections.abc as cabc
+    import datetime as dt
+
+    from minijinja import Environment
+
+_log = logging.getLogger(__name__)
+
+#: Template that renders one documentation section, and its relative suffix.
+DOCUMENT_TEMPLATE = "doc_page.jinja"
+_TEMPLATE_SUFFIX = ".jinja"
+
+#: Templates shipped with the package, resolved once when the module loads.
+#: Resolving here keeps construction free of filesystem metadata lookups.
+DEFAULT_TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "templates"
+
+
+class DocumentTemplate(typ.Protocol):
+    """The slice of a template environment a document render needs.
+
+    Registering the template graph is preparation; rendering then needs only
+    these two calls, so a recorded template can stand in for the environment.
+    """
+
+    def add_template(self, name: str, source: str) -> None:
+        """Register ``source`` under ``name``."""
+        ...
+
+    def render_template(self, template_name: str, /, **context: object) -> str:
+        """Render the registered template ``template_name`` with ``context``."""
+        ...
+
+
+@dc.dataclass(frozen=True)
+class PreparedDocument:
+    """A document prepared for rendering without further preparation work.
+
+    ``sections`` is the parsed document whose markdown has already been
+    prepared, and ``template`` renders it. Both are values, so rendering the
+    document reads no file, consults no environment and starts no subprocess.
+    """
+
+    sections: list[Section]
+    template: DocumentTemplate
+    markdown: PreparedMarkdown
+
+
+@dc.dataclass(frozen=True)
+class WrittenDocument:
+    """What publishing one rendered bundle produced."""
+
+    html_paths: list[Path]
+    metadata_path: Path
+    metadata_written: bool
+    metadata_error: OSError | None = None
+
+
+@dc.dataclass
+class RenderedDocument:
+    """HTML sections and the metadata destination for one documentation bundle."""
+
+    output_dir: Path
+    metadata_path: Path
+    sections: list[tuple[str, str]]
+
+    def write(self) -> WrittenDocument:
+        """Write sections in order, then publish the index pointer to the first.
+
+        Metadata is best effort: the HTML is already published, so a failed
+        pointer must not fail the bundle. The outcome is returned rather than
+        logged here, so the caller records it where it has the context.
+
+        Returns
+        -------
+        WrittenDocument
+            The written HTML paths, the index pointer's destination, and
+            whether that pointer could be written. A failure carries the
+            ``OSError`` that stopped it.
+        """
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        written = []
+        for filename, html in self.sections:
+            path = self.output_dir / filename
+            path.write_text(html, encoding="utf-8")
+            written.append(path)
+        metadata_written = False
+        metadata_error: OSError | None = None
+        if written:
+            metadata = {"first_file": written[0].name}
+            try:
+                self.metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+            except OSError as error:
+                metadata_error = error
+            else:
+                metadata_written = True
+        return WrittenDocument(
+            html_paths=written,
+            metadata_path=self.metadata_path,
+            metadata_written=metadata_written,
+            metadata_error=metadata_error,
+        )
+
+
+def publish_document(document: RenderedDocument) -> list[Path]:
+    """Publish one bundle, reporting a metadata failure without raising.
+
+    Parameters
+    ----------
+    document : RenderedDocument
+        The rendered bundle to write.
+
+    Returns
+    -------
+    list[Path]
+        Written HTML paths in section order.
+    """
+    written = document.write()
+    if written.html_paths and not written.metadata_written:
+        _log.warning(
+            "could not write document metadata for %s",
+            written.metadata_path,
+            exc_info=written.metadata_error,
+        )
+    return written.html_paths
 
 
 class PageContentGenerator:
     """Fetch page markdown and emit themed HTML per section."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913 -- one seam per injected collaborator
         self,
         page_config: PageConfig,
         *,
         templates_dir: Path | None = None,
         source_url: str | None = None,
         output_dir: Path | None = None,
+        github_token: str | None = None,
+        github_client: GitHub | None = None,
+        doc_updated_at: dt.datetime | None = None,
+        fetcher: DocumentFetcher = fetch_document,
+        mermaid: MermaidRenderer | None = None,
     ) -> None:
         """Initialize the generator with configuration and template context.
+
+        Construction performs no I/O: no document is fetched, no template is
+        read, no path is resolved, no commit date is looked up and no output
+        directory is created.
+        The network is reached only by :meth:`render`; template and Mermaid
+        I/O happens in :meth:`prepare_document`.
 
         Parameters
         ----------
@@ -68,28 +237,39 @@ class PageContentGenerator:
             Override for the document source URL; falls back to the page config.
         output_dir : Path, optional
             Override for the HTML output directory; defaults to the page config output.
+        github_token : str, optional
+            Token used for the commit-date lookup. The caller reads it at the
+            command boundary so this module never consults the environment.
+        github_client : github3.GitHub, optional
+            Client for the commit-date lookup, injected by tests and by callers
+            that already hold one.
+        doc_updated_at : datetime, optional
+            Date already resolved for the document. The configured release
+            date takes precedence over it.
+        fetcher : DocumentFetcher, optional
+            Callable that turns a :class:`DocumentSource` into markdown. Tests
+            inject one that fails if called, to prove a path never fetches.
+        mermaid : MermaidRenderer, optional
+            Renderer for the document's fenced diagrams. Tests inject one that
+            fails if called, to prove a path compiles no diagram.
         """
         self.page = page_config
         self.output_dir_override = output_dir
-        default_templates = Path(__file__).resolve().parents[1] / "templates"
-        self.templates_dir = templates_dir or default_templates
+        self.templates_dir = templates_dir or DEFAULT_TEMPLATES_DIR
         self.renderer = HtmlContentRenderer(
-            page_config.pygments_style, link_extension=_build_link_rewriter(page_config)
+            page_config.pygments_style,
+            link_extension=_build_link_rewriter(page_config),
+            mermaid=mermaid,
         )
-        self.description_resolver = ManifestDescriptionResolver()
-        self.page_description = self._resolve_description()
-        self.doc_version: str | None = None
-        self.doc_version_display: str | None = None
-        self._github_client: GitHub | None = None
-        self.doc_updated_at: dt.datetime | None = self._resolve_doc_updated_at()
-        self.env = Environment(
-            loader=FileSystemLoader(str(self.templates_dir)),
-            autoescape=select_autoescape(["html", "xml"]),
-            trim_blocks=True,
-            lstrip_blocks=True,
+        self._description_resolver = ManifestDescriptionResolver()
+        self.env: Environment = template_environment(
+            self.templates_dir, escape_by_suffix=True
         )
-        self.template = self.env.get_template("doc_page.jinja")
-        self.source_url = self._resolve_source_url(source_url)
+        self.source = resolve_document_source(page_config, source_url)
+        self.doc_updated_at = page_config.latest_release_published_at or doc_updated_at
+        self._github_token = github_token
+        self._github_client = github_client
+        self._fetcher = fetcher
 
     def run(self) -> list[Path]:
         """Render every section into themed HTML files on disk.
@@ -101,6 +281,8 @@ class PageContentGenerator:
 
         Raises
         ------
+        requests.RequestException
+            If the upstream document cannot be fetched.
         RuntimeError
             Raised when the source markdown contains no second-level sections to render.
 
@@ -109,26 +291,186 @@ class PageContentGenerator:
         Side effects include writing HTML files and metadata artifacts into the
         configured output directory.
         """
-        markdown_source = self._fetch_markdown()
-        sections = parse_sections(markdown_source)
+        return publish_document(self.render())
+
+    def render(self) -> RenderedDocument:
+        """Fetch the page's markdown and render it into an unpublished bundle.
+
+        This is the command that reaches the network and the clock: it fetches
+        the document, selects the build timestamp and, when no release date is
+        configured, asks GitHub for the latest commit date. A failed commit
+        date lookup is logged with the page key and the page renders without
+        that date, since decoration must never stop a page being published. It
+        then hands the markdown to :meth:`prepare_document` and the prepared
+        result to :meth:`render_document`.
+
+        Returns
+        -------
+        RenderedDocument
+            The HTML and destination paths ready for the writer.
+
+        Raises
+        ------
+        requests.RequestException
+            If the document cannot be fetched, or a candidate fails for a
+            reason other than a missing release-pinned document.
+        RuntimeError
+            If the upstream document has no second-level sections.
+        """
+        updated_at = self.doc_updated_at or self._resolve_commit_date()
+        fetched = self._fetcher(self.source, updated_at=updated_at)
+        # A release-pinned fetch that falls back to the branch answered from a
+        # different tree, so the prepared document captures the ref that
+        # answered rather than the configured pin.
+        prepared = self.prepare_document(fetched.text, link_ref=fetched.ref)
+        return self.render_document(
+            prepared,
+            source_url=fetched.source_url,
+            # A fetcher reports a release tag, so it is displayed the way the
+            # configured release pin is.
+            version_display=DocumentSource(
+                fetched.source_url, version=fetched.version
+            ).version_display,
+            page_description=self._resolve_description(),
+            updated_at=fetched.updated_at,
+            generated_at=build_timestamp(),
+        )
+
+    def _resolve_commit_date(self) -> dt.datetime | None:
+        """Ask GitHub for the document's latest commit date, best effort.
+
+        The client is built here, at the command boundary that reaches the
+        network, rather than inside the query. A failed lookup is logged with
+        the page key and reported as no date, so a page still publishes when
+        its date cannot be read.
+        """
+        client = self._github_client or GitHub(token=self._github_token)
+        try:
+            return resolve_doc_updated_at(self.page, client=client)
+        except gh_exc.GitHubException as error:
+            _log.warning(
+                "could not resolve the commit date for page %s: %s",
+                self.page.key,
+                error,
+            )
+            return None
+
+    def prepare_document(
+        self, markdown: str, *, link_ref: str | None = None
+    ) -> PreparedDocument:
+        """Do the document's side-effecting work ahead of rendering.
+
+        This is a command, not a query. It registers every template in
+        :attr:`templates_dir` with the environment, so rendering never returns
+        to the filesystem, and it compiles the document's Mermaid fences to
+        figures. What it returns is therefore safe to render anywhere.
+
+        Parameters
+        ----------
+        markdown : str
+            The document body as fetched.
+        link_ref : str, optional
+            Git ref the fetch answered from. It is captured into the prepared
+            markdown, so a document prepared from a release keeps release
+            links even after another document's fetch falls back to a branch.
+
+        Returns
+        -------
+        PreparedDocument
+            The parsed sections, the prepared markdown backing them, and the
+            template that renders a section.
+
+        Raises
+        ------
+        OSError
+            If a template file cannot be read.
+        """
+        self._register_templates()
+        content = self.renderer.prepare_markdown(markdown, link_ref=link_ref)
+        return PreparedDocument(
+            sections=parse_sections(content.markdown),
+            template=self.env,
+            markdown=content,
+        )
+
+    def _register_templates(self) -> None:
+        """Register every template file so rendering never reads the disk.
+
+        MiniJinja exposes no way to load a template without rendering it, so
+        the whole directory is registered ahead of the first render. Registering
+        an include as well as the document template is what keeps a lazy import
+        from reaching back to the filesystem mid-render.
+        """
+        for path in sorted(self.templates_dir.rglob(f"*{_TEMPLATE_SUFFIX}")):
+            name = path.relative_to(self.templates_dir).as_posix()
+            self.env.add_template(name, path.read_text(encoding="utf-8"))
+
+    def render_document(  # noqa: PLR0913 -- provenance and timestamp are values
+        self,
+        prepared: PreparedDocument,
+        *,
+        source_url: str,
+        version_display: str | None,
+        page_description: str,
+        updated_at: dt.datetime | None = None,
+        generated_at: dt.datetime,
+    ) -> RenderedDocument:
+        """Render a prepared document into an unpublished bundle.
+
+        The method performs no I/O: it builds the section models from the
+        supplied sections and renders the template against the supplied
+        provenance. A caller can therefore render a fixture, or re-render a
+        cached document, without a network call, a filesystem read, an
+        environment lookup or an output write.
+
+        Parameters
+        ----------
+        prepared : PreparedDocument
+            The document returned by :meth:`prepare_document`.
+        source_url : str
+            URL the document was fetched from, shown in the page chrome.
+        version_display : str or None
+            Release version without its leading ``v``, or ``None`` when the
+            document is not pinned to a release.
+        page_description : str
+            Description used in the page's metadata tags.
+        updated_at : datetime, optional
+            Date shown as the document's "Updated" badge; ``generated_at`` is
+            used when omitted.
+        generated_at : datetime
+            The build timestamp to stamp the page with. It is a parameter
+            rather than a lookup, so the same prepared document renders
+            identically on every call.
+
+        Returns
+        -------
+        RenderedDocument
+            The HTML and destination paths ready for the writer.
+
+        Raises
+        ------
+        RuntimeError
+            If the prepared document has no second-level sections.
+        """
+        sections = prepared.sections
         if not sections:
             msg = "No second-level sections were found in the upstream markdown."
             raise RuntimeError(msg)
 
         out_dir = self.output_dir_override or self.page.output_dir
-        out_dir.mkdir(parents=True, exist_ok=True)
 
-        generated_at = dt.datetime.now(dt.UTC)
-        doc_updated_at = self.doc_updated_at or generated_at
+        doc_updated_at = updated_at or generated_at
         section_bundle: list[tuple[Section, SectionModel, str]] = []
         for section in sections:
             layout = self._resolve_layout(section.slug)
-            section_model = self._build_section_model(section, layout)
+            section_model = self._build_section_model(
+                section, layout, prepared.markdown.figures, prepared.markdown.link_ref
+            )
             html_title = self._format_page_title(section)
             section_bundle.append((section, section_model, html_title))
 
         nav_groups = self._build_nav_groups([bundle[1] for bundle in section_bundle])
-        written: list[Path] = []
+        rendered = []
         for section, section_model, html_title in section_bundle:
             context = {
                 "section": section_model,
@@ -136,229 +478,30 @@ class PageContentGenerator:
                 "theme": self.page.theme,
                 "generated_at": generated_at,
                 "doc_updated_at": doc_updated_at,
-                "doc_version": self.doc_version_display,
-                "source_url": self.source_url,
+                "doc_version": version_display,
+                "source_url": source_url,
                 "source_label": self.page.source_label,
                 "pygments_css": self.renderer.stylesheet,
                 "page": self.page,
-                "page_description": self.page_description,
+                "page_description": page_description,
                 "html_title": html_title,
                 "footer_note": self.page.footer_note,
             }
-            html = self.template.render(**context)
+            html = prepared.template.render_template(DOCUMENT_TEMPLATE, **context)
             filename = f"{self.page.filename_prefix}{section.slug}.html"
-            output_path = out_dir / filename
-            output_path.write_text(html, encoding="utf-8")
-            written.append(output_path)
-        if written:
-            self._write_metadata(written[0].name)
-        return written
-
-    def _resolve_doc_updated_at(self) -> dt.datetime | None:
-        """Return the latest release date, else the doc commit date if any."""
-        if self.page.latest_release_published_at:
-            return self.page.latest_release_published_at
-        return self._fetch_doc_commit_date()
-
-    def _github(self) -> GitHub:
-        """Return a cached github3.py client, lazily configured from env tokens."""
-        if self._github_client is None:
-            token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
-            self._github_client = GitHub(token=token)
-        return self._github_client
-
-    def _fetch_doc_commit_date(self) -> dt.datetime | None:
-        """Return the latest commit timestamp for the page repo or None on errors."""
-        result: dt.datetime | None = None
-        repo_slug = self.page.repo
-        if repo_slug:
-            try:
-                owner, name = repo_slug.split("/", 1)
-            except ValueError:
-                owner = name = None
-
-            if owner and name:
-                branch = self.page.branch or "main"
-                doc_path = self.page.doc_path.lstrip("/")
-                try:
-                    repository = self._github().repository(owner, name)
-                except gh_exc.GitHubException:
-                    repository = None
-
-                if repository is not None:
-                    try:
-                        commits = repository.commits(path=doc_path, sha=branch)
-                    except gh_exc.GitHubException:
-                        commits = None
-
-                    if commits is not None:
-                        try:
-                            latest_commit = next(iter(commits), None)
-                        except gh_exc.GitHubException:
-                            latest_commit = None
-                        if latest_commit:
-                            result = self._extract_commit_timestamp(latest_commit)
-
-        return result
-
-    def _extract_commit_timestamp(self, commit: object) -> dt.datetime | None:
-        """Extract a commit datetime from github3 objects or dict payloads.
-
-        Parameters
-        ----------
-        commit : object
-            Commit object or dictionary exposing ``commit.author``/``committer``
-            with ``date`` attributes.
-
-        Returns
-        -------
-        datetime | None
-            The first normalized commit timestamp, or ``None`` when unavailable.
-        """
-        commit_payload = getattr(commit, "commit", None)
-        if commit_payload is None and isinstance(commit, dict):
-            commit_payload = typ.cast("dict[str, typ.Any]", commit).get("commit")
-        if commit_payload is None:
-            return None
-
-        actors: list[typ.Any] = []
-        for attr in ("author", "committer"):
-            actor = getattr(commit_payload, attr, None)
-            if actor is None and isinstance(commit_payload, dict):
-                actor = commit_payload.get(attr)
-            if actor is not None:
-                actors.append(actor)
-
-        for actor in actors:
-            date_value = getattr(actor, "date", None)
-            if date_value is None and isinstance(actor, dict):
-                date_value = actor.get("date")
-            normalized = self._normalize_commit_date(date_value)
-            if normalized:
-                return normalized
-        return None
-
-    @staticmethod
-    def _normalize_commit_date(value: object) -> dt.datetime | None:
-        """Normalize a commit timestamp value into a UTC datetime, if possible."""
-        result: dt.datetime | None = None
-        if value is None:
-            result = None
-        elif isinstance(value, dt.datetime):
-            if value.tzinfo is None:
-                result = value.replace(tzinfo=dt.UTC)
-            else:
-                result = value.astimezone(dt.UTC)
-        elif isinstance(value, str):
-            sanitized = value.strip()
-            if sanitized:
-                sanitized = sanitized.replace("Z", "+00:00")
-                try:
-                    parsed = dt.datetime.fromisoformat(sanitized)
-                except ValueError:
-                    parsed = None
-                if parsed is not None:
-                    if parsed.tzinfo is None:
-                        result = parsed.replace(tzinfo=dt.UTC)
-                    else:
-                        result = parsed.astimezone(dt.UTC)
-        return result
-
-    def _fetch_markdown(self) -> str:
-        """Download markdown from the resolved source URL, updating doc timestamps.
-
-        When the release-pinned URL is missing the document (a guide added
-        after the release was cut), fall back to the branch source URL and
-        drop the version pin rather than failing the whole generation run.
-        """
-        session = requests.Session()
-        retry = Retry(
-            total=5,
-            read=5,
-            connect=3,
-            backoff_factor=0.5,
-            status_forcelist=(500, 502, 503, 504),
-            allowed_methods=("GET", "HEAD"),
-        )
-        adapter = HTTPAdapter(max_retries=retry)
-        session.mount("https://", adapter)
-        session.mount("http://", adapter)
-        try:
-            resp = session.get(self.source_url, timeout=30)
-            fallback_url = self.page.source_url
-            if (
-                getattr(resp, "status_code", None) == requests.codes.not_found
-                and self.doc_version
-                and fallback_url
-                and fallback_url != self.source_url
-            ):
-                self.doc_version = None
-                self.doc_version_display = None
-                self.doc_updated_at = None
-                self.source_url = fallback_url
-                resp = session.get(fallback_url, timeout=30)
-            resp.raise_for_status()
-            if not self.doc_updated_at:
-                self.doc_updated_at = self._extract_timestamp(
-                    resp.headers.get("Last-Modified")
-                )
-            return resp.text
-        finally:
-            session.close()
-
-    def _resolve_source_url(self, override: str | None) -> str:
-        """Return the effective markdown source URL, tracking release versions."""
-        if override:
-            return override
-        if self.page.repo and self.page.latest_release:
-            self.doc_version = self.page.latest_release
-            self.doc_version_display = self._strip_version_prefix(self.doc_version)
-            return _build_release_url(
-                self.page.repo, self.page.latest_release, self.page.doc_path
-            )
-        return self.page.source_url
-
-    def _extract_timestamp(self, header_value: str | None) -> dt.datetime:
-        """Parse an HTTP Last-Modified header into a timezone-aware UTC datetime."""
-        if header_value:
-            try:
-                parsed = parsedate_to_datetime(header_value)
-            except (TypeError, ValueError):
-                parsed = None
-            if parsed is not None:
-                if parsed.tzinfo is None:
-                    parsed = parsed.replace(tzinfo=dt.UTC)
-                return parsed.astimezone(dt.UTC)
-        return dt.datetime.now(dt.UTC)
+            rendered.append((filename, html))
+        return RenderedDocument(out_dir, self._metadata_path(), rendered)
 
     def _resolve_description(self) -> str:
         """Return the page description override or fetch it from the manifest."""
         if self.page.description_override:
             return self.page.description_override
-        return self.description_resolver.resolve(self.page)
-
-    @staticmethod
-    def _strip_version_prefix(tag: str | None) -> str | None:
-        """Strip a leading ``v`` or ``V`` if more follows; ``None`` if empty."""
-        if not tag:
-            return None
-        if tag.upper().startswith("V") and len(tag) > 1:
-            return tag[1:]
-        return tag
+        return self._description_resolver.resolve(self.page)
 
     def _metadata_path(self) -> Path:
         """Return the path to the metadata JSON file for this page."""
         filename = PAGE_META_TEMPLATE.format(key=self.page.key)
         return self.page.output_dir / filename
-
-    def _write_metadata(self, first_filename: str) -> None:
-        """Persist the metadata JSON that records the first generated filename."""
-        metadata = {"first_file": first_filename}
-        path = self._metadata_path()
-        try:
-            path.write_text(json.dumps(metadata), encoding="utf-8")
-        except OSError:  # pragma: no cover - IO issues
-            return
 
     def _build_nav_groups(
         self, section_models: list[SectionModel]
@@ -397,14 +540,22 @@ class PageContentGenerator:
         return self.page.layouts.get(slug, SectionLayout())
 
     def _build_section_model(
-        self, section: Section, layout: SectionLayout
+        self,
+        section: Section,
+        layout: SectionLayout,
+        figures: cabc.Mapping[str, str],
+        link_ref: str | None = None,
     ) -> SectionModel:
         """Construct a SectionModel with rendered HTML and layout metadata."""
-        intro_html = self.renderer.markdown(section.intro_markdown)
-        default_html = self.renderer.markdown(section.markdown)
+        intro_html = self.renderer.markdown(
+            section.intro_markdown, figures=figures, link_ref=link_ref
+        )
+        default_html = self.renderer.markdown(
+            section.markdown, figures=figures, link_ref=link_ref
+        )
         numbered_steps: list[NumberedStep] = []
         split_panel = {"primary_html": "", "secondary_html": ""}
-        subsections = self._build_subsection_blocks(section)
+        subsections = self._build_subsection_blocks(section, figures, link_ref)
         toc_items = [
             {"label": block["title"], "anchor": block["anchor"]}
             for block in subsections
@@ -412,9 +563,13 @@ class PageContentGenerator:
         resolved_layout = layout.device
 
         if layout.device == "numbered_steps":
-            subsection_anchors = {b["title"]: b["anchor"] for b in subsections}
-            numbered_steps = self._prepare_numbered_steps(
-                section, layout, subsection_anchors=subsection_anchors
+            numbered_steps = prepare_numbered_steps(
+                self.renderer,
+                section,
+                layout,
+                figures=figures,
+                link_ref=link_ref,
+                subsection_anchors=[block["anchor"] for block in subsections],
             )
             if not numbered_steps:
                 resolved_layout = "default"
@@ -424,7 +579,9 @@ class PageContentGenerator:
                     for step in numbered_steps
                 ]
         elif layout.device == "split_panel":
-            split_panel = self._prepare_split_panel(section, layout)
+            split_panel = prepare_split_panel(
+                self.renderer, section, layout, figures, link_ref=link_ref
+            )
             if not split_panel.get("secondary_html"):
                 resolved_layout = "default"
 
@@ -442,92 +599,18 @@ class PageContentGenerator:
             toc_items=toc_items,
         )
 
-    def _prepare_numbered_steps(
-        self,
-        section: Section,
-        layout: SectionLayout,
-        *,
-        subsection_anchors: dict[str, str] | None = None,
-    ) -> list[NumberedStep]:
-        """Return numbered step data for ``section`` based on the provided layout.
-
-        Parameters
-        ----------
-        section : Section
-            The parsed markdown section containing subsections.
-        layout : SectionLayout
-            Layout configuration that may specify a custom step ordering.
-        subsection_anchors : dict[str, str] or None, optional
-            Mapping of subsection title to content-based anchor string, as
-            produced by :meth:`_build_subsection_blocks`.  When provided, each
-            step's ``content_anchor`` is set to the corresponding value so that
-            nav links and in-page anchors remain consistent.
-        """
-        subsections = list(section.subsections)
-        if not subsections:
-            return []
-
-        if layout.step_order:
-            ordered: list[Subsection] = []
-            lower_map = {sub.title.lower(): sub for sub in subsections}
-            for desired in layout.step_order:
-                match = lower_map.get(desired.lower())
-                if match and match not in ordered:
-                    ordered.append(match)
-            for sub in subsections:
-                if sub not in ordered:
-                    ordered.append(sub)
-            subsections = ordered
-
-        anchors = subsection_anchors or {}
-        steps: list[NumberedStep] = []
-        for idx, sub in enumerate(subsections, start=1):
-            html = self.renderer.markdown(sub.markdown)
-            step_anchor = f"{section.slug}-step-{idx}"
-            content_anchor = anchors.get(sub.title, step_anchor)
-            steps.append(
-                NumberedStep(
-                    title=sub.title,
-                    number=idx,
-                    html=html,
-                    anchor=step_anchor,
-                    content_anchor=content_anchor,
-                )
-            )
-        return steps
-
-    def _prepare_split_panel(
-        self, section: Section, layout: SectionLayout
-    ) -> dict[str, str]:
-        """Render split-panel HTML blocks for the section based on layout hints."""
-        matches = list(CODE_BLOCK_PATTERN.finditer(section.markdown))
-        if not matches:
-            return {
-                "primary_html": self.renderer.markdown(section.markdown),
-                "secondary_html": "",
-            }
-
-        index = layout.emphasized_code_block or 0
-        if index >= len(matches):
-            index = 0
-        match = matches[index]
-        lang = match.group(1) or "text"
-        code = match.group(2).strip("\n")
-        before = section.markdown[: match.start()]
-        after = section.markdown[match.end() :]
-        primary_md = (before + "\n\n" + after).strip()
-        return {
-            "primary_html": self.renderer.markdown(primary_md),
-            "secondary_html": self.renderer.code_block(code, lang),
-        }
-
     def _format_page_title(self, section: Section) -> str:
         """Compose the HTML title using site name, section, and configured suffix."""
         site_name = self.page.theme.site_name
         suffix = self.page.page_title_suffix
         return f"{site_name} — {section.short_title} | {suffix}"
 
-    def _build_subsection_blocks(self, section: Section) -> list[dict[str, str]]:
+    def _build_subsection_blocks(
+        self,
+        section: Section,
+        figures: cabc.Mapping[str, str],
+        link_ref: str | None = None,
+    ) -> list[dict[str, str]]:
         """Return rendered subsection blocks with unique anchors for ``section``."""
         if not section.subsections:
             return []
@@ -536,7 +619,9 @@ class PageContentGenerator:
         used: set[str] = set()
         for idx, sub in enumerate(section.subsections, start=1):
             anchor = self._section_anchor(section.slug, sub.title, idx, used)
-            html = self.renderer.markdown(sub.markdown)
+            html = self.renderer.markdown(
+                sub.markdown, figures=figures, link_ref=link_ref
+            )
             blocks.append({"title": sub.title, "anchor": anchor, "html": html})
         return blocks
 
@@ -573,7 +658,22 @@ class PageContentGenerator:
         return label.strip().rstrip(":").strip()
 
 
-def _build_release_url(repo: str, tag: str, path: str) -> str:
-    """Return the raw GitHub URL for the file at ``path`` within a tagged release."""
-    normalized = path.lstrip("/")
-    return f"https://raw.githubusercontent.com/{repo}/refs/tags/{tag}/{normalized}"
+__all__ = [
+    "DEFAULT_TEMPLATES_DIR",
+    "DOCUMENT_TEMPLATE",
+    "FETCH_TIMEOUT_SECONDS",
+    "DocumentFetcher",
+    "DocumentSource",
+    "DocumentTemplate",
+    "FetchedMarkdown",
+    "MarkdownResponse",
+    "PageContentGenerator",
+    "PreparedDocument",
+    "RenderedDocument",
+    "WrittenDocument",
+    "fetch_document",
+    "fetch_markdown",
+    "publish_document",
+    "resolve_doc_updated_at",
+    "resolve_document_source",
+]

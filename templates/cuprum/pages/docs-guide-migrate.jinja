@@ -92,7 +92,7 @@
     <code>output=</code>:
   </p>
 {% call ui.code_panel('run_output_options.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import io
 import sys
 
@@ -115,7 +115,7 @@ except TypeError:
     pass
 else:
     raise AssertionError("the 0.1 keyword should be rejected")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     <code>Pipeline.run()</code> and <code>run_sync()</code> still accept the
@@ -134,7 +134,7 @@ else:
     bindings in one value. The old keywords raise <code>TypeError</code>.
   </p>
 {% call ui.code_panel('scope_config.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ScopeConfig, current_context, scoped
@@ -146,7 +146,7 @@ started = []
 with scoped(ScopeConfig(allowlist=frozenset([PYTHON]), before_hooks=(started.append,))):
     assert current_context().is_allowed(PYTHON)
     assert not current_context().is_allowed(Program("rm"))
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     When the scope only needs the programs of a catalogue,
@@ -163,7 +163,7 @@ with scoped(ScopeConfig(allowlist=frozenset([PYTHON]), before_hooks=(started.app
     may run.
   </p>
 {% call ui.code_panel('disjoint_scopes.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import Program, ScopeConfig, current_context, scoped
 
 GIT, TAR = Program("git"), Program("tar")
@@ -172,7 +172,7 @@ with scoped(ScopeConfig(allowlist=frozenset([GIT]))):
         # 0.1 allowed both here; 0.2.0 allows neither.
         assert not current_context().is_allowed(GIT)
         assert not current_context().is_allowed(TAR)
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     The default context, outside any scope, still permits every program.
@@ -193,7 +193,7 @@ with scoped(ScopeConfig(allowlist=frozenset([GIT]))):
     the right call:
   </p>
 {% call ui.code_panel('reserved_options.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -208,7 +208,7 @@ except TypeError as exc:
     )
 else:
     raise AssertionError("cwd should not become a child flag")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Move the value to <code>run_sync</code>, passing
@@ -236,7 +236,7 @@ else:
     a path, yourself:
   </p>
 {% call ui.code_panel('typed_arguments.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import Program, ProgramCatalogue, sh
 
 catalogue = ProgramCatalogue.from_programs("echo", name="typed-arguments")
@@ -246,14 +246,14 @@ builder = sh.make(Program("echo"), catalogue=catalogue)
 tags = ["a", "b"]
 command = builder("--tags", ",".join(tags))
 assert command.argv == ("--tags", "a,b")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Decode caller-held filesystem bytes with <code>os.fsdecode()</code>
     before building the command:
   </p>
 {% call ui.code_panel('bytes_arguments.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import os
 import sys
 
@@ -264,7 +264,7 @@ python = sh.make(Program(sys.executable), catalogue=catalogue)
 argument = os.fsdecode(b"v\xc3\xbf")
 command = python("-c", "print('two words')", argument)
 assert command.argv == ("-c", "print('two words')", argument)
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     <code>os.fsdecode()</code> uses the configured filesystem encoding and
@@ -318,7 +318,7 @@ assert command.argv == ("-c", "print('two words')", argument)
     a default arm:
   </p>
 {% call ui.code_panel('exhaustive_hook.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import ExecEvent, Program, ProgramCatalogue, sh
@@ -339,7 +339,7 @@ def hook(event: ExecEvent) -> None:
 with sh.observe(hook):
     python("-c", "pass").run_sync()
 assert [outcome.value for outcome in outcomes] == ["exit_zero"]
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     <code>settled</code> is the one most hooks will want. It is emitted once
@@ -438,14 +438,14 @@ assert [outcome.value for outcome in outcomes] == ["exit_zero"]
     catalogue straight from programs, as every example here does.
   </p>
 {% call ui.code_panel('catalogue.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import Program
 from cuprum.catalogue import ProgramCatalogue, ProjectSettings
 
 settings = ProjectSettings(name="rust-test-gates", programs=(Program("cargo"),))
 catalogue = ProgramCatalogue.from_project(settings)
 assert catalogue.lookup(Program("cargo")).project_name == "rust-test-gates"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 
   <h3 id="lines">Line-level output</h3>
@@ -520,7 +520,7 @@ assert catalogue.lookup(Program("cargo")).project_name == "rust-test-gates"
     result.
   </p>
 {% call ui.code_panel('executable_bindings.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, ScopeConfig, bind_executable, scoped, sh
@@ -536,7 +536,7 @@ with (
     result = python("-c", "import sys; sys.stdout.write(sys.executable)").run_sync()
     assert result.program == PYTHON, "the catalogue identity is preserved"
     assert result.resolved_path == sys.executable, "the bound path ran instead"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     A binding does not grant permission: a program outside the allowlist is
@@ -598,7 +598,7 @@ with (
     behaves as before:
   </p>
 {% call ui.code_panel('broken_pipe.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import (
@@ -615,7 +615,7 @@ options = RunOutputOptions(broken_pipe_policy=BrokenPipePolicy.BEST_EFFORT)
 assert options.broken_pipe_policy is BrokenPipePolicy.BEST_EFFORT
 result = command.run_sync(output=options)
 assert result.ok and result.stdout == "hello\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Under best-effort, a <code>BrokenPipeError</code> from a sink disables
@@ -633,7 +633,7 @@ assert result.ok and result.stdout == "hello\n"
     the stderr sink and never into captured output.
   </p>
 {% call ui.code_panel('heartbeat.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
@@ -642,7 +642,7 @@ catalogue = ProgramCatalogue.from_programs(sys.executable, name="idle")
 command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('done')")
 result = command.run_sync(output=RunOutputOptions(idle_after=30.0))
 assert result.ok and result.stdout == "done\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     <code>on_idle(elapsed_total, elapsed_idle)</code> replaces the notice.
@@ -652,7 +652,7 @@ assert result.ok and result.stdout == "done\n"
     something off the loop drains:
   </p>
 {% call ui.code_panel('queue_sink.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import queue
 
 
@@ -674,7 +674,7 @@ sink = QueueSink(pending)
 sink.write("ready")
 sink.flush()
 assert pending.get_nowait() == "ready"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 
   <h3 id="sink">An opt-in presentation sink</h3>
@@ -684,7 +684,7 @@ assert pending.get_nowait() == "ready"
     one error annotation. Nothing is framed unless a sink is passed.
   </p>
 {% call ui.code_panel('actions_sink.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
@@ -696,7 +696,7 @@ result = command.run_sync(
     output=RunOutputOptions(echo=True, sink=GitHubActionsSink()),
 )
 assert result.ok and result.stdout == "hello\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 
   <h3 id="flags">Group and annotate flags</h3>
@@ -706,7 +706,7 @@ assert result.ok and result.stdout == "hello\n"
     framing without constructing a sink:
   </p>
 {% call ui.code_panel('flags.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
@@ -718,7 +718,7 @@ options = RunOutputOptions(echo=True, group=True, annotate_failure=True)
 assert isinstance(options.sink, GitHubActionsSink)
 result = command.run_sync(output=options)
 assert result.ok and result.stdout == "hello\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Both default to <code>False</code>, so existing applications need no
@@ -740,7 +740,7 @@ assert result.ok and result.stdout == "hello\n"
     that does not opt in behaves as before:
   </p>
 {% call ui.code_panel('process_group.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import ExecutionContext, ProcessGroupPolicy, Program, ProgramCatalogue, sh
@@ -754,7 +754,7 @@ assert owned.process_group is ProcessGroupPolicy.OWN_GROUP
 assert command.run_sync(context=owned).stdout == "True\n"
 # The default is unchanged: a run that says nothing keeps the caller's group.
 assert ExecutionContext().process_group is ProcessGroupPolicy.INHERIT
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Under <code>OWN_GROUP</code> the child leads a new session and process
@@ -776,7 +776,7 @@ assert ExecutionContext().process_group is ProcessGroupPolicy.INHERIT
     transfer. Nothing is installed until a hook is registered.
   </p>
 {% call ui.code_panel('stream_metrics.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -790,7 +790,7 @@ command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('he
 with observe_stream_operation(stream_operation_metrics_hook(metrics)):
     result = command.run_sync()
 assert result.ok and result.stdout == "hello\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 
   <h3 id="windows-handle">The Windows raw-handle hand-off outcome</h3>

@@ -32,7 +32,7 @@
             <h2 id="guides-title" class="cu-docs__part-title">Guides</h2>
             <ul class="cu-card-grid" role="list">
               {% for guide in docs_guides %}
-              <li>{{ ui.card(guide.title, guide.summary, number='Guide ' ~ '%02d' % loop.index, href=guide.href, heading='h3') }}</li>
+              <li>{{ ui.card(guide.title, guide.summary, number='Guide ' ~ '%02d' | format(loop.index), href=guide.href, heading='h3') }}</li>
               {% endfor %}
             </ul>
           </section>

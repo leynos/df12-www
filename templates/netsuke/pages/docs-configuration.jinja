@@ -102,7 +102,7 @@
                         </div>
                         <div class="hm-config-keys__panels" data-config-keys-panels>
                             <div class="hm-config-keys__panel" id="config-keys-panel-build" data-config-keys-panel="build" role="group" aria-labelledby="config-keys-label-build">
-{% highlight 'toml' %}
+{% filter highlight('toml') %}
 # Keys are flat; this mirrors docs/sample-netsuke.toml
 # Manifest path override
 file = "Netsukefile"
@@ -112,10 +112,10 @@ jobs = 8
 default_targets = ["fmt", "lint", "test"]
 # Netsuke never prompts; `no_input = false` is rejected
 no_input = true
-{% endhighlight %}
+{% endfilter %}
                             </div>
                             <div class="hm-config-keys__panel" id="config-keys-panel-output" data-config-keys-panel="output" role="group" aria-labelledby="config-keys-label-output">
-{% highlight 'toml' %}
+{% filter highlight('toml') %}
 # Output policies
 progress = "auto"       # auto | always | never
 accessibility = "auto"  # auto | on | off
@@ -126,10 +126,10 @@ locale = "en-US"
 json = false
 # Diagnostic tracing, timing summaries, and a final metrics snapshot
 verbose = false
-{% endhighlight %}
+{% endfilter %}
                             </div>
                             <div class="hm-config-keys__panel" id="config-keys-panel-policy" data-config-keys-panel="policy" role="group" aria-labelledby="config-keys-label-policy">
-{% highlight 'toml' %}
+{% filter highlight('toml') %}
 # Network policy for the fetch() helper
 fetch_default_deny = false
 # Allow entries in a project .netsuke.toml are ignored
@@ -142,7 +142,7 @@ trust_project_fetch_policy = false
 # env() access: exact names, a block always wins
 env_allow_var = ["CI", "PACKAGE_REGISTRY_TOKEN"]
 env_block_var = ["AWS_SECRET_ACCESS_KEY"]
-{% endhighlight %}
+{% endfilter %}
                             </div>
                         </div>
                     </div>
@@ -186,7 +186,7 @@ env_block_var = ["AWS_SECRET_ACCESS_KEY"]
                     Seven keys bound manifest evaluation. They are not in <code>docs/sample-netsuke.toml</code>; the names and defaults below come from the upstream <a href="https://github.com/leynos/netsuke/blob/main/docs/users-guide.md#resource-budgets" class="hm-link">users' guide</a> and the CLI definition. Each has a <code>NETSUKE_</code> variable (the key in upper case) and a <code>--manifest-*</code> flag. Values must be positive integers.
                 </p>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
-{% highlight 'toml' %}
+{% filter highlight('toml') %}
 # Defaults shown; set these in trusted configuration
 manifest_evaluation_fuel = 1000000           # MiniJinja instructions per evaluation
 manifest_fuel = 100000000                    # MiniJinja instructions per manifest
@@ -195,7 +195,7 @@ manifest_rendered_manifest_bytes = 16777216  # 16 MiB across all rendered values
 manifest_source_bytes = 4194304              # 4 MiB of template source
 manifest_foreach_cardinality = 10000         # values per foreach
 manifest_expanded_entries = 50000            # targets and actions after expansion
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <p class="text-xs text-charcoal-mid max-w-3xl">A breach reports <code>Manifest resource budget exhausted</code> with the stage and limit, under the JSON code <code>netsuke::runner::manifest_budget_exceeded</code>.</p>
             </section>

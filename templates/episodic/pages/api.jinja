@@ -63,7 +63,7 @@
     {% call ui.code_block(
       "Upload a source, attach it to a job, and poll until ready",
       "Request shapes follow the users' guide; field names are not a published schema") %}
-      {% highlight 'bash', 'episodic-syntax' %}
+      {% filter highlight('bash', 'episodic-syntax') %}
       curl -X POST "$EPISODIC_BASE/v1/uploads" \
         -H "Authorization: Bearer REPLACE_WITH_TOKEN" \
         -H "Idempotency-Key: 2f8c1e40-upload-01" \
@@ -83,7 +83,7 @@
 
       curl "$EPISODIC_BASE/v1/ingestion-jobs/$JOB_ID" \
         -H "Authorization: Bearer REPLACE_WITH_TOKEN"
-      {% endhighlight %}
+      {% endfilter %}
     {% endcall %}
     <p>
       Repeating any of those <code>POST</code> requests with the same

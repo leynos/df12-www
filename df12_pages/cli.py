@@ -24,11 +24,15 @@ Regenerate a single page into a custom directory:
 
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 import subprocess
 import sys
+import time
 import typing as typ
+from concurrent.futures import ThreadPoolExecutor
+from itertools import batched
 from pathlib import Path
 
 import cyclopts
@@ -36,7 +40,13 @@ from cyclopts import App, Parameter
 
 from .about_page import AboutPageBuilder
 from .bump import bump_latest_release_metadata
-from .config import SharedContentPageChrome, SiteConfig, SubSiteConfig, load_site_config
+from .config import (
+    PageConfig,
+    SharedContentPageChrome,
+    SiteConfig,
+    SubSiteConfig,
+    load_site_config,
+)
 from .content_page import ContentPageGenerator
 from .deploy import (
     DEFAULT_CONFIG_PATH,
@@ -48,12 +58,27 @@ from .deploy import (
 )
 from .docs_index import DocsIndexBuilder
 from .generator import PageContentGenerator
+from .generator.page_generator import publish_document
 from .homepage import HomePageBuilder
 from .releases import GitHubReleaseClient
 from .shared_content import SharedContentGenerator
 from .subsite_homepage import SubSiteHomePageBuilder
 
+if typ.TYPE_CHECKING:
+    import collections.abc as cabc
+
+    from .generator.page_generator import RenderedDocument
+
+
+DEFAULT_DOC_WORKERS = 8
 DEFAULT_CONFIG = Path("config/pages.yaml")
+
+_log = logging.getLogger(__name__)
+
+
+class PagesUsageError(ValueError):
+    """A command-line argument combination the generator cannot honour."""
+
 
 app = App(name="pages", config=cyclopts.config.Env("INPUT_", command=False))  # type: ignore[unknown-argument]
 
@@ -89,6 +114,9 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         str | None,
         Parameter(help="Generate a specific sub-site only"),
     ] = None,
+    doc_workers: typ.Annotated[
+        int, Parameter(help="Concurrent documentation bundles")
+    ] = DEFAULT_DOC_WORKERS,
     all_sites: typ.Annotated[
         bool,
         Parameter(help="Generate main site and all sub-sites"),
@@ -112,6 +140,8 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         multiple pages are selected).
     site : str or None, optional
         Generate only the named sub-site (e.g. ``weaver``).
+    doc_workers : int
+        Maximum concurrent documentation bundles. Defaults to eight.
     all_sites : bool
         Generate the main site plus all configured sub-sites.
 
@@ -123,7 +153,8 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
     Raises
     ------
     ValueError
-        If ``--site`` and ``--all-sites`` are both supplied (mutually
+        If ``--doc-workers`` is less than one, or
+        if ``--site`` and ``--all-sites`` are both supplied (mutually
         exclusive).  If ``--source-url`` or ``--output-dir`` overrides are
         combined with ``--site``.  If ``--all-sites`` is combined with any
         partial-render override (``--page``, ``--source-url``,
@@ -131,12 +162,15 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         supplied when more than one page is requested.  If ``--site`` names an
         unknown sub-site.
     """
+    if doc_workers < 1:
+        msg = "--doc-workers must be at least one"
+        raise PagesUsageError(msg)
     if site and all_sites:
         msg = "--site and --all-sites are mutually exclusive"
-        raise ValueError(msg)
+        raise PagesUsageError(msg)
     if site and (source_url is not None or output_dir is not None):
         msg = "--source-url and --output-dir are not supported with --site"
-        raise ValueError(msg)
+        raise PagesUsageError(msg)
     if all_sites and (
         page is not None or source_url is not None or output_dir is not None
     ):
@@ -144,16 +178,29 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
             "--all-sites does not support partial render overrides"
             " (--page, --source-url, --output-dir)"
         )
-        raise ValueError(msg)
+        raise PagesUsageError(msg)
 
     site_config = load_site_config(config)
+
+    # One total per invocation, so a whole `--all-sites` run can be timed from
+    # the outside as well as from the per-site worker loop.
+    started = time.perf_counter()
+
+    github_token = _github_token()
 
     if site:
         if site not in site_config.sites:
             available = ", ".join(sorted(site_config.sites))
             msg = f"Unknown site '{site}'. Known sites: {available}"
-            raise ValueError(msg)
-        _generate_subsite(site_config, site_config.sites[site], page=page)
+            raise PagesUsageError(msg)
+        _generate_subsite(
+            site_config,
+            site_config.sites[site],
+            page=page,
+            doc_workers=doc_workers,
+            github_token=github_token,
+        )
+        _log.info("generated site %r in %.3f s", site, time.perf_counter() - started)
         return
 
     _generate_main_site(
@@ -161,19 +208,138 @@ def generate(  # noqa: PLR0913  FIXME: refactor into GenerateOptions dataclass
         page=page,
         source_url=source_url,
         output_dir=output_dir,
+        doc_workers=doc_workers,
+        github_token=github_token,
     )
 
     if all_sites:
         for subsite in site_config.sites.values():
-            _generate_subsite(site_config, subsite)
+            _generate_subsite(
+                site_config, subsite, doc_workers=doc_workers, github_token=github_token
+            )
+    _log.info("generated the requested sites in %.3f s", time.perf_counter() - started)
 
 
-def _generate_main_site(
+def _github_token() -> str | None:
+    """Return the GitHub token for commit-date lookups, read at the boundary."""
+    return os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+
+
+def _publish_documents(
+    pages: list[PageConfig],
+    workers: int,
+    render: cabc.Callable[[PageConfig], RenderedDocument],
+) -> cabc.Iterator[Path]:
+    """Render bundles and publish potentially overlapping paths in order.
+
+    Scheduling and publication live here and nowhere else: ``render`` is the
+    caller's command, so this unit makes no network request of its own. At
+    most one worker-sized batch of rendered HTML is held in memory, and each
+    batch publishes in configuration order whatever order its renders finish.
+
+    Parameters
+    ----------
+    pages : list[PageConfig]
+        Bundles in configuration order.
+    workers : int
+        Maximum concurrency; one bundle is published at a time regardless.
+    render : callable
+        Produces one bundle's :class:`RenderedDocument`; called from the pool.
+
+    Yields
+    ------
+    Path
+        Written HTML paths, in configuration order.
+    """
+    if workers == 1 or len(pages) <= 1:
+        for page in pages:
+            yield from publish_document(render(page))
+        return
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for batch in batched(pages, min(workers, len(pages)), strict=False):
+            for document in pool.map(render, batch):
+                yield from publish_document(document)
+
+
+def _write_documents(  # noqa: PLR0913 -- passes the single-bundle overrides through
+    pages: list[PageConfig],
+    workers: int,
+    *,
+    templates_dir: Path | None = None,
+    source_url: str | None = None,
+    output_dir: Path | None = None,
+    github_token: str | None = None,
+) -> cabc.Iterator[Path]:
+    """Time and log a publication run, yielding its paths in configuration order.
+
+    Parameters
+    ----------
+    pages : list[PageConfig]
+        Bundles in configuration order.
+    workers : int
+        Configured concurrency limit; the effective count is the smaller of it
+        and the bundle count.
+    templates_dir : Path, optional
+        Template root for sub-site bundles.
+    source_url : str, optional
+        Source URL override; only valid for a single bundle.
+    output_dir : Path, optional
+        Output directory override; only valid for a single bundle.
+    github_token : str, optional
+        Token passed to each generator for its commit-date lookup.
+
+    Yields
+    ------
+    Path
+        Written HTML paths, in configuration order.
+    """
+    started = time.perf_counter()
+    # The pool never runs more bundles at once than there are bundles to run.
+    effective_workers = min(workers, len(pages))
+    _log.info(
+        "rendering %d document bundle(s) with %d effective worker(s) (limit %d)",
+        len(pages),
+        effective_workers,
+        workers,
+    )
+
+    def render(page: PageConfig) -> RenderedDocument:
+        """Keep each generator and its render state local to one job."""
+        bundle_started = time.perf_counter()
+        try:
+            document = PageContentGenerator(
+                page,
+                templates_dir=templates_dir,
+                source_url=source_url,
+                output_dir=output_dir,
+                github_token=github_token,
+            ).render()
+        except Exception:
+            _log.exception("document bundle %r failed to render", page.key)
+            raise
+        _log.info(
+            "rendered document bundle %r in %.3f s",
+            page.key,
+            time.perf_counter() - bundle_started,
+        )
+        return document
+
+    yield from _publish_documents(pages, workers, render)
+    _log.info(
+        "wrote %d document bundle(s) in %.3f s",
+        len(pages),
+        time.perf_counter() - started,
+    )
+
+
+def _generate_main_site(  # noqa: PLR0913 -- one keyword per generator override
     site_config: SiteConfig,
     *,
+    doc_workers: int = DEFAULT_DOC_WORKERS,
     page: str | None = None,
     source_url: str | None = None,
     output_dir: Path | None = None,
+    github_token: str | None = None,
 ) -> None:
     """Generate the main df12 site pages."""
     shared_output_root = (
@@ -190,13 +356,14 @@ def _generate_main_site(
         msg = "Cannot override source_url/output_dir when generating multiple pages."
         raise ValueError(msg)
 
-    for page_config in target_pages:
-        generator = PageContentGenerator(
-            page_config, source_url=source_url, output_dir=output_dir
-        )
-        written = generator.run()
-        for path in written:
-            print(f"wrote {_format_path(path)}")
+    for path in _write_documents(
+        target_pages,
+        doc_workers,
+        source_url=source_url,
+        output_dir=output_dir,
+        github_token=github_token,
+    ):
+        print(f"wrote {_format_path(path)}")
 
     if page:
         return
@@ -247,7 +414,9 @@ def _generate_subsite(
     site_config: SiteConfig,
     subsite: SubSiteConfig,
     *,
+    doc_workers: int = DEFAULT_DOC_WORKERS,
     page: str | None = None,
+    github_token: str | None = None,
 ) -> None:
     """Generate all pages for a single sub-site.
 
@@ -257,10 +426,15 @@ def _generate_subsite(
         Top-level site configuration, used to resolve shared content.
     subsite : SubSiteConfig
         Configuration for the sub-site to generate.
+    doc_workers : int
+        Maximum number of upstream document bundles rendered concurrently.
     page : str or None, optional
         Specific page key to render; when ``None`` (default) all pages,
         the docs index, homepage, about page, shared content, content
         pages, and static assets are rendered.
+    github_token : str or None, optional
+        Token passed to each documentation bundle for its commit-date
+        lookup; read from the environment by :func:`generate`.
 
     Raises
     ------
@@ -283,11 +457,13 @@ def _generate_subsite(
     else:
         target_pages = list(subsite.pages.values())
 
-    for page_config in target_pages:
-        generator = PageContentGenerator(page_config, templates_dir=templates_dir)
-        written = generator.run()
-        for path in written:
-            print(f"[{subsite.key}] wrote {_format_path(path)}")
+    for path in _write_documents(
+        target_pages,
+        doc_workers,
+        templates_dir=templates_dir,
+        github_token=github_token,
+    ):
+        print(f"[{subsite.key}] wrote {_format_path(path)}")
 
     if page is not None:
         return
@@ -630,8 +806,25 @@ def main() -> None:
     --------
     >>> main()  # doctest: +SKIP
     """
+    # Surface the generator's progress and timing records on stderr, leaving
+    # stdout for the machine-readable "wrote ..." paths.
+    logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
+    if (
+        sys.implementation.name != "cpython"
+        or sys.version_info < (3, 15, 2)
+        or sys._is_gil_enabled()
+    ):
+        message = (
+            "pages requires free-threaded CPython 3.15.2 or newer with the GIL "
+            "disabled. Run 'uv python install' and 'uv sync --locked' from the "
+            "checkout and unset PYTHON_GIL."
+        )
+        raise SystemExit(message)
     try:
         app()
+    except PagesUsageError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(1) from None
     except subprocess.CalledProcessError as exc:
         detail = (exc.stderr or "").strip()
         if detail:

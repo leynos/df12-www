@@ -319,6 +319,8 @@ describe("compile-browser-scripts.ts as a build step", () => {
     expect(js).not.toContain("interface Pair");
   });
 
+  // Three nested `bun run` invocations, each compiling swc: a loaded host can
+  // push this past the default budget, so it states the budget it needs.
   test("skips an output newer than its source and recompiles once the source moves", () => {
     const root = fixtureTree();
     expect(runScript("compile-browser-scripts.ts", root).status).toBe(0);
@@ -330,7 +332,7 @@ describe("compile-browser-scripts.ts as a build step", () => {
     utimesSync(sourcePath, later, later);
     const third = runScript("compile-browser-scripts.ts", root);
     expect(third.output).toContain("browser scripts: 1 compiled, 0 up to date");
-  });
+  }, 30_000);
 
   test("says so and exits cleanly when there is no src/static", () => {
     const root = mkdtempSync(join(tmpdir(), "df12-compile-empty-"));

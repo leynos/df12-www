@@ -56,12 +56,22 @@ const BAD_VENDORED = `const count: number = "not a number";
 export { count };
 `;
 
+/* Colour is off in every child: an inherited FORCE_COLOR would otherwise put
+   ANSI escapes between "error" and "TS2322", and these tests assert on the
+   text of the compiler's output. */
+const SPAWN_ENV = {
+  ...process.env,
+  MAKEFLAGS: "",
+  FORCE_COLOR: "0",
+  NO_COLOR: "1",
+};
+
 /* Run the gate and report how it exited. */
 function typecheck() {
   const result = spawnSync("make", ["typecheck-js"], {
     cwd: REPO_ROOT,
     encoding: "utf8",
-    env: { ...process.env, MAKEFLAGS: "" },
+    env: SPAWN_ENV,
   });
   return { status: result.status, output: `${result.stdout ?? ""}${result.stderr ?? ""}` };
 }
@@ -129,6 +139,7 @@ describe("the typecheck-js target", () => {
       spawnSync(join(REPO_ROOT, "node_modules", ".bin", "tsc"), ["-b", "tsconfig.json"], {
         cwd: REPO_ROOT,
         encoding: "utf8",
+        env: SPAWN_ENV,
       });
     for (const info of ["tsconfig.browser.tsbuildinfo", "tsconfig.scripts.tsbuildinfo"]) {
       written.push(join(REPO_ROOT, info));

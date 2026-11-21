@@ -45,11 +45,13 @@ language, custom doc path, or manifest overrides; otherwise the CLI infers
 sensible defaults (for example Rust repos assume `docs/users-guide.md` and
 `Cargo.toml`).
 
-To refresh the docs, install the Python requirements (or rely on the embedded
-`uv` metadata) and run the `pages` CLI:
+The generator requires free-threaded CPython 3.15.2 or newer with the GIL
+disabled. From the checkout, install the pinned interpreter and refresh the
+docs with uv.
 
 ```bash
-pip install -r requirements.txt  # optional when not using `uv run`
+uv python install
+uv sync --locked
 uv run pages generate --page netsuke
 ```
 

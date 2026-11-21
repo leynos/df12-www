@@ -39,13 +39,13 @@ def test_subsite_homepage_preserves_configured_title(tmp_path: Path) -> None:
 def test_subsite_homepage_environment_registers_highlight_tag(
     tmp_path: Path,
 ) -> None:
-    """The builder's Jinja environment renders ``{% highlight %}`` blocks."""
+    """The builder's Jinja environment renders ``highlight`` blocks."""
     template_dir = tmp_path / "templates"
     template_dir.mkdir()
     (template_dir / "home_page.jinja").write_text(
-        "{% highlight 'netsuke' %}{% raw %}\n"
+        "{% filter highlight('netsuke') %}{% raw %}\n"
         + MANIFEST_FRAGMENT
-        + "{% endraw %}{% endhighlight %}\n",
+        + "{% endraw %}{% endfilter %}\n",
         encoding="utf-8",
     )
 

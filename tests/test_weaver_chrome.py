@@ -17,8 +17,12 @@ from __future__ import annotations
 import typing as typ
 from pathlib import Path
 
-import jinja2
 import pytest
+
+from df12_pages.templating import template_environment
+
+if typ.TYPE_CHECKING:
+    from minijinja import Environment
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WEAVER_TEMPLATES = REPO_ROOT / "templates" / "weaver"
@@ -32,25 +36,35 @@ CURRENT_CLASS = "weaver-nav-link--current"
 
 
 @pytest.fixture(scope="module")
-def chrome() -> typ.Any:  # noqa: ANN401 - a Jinja module namespace is dynamic
+def chrome() -> Environment:
     """Load `_chrome.jinja` in an environment of its own.
 
     Isolated from the generator's environment so these tests describe the
     template rather than the way the site happens to configure Jinja.
     """
-    environment = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(str(WEAVER_TEMPLATES)),
-        autoescape=True,
+    return template_environment(WEAVER_TEMPLATES)
+
+
+def _nav_link(env: Environment, *args: str) -> str:
+    """Render the sidebar link macro with the supplied positional arguments."""
+    return env.render_str(
+        '{% import "_chrome.jinja" as ui %}{{ ui.nav_link(*args) }}', args=args
     )
-    return environment.get_template("_chrome.jinja").module
+
+
+def _current_href(env: Environment, links: list[dict[str, str | bool]]) -> str:
+    """Render the macro that selects the current navigation link."""
+    return env.render_str(
+        '{% import "_chrome.jinja" as ui %}{{ ui.current_href(links) }}', links=links
+    )
 
 
 def test_the_current_link_is_marked_for_the_reader_and_for_assistive_tools(
-    chrome: typ.Any,  # noqa: ANN401 - see the fixture
+    chrome: Environment,
 ) -> None:
     """`aria-current` is the half a stylesheet cannot supply."""
     rendered = str(
-        chrome.nav_link("/weaver/safety/", "04", "Safety", "/weaver/safety/")
+        _nav_link(chrome, "/weaver/safety/", "04", "Safety", "/weaver/safety/")
     )
 
     assert 'href="/weaver/safety/"' in rendered, rendered
@@ -69,10 +83,12 @@ def test_the_current_link_is_marked_for_the_reader_and_for_assistive_tools(
 
 
 def test_a_link_that_is_not_current_is_dressed_differently_and_says_nothing(
-    chrome: typ.Any,  # noqa: ANN401 - see the fixture
+    chrome: Environment,
 ) -> None:
     """The other twelve links, and the dimming that had to clear AA."""
-    rendered = str(chrome.nav_link("/weaver/safety/", "04", "Safety", "/weaver/docs/"))
+    rendered = str(
+        _nav_link(chrome, "/weaver/safety/", "04", "Safety", "/weaver/docs/")
+    )
 
     assert BASE_CLASS in rendered, rendered
     assert CURRENT_CLASS not in rendered, (
@@ -89,10 +105,12 @@ def test_a_link_that_is_not_current_is_dressed_differently_and_says_nothing(
 
 
 def test_a_resource_link_carries_no_number(
-    chrome: typ.Any,  # noqa: ANN401 - see the fixture
+    chrome: Environment,
 ) -> None:
     """The links at the foot of the nav are unnumbered, and get no empty span."""
-    rendered = str(chrome.nav_link("/weaver/roadmap/", "", "Roadmap", "/weaver/docs/"))
+    rendered = str(
+        _nav_link(chrome, "/weaver/roadmap/", "", "Roadmap", "/weaver/docs/")
+    )
 
     assert BASE_CLASS in rendered, rendered
     assert "font-mono" not in rendered, (
@@ -105,11 +123,11 @@ def test_a_resource_link_carries_no_number(
 
 
 def test_the_install_link_is_marked_when_it_is_not_the_current_page(
-    chrome: typ.Any,  # noqa: ANN401 - see the fixture
+    chrome: Environment,
 ) -> None:
     """It is a call to action, so it gets a marker in place of a number."""
     rendered = str(
-        chrome.nav_link("/weaver/install/", "", "Install", "/weaver/docs/", "install")
+        _nav_link(chrome, "/weaver/install/", "", "Install", "/weaver/docs/", "install")
     )
 
     assert "&gt;" in rendered, (
@@ -120,8 +138,8 @@ def test_the_install_link_is_marked_when_it_is_not_the_current_page(
 
     # On its own page it is current, and the marker gives way to that.
     current = str(
-        chrome.nav_link(
-            "/weaver/install/", "", "Install", "/weaver/install/", "install"
+        _nav_link(
+            chrome, "/weaver/install/", "", "Install", "/weaver/install/", "install"
         )
     )
     assert "&gt;" not in current, (
@@ -132,7 +150,7 @@ def test_the_install_link_is_marked_when_it_is_not_the_current_page(
 
 
 def test_the_current_href_is_taken_from_whichever_link_is_flagged(
-    chrome: typ.Any,  # noqa: ANN401 - see the fixture
+    chrome: Environment,
 ) -> None:
     """One lookup, passed to every link, rather than a flag per call site."""
     nav_links = [
@@ -141,13 +159,13 @@ def test_the_current_href_is_taken_from_whichever_link_is_flagged(
         {"href": "/weaver/docs/", "current": False},
     ]
 
-    assert str(chrome.current_href(nav_links)) == "/weaver/safety/", (
-        f"got {str(chrome.current_href(nav_links))!r}"
+    assert str(_current_href(chrome, nav_links)) == "/weaver/safety/", (
+        f"got {str(_current_href(chrome, nav_links))!r}"
     )
 
 
 def test_a_page_outside_the_nav_yields_an_empty_current_href(
-    chrome: typ.Any,  # noqa: ANN401 - see the fixture
+    chrome: Environment,
 ) -> None:
     """The legal pages are rendered with the sidebar but are not listed in it.
 
@@ -160,17 +178,21 @@ def test_a_page_outside_the_nav_yields_an_empty_current_href(
         {"href": "/weaver/docs/", "current": False},
     ]
 
-    assert str(chrome.current_href(nav_links)) == "", (
-        f"expected an empty string, got {str(chrome.current_href(nav_links))!r}"
+    assert str(_current_href(chrome, nav_links)) == "", (
+        f"expected an empty string, got {str(_current_href(chrome, nav_links))!r}"
     )
-    assert str(chrome.current_href([])) == "", (
+    assert str(_current_href(chrome, [])) == "", (
         "an empty nav should also yield an empty string rather than failing"
     )
 
     # And the empty string must not accidentally match a link.
     rendered = str(
-        chrome.nav_link(
-            "/weaver/safety/", "04", "Safety", str(chrome.current_href(nav_links))
+        _nav_link(
+            chrome,
+            "/weaver/safety/",
+            "04",
+            "Safety",
+            str(_current_href(chrome, nav_links)),
         )
     )
     assert CURRENT_CLASS not in rendered, (

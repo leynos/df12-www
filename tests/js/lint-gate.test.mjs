@@ -19,6 +19,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+
+/* Every test here runs the whole `make lint` target, or a Biome run close to
+   it. That is a few seconds of real subprocess work, which the five-second
+   default cannot hold on a machine running several builds at once. */
+const GATE_TIMEOUT_MS = 60_000;
 const FIXTURE = join(REPO_ROOT, "src", "static", "netsuke", "assets", "js", "lint-gate-fixture.js");
 
 /* The rule that got through on #48: a `map()` callback that returns nothing.
@@ -48,35 +53,51 @@ afterEach(() => {
 });
 
 describe("the lint target", () => {
-  test("runs Biome as well as Ruff", () => {
-    const { output } = make("lint");
-    expect(output).toContain("ruff check");
-    expect(output).toContain("bun run lint:js");
-    expect(output).toContain("biome check .");
-  });
+  test(
+    "runs Biome as well as Ruff",
+    () => {
+      const { output } = make("lint");
+      expect(output).toContain("ruff check");
+      expect(output).toContain("bun run lint:js");
+      expect(output).toContain("biome check .");
+    },
+    GATE_TIMEOUT_MS,
+  );
 
-  test("passes on the tree as committed", () => {
-    expect(make("lint").status).toBe(0);
-  });
+  test(
+    "passes on the tree as committed",
+    () => {
+      expect(make("lint").status).toBe(0);
+    },
+    GATE_TIMEOUT_MS,
+  );
 
-  test("fails on an introduced Biome violation, and passes once it is removed", () => {
-    expect(existsSync(FIXTURE)).toBe(false);
+  test(
+    "fails on an introduced Biome violation, and passes once it is removed",
+    () => {
+      expect(existsSync(FIXTURE)).toBe(false);
 
-    writeFileSync(FIXTURE, VIOLATION);
-    const dirty = make("lint");
-    expect(dirty.status).not.toBe(0);
-    expect(dirty.output).toContain("lint/suspicious/useIterableCallbackReturn");
+      writeFileSync(FIXTURE, VIOLATION);
+      const dirty = make("lint");
+      expect(dirty.status).not.toBe(0);
+      expect(dirty.output).toContain("lint/suspicious/useIterableCallbackReturn");
 
-    rmSync(FIXTURE);
-    expect(make("lint").status).toBe(0);
-  });
+      rmSync(FIXTURE);
+      expect(make("lint").status).toBe(0);
+    },
+    GATE_TIMEOUT_MS,
+  );
 
-  test("fails on a formatting violation too, since `biome check` covers both", () => {
-    writeFileSync(FIXTURE, "const   badlyFormatted   =   1;\nexport { badlyFormatted };\n");
-    const dirty = make("lint");
-    expect(dirty.status).not.toBe(0);
-    expect(dirty.output).toContain("Formatter would have printed");
-  });
+  test(
+    "fails on a formatting violation too, since `biome check` covers both",
+    () => {
+      writeFileSync(FIXTURE, "const   badlyFormatted   =   1;\nexport { badlyFormatted };\n");
+      const dirty = make("lint");
+      expect(dirty.status).not.toBe(0);
+      expect(dirty.output).toContain("Formatter would have printed");
+    },
+    GATE_TIMEOUT_MS,
+  );
 
   test("leaves no fixture behind", () => {
     expect(existsSync(FIXTURE)).toBe(false);
@@ -122,37 +143,49 @@ describe("the Biome configuration", () => {
   });
 
   for (const { tree, fixture, contents } of EXCLUSIONS) {
-    test(`keeps ${tree} out of scope, so the gate ignores what is written there`, () => {
-      const path = join(REPO_ROOT, fixture);
-      if (!existsSync(dirname(path))) {
-        mkdirSync(dirname(path), { recursive: true });
-        created.push(dirname(path));
-      }
-      written.push(path);
-      writeFileSync(path, contents);
+    test(
+      `keeps ${tree} out of scope, so the gate ignores what is written there`,
+      () => {
+        const path = join(REPO_ROOT, fixture);
+        if (!existsSync(dirname(path))) {
+          mkdirSync(dirname(path), { recursive: true });
+          created.push(dirname(path));
+        }
+        written.push(path);
+        writeFileSync(path, contents);
 
-      /* The same content inside a scanned tree fails the gate, so a pass here
+        /* The same content inside a scanned tree fails the gate, so a pass here
          is the exclusion doing the work rather than the fixture being clean. */
-      expect(make("lint").status).toBe(0);
-    });
+        expect(make("lint").status).toBe(0);
+      },
+      GATE_TIMEOUT_MS,
+    );
   }
 
-  test("a misformatted file in a scanned tree does fail, so the probes mean something", () => {
-    const path = join(REPO_ROOT, "src", "static", "netsuke", "assets", "js", "scope-probe.js");
-    written.push(path);
-    writeFileSync(path, "const   scoped   =   1;\nexport { scoped };\n");
-    expect(make("lint").status).not.toBe(0);
-  });
+  test(
+    "a misformatted file in a scanned tree does fail, so the probes mean something",
+    () => {
+      const path = join(REPO_ROOT, "src", "static", "netsuke", "assets", "js", "scope-probe.js");
+      written.push(path);
+      writeFileSync(path, "const   scoped   =   1;\nexport { scoped };\n");
+      expect(make("lint").status).not.toBe(0);
+    },
+    GATE_TIMEOUT_MS,
+  );
 
-  test("parses the Tailwind directives the entrypoints use", () => {
-    /* Both entrypoints open with `@source`; without the parser option Biome
+  test(
+    "parses the Tailwind directives the entrypoints use",
+    () => {
+      /* Both entrypoints open with `@source`; without the parser option Biome
        reports them as parse errors rather than checking them. */
-    const { status, stdout, stderr } = spawnSync("bunx", ["biome", "check", "src/styles"], {
-      cwd: REPO_ROOT,
-      encoding: "utf8",
-    });
-    const output = `${stdout ?? ""}${stderr ?? ""}`;
-    expect(status).toBe(0);
-    expect(output).not.toContain("Tailwind-specific syntax is disabled");
-  });
+      const { status, stdout, stderr } = spawnSync("bunx", ["biome", "check", "src/styles"], {
+        cwd: REPO_ROOT,
+        encoding: "utf8",
+      });
+      const output = `${stdout ?? ""}${stderr ?? ""}`;
+      expect(status).toBe(0);
+      expect(output).not.toContain("Tailwind-specific syntax is disabled");
+    },
+    GATE_TIMEOUT_MS,
+  );
 });

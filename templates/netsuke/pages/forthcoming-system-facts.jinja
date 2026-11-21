@@ -74,7 +74,7 @@
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed syntax, RFC 0029 &sect;1</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 host_facts:
   schema: 1
 
@@ -89,19 +89,19 @@ actions:
   - name: check-windows
     when: "{{ host.os == 'windows' }}"
     command: cargo test --all-targets
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed syntax, RFC 0029 &sect;5.1</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size] mb-4" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 host_facts:
   schema: 1
   gather:
     - platform
     - distribution
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                         <ul class="space-y-2 text-xs text-charcoal-mid">
                             <li><strong>Two keys only.</strong> <code>schema</code> is required; <code>gather</code> is a non-empty, duplicate-free list of literal group names that must include <code>platform</code>.</li>
@@ -183,20 +183,20 @@ host_facts:
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-accent-text mb-2">Today: ambient probing</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 actions:
   - name: sign-installer
     # Fails to load where OS is unset:
     # env() has no default on main.
     when: env('OS') == 'Windows_NT'
     command: "Set-AuthenticodeSignature ..."
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-success-text mb-2">Proposed: the <code>when</code> form from RFC 0029 &sect;1</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 host_facts:
   schema: 1
 
@@ -204,7 +204,7 @@ actions:
   - name: sign-installer
     when: "{{ host.os == 'windows' }}"
     command: "Set-AuthenticodeSignature ..."
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -244,9 +244,9 @@ actions:
                         <p class="text-sm text-charcoal-mid mb-4"><code>netsuke help targets</code> collects no facts by default. If discovery meets a <code>host</code> reference in metadata or a <code>when</code>, it returns <code>host_facts_disabled_in_query</code>: it must not guess a platform, hide targets, or present an incomplete list as complete. Consent is per invocation, and a project setting cannot give it:</p>
                         <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed command, RFC 0029 &sect;8.1</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke help targets --host-facts
-{% endhighlight %}
+{% endfilter %}
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3">With consent it gathers exactly the requested groups within the ceiling, and still renders no recipes and permits no <code>env()</code>, <code>which()</code>, command, or network helper. This differs from <code>env()</code> today, whose guarded entries are kept and marked conditional; the RFC accepts an actionable error instead of symbolic evaluation.</p>
                     </div>
@@ -255,10 +255,10 @@ $ netsuke help targets --host-facts
                         <p class="text-sm text-charcoal-mid mb-4">A read-only <code>facts</code> command needs no Netsukefile and reads only trusted operator configuration. <code>--gather</code> chooses what is collected; repeated <code>--filter</code> chooses only what is shown.</p>
                         <p class="text-xs font-mono uppercase tracking-wide text-primary-text mb-2">Proposed commands, RFC 0029 &sect;8.2</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke facts
 $ netsuke --json facts --gather platform --filter os --filter arch
-{% endhighlight %}
+{% endfilter %}
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3">The JSON envelope carries <code>schema_version</code>, <code>scope: planner_process</code>, <code>collected_groups</code>, <code>facts</code>, group outcomes, and bounded provider identifiers. A schema-description option returns the field catalogue without collecting anything. The command and flag spellings are still open for review (&sect;14.6).</p>
                     </div>

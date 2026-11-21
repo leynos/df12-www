@@ -69,20 +69,20 @@
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Existing-style fragment, still valid (RFC 0022 &sect;3)</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 vars:
   workers: 2
 
 actions:
   - name: test
     command: "pytest -n {{ workers }}"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0022 &sect;3 (verbatim)</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 inputs:
   workers:
     type: integer
@@ -95,7 +95,7 @@ actions:
   - name: test
     command:
       invoke: pytest -n {{ inputs.workers }}
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -143,14 +143,14 @@ actions:
                 </div>
                 <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Adapted: field names from RFC 0022 &sect;4, not an RFC example</p>
                 <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 inputs:
   mode:
     type: string
     choices: [debug, release]
     default: debug
     expose: non-secret
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
             </section>
 
@@ -195,9 +195,9 @@ inputs:
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-2" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Adapted: the RFC names the option but gives no full command line</div>
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke build --input workers=4
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <p class="text-xs text-charcoal-mid mb-8">Against the declaration above, <code>--input workers=0</code> would fail <code>minimum: 1</code> before any command starts.</p>
 

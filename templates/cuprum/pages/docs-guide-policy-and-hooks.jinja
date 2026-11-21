@@ -19,7 +19,7 @@
     environment.
   </p>
 {% call ui.code_panel('scoped_policy.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, env, scoped, sh
@@ -29,7 +29,7 @@ python = sh.make(Program(sys.executable), catalogue=catalogue)
 with scoped(catalogue=catalogue), env(CUPRUM_EXAMPLE="scoped"):
     result = python("-c", "import os; print(os.getenv('CUPRUM_EXAMPLE'))").run_sync()
 assert result.stdout == "scoped\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Use {{ api.ref('ScopeConfig') }} when a catalogue alone is not enough:
@@ -58,7 +58,7 @@ assert result.stdout == "scoped\n"
     allow therefore constructs successfully and fails only at run time:
   </p>
 {% call ui.code_panel('enforcement_points.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import (
@@ -85,7 +85,7 @@ with scoped(catalogue=allowed):
         pass
     else:
         raise AssertionError("the scope should forbid the foreign program")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Naming a catalogue explicitly is how a caller opts out of the scope's
@@ -107,7 +107,7 @@ with scoped(catalogue=allowed):
     program without running it.
   </p>
 {% call ui.code_panel('restricted_scope.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import (
@@ -133,7 +133,7 @@ with scoped(ScopeConfig(allowlist=frozenset([OTHER]))):
         pass
     else:
         raise AssertionError("the scope should forbid the interpreter")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     {{ api.ref('allow') }} is the one way to widen policy: it adds programs
@@ -158,7 +158,7 @@ with scoped(ScopeConfig(allowlist=frozenset([OTHER]))):
     ran, or <code>None</code> when nothing was bound.
   </p>
 {% call ui.code_panel('executable_bindings.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, ScopeConfig, bind_executable, scoped, sh
@@ -176,7 +176,7 @@ with (
     assert result.program == PYTHON, "the logical identity is preserved"
     assert result.resolved_path == sys.executable, "the bound path was executed"
     assert (result.stdout or "").strip() == sys.executable, "the child agrees"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     A binding never widens the allowlist: binding an unlisted program and
@@ -217,7 +217,7 @@ with (
     records through the standard <code>logging</code> module.
   </p>
 {% call ui.code_panel('hooks.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import logging
 import sys
 
@@ -240,7 +240,7 @@ logger = logging.getLogger("myapp.commands")
 with before(note_start), after(note_finish), logging_hook(logger=logger):
     python("-c", "pass").run_sync()
 assert seen == [("before", "pass"), ("after", 0)]
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     A before or after hook is application code: an exception from one

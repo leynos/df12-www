@@ -33,6 +33,21 @@ rationale for a specific change lives in its execution plan under
 
 ## 2. Build and serve
 
+Run `uv python install` and `uv sync --locked` from the checkout. The project
+pins free-threaded CPython 3.15.2 and the CLI requires the GIL to be disabled.
+A fresh Linux x86-64 development environment needs a C compiler for the locked
+`msgspec` test dependency.
+
+`make build-release` builds the sdist and wheel through `scripts/uv_gate.py`,
+running `pyproject-build` from the pinned `build==1.6.1`, on the interpreter
+named by `.python-version`. The Makefile reads that file into `PROJECT_PYTHON`
+once and passes it to both `build-release` and `interrogate`, so the packaging
+and docstring gates use the same interpreter a checkout selects for the site.
+`MarkupSafe` is pinned to `>=3.0,<4` in `pyproject.toml`. The template layer
+calls it directly for HTML escaping, so the upper bound keeps an unlocked
+install from picking up a future major release whose escaping behaviour has not
+been reviewed.
+
 `bun run build` runs the full pipeline in a fixed order, because each step
 depends on the last:
 
@@ -65,6 +80,18 @@ the compiler preserves and section 2.4 for the typecheck that goes with it.
 uv run pages generate --all-sites     # main site plus every sub-site
 uv run pages generate --site netsuke  # one sub-site
 ```
+
+To render documentation bundles concurrently, pass `--doc-workers N` or set
+`INPUT_DOC_WORKERS=N` for a Bun build. The default is eight workers. Set the
+count to one for a serial build. Each worker fetches and renders a whole
+upstream document. The generator writes the HTML and metadata in configuration
+order before building the documentation index. Set `SOURCE_DATE_EPOCH` to a
+Unix timestamp to fix the UTC date rendered by the page templates. The browser
+tests use the reference capture date so the width of date-bearing headings
+stays reproducible.
+
+For the free-threaded runtime and worker-count measurements, see the
+[MiniJinja benchmark](minijinja-benchmark.md#free-threaded-document-workers).
 
 `scripts/build-episodic-search-index.mjs` then reads the rendered
 `public/episodic/` routes and the upstream-document manifest, writing the
@@ -406,17 +433,21 @@ together on the Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd sub-sites,
 referenced from the
 [Netsuke update execution plan](execplans/netsuke-update.md).
 
-### 4.1. Styles, lexers, and the highlight tag
+### 4.1. Styles, lexers, and the highlight filter
 
 Code blocks on the Episodic, Netsuke, Stilyagi, Cuprum, and rstest-bdd
-sub-sites are highlighted at build time by the Jinja tag
-`{% highlight '<lexer>'[, '<class>'] %} ... {% endhighlight %}`, implemented in
-`df12_pages/jinja_highlight.py`. The tag dedents its body, runs it through
+sub-sites are highlighted at build time by the MiniJinja filter block
+`{% filter highlight(lexer, css_class) %} ... {% endfilter %}`, implemented in
+`df12_pages/jinja_highlight.py`. The filter is `highlight_code()`; an unknown
+lexer alias raises `RuntimeError` naming the alias rather than silently
+rendering unhighlighted text. The filter dedents its body, runs it through
 `pygments.highlight` with the named lexer, and wraps the result in a
 `<div class="hm-syntax">` (or the named class, when a second argument is given)
-using `pygments.formatters.html.HtmlFormatter`. Source text containing Jinja
-syntax of its own — every `Netsukefile` example with `{{ ins }}` placeholders —
-must be wrapped in `{% raw %}` inside the tag.
+using `pygments.formatters.html.HtmlFormatter`. A wrapper class that the
+stylesheet makes scrollable (`SCROLLING_CSS_CLASSES`) also receives
+`tabindex="0"`. Source text containing Jinja syntax of its own — every
+`Netsukefile` example with `{{ ins }}` placeholders — must be wrapped in
+`{% raw %}` inside the filter block.
 
 Five Pygments styles supply the colours:
 
@@ -435,7 +466,7 @@ Five Pygments styles supply the colours:
   rstest-bdd sub-site.
 
 `EpisodicStyle`, `CuprumStyle`, and `LanternStyle` are imported directly by
-their generators; nothing resolves them by name, because the highlight tag
+their generators; nothing resolves them by name, because the highlight filter
 emits token classes and the colours arrive from the generated stylesheet. The
 Netsuke custom lexers and the `HimotoshiStyle` and `StilyagiStyle` classes are
 registered with Pygments through the `pygments.lexers` and `pygments.styles`
@@ -603,7 +634,7 @@ block outright, so a run restores it without needing the previous content.
 | rstest-bdd | `LanternStyle`   | `rust`, `gherkin`, `toml`, `console`               | `lantern-syntax`  | `--lantern-syntax-`  | `600`       | `src/static/rstest-bdd/assets/styles/syntax.css` |
 
 _Table 4: Pygments styles, the lexers each sub-site's templates actually name
-in a `{% highlight %}` tag, and the generator parameters that produce each
+in a `highlight` filter, and the generator parameters that produce each
 stylesheet._
 
 The lexer list reflects what the templates currently use, not the full set
@@ -864,8 +895,8 @@ Call it like any other macro:
 Netsuke page bodies used to be wrapped in `{% raw %}` from top to bottom, which
 forced every call to step out of the region and back in. They no longer are:
 markup is live Jinja by default, and `{% raw %}` wraps only the literal
-examples that must reach the reader unrendered — chiefly the `{% highlight %}`
-bodies holding Netsukefile snippets, which are themselves full of Jinja.
+examples that must reach the reader unrendered — chiefly the `highlight` bodies
+holding Netsukefile snippets, which are themselves full of Jinja.
 
 Each sub-site centralizes its chrome in a `_layout.jinja` that every page
 extends, directly or through the sub-site's `doc_page.jinja`.
@@ -938,21 +969,21 @@ document is `pages/icon-replacements.jinja`, which carries its own head and
 scripts.
 
 The windows are `{% call %}` blocks, and the call joins the fence the
-`{% highlight %}` tag already needs:
+`highlight` filter already needs:
 
 ```jinja
-{% call chrome.faux_window('Netsukefile') %}{% highlight 'netsuke' %}{% raw %}
+{% call chrome.faux_window('Netsukefile') %}{% filter highlight('netsuke') %}{% raw %}
 netsuke_version: "1.0.0"
-{% endraw %}{% endhighlight %}{% endcall %}
+{% endraw %}{% endfilter %}{% endcall %}
 ```
 
 They were opener/closer pairs until the raw regions narrowed, to keep a long
 sample inside the page's raw region rather than leaving and re-entering it
 around the macro call. That mattered while page bodies were raw from top to
-bottom; now that raw wraps only the sample, a block holds both the
-`{% highlight %}` tag and its fence. The block form is worth the change on its
-own: an unclosed window is a template error rather than markup that renders
-wrong, and no macro emits half an element.
+bottom; now that raw wraps only the sample, a block holds both the `highlight`
+filter and its fence. The block form is worth the change on its own: an
+unclosed window is a template error rather than markup that renders wrong, and
+no macro emits half an element.
 
 `faux_window(label, variant='', outer_class='', frame=none, body_class=none)`
 draws the dark frame and a titlebar with the traffic-light dots and a centred
@@ -1288,9 +1319,9 @@ The macros:
 
 - `href(key, section=none)` — the URL of a preview, or of one of its
   sections. An unknown preview, or a section not listed in that preview's
-  `sections`, calls an undefined function, which fails the build with a Jinja2
-  `UndefinedError` rather than publishing a link to nowhere — the same device
-  `api.ref` uses for Cuprum's API reference (section 5.5).
+  `sections`, calls an undefined function, which fails the build with a
+  MiniJinja `TemplateError` rather than publishing a link to nowhere — the same
+  device `api.ref` uses for Cuprum's API reference (section 5.5).
 - `target_label(entry)` — the chip text naming how near a preview is.
 - `chip(entry)` — the status chip built from `target_label`.
 - `sidebar(key)` — the preview sidebar: every preview, with the current one's
@@ -2425,9 +2456,9 @@ so the answer differs by sub-site:
   and `.hm-syntax:focus-visible` in `himotoshi.css` draws the ring.
 
 A handwritten `overflow-x-auto` wrapper — a wide table, a `pre` that is not run
-through the highlight tag — carries `tabindex="0"` in the markup. Whether one
-scrolls depends on the viewport, so check at 360px as well as at desktop width;
-several Netsuke tables scroll only at the narrow end.
+through the highlight filter — carries `tabindex="0"` in the markup. Whether
+one scrolls depends on the viewport, so check at 360px as well as at desktop
+width; several Netsuke tables scroll only at the narrow end.
 
 ### 8.3. Inline links carry an underline
 
@@ -2473,6 +2504,220 @@ bun add -d playwright
 bun x playwright install chromium
 uv run pytest tests/test_stilyagi_focus.py -v
 ```
+
+## 9. Template rendering and document publication
+
+The page builders share one MiniJinja environment, defined in
+`df12_pages/templating.py`, and the documentation builders separate rendering
+from writing so independent bundles can render concurrently without changing
+what is published where. The engine and runtime choice are recorded in
+[ADR 0001](adrs/adr-0001-minijinja-and-free-threaded-cpython.md).
+
+### 9.1. The shared template environment
+
+`template_environment(directory, variables=..., escape_by_suffix=...)` returns
+a MiniJinja `Environment` that loads named templates, imports and includes from
+`directory` with `load_from_path`. Templates load on first use rather than
+eagerly. The environment sets `trim_blocks` and `lstrip_blocks`, registers the
+`highlight`, `forceescape` and `index` filters, and installs a finalizer that
+keeps URL-valued macros comparable to raw `href` values when HTML escaping is
+on.
+
+Escaping is decided per template name, not globally:
+
+- `escape_by_suffix=True` escapes only `.html` and `.xml` templates. The
+  document builder (`PageContentGenerator`) and the docs-index builder use
+  this, because they also load fragments whose suffix should not trigger
+  escaping.
+- `escape_by_suffix=False` escapes every template, including `.jinja`, which is
+  what the sub-site content, homepage, shared-content and chrome builders want.
+
+`variables` populates the environment globals, so imported macros see the same
+site-wide values as the page template that imports them; this is how a
+sub-site's `template_vars` reach both. `render_template(name, **context)`
+renders one named template from that environment and is the only entry point
+the builders use. MiniJinja exposes no way to load a template without rendering
+it, so the document builder registers its whole template directory with
+`add_template` before its first render; that is what keeps a lazy `{% from %}`
+import from reaching back to the filesystem mid-render.
+
+### 9.2. Reproducible build timestamps
+
+`build_timestamp()` returns the UTC instant a page was rendered. When
+`SOURCE_DATE_EPOCH` is set to an integer number of Unix seconds, it returns
+that instant instead of the current time, so repeated builds of the same inputs
+produce byte-identical pages. A non-integer value raises `ValueError` rather
+than silently falling back to the wall clock. The browser capture fixtures set
+the reference epoch (`1790899200`, 2 October 2026) so date-bearing headings
+keep a stable width.
+
+### 9.3. Fetch, prepare, render and write
+
+A documentation bundle used to be fetched, rendered and written in one step.
+`PageContentGenerator` now separates the four, so the rule that decides what a
+page contains is a query over values:
+
+- `PageContentGenerator.render()` is the command that reaches the outside
+  world. It fetches the upstream Markdown through the injected `DocumentFetcher`
+  (`fetch_document` unless the constructor was given another), asks GitHub for
+  the latest commit date when no release date is configured, and selects the
+  build timestamp. It hands the result to the two steps below.
+- `PageContentGenerator.prepare_document(markdown)` does the remaining
+  side-effecting work: it registers the template directory with the environment
+  and compiles the document's Mermaid fences to SVG figures through
+  `MermaidRenderer`. It returns a `PreparedDocument` holding the parsed
+  sections, the prepared Markdown, and the template that will render them.
+- `PageContentGenerator.render_document(prepared, ...)` is the query. It takes
+  the prepared document, the provenance to display and the timestamp as
+  parameters, builds the navigation model and renders every section into
+  memory. It reads no file, consults no environment variable, starts no
+  subprocess and touches no output file. `tests/test_doc_generation.py` deletes
+  the template directory between preparation and rendering to show that.
+- `RenderedDocument.write()` creates the output directory, writes the HTML
+  sections in order, then writes the metadata JSON that points the docs index
+  at the first section. It returns a `WrittenDocument` describing what it
+  published, including any `OSError` that stopped the metadata.
+  `publish_document()` logs that outcome, because the HTML is already published
+  and a failed pointer must not fail the bundle. A bundle with no sections
+  writes neither HTML nor metadata.
+
+`PageContentGenerator.run()` remains the convenience entry point; it is
+`publish_document(self.render())` for a single bundle.
+
+#### Fetching a document
+
+`df12_pages/generator/document_fetch.py` owns the network call.
+`resolve_document_source(page, override=None)` turns a `PageConfig` into a
+`DocumentSource`: the configured `source_url` and branch, plus the release tag
+and a raw URL pinned to that tag when the page names a repository and a latest
+release. An explicit source override replaces the pin and yields that URL alone.
+`PageContentGenerator` resolves it once in its constructor, passing the
+`source_url` override it was given.
+
+`DocumentSource.attempts()` orders the candidates: the release-pinned URL
+first, the configured branch source second, and only when the two differ. The
+branch attempt carries no version, so a document added after the release was
+cut cannot claim to belong to it.
+
+`fetch_document(source, *, updated_at=None, session=None)` returns a
+`FetchedMarkdown` for the first candidate that answers. Only a 404 on a
+non-final candidate earns the fallback; any other HTTP error, a transport
+failure, or a 404 on the branch source itself is raised, so a missing document
+is never published as a blank page.
+
+The result carries the provenance that answered: `source_url` is the URL that
+returned the body, `version` is the release tag or `None` for the branch, and
+`ref` is the tag or branch attached to the candidate that answered. An explicit
+source override attaches neither, so its `ref` and `version` are both `None`.
+`updated_at` is the caller's known date when it supplied one and the first
+candidate answered, which covers a release-pinned URL, a branch-only source and
+an explicit override alike. It is dropped only when a release-pinned 404 falls
+back to the branch: then the response's `Last-Modified` date stands in, since
+neither the document nor its date may be attributed to a release that does not
+contain it.
+
+The fallback is logged at `INFO` with the release tag and the branch name
+rather than either URL, which says which tree answered without putting a fetch
+target in the build log.
+
+A caller-supplied `session` is used as given and left open; when none is passed,
+`fetch_document()` builds a session that retries transient failures with
+backoff and closes it before returning. `DocumentFetcher`, a protocol for
+`(source, *, updated_at=None) -> FetchedMarkdown`, is the seam the generator
+holds: `PageContentGenerator` takes one as `fetcher`, defaulting to
+`fetch_document`, so a test can supply a fetcher that never opens a socket.
+
+#### The document date and the section model
+
+`resolve_doc_updated_at(page, *, client)` in
+`df12_pages/generator/commit_date.py` is the date query. It returns the
+configured release date when the page has one and otherwise the timestamp of
+the latest commit touching `doc_path` on the page's branch, normalized to UTC.
+A page with no repository, a malformed slug or an unparsable timestamp yields
+`None`; a GitHub failure is raised rather than swallowed, so the module
+distinguishes "there is no date" from "the date could not be read".
+
+That places it in the fetch step. `render()` resolves it through
+`_resolve_commit_date()` when no date is already known; that helper builds the
+`github3` client at that boundary unless one was injected, and catches
+`github3.exceptions.GitHubException`. A failed lookup is logged as a warning
+naming the page key, and the page still renders: its date then comes from the
+fetch's `Last-Modified` header, or from the build timestamp when that is absent.
+
+`prepare_numbered_steps()` and `prepare_split_panel()` in
+`df12_pages/generator/section_render.py` are pure helpers, so they belong to
+the render step. `render_document()` calls the first when a section's layout is
+`numbered_steps` and the second when it is `split_panel`, while building the
+section model; each is a pure function of its arguments and returns template
+data rather than writing anything. Both forward the document's `figures`
+mapping and the `link_ref` captured at preparation to every markdown conversion
+they make, so a step, a panel and the section around them all point into the
+same tree.
+
+#### Two-phase markdown preparation
+
+`HtmlContentRenderer.prepare_markdown(text, *, link_ref=None)` returns a
+`PreparedMarkdown`: the document with each renderable Mermaid fence replaced by
+a placeholder token, and `figures` mapping that token to the `<figure>` markup
+that replaces it once the document is converted. It is the only step that may
+start the Mermaid CLI, and so the only side-effecting half of markdown
+rendering. `render_prepared(prepared)` converts an already-prepared document
+and compiles nothing, so a caller that needs an I/O-free render runs the first
+and hands its result to the second; `markdown(text)` is the one-shot form that
+does both. Passed a `figures` mapping, `markdown()` goes straight to
+conversion, which is how the section helpers render a slice of a prepared
+document.
+
+`prepare_markdown()` also captures a `link_ref` in the result. An explicit
+argument wins; otherwise it records the ref the renderer's link extension was
+configured with, if it had one. Carrying the ref with the document keeps a
+retained document's relative links pointing at the tree its own fetch answered
+from, even after another document's fetch has been retargeted to a different
+ref. `PreparedDocument.markdown` is the value `prepare_document()` stores, and
+`render_document()` reads its figures and ref from there.
+
+#### The Mermaid CLI
+
+`MermaidRenderer` invokes a headless Mermaid CLI to compile a fence's source to
+inline SVG. The executable is resolved per invocation, in order: the value
+passed to the constructor, then the `DF12_MERMAID_CLI` environment variable,
+then `merman-cli`. Reading the environment lazily keeps constructing a renderer
+free of ambient configuration, and a test can pin a command without exporting a
+variable.
+
+A CLI that is missing, exits non-zero or times out is reported as a warning on
+standard error, and the fence is left in the markdown so it falls through to a
+highlighted code block; one broken diagram does not abort a build. Results are
+cached per source text for the renderer's lifetime, including a failure, so a
+repeated diagram shells out once.
+
+### 9.4. Concurrent document workers
+
+`df12_pages.cli._publish_documents` renders one site's bundles through a
+`ThreadPoolExecutor` when `--doc-workers` (or `INPUT_DOC_WORKERS`) is greater
+than one. Each worker renders a whole bundle, and the pool is given at most one
+worker-sized batch of pages at a time, so only that many rendered documents are
+held in memory. `df12_pages.cli._write_documents` builds the render closure,
+logs the timing and delegates to it.
+
+Rendering order is not publication order. The pool maps each batch in
+configuration order and every `RenderedDocument` is written as it is yielded,
+so a later-configured bundle always wins a path that two bundles share, even
+when it finished rendering first. Tests in `tests/test_doc_generation.py` pin
+the serial, multi-batch and reverse-completion cases. The effective worker
+count is logged beside the configured limit — it is the smaller of the limit
+and the bundle count, so a site with two bundles never claims eight workers —
+together with each bundle's render time and the site's total elapsed time, all
+at `INFO` through the `df12_pages.cli` logger. `generate()` adds a total for
+the whole invocation once every requested site is written. A worker failure is
+logged with the page key and re-raised. These figures are log lines from one
+process, not the fresh-process measurements in the
+[benchmark report](minijinja-benchmark.md), which remain the recorded numbers.
+
+The CLI requires free-threaded CPython 3.15.2 or newer with the GIL disabled.
+`main()` checks the interpreter and GIL state before parsing arguments, because
+package version metadata cannot express that requirement. Setup and worker
+overrides are covered in [Build and serve](#2-build-and-serve).
 
 ## femtologging sub-site
 

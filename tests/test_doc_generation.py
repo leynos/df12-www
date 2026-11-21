@@ -552,11 +552,16 @@ def test_resolve_doc_updated_at_prefers_the_release_without_a_commit(
     )
 
 
+@pytest.mark.parametrize(
+    "slug",
+    ["not-a-slug", "owner/repo/extra", "/repo", "owner/"],
+    ids=["no-slash", "extra-component", "missing-owner", "missing-name"],
+)
 def test_fetch_latest_doc_commit_rejects_a_malformed_slug_without_a_lookup(
-    page_config: PageConfig, mocker: MockerFixture
+    page_config: PageConfig, mocker: MockerFixture, slug: str
 ) -> None:
     """A slug that names no repository is a page with no date, not a lookup."""
-    page = dc.replace(page_config, repo="not-a-slug")
+    page = dc.replace(page_config, repo=slug)
     client = mocker.Mock()
 
     resolved = fetch_latest_doc_commit(page, client=typ.cast("GitHub", client))

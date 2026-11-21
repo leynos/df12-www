@@ -104,11 +104,16 @@ def fetch_latest_doc_commit(page: PageConfig, *, client: GitHub) -> object | Non
 
 
 def _repository_parts(slug: str | None) -> tuple[str | None, str | None]:
-    """Split an ``owner/name`` slug, returning two ``None``s when malformed."""
+    """Split an ``owner/name`` slug, returning two ``None``s when malformed.
+
+    Exactly one slash separates the owner from the name. A slug with an empty
+    side or extra components names no repository, so it is rejected here
+    rather than passed to GitHub as a repository name containing a slash.
+    """
     if not slug:
         return None, None
     owner, _, name = slug.partition("/")
-    if not owner or not name:
+    if not owner or not name or "/" in name:
         return None, None
     return owner, name
 

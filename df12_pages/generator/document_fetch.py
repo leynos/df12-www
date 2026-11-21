@@ -67,12 +67,13 @@ class FetchedMarkdown:
     """A markdown body and the provenance that actually answered for it.
 
     ``updated_at`` is the date to display for the document, if any. It is the
-    caller's release or commit date when that applies to the URL that
-    answered, and otherwise the response's ``Last-Modified`` date.
+    caller's known date when one was supplied and the first candidate answered,
+    and otherwise the response's ``Last-Modified`` date.
 
-    ``ref`` is the git ref the answering document came from: the release tag
-    when the pinned attempt answered, and the branch otherwise. Relative links
-    in the document are rewritten against it.
+    ``ref`` is the git ref the answering document came from: the release tag or
+    the branch attached to the candidate that answered, or ``None`` when that
+    candidate names neither, as an explicit override does. Relative links in
+    the document are rewritten against it.
     """
 
     text: str
@@ -242,8 +243,10 @@ def fetch_document(
     source : DocumentSource
         Candidate URLs, pinned release first.
     updated_at : datetime, optional
-        Date already known for the document, used only when the release-pinned
-        attempt is the one that answered.
+        Date already known for the document. It is used when the first
+        candidate answers -- whether that is the release-pinned URL, a
+        branch-only source or an explicit override -- and dropped when a
+        release-pinned 404 falls back to the branch.
     session : requests.Session, optional
         Session to fetch through; a retrying session is created and closed
         when omitted.

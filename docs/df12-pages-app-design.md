@@ -89,8 +89,9 @@ flaky network-dependent tests.
      coverage) which re-syncs release info and rewrites `config/pages.yaml`.
 
 3. **MiniJinja Rendering from the Snapshot**
-   - `PageContentGenerator` reads `config/pages.yaml` and parses the referenced
-     Markdown into sections. Fetching that Markdown belongs to
+   - The CLI loads `config/pages.yaml` and hands the selected `PageConfig` to
+     `PageContentGenerator`, which parses the fetched Markdown into sections.
+     Fetching that Markdown belongs to
      `df12_pages/generator/document_fetch.py`, which tries a release-pinned URL
      first and falls back to the configured branch source on a 404. See
      [Fetch, prepare, render and write](developers-guide.md#93-fetch-prepare-render-and-write).

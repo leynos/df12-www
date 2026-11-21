@@ -115,6 +115,7 @@ from df12_pages.generator.page_generator import (
     fetch_document,
     publish_document,
     resolve_doc_updated_at,
+    resolve_document_source,
 )
 from df12_pages.generator.renderer import MermaidRenderer
 
@@ -1004,6 +1005,50 @@ def test_fetch_document_falls_back_to_a_response_date_without_a_known_one() -> N
     assert fetched.updated_at == dt.datetime(2025, 1, 4, 18, 30, tzinfo=dt.UTC), (
         "the response Last-Modified date stands in for a missing known date"
     )
+
+
+def test_fetch_document_uses_a_known_date_for_a_branch_only_source() -> None:
+    """The branch is the first candidate, so a supplied date outranks the header."""
+    url = "https://example.test/main/docs/guide.md"
+    known = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
+    session = _ScriptedSession(
+        {url: ("# Text", {"Last-Modified": "Mon, 30 Dec 2024 09:00:00 GMT"})}
+    )
+
+    fetched = fetch_document(
+        DocumentSource(url, branch="main"),
+        updated_at=known,
+        session=typ.cast("requests.Session", session),
+    )
+
+    assert fetched.updated_at == known, (
+        "the caller's date applies whenever the first candidate answers"
+    )
+    assert fetched.version is None, "a branch source carries no release pin"
+    assert fetched.ref == "main", "branch links must point into the branch"
+
+
+def test_an_explicit_source_override_keeps_the_known_date_and_names_no_ref(
+    page_config: PageConfig,
+) -> None:
+    """An override is a first candidate with no branch or release of its own."""
+    url = "https://example.test/override/guide.md"
+    known = dt.datetime(2024, 12, 25, tzinfo=dt.UTC)
+    source = resolve_document_source(page_config, override=url)
+    session = _ScriptedSession(
+        {url: ("# Override", {"Last-Modified": "Mon, 30 Dec 2024 09:00:00 GMT"})}
+    )
+
+    assert source.branch is None, "an override names no branch to rewrite links into"
+    fetched = fetch_document(
+        source, updated_at=known, session=typ.cast("requests.Session", session)
+    )
+
+    assert fetched.updated_at == known, (
+        "the caller's date applies whenever the first candidate answers"
+    )
+    assert fetched.version is None, "an override carries no release pin"
+    assert fetched.ref is None, "an override names no tree for relative links"
 
 
 @pytest.mark.parametrize(

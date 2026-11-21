@@ -2607,10 +2607,12 @@ is never published as a blank page.
 
 The result carries the provenance that answered: `source_url` is the URL that
 returned the body, `version` is the release tag or `None` for the branch, and
-`ref` is the tag when the pinned attempt answered and the branch otherwise.
-`updated_at` is the caller's known date only when it supplied one and the
-release-pinned attempt answered; otherwise the response's `Last-Modified` date
-stands in. A branch fallback drops the release date along with the pin, since
+`ref` is the tag or branch attached to the candidate that answered. An explicit
+source override attaches neither, so its `ref` and `version` are both `None`.
+`updated_at` is the caller's known date when it supplied one and the first
+candidate answered, which covers a release-pinned URL, a branch-only source and
+an explicit override alike. It is dropped only when a release-pinned 404 falls
+back to the branch: then the response's `Last-Modified` date stands in, since
 neither the document nor its date may be attributed to a release that does not
 contain it.
 

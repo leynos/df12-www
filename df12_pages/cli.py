@@ -781,6 +781,18 @@ def _describe_failed_command(exc: subprocess.CalledProcessError) -> str:
 MINIMUM_FREE_THREADED_PYTHON = (3, 15, 2)
 
 
+def _gil_enabled() -> bool:
+    """Return whether the running interpreter reports the GIL as enabled.
+
+    ``sys._is_gil_enabled`` is a CPython implementation detail. It is absent
+    on other runtimes and on CPython before 3.13, neither of which can be the
+    free-threaded 3.15.2 runtime this application requires, so a missing probe
+    counts as an enabled GIL rather than failing with ``AttributeError``.
+    """
+    probe = getattr(sys, "_is_gil_enabled", None)
+    return True if probe is None else bool(probe())
+
+
 def _require_free_threaded_cpython(
     *,
     implementation: str,
@@ -858,7 +870,7 @@ def main() -> None:
     _require_free_threaded_cpython(
         implementation=sys.implementation.name,
         version=sys.version_info[:3],
-        gil_enabled=sys._is_gil_enabled(),
+        gil_enabled=_gil_enabled(),
     )
     try:
         app()

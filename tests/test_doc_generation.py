@@ -1921,6 +1921,49 @@ def test_the_cli_accepts_the_supported_free_threaded_boundary() -> None:
     )
 
 
+def test_main_rejects_a_runtime_without_the_gil_probe(
+    monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture
+) -> None:
+    """A runtime lacking sys._is_gil_enabled is refused, not crashed on."""
+    monkeypatch.setattr(sys, "implementation", SimpleNamespace(name="pypy"))
+    monkeypatch.delattr(sys, "_is_gil_enabled", raising=False)
+    dispatch = mocker.patch.object(cli, "app")
+
+    with pytest.raises(SystemExit, match=r"free-threaded CPython 3\.15\.2"):
+        cli.main()
+
+    dispatch.assert_not_called()
+
+
+def test_main_rejects_an_old_version_before_dispatch(
+    monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture
+) -> None:
+    """An interpreter below the minimum exits before Cyclopts is invoked."""
+    monkeypatch.setattr(sys, "implementation", SimpleNamespace(name="cpython"))
+    monkeypatch.setattr(sys, "version_info", (3, 14, 9))
+    monkeypatch.setattr(sys, "_is_gil_enabled", lambda: False)
+    dispatch = mocker.patch.object(cli, "app")
+
+    with pytest.raises(SystemExit, match=r"free-threaded CPython 3\.15\.2"):
+        cli.main()
+
+    dispatch.assert_not_called()
+
+
+def test_main_dispatches_on_the_supported_boundary(
+    monkeypatch: pytest.MonkeyPatch, mocker: MockerFixture
+) -> None:
+    """Free-threaded CPython 3.15.2 reaches the command line application."""
+    monkeypatch.setattr(sys, "implementation", SimpleNamespace(name="cpython"))
+    monkeypatch.setattr(sys, "version_info", (3, 15, 2))
+    monkeypatch.setattr(sys, "_is_gil_enabled", lambda: False)
+    dispatch = mocker.patch.object(cli, "app")
+
+    cli.main()
+
+    dispatch.assert_called_once_with()
+
+
 def test_generate_rejects_zero_document_workers() -> None:
     """Reject an invalid pool size before doing any build work."""
     with pytest.raises(ValueError, match="--doc-workers must be at least one"):

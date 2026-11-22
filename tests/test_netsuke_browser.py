@@ -390,10 +390,11 @@ def test_a_netsuke_page_fits_a_phone(
     page wider than the viewport is the other classic mobile failure: the code
     panels scroll on purpose and are allowed to, but the document is not.
 
-    Five pages already overflow at this width and are waived by name, with the
-    width each was measured at; the waiver asserts the overflow is still there,
-    so fixing one of them fails this test until the entry is removed, and
-    worsening one fails it outright.
+    One page still overflows at this width -- the design reference sheet -- and
+    is waived by name with the width it was measured at; the waiver asserts the
+    overflow is still there, so fixing it fails this test until the entry is
+    removed, and worsening it fails it outright. Every other page, including
+    all five examples pages whose manifest header used to overflow, must fit.
     """
     _open(drive, served, page, MOBILE_WIDTH, MOBILE_HEIGHT)
     narrow = _evaluate(drive, LAYOUT)

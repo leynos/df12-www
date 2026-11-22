@@ -107,17 +107,17 @@ STANDALONE = frozenset({"icon-replacements/"})
 # fixtures set. A waived page is asserted to still overflow, but by no more
 # than the recorded width, so the waiver cannot outlive the defect and a page
 # that grows fails here by name. The widths are a property of this host's
-# text metrics as much as of the markup: `examples/static-site-pipeline/` is
-# only two pixels over, which is within what a changed fallback font moves.
-# Re-measure the whole set on the host that records the snapshots rather than
-# trusting these numbers on another machine. See the decision log in
+# text metrics as much as of the markup, so re-measure the whole set on the
+# host that records the snapshots rather than trusting these numbers on
+# another machine. See the decision log in
 # `docs/execplans/netsuke-daisy-migration.md`.
+#
+# The five example pages that used to be waived here are gone: their manifest
+# header row now wraps, so the file label and the copy button stack instead of
+# pushing the page 2-45px past a 360px viewport. `design/` remains, and it is
+# the only entry that should be added back without a measurement.
 KNOWN_OVERFLOW = {
     "design/": 590,
-    "examples/batch-photo-processing/": 384,
-    "examples/multi-format-documentation/": 362,
-    "examples/static-site-pipeline/": 362,
-    "examples/visual-design-assets/": 405,
 }
 
 # What the two layouts are distinguished by, measured the same way at both

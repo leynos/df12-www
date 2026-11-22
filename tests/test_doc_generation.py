@@ -99,6 +99,7 @@ from bs4 import BeautifulSoup
 from github3 import exceptions as gh_exc
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
+from requests.adapters import HTTPAdapter
 
 from df12_pages import cli
 from df12_pages._constants import PAGE_META_TEMPLATE
@@ -110,6 +111,7 @@ from df12_pages.cli import (
 )
 from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.generator import PageContentGenerator
+from df12_pages.generator.document_fetch import _retrying_session
 from df12_pages.generator.page_generator import (
     DEFAULT_TEMPLATES_DIR,
     DocumentSource,
@@ -575,6 +577,86 @@ def test_fetch_latest_doc_commit_rejects_a_malformed_slug_without_a_lookup(
     client.repository.assert_not_called()
 
 
+class _RecordingClient:
+    """A GitHub stand-in that records the query it was asked for."""
+
+    def __init__(self, commits: list[object] | None = None) -> None:
+        """Record the repository query and serve the supplied commits."""
+        self.queries: list[tuple[str, str, str, str]] = []
+        self._commits = list(commits or [])
+
+    def repository(self, owner: str, name: str) -> SimpleNamespace:
+        """Return a repository that records the commit query it receives."""
+        return SimpleNamespace(commits=self._listing(owner, name))
+
+    def _listing(
+        self, owner: str, name: str
+    ) -> typ.Callable[..., typ.Iterator[object]]:
+        """Return a callable that records one commit listing query."""
+        return lambda *, path, sha: self._record(owner, name, path, sha)
+
+    def _record(
+        self, owner: str, name: str, path: str, sha: str
+    ) -> typ.Iterator[object]:
+        """Record one query and return the scripted commits."""
+        self.queries.append((owner, name, path, sha))
+        return iter(self._commits)
+
+
+def test_fetch_latest_doc_commit_queries_the_document_path_and_branch(
+    page_config: PageConfig,
+) -> None:
+    """The command strips a leading slash and asks for the configured branch."""
+    page = dc.replace(
+        page_config,
+        repo="df12/testdocs",
+        doc_path="/docs/users-guide.md",
+        branch="trunk",
+    )
+    client = _RecordingClient()
+
+    fetch_latest_doc_commit(page, client=typ.cast("GitHub", client))
+
+    assert client.queries == [("df12", "testdocs", "docs/users-guide.md", "trunk")], (
+        "a leading slash must be stripped and the configured branch used"
+    )
+
+
+def test_fetch_latest_doc_commit_defaults_the_branch_to_main(
+    page_config: PageConfig,
+) -> None:
+    """A page with no branch is queried on main."""
+    page = dc.replace(
+        page_config, repo="df12/testdocs", doc_path="docs/guide.md", branch=None
+    )
+    client = _RecordingClient()
+
+    fetch_latest_doc_commit(page, client=typ.cast("GitHub", client))
+
+    assert client.queries == [("df12", "testdocs", "docs/guide.md", "main")], (
+        "the missing branch must default to main"
+    )
+
+
+def test_resolve_doc_updated_at_falls_back_to_the_committer_date(
+    page_config: PageConfig,
+) -> None:
+    """The author date wins, but a missing one leaves the committer date."""
+    committed = dt.datetime(2025, 3, 4, 5, 6, tzinfo=dt.UTC)
+    latest = SimpleNamespace(
+        commit=SimpleNamespace(
+            author=SimpleNamespace(date=None),
+            committer=SimpleNamespace(date=committed),
+        )
+    )
+
+    resolved = resolve_doc_updated_at(page_config, commit=latest)
+
+    assert resolved == committed, (
+        "a commit with no author date must fall back to the committer date"
+    )
+
+
 def test_indented_fenced_block_renders_codehilite(
     generated_docs: dict[str, BeautifulSoup],
 ) -> None:
@@ -925,6 +1007,11 @@ class _ScriptedSession:
         """Store the scripted outcome for each URL."""
         self._outcomes = outcomes
         self.requested: list[str] = []
+        self.closed = False
+
+    def close(self) -> None:
+        """Record that the fetch closed this session."""
+        self.closed = True
 
     def get(self, url: str, timeout: int = 30) -> SimpleNamespace:
         """Record the URL, then return its body and headers or raise its error."""
@@ -1094,6 +1181,51 @@ def test_fetch_document_ignores_a_missing_or_unparseable_source_date(
         "an absent, empty or malformed header must leave the date unset"
     )
     assert fetched.text == "# Text", "the body is served regardless of the header"
+
+
+def test_fetch_document_closes_only_the_session_it_created(
+    mocker: MockerFixture,
+) -> None:
+    """An owned session is closed; a caller's session is left open."""
+    url = "https://example.test/main/docs/guide.md"
+    created = _ScriptedSession({url: "# Owned"})
+    mocker.patch(
+        "df12_pages.generator.document_fetch._retrying_session",
+        return_value=created,
+    )
+
+    fetch_document(DocumentSource(url))
+    assert created.closed is True, "the session fetch_document built must close"
+
+    supplied = _ScriptedSession({url: "# Supplied"})
+    fetch_document(DocumentSource(url), session=typ.cast("requests.Session", supplied))
+    assert supplied.closed is False, (
+        "a caller's session outlives the fetch that used it"
+    )
+
+
+def test_the_retrying_session_carries_the_documented_retry_policy() -> None:
+    """The build's own session retries transient failures with backoff."""
+    session = _retrying_session()
+    try:
+        adapter = session.get_adapter("https://example.test")
+        assert isinstance(adapter, HTTPAdapter), "an HTTP adapter carries the policy"
+        retry = adapter.max_retries
+
+        assert retry.total == 5, "five attempts in total"  # noqa: PLR2004 -- documented policy
+        assert retry.read == 5, "five read retries"  # noqa: PLR2004 -- documented policy
+        assert retry.connect == 3, "three connect retries"  # noqa: PLR2004 -- documented policy
+        assert retry.backoff_factor == 0.5, (  # noqa: PLR2004 -- documented policy
+            "a half-second backoff factor"
+        )
+        assert set(retry.status_forcelist or ()) == {500, 502, 503, 504}, (
+            "the transient statuses are retried"
+        )
+        assert set(retry.allowed_methods or ()) == {"GET", "HEAD"}, (
+            "only the read methods are retried"
+        )
+    finally:
+        session.close()
 
 
 def test_fetch_document_does_not_fall_back_on_an_unrelated_failure() -> None:
@@ -1962,6 +2094,25 @@ def test_main_dispatches_on_the_supported_boundary(
     cli.main()
 
     dispatch.assert_called_once_with()
+
+
+def test_generate_logs_one_total_for_the_whole_invocation(
+    caplog: pytest.LogCaptureFixture, mocker: MockerFixture
+) -> None:
+    """A single-site run reports the wall time of the whole invocation."""
+    site_config = SimpleNamespace(sites={})
+    mocker.patch.object(cli, "load_site_config", return_value=site_config)
+    mocker.patch.object(cli, "_github_token", return_value=None)
+    mocker.patch.object(cli, "_generate_main_site")
+    mocker.patch("time.perf_counter", side_effect=[100.0, 112.5])
+
+    with caplog.at_level(logging.INFO, logger="df12_pages.cli"):
+        generate()
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert messages == ["generated the requested sites in 12.500 s"], (
+        f"one total must cover the whole invocation, got {messages!r}"
+    )
 
 
 def test_generate_rejects_zero_document_workers() -> None:

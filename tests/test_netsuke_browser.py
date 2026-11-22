@@ -390,9 +390,11 @@ def test_a_netsuke_page_fits_a_phone(
     page wider than the viewport is the other classic mobile failure: the code
     panels scroll on purpose and are allowed to, but the document is not.
 
-    Four pages already overflow at this width and are waived by name; the
-    waiver asserts the overflow is still there, so fixing one of them fails
-    this test until the entry is removed, and worsening one fails it outright.
+    One page still overflows at this width -- the design reference sheet -- and
+    is waived by name with the width it was measured at; the waiver asserts the
+    overflow is still there, so fixing it fails this test until the entry is
+    removed, and worsening it fails it outright. Every other page, including
+    all five examples pages whose manifest header used to overflow, must fit.
     """
     _open(drive, served, page, MOBILE_WIDTH, MOBILE_HEIGHT)
     narrow = _evaluate(drive, LAYOUT)
@@ -736,6 +738,13 @@ def test_every_page_renders_as_the_committed_baseline(
     the build year in every footer, and the release version, release date,
     and Rust nightly configured in ``pages.yaml`` are the accepted
     differences, and all are redacted before hashing.
+
+    The record belongs to the host and browser that took it. The normalized
+    tree carries bounding boxes, so a fallback font that resolves differently
+    moves every digest while the markup is unchanged. Before chasing a
+    mismatch, build the commit that wrote the record and capture from it: if
+    that also fails here, the difference is the environment, and the record
+    wants re-recording rather than the site wanting a fix.
     """
     name, out_dir = captured
     digests = {path.stem: _digest(path) for path in sorted(out_dir.glob("*.json"))}

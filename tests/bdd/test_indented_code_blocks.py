@@ -10,8 +10,8 @@ Usage
 -----
 Run ``pytest tests/bdd/test_indented_code_blocks.py -v`` after installing the
 dev dependencies (``uv sync --group dev``). The scenario relies on the
-``scenario_state`` fixture and stubs ``PageContentGenerator._fetch_markdown`` to
-avoid network calls, so no external services are required.
+``scenario_state`` fixture and injects a document fetcher that serves the
+stubbed markdown, so no external services are required.
 """
 
 from __future__ import annotations
@@ -25,6 +25,10 @@ from pytest_bdd import given, scenarios, then, when
 
 from df12_pages.config import load_site_config
 from df12_pages.generator import PageContentGenerator
+from df12_pages.generator.page_generator import DocumentSource, FetchedMarkdown
+
+if typ.TYPE_CHECKING:
+    import datetime as dt
 
 FEATURE_FILE = (
     Path(__file__).resolve().parents[2] / "features" / "indented_code_blocks.feature"
@@ -74,22 +78,26 @@ def given_stubbed_markdown(scenario_state: dict[str, object]) -> None:
 
 
 @when("I render the sample docs page")
-def when_render_docs(
-    scenario_state: dict[str, object],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def when_render_docs(scenario_state: dict[str, object]) -> None:
     """Render the sample docs page for the indented code blocks scenario."""
     config_path = typ.cast("Path", scenario_state["config_path"])
     config = load_site_config(config_path)
     page = config.get_page("sample")
+    markdown = typ.cast("str", scenario_state["markdown"])
 
-    def _fake_fetch(self: PageContentGenerator) -> str:
-        """Return stubbed markdown content for indented code block tests."""
-        return typ.cast("str", scenario_state["markdown"])
+    def fake_fetch(
+        source: DocumentSource, *, updated_at: dt.datetime | None = None
+    ) -> FetchedMarkdown:
+        """Return the stubbed markdown and the provenance it would carry."""
+        return FetchedMarkdown(
+            text=markdown,
+            source_url=source.source_url,
+            version=source.version,
+            updated_at=updated_at,
+        )
 
-    monkeypatch.setattr(PageContentGenerator, "_fetch_markdown", _fake_fetch)
     output_dir = typ.cast("Path", scenario_state["output_dir"])
-    generator = PageContentGenerator(page, output_dir=output_dir)
+    generator = PageContentGenerator(page, output_dir=output_dir, fetcher=fake_fetch)
     written = generator.run()
     scenario_state["written"] = written
 

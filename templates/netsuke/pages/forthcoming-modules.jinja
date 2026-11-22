@@ -82,24 +82,24 @@
                     <div class="min-w-0">
                         <p class="text-xs font-mono text-charcoal-mid mb-2">Proposed syntax, RFC 0002 §§5&ndash;5.1</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                            {% highlight 'netsuke' %}{% raw %}
+                            {% filter highlight('netsuke') %}{% raw %}
 includes:
   - path: build/netsuke/release.yaml
   - path: build/netsuke/rust-quality.yaml
     as: rust_quality
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-mono text-charcoal-mid mb-2">Illustrative metadata fields, RFC 0002 §11</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                            {% highlight 'json' %}{% raw %}
+                            {% filter highlight('json') %}{% raw %}
 {
   "name": "rust_quality::lint",
   "source": "build/netsuke/rust-quality.yaml",
   "namespace": "rust_quality"
 }
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -157,7 +157,7 @@ includes:
                     <div class="min-w-0">
                         <p class="text-xs font-mono text-charcoal-mid mb-2">Bundle descriptor, trimmed from RFC 0003 §4</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                            {% highlight 'yaml' %}{% raw %}
+                            {% filter highlight('yaml') %}{% raw %}
 bundle:
   name: df12.rust-quality
   version: 1.4.2
@@ -173,13 +173,13 @@ exports:
   actions:
     - lint
     - test
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-mono text-charcoal-mid mb-2">Proposed import, RFC 0003 §5.1</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                            {% highlight 'netsuke' %}{% raw %}
+                            {% filter highlight('netsuke') %}{% raw %}
 bundles:
   - name: df12.rust-quality
     source:
@@ -191,7 +191,7 @@ bundles:
       features:
         - serde
         - tracing
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -258,7 +258,7 @@ bundles:
                     <div class="min-w-0">
                         <p class="text-xs font-mono text-charcoal-mid mb-2">Proposed syntax, RFC 0004 §5 (<code>with</code> omitted)</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                            {% highlight 'netsuke' %}{% raw %}
+                            {% filter highlight('netsuke') %}{% raw %}
 bundles:
   - source:
       git:
@@ -269,19 +269,19 @@ bundles:
     name: df12.rust-quality
     version: "=1.4.2"
     as: rust
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-mono text-charcoal-mid mb-2">Provenance output, RFC 0004 §15</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-                            {% highlight 'text' %}{% raw %}
+                            {% filter highlight('text') %}{% raw %}
 rust: df12.rust-quality 1.4.2
   git tag rust-quality/v1.4.2
   commit 8c5e4e6d76d75de67f66f09cb2c63d69d2e14f84
   digest sha256:4e9f2d...
   lock verified, cache hit
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>

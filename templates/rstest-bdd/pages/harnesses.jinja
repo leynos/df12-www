@@ -100,7 +100,7 @@
               returns <code>Err</code> fails with “scenario returned an error”.
             </p>
             {% call ui.code_panel('From the user’s guide', copy=false, foot='Quoted from the user’s guide; the sample crate does not build GPUI.') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[scenario(
     path = "tests/features/counter.feature",
     name = "Increment a counter and observe GPUI context",
@@ -110,7 +110,7 @@ fn increment_and_observe_gpui_context() -> Result<(), std::io::Error> {
     increment_counter()?;
     Ok(())
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             <p>
               Scenarios that keep windows and entities alive between steps have

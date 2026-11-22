@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import datetime as dt
 import typing as typ
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+from .templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:
     from .config import AboutPageConfig
@@ -21,20 +20,14 @@ class AboutPageBuilder:
         """Initialize the builder and Jinja environment."""
         self.about = about
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
-        self.env = Environment(
-            loader=FileSystemLoader(self.templates_dir),
-            autoescape=True,
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.template = self.env.get_template("about_page.jinja")
+        self.env = template_environment(self.templates_dir)
 
     def run(self) -> Path:
         """Render and write the About page HTML, returning the output path."""
         output_path = self.about.output
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        context = {"about": self.about, "generated_at": dt.datetime.now(dt.UTC)}
-        html = self.template.render(**context)
+        context = {"about": self.about, "generated_at": build_timestamp()}
+        html = self.env.render_template("about_page.jinja", **context)
         if not html.endswith("\n"):
             html += "\n"
         output_path.write_text(html, encoding="utf-8")

@@ -27,9 +27,9 @@
               <code>tokio</code> dev-dependency for the test attribute.
             </p>
             {% call ui.code_panel('Cargo.toml', sample='Cargo.toml') %}
-            {% highlight 'toml', 'lantern-syntax' %}
+            {% filter highlight('toml', 'lantern-syntax') %}
 tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
           </section>
 
@@ -44,7 +44,7 @@ tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }
               written.
             </p>
             {% call ui.code_panel('tests/stage.rs', sample='tests/stage.rs') %}
-            {% highlight 'rust', 'lantern-syntax' %}
+            {% filter highlight('rust', 'lantern-syntax') %}
 #[scenario(
     path = "tests/features/stage.feature",
     harness = rstest_bdd_harness_tokio::TokioHarness,
@@ -52,7 +52,7 @@ tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }
 fn tokio_stage(trolley: Trolley) {
     let _ = trolley;
 }
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             {% call ui.note('The harness does not wait', 'caveat') %}
             <p>

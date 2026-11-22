@@ -19,6 +19,10 @@ const SCRIPT = fileURLToPath(
   new URL("../../scripts/build-episodic-search-index.mjs", import.meta.url),
 );
 
+/* Each test starts real interpreter processes and parses a MiniSearch index;
+   the five-second default is not enough when the host is building. */
+const INDEX_TIMEOUT_MS = 30_000;
+
 async function fixtureRoot() {
   const root = await mkdtemp(path.join(tmpdir(), "episodic-index-"));
   await mkdir(path.join(root, "public/episodic/docs"), { recursive: true });
@@ -54,66 +58,82 @@ function runIndexAsync(root, ...args) {
 }
 
 describe("Episodic search-index command", () => {
-  test("writes deterministic output and detects drift in check mode", async () => {
-    const root = await fixtureRoot();
-    const outputPath = path.join(root, "src/static/episodic/assets/search/episodic-search.json");
-    try {
-      expect(runIndex(root).status).toBe(0);
-      const generated = await readFile(outputPath, "utf8");
-      const payload = JSON.parse(generated);
-      expect(payload.index).toBeString();
-      const index = MiniSearch.loadJSON(payload.index, {
-        fields: payload.indexOptions.fields,
-        storeFields: payload.indexOptions.storeFields,
-      });
-      expect(index.search("fixture").map((result) => result.sitePath)).toContain(
-        "https://github.com/leynos/episodic/blob/main/docs/fixture.md",
-      );
-      expect(runIndex(root, "--check").status).toBe(0);
+  test(
+    "writes deterministic output and detects drift in check mode",
+    async () => {
+      const root = await fixtureRoot();
+      const outputPath = path.join(root, "src/static/episodic/assets/search/episodic-search.json");
+      try {
+        expect(runIndex(root).status).toBe(0);
+        const generated = await readFile(outputPath, "utf8");
+        const payload = JSON.parse(generated);
+        expect(payload.index).toBeString();
+        const index = MiniSearch.loadJSON(payload.index, {
+          fields: payload.indexOptions.fields,
+          storeFields: payload.indexOptions.storeFields,
+        });
+        expect(index.search("fixture").map((result) => result.sitePath)).toContain(
+          "https://github.com/leynos/episodic/blob/main/docs/fixture.md",
+        );
+        expect(runIndex(root, "--check").status).toBe(0);
 
-      await writeFile(outputPath, "stale\n");
-      const drift = runIndex(root, "--check");
-      expect(drift.status).not.toBe(0);
-      expect(drift.stderr).toContain("is stale");
-    } finally {
-      await rm(root, { force: true, recursive: true });
-    }
-  });
+        await writeFile(outputPath, "stale\n");
+        const drift = runIndex(root, "--check");
+        expect(drift.status).not.toBe(0);
+        expect(drift.stderr).toContain("is stale");
+      } finally {
+        await rm(root, { force: true, recursive: true });
+      }
+    },
+    INDEX_TIMEOUT_MS,
+  );
 
-  test("fails rather than publishing a partial index when rendered pages are absent", async () => {
-    const root = await fixtureRoot();
-    await rm(path.join(root, "public"), { force: true, recursive: true });
-    try {
-      const result = runIndex(root);
-      expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain("ENOENT");
-    } finally {
-      await rm(root, { force: true, recursive: true });
-    }
-  });
+  test(
+    "fails rather than publishing a partial index when rendered pages are absent",
+    async () => {
+      const root = await fixtureRoot();
+      await rm(path.join(root, "public"), { force: true, recursive: true });
+      try {
+        const result = runIndex(root);
+        expect(result.status).not.toBe(0);
+        expect(result.stderr).toContain("ENOENT");
+      } finally {
+        await rm(root, { force: true, recursive: true });
+      }
+    },
+    INDEX_TIMEOUT_MS,
+  );
 
-  test("fails when the upstream documentation manifest is absent", async () => {
-    const root = await fixtureRoot();
-    await rm(path.join(root, "templates"), { force: true, recursive: true });
-    try {
-      const result = runIndex(root);
-      expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain("ENOENT");
-    } finally {
-      await rm(root, { force: true, recursive: true });
-    }
-  });
+  test(
+    "fails when the upstream documentation manifest is absent",
+    async () => {
+      const root = await fixtureRoot();
+      await rm(path.join(root, "templates"), { force: true, recursive: true });
+      try {
+        const result = runIndex(root);
+        expect(result.status).not.toBe(0);
+        expect(result.stderr).toContain("ENOENT");
+      } finally {
+        await rm(root, { force: true, recursive: true });
+      }
+    },
+    INDEX_TIMEOUT_MS,
+  );
 
-  test("leaves a complete index when simultaneous builds replace the same output", async () => {
-    const root = await fixtureRoot();
-    const outputPath = path.join(root, "src/static/episodic/assets/search/episodic-search.json");
-    try {
-      const [first, second] = await Promise.all([runIndexAsync(root), runIndexAsync(root)]);
-      expect(first.status).toBe(0);
-      expect(second.status).toBe(0);
-      expect(JSON.parse(await readFile(outputPath, "utf8")).index).toBeString();
-    } finally {
-      await rm(root, { force: true, recursive: true });
-    }
-  });
+  test(
+    "leaves a complete index when simultaneous builds replace the same output",
+    async () => {
+      const root = await fixtureRoot();
+      const outputPath = path.join(root, "src/static/episodic/assets/search/episodic-search.json");
+      try {
+        const [first, second] = await Promise.all([runIndexAsync(root), runIndexAsync(root)]);
+        expect(first.status).toBe(0);
+        expect(second.status).toBe(0);
+        expect(JSON.parse(await readFile(outputPath, "utf8")).index).toBeString();
+      } finally {
+        await rm(root, { force: true, recursive: true });
+      }
+    },
+    INDEX_TIMEOUT_MS,
+  );
 });

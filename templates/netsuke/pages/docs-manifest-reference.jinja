@@ -38,7 +38,7 @@
                     Every <code class="font-mono text-sm">Netsukefile</code> is a YAML mapping. Unknown fields and duplicate mapping keys are errors. <code>netsuke_version</code> and <code>targets</code> are required (an empty <code>targets</code> list is valid for an action-only manifest); <code>vars</code>, <code>macros</code>, <code>rules</code>, <code>actions</code>, and <code>defaults</code> are optional.
                 </p>
 
-                {% call chrome.faux_window('Netsukefile', outer_class='relative') %}{% highlight 'netsuke' %}{% raw %}
+                {% call chrome.faux_window('Netsukefile', outer_class='relative') %}{% filter highlight('netsuke') %}{% raw %}
 # 1. Schema version
 netsuke_version: "1.0.0"
 
@@ -58,7 +58,7 @@ targets:
 
 defaults:
   - "main.o"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                     <!-- Annotation Overlay -->
                     <div class="absolute right-6 top-16 hidden lg:block">
                         <div class="flex items-center mb-10">
@@ -168,7 +168,7 @@ defaults:
                     <div>
                         <h4 class="font-serif font-bold text-base-content mb-4">Basic Usage</h4>
                         <div class="bg-base-content rounded-lg border border-charcoal-mid shadow-lg p-5 font-mono text-sm overflow-x-auto text-stone-light">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 targets:
   - name: "page.html"
     sources:
@@ -176,7 +176,7 @@ targets:
       - "body.txt"
       - "footer.txt"
     command: "cat {{ ins }} > {{ outs }}"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                         <div class="mt-4 p-4 bg-base-100 border border-base-300 rounded-lg">
                             <h5 class="text-sm font-bold text-base-content mb-2">Common placeholders</h5>

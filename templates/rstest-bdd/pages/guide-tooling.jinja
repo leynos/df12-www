@@ -15,13 +15,13 @@
               test fails and names the step, the feature, and the scenario:
             </p>
             {% call ui.code_panel('tests/features/missing.feature', foot='Not part of the sample crate: it exists to fail.', copy=false) %}
-            {% highlight 'gherkin', 'lantern-syntax' %}
+            {% filter highlight('gherkin', 'lantern-syntax') %}
 Feature: A forgotten step
   Scenario: Nobody wrote the bell
     Given a lantern on the trolley
     When the bell is rung twice
     Then the lantern arrives upright
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             {% call ui.output('cargo test --test missing', 'excerpt') %}
 thread 'nobody_wrote_the_bell' (605609) panicked at tests/missing.rs:9:1:
@@ -34,9 +34,9 @@ Step not found at index 1: When the bell is rung twice (feature: tests/features/
               step:
             </p>
             {% call ui.code_panel('Terminal', copy='console') %}
-            {% highlight 'console', 'lantern-syntax' %}
+            {% filter highlight('console', 'lantern-syntax') %}
 $ cargo test --features "rstest-bdd-macros/strict-compile-time-validation"
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             {% call ui.output('Output', 'excerpt') %}
 error: No matching step definition found for 'When the bell is rung twice'
@@ -64,10 +64,10 @@ error: No matching step definition found for 'When the bell is rung twice'
               file and line that define them:
             </p>
             {% call ui.code_panel('Terminal', copy='console') %}
-            {% highlight 'console', 'lantern-syntax' %}
+            {% filter highlight('console', 'lantern-syntax') %}
 $ cargo install cargo-bdd --version {{ rstest_bdd_version }} --locked
 $ cargo-bdd steps
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             {% call ui.output('cargo-bdd steps, the first six lines', 'cargo-bdd ' ~ rstest_bdd_version) %}
 Given 'a bell on the trolley' (tests/bell.rs:15)
@@ -105,10 +105,10 @@ When 'the departure bell rings' (tests/counting.rs:20)
               placeholders, tables, and docstrings when a file is saved.
             </p>
             {% call ui.code_panel('Terminal', copy='console') %}
-            {% highlight 'console', 'lantern-syntax' %}
+            {% filter highlight('console', 'lantern-syntax') %}
 $ cargo install --git https://github.com/leynos/rstest-bdd --tag {{ rstest_bdd_tag }} rstest-bdd-server --locked
 $ rstest-bdd-lsp --help
-            {% endhighlight %}
+            {% endfilter %}
             {% endcall %}
             {% call ui.output('rstest-bdd-lsp --help', 'excerpt') %}
 Language server for rstest-bdd BDD testing framework

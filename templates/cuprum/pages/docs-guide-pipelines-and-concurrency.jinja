@@ -14,7 +14,7 @@
     result.
   </p>
 {% call ui.code_panel('pipeline.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -27,7 +27,7 @@ result = (producer | consumer).run_sync()
 assert result.ok
 assert result.stdout == "HELLO\n"
 assert [stage.exit_code for stage in result.stages] == [0, 0]
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 </section>
 
@@ -54,7 +54,7 @@ assert [stage.exit_code for stage in result.stages] == [0, 0]
     back in submission order.
   </p>
 {% call ui.code_panel('concurrent.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ConcurrentConfig, ProgramCatalogue, run_concurrent_sync, sh
@@ -66,7 +66,7 @@ result = run_concurrent_sync(*commands, config=ConcurrentConfig(concurrency=2))
 assert result.ok
 assert [item.stdout for item in result.results] == ["1\n", "2\n"]
 assert result.submission_indices == (0, 1)
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     With <code>fail_fast=True</code>, the remaining commands are cancelled

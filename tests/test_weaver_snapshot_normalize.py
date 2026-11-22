@@ -497,6 +497,44 @@ def test_a_light_colour_scheme_reads_as_the_default_one() -> None:
     assert dark["styleDiff"]["color-scheme"] == "dark", "dark is a real change"
 
 
+def test_a_renamed_alignment_keyword_reads_as_the_one_it_renamed() -> None:
+    """Chromium 158 reports `flex-start` as `flow-start`, and means the same."""
+    renamed = normalize._normalize(
+        _node(**{"align-items": "flow-start", "align-self": "flow-end"})
+    )
+    spelled = normalize._normalize(
+        _node(**{"align-items": "flex-start", "align-self": "flex-end"})
+    )
+    assert renamed["styleDiff"] == spelled["styleDiff"], (
+        "a record taken before the rename must match a capture taken after it"
+    )
+
+    elsewhere = normalize._normalize(_node(**{"align-items": "center"}))
+    assert elsewhere["styleDiff"]["align-items"] == "center", (
+        "an alignment this alias map does not name is left alone"
+    )
+
+    modified = normalize._normalize(
+        _node(
+            **{
+                "align-items": "safe flow-start",
+                "justify-content": "unsafe flow-end",
+            }
+        )
+    )
+    assert modified["styleDiff"]["align-items"] == "safe flex-start", (
+        "a safety modifier keeps its keyword's older spelling"
+    )
+    assert modified["styleDiff"]["justify-content"] == "unsafe flex-end", (
+        "the unsafe modifier is preserved as written"
+    )
+
+    unrelated = normalize._normalize(_node(**{"align-items": "baseline flow-start"}))
+    assert unrelated["styleDiff"]["align-items"] == "baseline flow-start", (
+        "a value without a valid modifier is not a keyword to rename"
+    )
+
+
 def test_the_head_is_not_compared() -> None:
     """Nothing in the head renders, and a cutover's whole point is what it removes."""
     root = _node()

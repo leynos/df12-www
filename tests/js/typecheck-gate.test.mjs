@@ -56,12 +56,22 @@ const BAD_VENDORED = `const count: number = "not a number";
 export { count };
 `;
 
+/* Colour is off in every child: an inherited FORCE_COLOR would otherwise put
+   ANSI escapes between "error" and "TS2322", and these tests assert on the
+   text of the compiler's output. */
+const SPAWN_ENV = {
+  ...process.env,
+  MAKEFLAGS: "",
+  FORCE_COLOR: "0",
+  NO_COLOR: "1",
+};
+
 /* Run the gate and report how it exited. */
 function typecheck() {
   const result = spawnSync("make", ["typecheck-js"], {
     cwd: REPO_ROOT,
     encoding: "utf8",
-    env: { ...process.env, MAKEFLAGS: "" },
+    env: SPAWN_ENV,
   });
   return { status: result.status, output: `${result.stdout ?? ""}${result.stderr ?? ""}` };
 }
@@ -80,7 +90,9 @@ describe("the typecheck-js target", () => {
     expect(status).toBe(0);
     expect(output).toContain("tsc -p tsconfig.browser.json --noEmit");
     expect(output).toContain("tsc -p tsconfig.scripts.json --noEmit");
-  });
+    // A full typecheck over every browser script and build script; on a busy
+    // machine it no longer fits the default five seconds.
+  }, 30000);
 
   test("fails on a type error in a browser script, and passes once it is removed", () => {
     expect(existsSync(BROWSER_FIXTURE)).toBe(false);
@@ -106,7 +118,8 @@ describe("the typecheck-js target", () => {
     expect(dirty.status).not.toBe(0);
     expect(dirty.output).toContain("scripts/typecheck-gate-fixture.ts");
     expect(dirty.output).toContain("error TS2322");
-  });
+    // A full typecheck over every browser script and build script.
+  }, 30000);
 
   test("keeps vendored code out of scope, so the gate ignores what is written there", () => {
     if (!existsSync(VENDOR_DIR)) {
@@ -118,7 +131,8 @@ describe("the typecheck-js target", () => {
     /* The same error at SCRIPTS_FIXTURE fails the gate above, so a pass here
        is the exclusion doing the work rather than the fixture being clean. */
     expect(typecheck().status).toBe(0);
-  });
+    // A full typecheck over every browser script and build script.
+  }, 30000);
 
   test("tsc -b builds the solution file and reports an error from a referenced project", () => {
     /* The root tsconfig.json references the two projects without `composite`.
@@ -129,6 +143,7 @@ describe("the typecheck-js target", () => {
       spawnSync(join(REPO_ROOT, "node_modules", ".bin", "tsc"), ["-b", "tsconfig.json"], {
         cwd: REPO_ROOT,
         encoding: "utf8",
+        env: SPAWN_ENV,
       });
     for (const info of ["tsconfig.browser.tsbuildinfo", "tsconfig.scripts.tsbuildinfo"]) {
       written.push(join(REPO_ROOT, info));

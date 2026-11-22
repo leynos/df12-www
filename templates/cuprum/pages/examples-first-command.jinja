@@ -24,7 +24,7 @@
 
 {% block code %}
 {% call ui.code_panel('word_count.py', 'Complete', foot=[verified]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import (
     Program,
     ProgramCatalogue,
@@ -52,7 +52,7 @@ def word_count(text: str) -> int:
 print(count_words("-w").argv_with_program)
 print(count_words("-w").project.name)
 print(word_count("Every command gets the right fitting."))
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 <div class="cu-prose mt-10">
   <h3>Reading it</h3>
@@ -109,7 +109,7 @@ word-count
 </div>
 <div class="cu-pair mt-8">
   {% call ui.code_panel('refusals.py', 'Failure path', foot=[verified], flat=true) %}
-  {% highlight 'python', 'cuprum-syntax' %}
+  {% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import (
     DEFAULT_CATALOGUE,
     ECHO,
@@ -136,7 +136,7 @@ with scoped(catalogue=CATALOGUE):
         sh.make(ECHO, catalogue=DEFAULT_CATALOGUE)("hello").run_sync()
     except ForbiddenProgramError as exc:
         print(f"ForbiddenProgramError: {exc}")
-  {% endhighlight %}
+  {% endfilter %}
   {% endcall %}
   <div>
     {% call ui.output('Expected output', 'stdout') %}

@@ -102,16 +102,22 @@ SHARED_CONTENT = _shared_content()
 # it is checked for fitting the viewport and for nothing about navigation.
 STANDALONE = frozenset({"icon-replacements/"})
 
-# Pages that lay out wider than the narrowest viewport today, before the
-# migration touched anything, keyed to the width each was measured at. The
-# migration is meant to be inert, so it neither fixes nor worsens these; the
-# waiver is asserted to still fire, so it cannot outlive the defect. See the
-# decision log in `docs/execplans/netsuke-daisy-migration.md`.
+# Pages that lay out wider than the narrowest viewport today, keyed to the
+# width each was measured at with the reference build date that the capture
+# fixtures set. A waived page is asserted to still overflow, but by no more
+# than the recorded width, so the waiver cannot outlive the defect and a page
+# that grows fails here by name. The widths are a property of this host's
+# text metrics as much as of the markup, so re-measure the whole set on the
+# host that records the snapshots rather than trusting these numbers on
+# another machine. See the decision log in
+# `docs/execplans/netsuke-daisy-migration.md`.
+#
+# The five example pages that used to be waived here are gone: their manifest
+# header row now wraps, so the file label and the copy button stack instead of
+# pushing the page 2-45px past a 360px viewport. `design/` remains, and it is
+# the only entry that should be added back without a measurement.
 KNOWN_OVERFLOW = {
-    "design/": 607,
-    "examples/batch-photo-processing/": 363,
-    "examples/multi-format-documentation/": 372,
-    "examples/visual-design-assets/": 385,
+    "design/": 590,
 }
 
 # What the two layouts are distinguished by, measured the same way at both

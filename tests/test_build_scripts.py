@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -54,3 +56,16 @@ def test_build_search_generates_once_and_the_check_command_detects_drift(
     assert package_scripts["check:search"] == f"{command} --check", (
         "check:search must retain deterministic Episodic index drift verification"
     )
+
+
+def test_pages_refuses_an_enabled_gil() -> None:
+    """Reject GIL-enabled execution before the CLI dispatches any command."""
+    result = subprocess.run(
+        [sys.executable, "-X", "gil=1", "-c", "from df12_pages import main; main()"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "free-threaded CPython 3.15.2" in result.stderr

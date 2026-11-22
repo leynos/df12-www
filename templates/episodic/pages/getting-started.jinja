@@ -64,7 +64,7 @@
   {{ ui.section_open(4, "health", "Confirming the service runs",
      "Two endpoints, and they mean different things.") }}
     {% call ui.code_block("Expected health responses") %}
-      {% highlight 'console', 'episodic-syntax' %}
+      {% filter highlight('console', 'episodic-syntax') %}
       $ curl -i localhost:8080/health/live
       HTTP/1.1 200 OK
 
@@ -74,7 +74,7 @@
       $ # With no reachable database:
       $ curl -i localhost:8080/health/ready
       HTTP/1.1 503 Service Unavailable
-      {% endhighlight %}
+      {% endfilter %}
     {% endcall %}
     <p>
       Liveness reports only that the process booted. Readiness reports whether

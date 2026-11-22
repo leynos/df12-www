@@ -33,7 +33,7 @@
     promptly. Lines keep their order within a stream, not across streams.
   </p>
 {% call ui.code_panel('output_lines.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
@@ -49,7 +49,7 @@ assert [(line.stream, line.text) for line in lines] == [
     ("stdout", "one"),
     ("stdout", "two"),
 ]
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 </section>
 
@@ -63,7 +63,7 @@ assert [(line.stream, line.text) for line in lines] == [
     <code>run()</code> would. Merely breaking out of the loop does not.
   </p>
 {% call ui.code_panel('first_line.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import asyncio
 import sys
 
@@ -85,7 +85,7 @@ async def first_line() -> str:
 
 
 assert asyncio.run(first_line()) == "0"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     After a loop that runs to the end, <code>stream.result</code> holds the
@@ -108,7 +108,7 @@ assert asyncio.run(first_line()) == "0"
     {{ api.ref('RunOutputOptions') }}:
   </p>
 {% call ui.code_panel('broken_pipe.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import io
 import sys
 
@@ -139,7 +139,7 @@ assert result.ok and result.stdout == "hello\n"
 assert [(f.stream, f.error_category) for f in result.relay_fallbacks] == [
     ("stdout", "broken_pipe")
 ]
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Under best-effort, the <code>BrokenPipeError</code> from the sink disables
@@ -165,7 +165,7 @@ assert [(f.stream, f.error_category) for f in result.relay_fallbacks] == [
     to prompt: both run on the command's event loop.
   </p>
 {% call ui.code_panel('heartbeat.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, RunOutputOptions, sh
@@ -174,7 +174,7 @@ catalogue = ProgramCatalogue.from_programs(sys.executable, name="idle")
 command = sh.make(Program(sys.executable), catalogue=catalogue)("-c", "print('done')")
 result = command.run_sync(output=RunOutputOptions(idle_after=30.0))
 assert result.ok and result.stdout == "done\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 </section>
 
@@ -210,7 +210,7 @@ assert result.ok and result.stdout == "done\n"
     stdout:
   </p>
 {% call ui.code_panel('redirect_stdout.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 import tempfile
 from pathlib import Path
@@ -225,7 +225,7 @@ result = python("-c", "print('redirected')").run_sync(
 )
 assert result.stdout is None, "a redirected stream is not captured"
 assert log.read_text(encoding="utf-8") == "redirected\n"
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     A few combinations are contradictory, and Cuprum rejects them with
@@ -263,7 +263,7 @@ assert log.read_text(encoding="utf-8") == "redirected\n"
     counterparts, are the same runs with capture left undecoded:
   </p>
 {% call ui.code_panel('binary_output.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import sys
 
 from cuprum import Program, ProgramCatalogue, sh
@@ -276,7 +276,7 @@ result = python(
 ).run_bytes_sync()
 assert result.ok
 assert result.stdout == payload
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     The byte-mode entry points take the same <code>output</code>,

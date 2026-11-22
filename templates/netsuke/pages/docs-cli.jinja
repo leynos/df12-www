@@ -168,7 +168,7 @@
 
                     <!-- Right: Terminal Preview -->
                     <div class="space-y-6 sticky top-24 self-start">
-                        {% call chrome.faux_window('user@dev:~/netsuke-project') %}{% highlight 'netsuke-console' %}
+                        {% call chrome.faux_window('user@dev:~/netsuke-project') %}{% filter highlight('netsuke-console') %}
 $ netsuke --verbose build app
 Parsed Netsukefile and expanded 3 targets
 Wrote build.ninja
@@ -180,7 +180,7 @@ digraph netsuke {
   "main.o" -> "app"
   "utils.o" -> "app"
 }
-{% endhighlight %}{% endcall %}
+{% endfilter %}{% endcall %}
 
                         <!-- Tip Card -->
                         <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
@@ -236,13 +236,13 @@ digraph netsuke {
                         </tbody>
                     </table>
                 </div>
-                {% call chrome.faux_window('Locking down a CI build', outer_class='mb-6') %}{% highlight 'netsuke-console' %}
+                {% call chrome.faux_window('Locking down a CI build', outer_class='mb-6') %}{% filter highlight('netsuke-console') %}
 $ netsuke --fetch-default-deny \
     --fetch-allow-host releases.example.com \
     --env-allow-var CI \
     --manifest-expanded-entries 5000 \
     build
-{% endhighlight %}{% endcall %}
+{% endfilter %}{% endcall %}
             </section>
 
             <section id="output-streams" class="mb-20 pt-10 border-t border-stone-light">
@@ -282,7 +282,7 @@ $ netsuke --fetch-default-deny \
                     </div>
                 </div>
 
-                {% call chrome.faux_window('Shell examples', outer_class='mb-6') %}{% highlight 'netsuke-console' %}
+                {% call chrome.faux_window('Shell examples', outer_class='mb-6') %}{% filter highlight('netsuke-console') %}
 # Capture build graph without status noise
 $ netsuke graph > build.dot
 
@@ -294,7 +294,7 @@ $ netsuke --progress never build
 
 # Inspect generated Ninja file inline
 $ netsuke generate | grep 'rule '
-{% endhighlight %}{% endcall %}
+{% endfilter %}{% endcall %}
 
                 <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 flex items-start">
                     <span class="iconify text-primary mt-1 mr-3" data-icon="carbon:information" aria-hidden="true"></span>
@@ -369,7 +369,7 @@ $ netsuke generate | grep 'rule '
                     In accessible mode each pipeline stage and each build task produces a labelled line on stderr.
                     No spinners, no cursor movement &mdash; just plain, ordered text a screen reader can follow.
                 </p>
-                {% call chrome.faux_window('stderr, accessible mode', outer_class='mb-8') %}{% highlight 'netsuke-console' %}
+                {% call chrome.faux_window('stderr, accessible mode', outer_class='mb-8') %}{% filter highlight('netsuke-console') %}
 Stage 1/6: Reading manifest file
 Stage 2/6: Parsing YAML document
 Stage 3/6: Expanding template directives
@@ -379,7 +379,7 @@ Stage 6/6: Synthesizing Ninja plan and executing Build
 Task 1/2: cc -c src/a.c
 Task 2/2: cc -c src/b.c
 Success: Build complete.
-{% endhighlight %}{% endcall %}
+{% endfilter %}{% endcall %}
 
                 <h3 class="font-bold text-base-content mb-4 text-sm uppercase tracking-wide">Emoji suppression</h3>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-2xl">

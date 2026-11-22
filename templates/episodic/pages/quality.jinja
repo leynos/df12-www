@@ -36,7 +36,7 @@
     {% call ui.code_block(
       "Synthetic Pedante finding",
       "Shape only; support levels and severities are defined by the evaluator contract") %}
-      {% highlight 'json', 'episodic-syntax' %}
+      {% filter highlight('json', 'episodic-syntax') %}
       {
         "claim_id": "c-014",
         "claim_kind": "attributed-quotation",
@@ -45,7 +45,7 @@
         "severity": "high",
         "remediation": "The transcript records this phrasing at 00:14:22 but attributes it to the second speaker. Confirm the attribution or cut the quotation."
       }
-      {% endhighlight %}
+      {% endfilter %}
     {% endcall %}
     <p>
       A finding names what it examined, what it could and could not tie to a

@@ -15,18 +15,17 @@ Typical usage mirrors the build pipeline:
 >>> print(output_path)
 
 The builder expects templates to reside under ``df12_pages/templates`` unless a
-custom directory is provided. It relies on Jinja2 with autoescape enabled and
+custom directory is provided. It relies on MiniJinja with autoescape enabled and
 produces UTF-8 encoded files. Side effects include reading template files and
 writing the rendered HTML to disk.
 """
 
 from __future__ import annotations
 
-import datetime as dt
 import typing as typ
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+from .templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:
     from .config import HomepageConfig
@@ -53,19 +52,12 @@ class HomePageBuilder:
         Notes
         -----
         Instantiating the builder resolves the template directory, configures a
-        Jinja2 ``Environment`` (autoescape, trimmed blocks), and eagerly loads
-        the ``home_page.jinja`` template so later ``run`` calls only handle
-        rendering and filesystem writes.
+        MiniJinja ``Environment`` (autoescape, trimmed blocks), and loads templates on
+        first render.
         """
         self.homepage = homepage
         self.templates_dir = templates_dir or Path(__file__).parent / "templates"
-        self.env = Environment(
-            loader=FileSystemLoader(self.templates_dir),
-            autoescape=True,
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
-        self.template = self.env.get_template("home_page.jinja")
+        self.env = template_environment(self.templates_dir)
 
     def run(self) -> Path:
         """Render and write the homepage HTML, returning the output path.
@@ -86,9 +78,9 @@ class HomePageBuilder:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         context = {
             "homepage": self.homepage,
-            "generated_at": dt.datetime.now(dt.UTC),
+            "generated_at": build_timestamp(),
         }
-        html = self.template.render(**context)
+        html = self.env.render_template("home_page.jinja", **context)
         if not html.endswith("\n"):
             html += "\n"
         output_path.write_text(html, encoding="utf-8")

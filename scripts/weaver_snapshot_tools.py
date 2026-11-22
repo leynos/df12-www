@@ -542,7 +542,7 @@ def _open_settled(drive: cabc.Callable[..., None], url: str) -> bool:
     drive("wait", "--load", "networkidle")
     try:
         drive("wait", "--fn", SETTLED)
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+    except subprocess.CalledProcessError, subprocess.TimeoutExpired:
         # agent-browser gives up on its own deadline, or the subprocess hits
         # this module's; either way the page is walked as it stands and the
         # capture says so.

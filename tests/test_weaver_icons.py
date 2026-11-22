@@ -13,8 +13,9 @@ import re
 import typing as typ
 from pathlib import Path
 
-import jinja2
 import pytest
+
+from df12_pages.templating import template_environment
 
 if typ.TYPE_CHECKING:
     from types import ModuleType
@@ -193,20 +194,17 @@ def icon_macro() -> typ.Callable[..., str]:
     refuses to parse, or on a macro that renders an empty string. Rendering it
     is what shows it works.
     """
-    environment = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(str(WEAVER_TEMPLATES)),
-        autoescape=True,
-    )
-    module = environment.get_template("_icons.jinja").module
-    # The macro is an attribute of the rendered module, which is dynamic, so
-    # the type checker cannot see it; that it exists at all is the first thing
-    # these tests assert.
-    macro = getattr(module, "icon", None)
-    assert macro is not None, (
-        "templates/weaver/_icons.jinja defines no `icon` macro; every call "
-        "site in every Weaver template would render nothing"
-    )
-    return typ.cast("typ.Callable[..., str]", macro)
+    environment = template_environment(WEAVER_TEMPLATES)
+
+    def render(name: str, extra_class: str = "") -> str:
+        """Render one icon in the template engine."""
+        return environment.render_str(
+            '{% from "_icons.jinja" import icon %}{{ icon(icon_name, extra_class) }}',
+            icon_name=name,
+            extra_class=extra_class,
+        )
+
+    return render
 
 
 def test_the_generated_macro_renders_an_svg(icon_macro: typ.Callable[..., str]) -> None:
@@ -301,18 +299,34 @@ def test_the_dictionary_is_built_once_at_template_scope(
     )
 
 
-def test_the_macro_renders_the_same_svg_however_often_it_is_called(
-    icon_macro: typ.Callable[..., str],
-) -> None:
+def test_the_macro_renders_the_same_svg_however_often_it_is_called() -> None:
     """A hoisted dictionary must not become state that a call can disturb.
 
     Rendering was previously self-contained per call; now every call reads one
     shared mapping, so the thing worth proving is that reading it repeatedly,
     and for different names, returns the same answer each time.
+
+    MiniJinja does not cache imports, so each ``render_str`` invocation imports
+    a fresh macro module. The whole sequence is therefore rendered in one
+    template after a single import; otherwise every call would read a new
+    dictionary and the test could not observe state leaking between calls.
     """
     names = ["terminal", "check", "xmark", "terminal", "check", "terminal"]
-    rendered = [str(icon_macro(name)) for name in names]
+    separator = "@@@@"
+    calls = "".join(f"{{{{ icon({name!r}) }}}}{separator}" for name in names)
+    environment = template_environment(WEAVER_TEMPLATES)
 
+    rendered = [
+        part
+        for part in environment.render_str(
+            '{% from "_icons.jinja" import icon %}' + calls
+        ).split(separator)
+        if part
+    ]
+
+    assert len(rendered) == len(names), (
+        f"expected {len(names)} icons from one import, got {len(rendered)}"
+    )
     for name, svg in zip(names, rendered, strict=True):
         assert svg.startswith("<svg "), f"{name!r} rendered {svg[:60]!r}"
         assert "<path" in svg or "<circle" in svg, f"{name!r} rendered no artwork"

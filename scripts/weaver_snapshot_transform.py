@@ -89,7 +89,7 @@ def _scale_matrix(value: str) -> tuple[float, ...] | None:
         sx = float(factors[0])
         sy = float(factors[1]) if len(factors) > 1 else sx
         sz = float(factors[2]) if len(factors) > 2 else 1.0  # noqa: PLR2004 - x, y, z
-    except (ValueError, IndexError):
+    except ValueError, IndexError:
         return None
     # A depth scale has no 2D matrix; only the default one folds.
     if sz != 1.0:

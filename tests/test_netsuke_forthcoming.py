@@ -11,16 +11,16 @@ in a published page.
 
 from __future__ import annotations
 
+import json
 import re
 import typing as typ
 from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
-from jinja2 import Environment, FileSystemLoader
-from jinja2.exceptions import UndefinedError
+from minijinja import Environment, TemplateError
 
-from df12_pages.jinja_highlight import HighlightExtension
+from df12_pages.templating import template_environment
 
 NETSUKE_TEMPLATES = Path("templates/netsuke").resolve()
 TEMPLATE_VARS: dict[str, object] = {
@@ -41,34 +41,25 @@ FOOTER_LINK_COUNT = 2
 
 def _forthcoming_environment() -> Environment:
     """Build a Jinja environment matching `ContentPageGenerator`'s."""
-    env = Environment(
-        loader=FileSystemLoader(str(NETSUKE_TEMPLATES)),
-        autoescape=True,
-        trim_blocks=True,
-        lstrip_blocks=True,
-        extensions=[HighlightExtension],
-    )
-    # Jinja types `globals` as the literal of its default namespace; it is
-    # open by design.
-    typ.cast("dict[str, object]", env.globals).update(TEMPLATE_VARS)
-    return env
+    return template_environment(NETSUKE_TEMPLATES, variables=TEMPLATE_VARS)
 
 
 def _render_macro(source: str, **context: object) -> BeautifulSoup:
     """Render a template string that imports the forthcoming macro module."""
     env = _forthcoming_environment()
     preamble = '{% import "forthcoming_data.jinja" as fc %}'
-    html = env.from_string(preamble + source).render(**context)
+    html = env.render_str(preamble + source, **context)
     return BeautifulSoup(html, "html.parser")
 
 
 def _catalogue() -> list[dict[str, object]]:
     """Return the `previews` list from the real template module."""
     env = _forthcoming_environment()
-    module = env.get_template("forthcoming_data.jinja").module
-    # `TemplateModule` exposes whatever the template sets at module scope;
-    # ty has no way to know `previews` is among them.
-    return typ.cast("list[dict[str, object]]", typ.cast("typ.Any", module).previews)
+    return json.loads(
+        env.render_str(
+            '{% import "forthcoming_data.jinja" as fc %}{{ fc.previews | tojson }}'
+        )
+    )
 
 
 def _release_order(target: object) -> tuple[int, ...]:
@@ -110,16 +101,16 @@ class TestHref:
         """An unlisted key calls the deliberately undefined raise global.
 
         Nothing defines `raise_unknown_preview`, so referencing a preview
-        the catalogue does not have raises `UndefinedError`, which is how a
+        the catalogue does not have raises `TemplateError`, which is how a
         stale link fails the build rather than publishing a link to
         nowhere.
         """
-        with pytest.raises(UndefinedError):
+        with pytest.raises(TemplateError, match="undefined is not callable"):
             _render_macro('{{ fc.href("no-such-preview") }}')
 
     def test_href_fails_the_build_for_an_unknown_section(self) -> None:
         """A section not listed on the preview also fails the build."""
-        with pytest.raises(UndefinedError):
+        with pytest.raises(TemplateError, match="undefined is not callable"):
             _render_macro(
                 '{{ fc.href("system-facts", "no-such-section") }}',
             )
@@ -130,12 +121,12 @@ class TestUnknownPreviewFailsEveryMacro:
 
     def test_sidebar_fails_the_build_for_an_unknown_preview(self) -> None:
         """`sidebar` raises before it can render an empty sources list."""
-        with pytest.raises(UndefinedError):
+        with pytest.raises(TemplateError, match="undefined is not callable"):
             _render_macro('{{ fc.sidebar("no-such-preview") }}')
 
     def test_header_fails_the_build_for_an_unknown_preview(self) -> None:
         """`header`, called with a lede body, still raises on a bad key."""
-        with pytest.raises(UndefinedError):
+        with pytest.raises(TemplateError, match="undefined is not callable"):
             _render_macro(
                 '{% call fc.header("no-such-preview") %}lede{% endcall %}',
             )

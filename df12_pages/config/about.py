@@ -93,7 +93,7 @@ def _build_avatar(payload: typ.Mapping[str, object] | None) -> AvatarConfig | No
     try:
         width_int = _as_int(width)
         height_int = _as_int(height)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return None
     return AvatarConfig(
         src=str(src),

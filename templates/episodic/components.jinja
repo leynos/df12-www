@@ -184,21 +184,21 @@
 {#
   A labelled, keyboard-scrollable code block.
 
-  Called with the body supplying a `{% highlight %}` tag, so the parent
-  generator's Pygments extension does the colouring:
+  Called with the body supplying a `highlight` filter, so the parent
+  generator's Pygments filter does the colouring:
 
       {% call ui.code_block("Health responses", "Expected output") %}
-        {% highlight 'console', 'episodic-syntax' %}
+        {% filter highlight('console', 'episodic-syntax') %}
         $ curl -i localhost:8080/health/live
-        {% endhighlight %}
+        {% endfilter %}
       {% endcall %}
 
   Pygments emits no attributes, so the scroll region and its label live on
   this wrapper. The label names what the block is, because "Terminal" alone
   tells a screen-reader user nothing.
 
-  Jinja lexes the tag body before the extension sees it, so any code
-  containing `{{` or `{%` must be wrapped in `{% raw %}` inside the tag.
+  MiniJinja renders the body before applying the filter, so any code
+  containing `{{` or `{%` must be wrapped in `{% raw %}` inside the filter block.
 #}
 {% macro code_block(label, caption=none) -%}
   <figure class="code-block">

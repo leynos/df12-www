@@ -32,7 +32,13 @@ PUBLIC_WEAVER = REPO_ROOT / "public" / "weaver"
 
 
 @pytest.fixture(scope="session")
-def built_site() -> Path:
+def site_build_env() -> dict[str, str]:
+    """Build with the date used to capture the Netsuke reference layouts."""
+    return {**os.environ, "SOURCE_DATE_EPOCH": "1790899200"}  # 2 October 2026
+
+
+@pytest.fixture(scope="session")
+def built_site(site_build_env: dict[str, str]) -> Path:
     """Build the published tree and return the Weaver sub-site's root.
 
     Returns
@@ -44,7 +50,12 @@ def built_site() -> Path:
     if not bun_exe:  # pragma: no cover - environment guard
         message = "Unable to locate 'bun' on PATH"
         raise FileNotFoundError(message)
-    subprocess.run([bun_exe, "run", "build"], cwd=REPO_ROOT, check=True)  # noqa: S603 - fixed argv, no user input
+    subprocess.run(  # noqa: S603 - fixed argv, no user input
+        [bun_exe, "run", "build"],
+        cwd=REPO_ROOT,
+        env=site_build_env,
+        check=True,
+    )
     if not PUBLIC_WEAVER.is_dir():  # pragma: no cover - defensive
         message = f"expected the Weaver sub-site at {PUBLIC_WEAVER}"
         raise FileNotFoundError(message)

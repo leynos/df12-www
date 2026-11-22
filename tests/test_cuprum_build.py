@@ -20,11 +20,10 @@ from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup, Tag
-from jinja2 import Environment, FileSystemLoader
-from jinja2.exceptions import UndefinedError
+from minijinja import Environment, TemplateError
 
 from df12_pages.config import load_site_config
-from df12_pages.jinja_highlight import HighlightExtension
+from df12_pages.templating import template_environment
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_CUPRUM = REPO_ROOT / "public" / "cuprum"
@@ -515,13 +514,7 @@ def _api_jinja_environment() -> Environment:
     `_icons.jinja` and `data/api.jinja` imports; `api.ref` needs no other
     template variables to build a link or to fail on a missing one.
     """
-    return Environment(
-        loader=FileSystemLoader(str(CUPRUM_TEMPLATES)),
-        autoescape=True,
-        trim_blocks=True,
-        lstrip_blocks=True,
-        extensions=[HighlightExtension],
-    )
+    return template_environment(CUPRUM_TEMPLATES)
 
 
 @pytest.mark.parametrize(
@@ -533,12 +526,9 @@ def test_api_ref_fails_the_build_for_an_unknown_reference(name: str) -> None:
     """`api.ref` calls the deliberately undefined `raise_missing_reference`.
 
     Nothing defines that global, so referencing a name or member the
-    generated data does not have raises `UndefinedError`, which is how a
+    generated data does not have raises `TemplateError`, which is how a
     stale reference fails the build today rather than publishing quietly.
     """
     env = _api_jinja_environment()
-    template = env.from_string(
-        f"{{% import '_api.jinja' as api %}}{{{{ api.ref({name!r}) }}}}"
-    )
-    with pytest.raises(UndefinedError):
-        template.render()
+    with pytest.raises(TemplateError, match="undefined is not callable"):
+        env.render_str(f"{{% import '_api.jinja' as api %}}{{{{ api.ref({name!r}) }}}}")

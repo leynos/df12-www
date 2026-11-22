@@ -3,12 +3,9 @@
 from __future__ import annotations
 
 import dataclasses as dc
-import datetime as dt
 import typing as typ
 
-from jinja2 import Environment, FileSystemLoader
-
-from .jinja_highlight import HighlightExtension
+from .templating import build_timestamp, template_environment
 
 if typ.TYPE_CHECKING:
     from pathlib import Path
@@ -49,18 +46,7 @@ class ContentPageGenerator:
         self.stylesheet = stylesheet
         self.parent_link = parent_link
         self.base_path = base_path
-        self.env = Environment(
-            loader=FileSystemLoader(str(templates_dir)),
-            autoescape=True,
-            trim_blocks=True,
-            lstrip_blocks=True,
-            extensions=[HighlightExtension],
-        )
-        if template_vars:
-            # Jinja types `globals` as the literal of its default namespace,
-            # so a checker rejects any other value; the namespace is open by
-            # design, and the cast says so once.
-            typ.cast("dict[str, object]", self.env.globals).update(template_vars)
+        self.env = template_environment(self.templates_dir, variables=template_vars)
 
     def run(self) -> Path:
         """Render the page template and write the output file.
@@ -72,22 +58,21 @@ class ContentPageGenerator:
 
         Raises
         ------
-        jinja2.TemplateNotFound
+        minijinja.TemplateError
             If the template named in :attr:`config.template` does not exist in
             the configured templates directory.
         OSError
             If the output directory cannot be created or the file cannot be
             written.
         """
-        template = self.env.get_template(self.config.template)
         marked_nav = self._mark_current_nav()
         context = {
             "nav_links": marked_nav,
             "parent_link": self.parent_link,
             "stylesheet": self.stylesheet,
-            "generated_at": dt.datetime.now(dt.UTC),
+            "generated_at": build_timestamp(),
         }
-        html = template.render(**context)
+        html = self.env.render_template(self.config.template, **context)
         if not html.endswith("\n"):
             html += "\n"
         output_path = self.output_dir / self.config.output_slug / "index.html"

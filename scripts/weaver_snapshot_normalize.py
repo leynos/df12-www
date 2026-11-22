@@ -40,6 +40,24 @@ _ORIGIN_POSITIONS = frozenset({"0px 0px", "0% 0%", "0px", "0%"})
 # that cycles its colour, leaves its box where it is, and the box stays in
 # the comparison.
 _MOVING_ANIMATIONS = frozenset({"spin", "ping", "bounce"})
+# Chromium 158 reports `flex-start` and `flex-end` as `flow-start` and
+# `flow-end`. The two spellings name one value -- the browser accepts either
+# and computes both identically -- so a record taken under one dialect has to
+# compare equal to a capture taken under the other.
+_ALIGNMENT_ALIASES = {"flow-start": "flex-start", "flow-end": "flex-end"}
+# The properties whose computed value can be one of those keywords.
+_ALIGNMENT_PROPERTIES = frozenset(
+    {
+        "align-content",
+        "align-items",
+        "align-self",
+        "justify-content",
+        "justify-items",
+        "justify-self",
+    }
+)
+# The modifiers that may qualify an alignment keyword, as in `safe center`.
+_ALIGNMENT_MODIFIERS = frozenset({"safe", "unsafe"})
 
 
 def _drop_invisible_border_colours(style: Style) -> None:
@@ -118,6 +136,8 @@ def _canonical_style(style_diff: Style | None) -> Style:
       :func:`_capped_radius`.
     - A background positioned at its origin, and ``color-scheme: light``,
       neither of which a light page renders any differently for.
+    - The alignment keyword Chromium 158 renamed. See
+      :func:`_canonical_alignment`.
 
     :func:`_normalize` handles three more that need the node rather than its
     styles alone: the individual transform properties are composed into the
@@ -168,8 +188,37 @@ def _canonical_style(style_diff: Style | None) -> Style:
     for key, value in style.items():
         if key.endswith("-radius") and isinstance(value, str):
             style[key] = _capped_radius(value)
+    _canonical_alignment(style)
     _drop_invisible_border_colours(style)
     return style
+
+
+def _canonical_alignment(style: Style) -> None:
+    """Spell a renamed alignment keyword the way older Chromium did.
+
+    A keyword may carry a ``safe`` or ``unsafe`` modifier, which the alias
+    keeps while renaming the keyword it qualifies. A value with any other
+    modifier is left exactly as the browser spelled it.
+
+    Parameters
+    ----------
+    style
+        A node's computed styles, modified in place.
+    """
+    for key in _ALIGNMENT_PROPERTIES & style.keys():
+        value = style[key]
+        if isinstance(value, str):
+            style[key] = _canonical_alignment_value(value)
+
+
+def _canonical_alignment_value(value: str) -> str:
+    """Rename an alignment keyword, preserving a ``safe``/``unsafe`` modifier."""
+    modifier, _, keyword = value.partition(" ")
+    if keyword and modifier in _ALIGNMENT_MODIFIERS:
+        return f"{modifier} {_ALIGNMENT_ALIASES.get(keyword, keyword)}"
+    if not keyword:
+        return _ALIGNMENT_ALIASES.get(modifier, modifier)
+    return value
 
 
 def _is_animated(style: Style) -> bool:

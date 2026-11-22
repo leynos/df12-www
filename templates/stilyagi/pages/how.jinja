@@ -134,7 +134,7 @@
             <div class="ex-body">
               <div class="code-scroll" tabindex="0" role="region"
                    aria-label="rules/heading_depth.py source">
-              {% highlight 'python', 'stilyagi-syntax' %}
+              {% filter highlight('python', 'stilyagi-syntax') %}
               # rules/heading_depth.py
               from stilyagi.rule import Rule, Level
               from stilyagi.regions import Heading
@@ -156,7 +156,7 @@
                               message=f"Heading depth {h.depth} exceeds maximum of 3.",
                               suggestion="Promote to a new section, or use bold text.",
                           )
-              {% endhighlight %}
+              {% endfilter %}
               </div>
             </div>
           </div>

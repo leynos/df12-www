@@ -53,7 +53,7 @@
   {{ ui.section_open(3, "gates", "The gates",
      "Every one runs before a change is reviewable. Running them locally is faster than discovering them in continuous integration.") }}
     {% call ui.code_block("Commit gates from the Episodic repository") %}
-      {% highlight 'make', 'episodic-syntax' %}
+      {% filter highlight('make', 'episodic-syntax') %}
       make check-fmt        # formatting
       make lint             # linters, including the hexagonal boundary check
       make typecheck        # strict type checking
@@ -61,7 +61,7 @@
       make check-migrations # schema drift between models and migrations
       make markdownlint     # Markdown lint and the en-GB-oxendict spelling policy
       make nixie            # Mermaid diagram validation
-      {% endhighlight %}
+      {% endfilter %}
     {% endcall %}
     <ul class="claim-list">
       <li><strong>Architecture.</strong> Import boundaries are a lint rule. A domain module that imports a framework fails the build.</li>

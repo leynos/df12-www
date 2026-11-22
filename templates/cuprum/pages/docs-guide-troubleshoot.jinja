@@ -45,11 +45,11 @@
     broken installation stays visible.
   </p>
 {% call ui.code_panel('rust_available.py', 'Tested', foot=[docs_tested]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import cuprum
 
 assert isinstance(cuprum.is_rust_available(), bool)
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <p>
     Behaviour is the same with or without the extension. The

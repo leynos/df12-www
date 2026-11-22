@@ -73,7 +73,7 @@
 
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">examples/visual_design.yml</div>
-                    {% highlight 'netsuke' %}{% raw %}
+                    {% filter highlight('netsuke') %}{% raw %}
 # Schema version comes first, always quoted.
 netsuke_version: "1.0.0"
 
@@ -113,7 +113,7 @@ actions:
 # Defaults name the deliverable, not an abstract label.
 defaults:
   - build/raster/hero.png
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
             </section>
 

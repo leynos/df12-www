@@ -16,12 +16,12 @@ import pytest
 from bs4 import BeautifulSoup, Tag
 from hypothesis import given, settings
 from hypothesis import strategies as st
-from jinja2 import Environment, FileSystemLoader, TemplateSyntaxError
+from minijinja import TemplateError
 
 from df12_pages.config import ContentPageConfig, SubSiteHomepageConfig
 from df12_pages.content_page import ContentPageGenerator
-from df12_pages.jinja_highlight import HighlightExtension
 from df12_pages.subsite_homepage import SubSiteHomePageBuilder
+from df12_pages.templating import template_environment
 
 NETSUKE_TEMPLATES = Path("templates/netsuke").resolve()
 TEMPLATE_VARS: dict[str, object] = {
@@ -97,22 +97,13 @@ def _render_homepage(tmp_path: Path) -> BeautifulSoup:
 
 def _render_macro(source: str, **context: object) -> BeautifulSoup:
     """Render a template string that imports the Netsuke macro modules."""
-    env = Environment(
-        loader=FileSystemLoader(str(NETSUKE_TEMPLATES)),
-        autoescape=True,
-        trim_blocks=True,
-        lstrip_blocks=True,
-        extensions=[HighlightExtension],
-    )
-    # Jinja types `globals` as the literal of its default namespace; it is
-    # open by design.
-    typ.cast("dict[str, object]", env.globals).update(TEMPLATE_VARS)
+    env = template_environment(NETSUKE_TEMPLATES, variables=TEMPLATE_VARS)
     preamble = (
         '{% import "chrome.jinja" as chrome %}'
         '{% import "docs_nav.jinja" as docsnav %}'
         '{% import "examples_data.jinja" as exdata %}'
     )
-    html = env.from_string(preamble + source).render(**context)
+    html = env.render_str(preamble + source, **context)
     return BeautifulSoup(html, "html.parser")
 
 
@@ -292,7 +283,7 @@ class TestWindows:
         replaced: a missing closer was previously markup that rendered with
         an unbalanced ``div``, and is now caught before the page is built.
         """
-        with pytest.raises(TemplateSyntaxError, match="endcall"):
+        with pytest.raises(TemplateError, match="expected end of block"):
             _render_macro("{% call chrome." + call + " %}<p>body</p>")
 
 
@@ -588,6 +579,43 @@ class TestExampleHeader:
         soup = _render_macro("{{ exdata.example_header('no-such-example') }}")
 
         assert soup.select_one("header") is None, "an unknown key renders no header"
+
+
+class TestCopyButtons:
+    """The copy buttons carry the manifest text verbatim in an attribute."""
+
+    def test_a_hostile_manifest_round_trips_through_the_attribute(self) -> None:
+        """Quotes, ampersands and angle brackets survive the attribute escaping."""
+        snippet = (
+            'targets:\n  - name: "a & b"\n'
+            '    command: "printf \'<%s>\' \\"x\\" && true"\n'
+        )
+        soup = _render_macro(
+            "{{ exdata.copy_button(snippet, 'Test') }}", snippet=snippet
+        )
+
+        button = soup.select_one("button[data-copy-text]")
+        assert isinstance(button, Tag), "the macro renders one copy button"
+        assert button["data-copy-text"] == snippet, (
+            "the copied text must be the snippet itself, not an escaped or "
+            f"truncated form: {button['data-copy-text']!r}"
+        )
+
+    def test_the_card_and_the_manifest_button_copy_the_same_text(self) -> None:
+        """Both call sites render through one macro, so neither can drift."""
+        card = _render_macro("{{ exdata.card(exdata.examples[0]) }}")
+        by_key = _render_macro("{{ exdata.copy_manifest_button('hello-world') }}")
+
+        card_button = card.select_one("button[data-copy-text]")
+        key_button = by_key.select_one("button[data-copy-text]")
+        assert isinstance(card_button, Tag), "the card carries a copy payload"
+        assert isinstance(key_button, Tag), "the keyed button carries a copy payload"
+        assert card_button["data-copy-text"] == key_button["data-copy-text"], (
+            "the card's payload must equal the canonical snippet's"
+        )
+        assert "netsuke_version:" in str(card_button["data-copy-text"]), (
+            "the payload is the manifest itself"
+        )
 
 
 _LABELS = (

@@ -191,6 +191,7 @@ def _dev_watch_ignores() -> list[str]:
 @pytest.mark.timeout(600)
 def test_a_build_does_not_rewrite_anything_the_dev_watcher_watches(
     built_site: Path,
+    site_build_env: dict[str, str],
 ) -> None:
     """`make dev` rebuilds on any change under `src/`, so a build must settle.
 
@@ -218,7 +219,9 @@ def test_a_build_does_not_rewrite_anything_the_dev_watcher_watches(
     bun_exe = shutil.which("bun") or pytest.skip("bun is not on PATH")
 
     before = snapshot()
-    subprocess.run([bun_exe, "run", "build"], cwd=REPO_ROOT, check=True)  # noqa: S603 - fixed argv, no user input
+    subprocess.run(  # noqa: S603 - fixed argv, no user input
+        [bun_exe, "run", "build"], cwd=REPO_ROOT, env=site_build_env, check=True
+    )
     after = snapshot()
 
     touched = sorted(

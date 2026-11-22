@@ -70,7 +70,7 @@
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0023 &sect;3 (verbatim)</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 artefacts:
   build-output:
     path: build
@@ -80,13 +80,13 @@ actions:
   - name: clean-build
     command:
       clean_owned: [build-output]
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs font-mono uppercase tracking-wide text-charcoal-mid mb-2">Proposed syntax, RFC 0023 &sect;3 (verbatim; the command is illustrative)</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 artefacts:
   benchmark-report:
     path: dist/benchmarks/microbenchmarks.json
@@ -98,7 +98,7 @@ actions:
     produces: [benchmark-report]
     command:
       invoke: python benchmarks/run.py --output dist/benchmarks/microbenchmarks.json
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                         </div>
                     </div>
                 </div>
@@ -135,10 +135,10 @@ actions:
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size] mb-6" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Proposed commands, RFC 0023 &sect;5 (verbatim)</div>
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke clean --artefact build-output --dry-run
 $ netsuke clean --artefact build-output --force --no-input
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">

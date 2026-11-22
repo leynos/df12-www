@@ -27,7 +27,7 @@
 
 {% block code %}
 {% call ui.code_panel('ci_step.py', 'Complete', foot=[verified]) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import io
 import logging
 import sys
@@ -70,7 +70,7 @@ print("result:", result.ok, repr(result.stdout))
 print("phases:", [phase for phase, _ in events])
 print("workflow log:")
 print(workflow_log.getvalue(), end="")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
 {% endblock %}
 
@@ -119,7 +119,7 @@ workflow log:
 </div>
 <div class="cu-pair mt-8">
 {% call ui.code_panel('ci_step_fails.py', 'Failure path', foot=[verified], flat=true) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 import io
 import sys
 
@@ -142,7 +142,7 @@ with scoped(catalogue=CATALOGUE):
 
 print("result:", result.ok, result.exit_code)
 print(workflow_log.getvalue(), end="")
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   {% call ui.output('Observed output', 'stdout') %}
 result: False 1
@@ -177,7 +177,7 @@ result: False 1
 </div>
 <div class="cu-pair mt-8">
 {% call ui.code_panel('ci_step_flags.py', 'On the runner', foot=[verified], flat=true) %}
-{% highlight 'python', 'cuprum-syntax' %}
+{% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import Program, ProgramCatalogue, RunOutputOptions, scoped, sh
 
 PYTHON = Program("python3")
@@ -193,7 +193,7 @@ with scoped(catalogue=CATALOGUE):
     result = python("-c", FAIL).run_sync(output=CI_OUTPUT)
 
 print("result:", result.ok, result.exit_code, repr(result.stdout))
-{% endhighlight %}
+{% endfilter %}
 {% endcall %}
   <div>
   {% call ui.output('Observed output', 'GITHUB_ACTIONS=true, stdout and stderr') %}

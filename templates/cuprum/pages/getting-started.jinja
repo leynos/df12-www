@@ -84,7 +84,7 @@
       {% call ui.section(sections, 'first-command', class='cu-section--tint') %}
       <div class="cu-pair">
         {% call ui.code_panel('first_command.py', 'Synchronous', foot=[verified]) %}
-        {% highlight 'python', 'cuprum-syntax' %}
+        {% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import ECHO, sh
 
 cmd = sh.make(ECHO)("-n", "hello, cuprum!")
@@ -92,7 +92,7 @@ print(cmd.argv_with_program)
 
 result = cmd.run_sync()
 print(result.ok, result.exit_code, repr(result.stdout))
-        {% endhighlight %}
+        {% endfilter %}
         {% endcall %}
         {% call ui.output('Expected output', 'stdout') %}
 ('echo', '-n', 'hello, cuprum!')
@@ -119,7 +119,7 @@ True 0 'hello, cuprum!'
       {% call ui.section(sections, 'async') %}
       <div class="cu-pair">
         {% call ui.code_panel('dispatch.py', 'Async', foot=[verified]) %}
-        {% highlight 'python', 'cuprum-syntax' %}
+        {% filter highlight('python', 'cuprum-syntax') %}
 import asyncio
 
 from cuprum import ECHO, RunOutputOptions, sh
@@ -137,7 +137,7 @@ async def main() -> None:
 
 
 asyncio.run(main())
-        {% endhighlight %}
+        {% endfilter %}
         {% endcall %}
         <div>
           {% call ui.output('Expected output', 'terminal') %}
@@ -164,7 +164,7 @@ exit 0, captured 'hello, cuprum!'
       {% call ui.section(sections, 'policy', class='cu-section--tint') %}
       <div class="cu-pair">
         {% call ui.code_panel('scoped.py', 'Scope', foot=[verified]) %}
-        {% highlight 'python', 'cuprum-syntax' %}
+        {% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import ECHO, LS, ForbiddenProgramError, ScopeConfig, scoped, sh
 
 with scoped(ScopeConfig(allowlist=frozenset([ECHO]))):
@@ -173,7 +173,7 @@ with scoped(ScopeConfig(allowlist=frozenset([ECHO]))):
         sh.make(LS)().run_sync()
     except ForbiddenProgramError as exc:
         print(f"refused: {exc}")
-        {% endhighlight %}
+        {% endfilter %}
         {% endcall %}
         <div>
           {% call ui.output('Expected output', 'stdout') %}
@@ -200,14 +200,14 @@ Program ls denied by context allowlist restricted_state=True
       </div>
       <div class="cu-pair mt-6">
         {% call ui.code_panel('unknown.py', 'Catalogue', foot=[verified], flat=true) %}
-        {% highlight 'python', 'cuprum-syntax' %}
+        {% filter highlight('python', 'cuprum-syntax') %}
 from cuprum import Program, UnknownProgramError, sh
 
 try:
     sh.make(Program("rm"))
 except UnknownProgramError as exc:
     print(f"refused: {exc}")
-        {% endhighlight %}
+        {% endfilter %}
         {% endcall %}
         {% call ui.output('Expected output', 'stdout') %}
 refused: Program 'rm' is not in the catalogue allowlist

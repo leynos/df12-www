@@ -148,7 +148,9 @@ describe("the repository's own configuration", () => {
       "does not have any documentation",
     );
     expect(result.status).toBe(0);
-  });
+    // A full TypeDoc run over the repository; a loaded host can exceed
+    // five seconds.
+  }, 30000);
 
   test("treats validation warnings as errors, which is what makes it a gate", () => {
     const config = spawnSync("bun", ["-e", "console.log(await Bun.file('typedoc.json').text())"], {

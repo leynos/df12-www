@@ -97,7 +97,7 @@
           <ol class="cu-dispatch">
             {% for card in dispatch_cards %}
             <li class="cu-dispatch__card cu-dispatch__card--{{ card.tone }}">
-              <span class="cu-dispatch__num" aria-hidden="true">{{ '%02d' % loop.index }}</span>
+              <span class="cu-dispatch__num" aria-hidden="true">{{ '%02d' | format(loop.index) }}</span>
               {{ icons.icon(card.icon, 'cu-dispatch__icon') }}
               <h3 class="cu-dispatch__title">{{ card.title }}</h3>
               <p>{{ card.body }}</p>
@@ -130,7 +130,7 @@
             <a class="cu-arrow-link" href="/cuprum/getting-started/">Run your first command {{ icons.icon('arrow-right') }}</a>
           </div>
           {% call ui.code_panel('dispatch.py', 'Job #0042', foot=['Verified ' ~ cuprum_verified_on ~ ' · Cuprum ' ~ cuprum_pypi ~ ' · Python ' ~ python_floor]) %}
-          {% highlight 'python', 'cuprum-syntax' %}
+          {% filter highlight('python', 'cuprum-syntax') %}
 import asyncio
 
 from cuprum import ECHO, RunOutputOptions, sh
@@ -148,7 +148,7 @@ async def main() -> None:
 
 
 asyncio.run(main())
-          {% endhighlight %}
+          {% endfilter %}
           {% endcall %}
         </div>
       </section>

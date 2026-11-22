@@ -72,7 +72,7 @@
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile: discovery block and its defaults</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 netsuke_version: "1.2.0"
 
 tests:
@@ -83,11 +83,11 @@ tests:
   exclude:
     - "**/_*.yml"
     - "**/_*.yaml"
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A test file's fixed keys plus test_* cases</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 netsuke_test_version: "1.0"   # required in every file
 
 imports:                       # optional support files,
@@ -101,7 +101,7 @@ fixtures: {}                   # fixture definitions
 
 test_compile_target:           # one or more cases
   steps: []
-{% endhighlight %}
+{% endfilter %}
                     </div>
                 </div>
                 <p class="text-xs text-charcoal-mid mt-4"><code>netsuke_test_version</code> is a <code>MAJOR.MINOR</code> string. The dialect denies unknown keys everywhere, so every addition is a minor-version event and an older runner rejects a newer file rather than misreading it; an unknown key is reported with the nearest known key. Case names match <code>test_[A-Za-z0-9_]+</code> and are reported as <code>&lt;file&gt;::&lt;name&gt;</code>.</p>
@@ -118,7 +118,7 @@ test_compile_target:           # one or more cases
                 </p>
                 <div class="bg-base-content rounded-xl overflow-hidden mb-8">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/hello.yml</div>
-                    {% highlight 'netsuke' %}
+                    {% filter highlight('netsuke') %}
 netsuke_test_version: "1.0"
 
 test_hello_target_is_generated:
@@ -127,7 +127,7 @@ test_hello_target_is_generated:
       then:
         - result.ok
         - result.graph.has_target("build/hello.txt")
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
@@ -146,7 +146,7 @@ test_hello_target_is_generated:
                         <h3 class="font-bold text-base-content mb-3 text-sm"><code>then</code>: assertion forms</h3>
                         <p class="text-xs text-charcoal-mid mb-3">Scalar entries are MiniJinja boolean expressions over the result and the mock journal; object entries are structured assertions with richer diffs. Helpers available in expressions: <code>contains</code>, <code>starts_with</code>, <code>ends_with</code>, <code>matches</code>, <code>file_exists</code>, <code>file_contains</code>.</p>
                         <div class="bg-base-content rounded-lg p-4 overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
-{% highlight 'netsuke' %}
+{% filter highlight('netsuke') %}
 then:
   - result.ok
   - result.graph.targets | length == 3
@@ -159,7 +159,7 @@ then:
   - matches:
       value: result.error.message
       regex: "missing.*rule"
-{% endhighlight %}
+{% endfilter %}
                         </div>
                         <p class="text-xs text-charcoal-mid mt-3">A false assertion is a <em>FAIL</em>. An assertion whose evaluation raises &mdash; an undefined name, a type mismatch &mdash; is an <em>ERROR</em>, so a typo such as <code>result.grpah</code> cannot pass itself off as an ordinary red result. Negative tests name the diagnostic they expect with <code>expect_failure</code>, so a different bug cannot satisfy them: <code>message_contains</code> works from the start, while matching on <code>code</code> waits until the diagnostic code namespace is declared stable.</p>
                     </div>
@@ -180,7 +180,7 @@ then:
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Shorthand doubles in given.let</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 given:
   env:
     set:
@@ -190,7 +190,7 @@ given:
     cc:   stub(returns="clang")
     now:  spy()
     compile_cmd: substitute("stand_in_compile")
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
                         <h3 class="font-bold text-base-content mb-3 text-sm">What can be mocked</h3>
@@ -217,7 +217,7 @@ given:
                 </p>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A fixture from the UX design</div>
-                    {% highlight 'netsuke' %}{% raw %}
+                    {% filter highlight('netsuke') %}{% raw %}
 fixtures:
   tiny_c_project:
     description: Minimal C project with one source and a Netsukefile.
@@ -239,7 +239,7 @@ fixtures:
     exports:
       root: "{{ project }}"
       manifest: "{{ project }}/Netsukefile"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                 </div>
             </section>
 
@@ -249,7 +249,7 @@ fixtures:
                 </h2>
                 <div class="bg-base-content rounded-xl overflow-hidden mb-6">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke test, as designed</div>
-                    {% highlight 'text' %}
+                    {% filter highlight('text') %}
 netsuke test [FILTER...]
 
 Arguments:
@@ -265,7 +265,7 @@ Options:
   --timeout <SECS>         Per-case wall-clock budget (default 60)
   --keep                   Preserve sandboxes of failing cases
   --allow-empty            Succeed when zero cases are selected
-{% endhighlight %}
+{% endfilter %}
                 </div>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-xl border border-base-300 shadow-xs min-w-0">
@@ -304,7 +304,7 @@ Options:
                 <div class="grid lg:grid-cols-2 gap-6 mb-6">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile (subject)</div>
-                        {% highlight 'netsuke' %}{% raw %}
+                        {% filter highlight('netsuke') %}{% raw %}
 netsuke_version: "1.2.0"
 
 tests:
@@ -324,11 +324,11 @@ targets:
 
 defaults:
   - build/main.o
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">netsuke-tests/compile.yml</div>
-                        {% highlight 'netsuke' %}{% raw %}
+                        {% filter highlight('netsuke') %}{% raw %}
 netsuke_test_version: "1.0"
 
 macros:
@@ -357,12 +357,12 @@ test_skips_filtered_sources:
         - contains(result.ninja, "STUB src/main.c -> build/main.o")
         - mocks.glob.call_count == 1
         - substitutes.compile_cmd.call_count == 1
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                     </div>
                 </div>
                 <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                     <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Human report, with one failing assertion rendered with its actual value</div>
-                    {% highlight 'netsuke-console' %}
+                    {% filter highlight('netsuke-console') %}
 $ netsuke test
 
 PASS compile.yml::test_generates_object_targets
@@ -372,7 +372,7 @@ FAIL compile.yml::test_substituted_macro_receives_source
     substitutes.compile_cmd.calls[0].args[0] = "src/lib.c"
 
 2 cases: 1 passed, 1 failed
-{% endhighlight %}
+{% endfilter %}
                 </div>
             </section>
 
@@ -389,23 +389,23 @@ FAIL compile.yml::test_substituted_macro_receives_source
                 <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">Netsukefile (quick start, UX design §14.1)</div>
-                        {% highlight 'netsuke' %}
+                        {% filter highlight('netsuke') %}
 netsuke_version: "1.2.0"
 
 targets:
   - name: build/hello.txt
     command: echo hello > build/hello.txt
-{% endhighlight %}
+{% endfilter %}
                     </div>
                     <div class="bg-base-content rounded-xl overflow-x-auto min-w-0 [contain:inline-size]" tabindex="0">
                         <div class="bg-charcoal-mid/20 px-4 py-2 border-b border-white/10 text-xs font-mono text-stone-light">A passing run, as designed</div>
-                        {% highlight 'netsuke-console' %}
+                        {% filter highlight('netsuke-console') %}
 $ netsuke test
 
 PASS hello.yml::test_hello_target_is_generated
 
 1 case: 1 passed
-{% endhighlight %}
+{% endfilter %}
                     </div>
                 </div>
                 <p class="text-sm text-charcoal-mid mb-4 max-w-3xl">

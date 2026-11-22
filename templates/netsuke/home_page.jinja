@@ -150,7 +150,7 @@
                 <div class="relative">
                     <div class="hm-faux-window__shadow absolute -top-6 -right-6 w-full h-full bg-base-300/30 rounded-lg transform rotate-2"></div>
                     {% call chrome.faux_window('Netsukefile', frame='code-window relative z-10 text-sm', body_class='p-6 overflow-x-auto text-stone-light leading-relaxed') %}
-{% highlight 'netsuke' %}{% raw %}
+{% filter highlight('netsuke') %}{% raw %}
 # Reusable commands live in rules
 netsuke_version: "1.0.0"
 
@@ -169,7 +169,7 @@ targets:
   - name: "docs/manual.html"
     command: "pandoc {{ ins }} -o {{ outs }}"
     sources: "README.md"
-{% endraw %}{% endhighlight %}
+{% endraw %}{% endfilter %}
                     {% endcall %}
                 </div>
             </div>

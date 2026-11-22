@@ -5,6 +5,7 @@
 # baseline requires to be called directly.
 UV_GATE ?= python3 scripts/uv_gate.py
 UV ?= uv
+PROJECT_PYTHON := $(shell cat .python-version)
 # The helper finds uv on PATH, so a caller's UV=/path/to/uv is honoured by putting
 # that uv's directory first on PATH for every recipe.
 export PATH := $(if $(findstring /,$(UV)),$(patsubst %/,%,$(dir $(UV))):)$(PATH)
@@ -95,7 +96,7 @@ $(NODE_MODULES_STAMP): package.json bun.lockb | bun ## Install locked JS depende
 	@touch $@
 
 build-release: ## Build artefacts (sdist & wheel)
-	python -m build --sdist --wheel
+	$(UV_GATE) tool --python $(PROJECT_PYTHON) --from build==1.6.1 -- pyproject-build --sdist --wheel
 
 clean: ## Remove build artifacts
 	rm -rf build dist *.egg-info \
@@ -167,7 +168,7 @@ INTERROGATE_TARGETS ?= df12_pages scripts tests src templates
 # Level 2 prints a MISSED row per undocumented definition, which the
 # `interrogate` target fails on: the rounded percentage alone passes a lone gap.
 INTERROGATE_FLAGS ?= -vv --no-color --ext pyi --fail-under 100
-INTERROGATE = $(UV_GATE) tool --python 3.13 --from interrogate==$(INTERROGATE_VERSION) -- interrogate
+INTERROGATE = $(UV_GATE) tool --python $(PROJECT_PYTHON) --from interrogate==$(INTERROGATE_VERSION) -- interrogate
 
 interrogate: ## Enforce complete Python docstring coverage
 	@report="$$($(INTERROGATE) $(INTERROGATE_FLAGS) $(INTERROGATE_TARGETS))"; \

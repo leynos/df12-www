@@ -42,10 +42,7 @@ from pathlib import Path
 
 import pytest
 
-from df12_pages.config import ContentPageConfig
-from df12_pages.content_page import ContentPageGenerator
 from tests.support.stilyagi_browser import (
-    http_serve,
     installed_chromium,
     skip_unless_browser_available,
 )
@@ -54,16 +51,12 @@ if typ.TYPE_CHECKING:
     import collections.abc as cabc
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-STILYAGI_TEMPLATES = REPO_ROOT / "templates" / "stilyagi"
 STILYAGI_STATIC = REPO_ROOT / "src" / "static" / "stilyagi"
 STYLES = STILYAGI_STATIC / "assets" / "styles"
 #: The compiled-stylesheet sources; the shared tokens and most page partials
 #: live here since the daisyUI migration, while anything not yet migrated
 #: stays under STYLES.
 STYLE_SOURCES = REPO_ROOT / "src" / "styles" / "stilyagi"
-COMPILED_STYLESHEET = (
-    REPO_ROOT / "public" / "stilyagi" / "assets" / "styles" / "stilyagi.css"
-)
 FOCUS_PROBE = Path(__file__).parent / "support" / "stilyagi_focus_probe.mjs"
 
 #: The namespace whose active chip is filled with ink, so its ring is the one
@@ -160,47 +153,10 @@ class TestFocusRingTokens:
         ), "the chip row must be hidden inside the narrow-viewport media query"
 
 
-@pytest.fixture(scope="module")
-def served_docs_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    """Render the docs page into a tree whose asset paths resolve.
-
-    The layout links its stylesheets and scripts from ``/stilyagi/assets/``, so
-    the served root has to carry the real assets at that path; the page is
-    styled by the same files the site ships.
-    """
-    root = tmp_path_factory.mktemp("stilyagi-site")
-    shutil.copytree(STILYAGI_STATIC / "assets", root / "stilyagi" / "assets")
-
-    # The layout links the compiled Tailwind + daisyUI sheet, which is build
-    # output rather than a static asset; the tree serves the site's real
-    # stylesheet or the page under test is unstyled.
-    if not COMPILED_STYLESHEET.exists():
-        pytest.skip("compiled Stilyagi stylesheet missing; run `bun run build:css`")
-    shutil.copy(
-        COMPILED_STYLESHEET, root / "stilyagi" / "assets" / "styles" / "stilyagi.css"
-    )
-
-    config = ContentPageConfig(
-        key="docs",
-        label="Docs",
-        template="pages/docs.jinja",
-        output_slug="docs",
-    )
-    generator = ContentPageGenerator(
-        config,
-        root / "stilyagi",
-        templates_dir=STILYAGI_TEMPLATES,
-        nav_links=[],
-        stylesheet="/stilyagi/assets/styles/stilyagi.css",
-    )
-    generator.run()
-    return root
-
-
 @pytest.mark.playwright
 @pytest.mark.timeout(120)
 def test_active_namespace_chip_shows_a_keyboard_focus_ring(
-    served_docs_root: Path,
+    served: str,
 ) -> None:
     """The active ink-filled chip keeps a ring the reader can actually see.
 
@@ -214,28 +170,27 @@ def test_active_namespace_chip_shows_a_keyboard_focus_ring(
         "PLAYWRIGHT_CHROMIUM_EXECUTABLE": typ.cast("str", installed_chromium())
     }
 
-    with http_serve(served_docs_root) as port:
-        url = f"http://127.0.0.1:{port}/stilyagi/docs/"
-        try:
-            probe = subprocess.run(  # noqa: S603 - fixed argv, paths from fixtures
-                [bun_exe, str(FOCUS_PROBE), url, INK_FILLED_NAMESPACE],
-                cwd=REPO_ROOT,
-                env=environment,
-                check=True,
-                capture_output=True,
-                text=True,
-                timeout=90,
+    url = f"{served}/stilyagi/docs/"
+    try:
+        probe = subprocess.run(  # noqa: S603 - fixed argv, paths from fixtures
+            [bun_exe, str(FOCUS_PROBE), url, INK_FILLED_NAMESPACE],
+            cwd=REPO_ROOT,
+            env=environment,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=90,
+        )
+    except subprocess.CalledProcessError as exc:  # pragma: no cover - guard
+        missing = ("Cannot find package", "Cannot find module")
+        if any(text in exc.stderr for text in missing):
+            pytest.skip(
+                "the Playwright node package is not installed; run "
+                "`bun add -d playwright` to run this check locally"
             )
-        except subprocess.CalledProcessError as exc:  # pragma: no cover - guard
-            missing = ("Cannot find package", "Cannot find module")
-            if any(text in exc.stderr for text in missing):
-                pytest.skip(
-                    "the Playwright node package is not installed; run "
-                    "`bun add -d playwright` to run this check locally"
-                )
-            raise
-        except subprocess.TimeoutExpired as exc:  # pragma: no cover - guard
-            pytest.skip(f"focus probe timed out: {exc}")
+        raise
+    except subprocess.TimeoutExpired as exc:  # pragma: no cover - guard
+        pytest.skip(f"focus probe timed out: {exc}")
 
     result = json.loads(probe.stdout)
     keyboard, pointer = result["keyboard"], result["pointer"]

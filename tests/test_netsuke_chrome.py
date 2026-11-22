@@ -581,6 +581,43 @@ class TestExampleHeader:
         assert soup.select_one("header") is None, "an unknown key renders no header"
 
 
+class TestCopyButtons:
+    """The copy buttons carry the manifest text verbatim in an attribute."""
+
+    def test_a_hostile_manifest_round_trips_through_the_attribute(self) -> None:
+        """Quotes, ampersands and angle brackets survive the attribute escaping."""
+        snippet = (
+            'targets:\n  - name: "a & b"\n'
+            '    command: "printf \'<%s>\' \\"x\\" && true"\n'
+        )
+        soup = _render_macro(
+            "{{ exdata.copy_button(snippet, 'Test') }}", snippet=snippet
+        )
+
+        button = soup.select_one("button[data-copy-text]")
+        assert isinstance(button, Tag), "the macro renders one copy button"
+        assert button["data-copy-text"] == snippet, (
+            "the copied text must be the snippet itself, not an escaped or "
+            f"truncated form: {button['data-copy-text']!r}"
+        )
+
+    def test_the_card_and_the_manifest_button_copy_the_same_text(self) -> None:
+        """Both call sites render through one macro, so neither can drift."""
+        card = _render_macro("{{ exdata.card(exdata.examples[0]) }}")
+        by_key = _render_macro("{{ exdata.copy_manifest_button('hello-world') }}")
+
+        card_button = card.select_one("button[data-copy-text]")
+        key_button = by_key.select_one("button[data-copy-text]")
+        assert isinstance(card_button, Tag), "the card carries a copy payload"
+        assert isinstance(key_button, Tag), "the keyed button carries a copy payload"
+        assert card_button["data-copy-text"] == key_button["data-copy-text"], (
+            "the card's payload must equal the canonical snippet's"
+        )
+        assert "netsuke_version:" in str(card_button["data-copy-text"]), (
+            "the payload is the manifest itself"
+        )
+
+
 _LABELS = (
     st.text(
         alphabet=st.characters(whitelist_categories=("L", "N", "P", "Z")),

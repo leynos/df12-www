@@ -378,7 +378,7 @@ defaults:
                             Read Guide <span class="iconify ml-2 text-xs" data-icon="carbon:arrow-right" aria-hidden="true"></span>
                         </a>
                         <div class="flex space-x-3">
-                            <button type="button" class="text-base-300 hover:text-base-content transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-text="{{ ex.snippet | forceescape }}"><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+                            {{ copy_button(ex.snippet, ex.title, 'text-base-300 hover:text-base-content') }}
                             <a href="{{ ex.github }}" class="text-base-300 hover:text-base-content transition-colors" title="View on GitHub"><span class="iconify" data-icon="carbon:logo-github" aria-hidden="true"></span></a>
                         </div>
                     </div>
@@ -396,13 +396,25 @@ defaults:
 {% endmacro %}
 
 {#
+  A copy button whose payload is the manifest text itself. Every button
+  that copies a snippet renders through this macro, so the escaping of
+  `data-copy-text` is decided in one place: `forceescape` makes the
+  snippet safe whatever the page's autoescape setting, so a manifest
+  holding quotes, ampersands or angle brackets round-trips through the
+  attribute and reaches the clipboard unchanged.
+#}
+{% macro copy_button(snippet, title, classes='text-stone-light hover:text-white') -%}
+<button type="button" class="{{ classes }} transition-colors" title="Copy manifest" aria-label="Copy the {{ title }} manifest to the clipboard" data-copy-text="{{ snippet | forceescape }}"><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+{%- endmacro %}
+
+{#
   A copy button for one example's manifest, looked up by key so the
   copied text always matches the canonical snippet above. Pass classes
   suited to the surrounding background (defaults suit a dark block).
 #}
 {% macro copy_manifest_button(key, classes='text-stone-light hover:text-white') %}
 {%- for ex in examples if ex.key == key -%}
-<button type="button" class="{{ classes }} transition-colors" title="Copy manifest" aria-label="Copy the {{ ex.title }} manifest to the clipboard" data-copy-text="{{ ex.snippet | forceescape }}"><span class="iconify" data-icon="carbon:copy" aria-hidden="true"></span></button>
+{{ copy_button(ex.snippet, ex.title, classes) }}
 {%- endfor -%}
 {% endmacro %}
 

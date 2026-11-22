@@ -90,7 +90,9 @@ describe("the typecheck-js target", () => {
     expect(status).toBe(0);
     expect(output).toContain("tsc -p tsconfig.browser.json --noEmit");
     expect(output).toContain("tsc -p tsconfig.scripts.json --noEmit");
-  });
+    // A full typecheck over every browser script and build script; on a busy
+    // machine it no longer fits the default five seconds.
+  }, 30000);
 
   test("fails on a type error in a browser script, and passes once it is removed", () => {
     expect(existsSync(BROWSER_FIXTURE)).toBe(false);
@@ -116,7 +118,8 @@ describe("the typecheck-js target", () => {
     expect(dirty.status).not.toBe(0);
     expect(dirty.output).toContain("scripts/typecheck-gate-fixture.ts");
     expect(dirty.output).toContain("error TS2322");
-  });
+    // A full typecheck over every browser script and build script.
+  }, 30000);
 
   test("keeps vendored code out of scope, so the gate ignores what is written there", () => {
     if (!existsSync(VENDOR_DIR)) {
@@ -128,7 +131,8 @@ describe("the typecheck-js target", () => {
     /* The same error at SCRIPTS_FIXTURE fails the gate above, so a pass here
        is the exclusion doing the work rather than the fixture being clean. */
     expect(typecheck().status).toBe(0);
-  });
+    // A full typecheck over every browser script and build script.
+  }, 30000);
 
   test("tsc -b builds the solution file and reports an error from a referenced project", () => {
     /* The root tsconfig.json references the two projects without `composite`.

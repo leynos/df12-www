@@ -108,7 +108,9 @@ describe("the stylelint target", () => {
   test("passes on the tree as committed", () => {
     expect(existsSync(FIXTURE)).toBe(false);
     expect(make("stylelint").status).toBe(0);
-  });
+    // A full stylelint run over every stylesheet under src/; on a busy
+    // machine it no longer fits the default five seconds.
+  }, 30000);
 
   test("fails on an introduced violation, and passes once it is removed", () => {
     expect(existsSync(FIXTURE)).toBe(false);
@@ -128,12 +130,14 @@ describe("the stylelint target", () => {
   test("passes on a conforming file, so the verdict tracks content not presence", () => {
     writeFileSync(FIXTURE, CLEAN);
     expect(make("stylelint").status).toBe(0);
-  });
+    // One full stylelint run over every stylesheet under src/.
+  }, 30000);
 
   test("names the offending file, so a failure is actionable", () => {
     writeFileSync(FIXTURE, VIOLATION);
     expect(make("stylelint").output).toContain("stylelint-gate-fixture.css");
-  });
+    // One full stylelint run over every stylesheet under src/.
+  }, 30000);
 
   test("leaves no fixture behind", () => {
     expect(existsSync(FIXTURE)).toBe(false);
@@ -189,5 +193,6 @@ describe("the fmt integration", () => {
        happens, so a passing assertion above cannot come from --fix being
        inert. */
     expect(fixed).toContain("color: rgb(0 0 0 / 50%);\n}");
-  });
+    // A fixing run over every stylesheet under src/.
+  }, 30000);
 });

@@ -776,6 +776,50 @@ def _describe_failed_command(exc: subprocess.CalledProcessError) -> str:
             return str(cmd)
 
 
+#: The oldest interpreter that provides the free-threaded runtime the
+#: generator's worker pool is built on.
+MINIMUM_FREE_THREADED_PYTHON = (3, 15, 2)
+
+
+def _require_free_threaded_cpython(
+    *,
+    implementation: str,
+    version: tuple[int, ...],
+    gil_enabled: bool,
+) -> None:
+    """Reject an interpreter that cannot run the generator's worker pool.
+
+    The decision is a function of the three runtime facts the caller passes in,
+    so the supported boundary can be exercised without re-launching Python.
+
+    Parameters
+    ----------
+    implementation : str
+        Value of ``sys.implementation.name`` for the running interpreter.
+    version : tuple of int
+        Interpreter version components, major first.
+    gil_enabled : bool
+        Whether the interpreter reports the GIL as enabled.
+
+    Raises
+    ------
+    SystemExit
+        With installation guidance when the interpreter is not free-threaded
+        CPython 3.15.2 or newer.
+    """
+    if (
+        implementation != "cpython"
+        or version < MINIMUM_FREE_THREADED_PYTHON
+        or gil_enabled
+    ):
+        message = (
+            "pages requires free-threaded CPython 3.15.2 or newer with the GIL "
+            "disabled. Run 'uv python install' and 'uv sync --locked' from the "
+            "checkout and unset PYTHON_GIL."
+        )
+        raise SystemExit(message)
+
+
 def main() -> None:
     """Invoke the Cyclopts application that powers the `pages` console command.
 
@@ -799,8 +843,10 @@ def main() -> None:
     Raises
     ------
     SystemExit
-        With the subprocess's exit status when a command fails, or ``1`` for
-        missing binaries and credential errors.
+        With installation guidance when the interpreter is not free-threaded
+        CPython 3.15.2 or newer, with the subprocess's exit status when a
+        command fails, or with ``1`` for missing binaries and credential
+        errors.
 
     Examples
     --------
@@ -809,17 +855,11 @@ def main() -> None:
     # Surface the generator's progress and timing records on stderr, leaving
     # stdout for the machine-readable "wrote ..." paths.
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
-    if (
-        sys.implementation.name != "cpython"
-        or sys.version_info < (3, 15, 2)
-        or sys._is_gil_enabled()
-    ):
-        message = (
-            "pages requires free-threaded CPython 3.15.2 or newer with the GIL "
-            "disabled. Run 'uv python install' and 'uv sync --locked' from the "
-            "checkout and unset PYTHON_GIL."
-        )
-        raise SystemExit(message)
+    _require_free_threaded_cpython(
+        implementation=sys.implementation.name,
+        version=sys.version_info[:3],
+        gil_enabled=sys._is_gil_enabled(),
+    )
     try:
         app()
     except PagesUsageError as exc:

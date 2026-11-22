@@ -102,7 +102,12 @@ from hypothesis import strategies as st
 
 from df12_pages import cli
 from df12_pages._constants import PAGE_META_TEMPLATE
-from df12_pages.cli import _publish_documents, _write_documents, generate
+from df12_pages.cli import (
+    _publish_documents,
+    _require_free_threaded_cpython,
+    _write_documents,
+    generate,
+)
 from df12_pages.config import PageConfig, ThemeConfig
 from df12_pages.generator import PageContentGenerator
 from df12_pages.generator.page_generator import (
@@ -1885,6 +1890,35 @@ def test_pages_command_rejects_zero_doc_workers(
 
     assert excinfo.value.code == 1, "a usage error must exit with status 1"
     assert "--doc-workers must be at least one" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    ("implementation", "version", "gil_enabled"),
+    [
+        ("pypy", (3, 15, 2), False),
+        ("cpython", (3, 15, 1), False),
+        ("cpython", (3, 14, 9), False),
+        ("cpython", (3, 15, 2), True),
+    ],
+    ids=["not-cpython", "old-patch", "old-minor", "gil-enabled"],
+)
+def test_the_cli_rejects_an_unsupported_interpreter(
+    implementation: str, version: tuple[int, ...], *, gil_enabled: bool
+) -> None:
+    """A non-CPython, old or GIL-enabled runtime is refused before dispatch."""
+    with pytest.raises(SystemExit, match=r"free-threaded CPython 3\.15\.2"):
+        _require_free_threaded_cpython(
+            implementation=implementation,
+            version=version,
+            gil_enabled=gil_enabled,
+        )
+
+
+def test_the_cli_accepts_the_supported_free_threaded_boundary() -> None:
+    """Exactly free-threaded CPython 3.15.2 is supported, not only newer."""
+    _require_free_threaded_cpython(
+        implementation="cpython", version=(3, 15, 2), gil_enabled=False
+    )
 
 
 def test_generate_rejects_zero_document_workers() -> None:

@@ -15,6 +15,8 @@ from __future__ import annotations
 import typing as typ
 
 import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 from df12_pages.config import SectionLayout
 from df12_pages.generator.renderer import HtmlContentRenderer, MermaidRenderer
@@ -187,6 +189,78 @@ def test_a_subsection_without_an_anchor_keeps_its_step_anchor() -> None:
     assert steps[1]["content_anchor"] == "guide-step-2", (
         "the unanchored step must not borrow its neighbour's anchor"
     )
+
+
+_TITLE_POOL = st.integers(min_value=0, max_value=12)
+
+
+def _pool_title(index: int, *, upper: bool = False) -> str:
+    """Return a title from the shared pool, optionally uppercased."""
+    return f"STEP{index}" if upper else f"Step{index}"
+
+
+@given(
+    title_ids=st.lists(_TITLE_POOL, unique=True, max_size=6),
+    order_ids=st.lists(_TITLE_POOL, max_size=6),
+    anchor_count=st.integers(min_value=0, max_value=6),
+)
+@settings(max_examples=100)
+def test_numbered_steps_preserve_each_subsection_and_its_anchor(
+    title_ids: list[int], order_ids: list[int], anchor_count: int
+) -> None:
+    """Every subsection appears once, in the ordered prefix, with its anchor."""
+    titles = [_pool_title(index) for index in title_ids]
+    order = [_pool_title(index, upper=index % 2 == 0) for index in order_ids]
+    subsections = [
+        Subsection(title, f"body-{position}") for position, title in enumerate(titles)
+    ]
+    anchors = [f"guide-anchor-{position}" for position in range(anchor_count)]
+    body_to_position = {
+        f"<p>body-{position}</p>": position for position in range(len(subsections))
+    }
+
+    steps = prepare_numbered_steps(
+        _StubRenderer(),
+        _section(subsections=subsections),
+        SectionLayout(device="numbered_steps", step_order=order),
+        figures={},
+        subsection_anchors=anchors,
+    )
+
+    positions = [body_to_position[step["html"]] for step in steps]
+    assert sorted(positions) == list(range(len(subsections))), (
+        f"each subsection must appear exactly once, got {positions!r}"
+    )
+    assert [step["number"] for step in steps] == list(range(1, len(steps) + 1)), (
+        "numbering must follow the displayed order"
+    )
+
+    by_lower = {title.lower(): title for title in titles}
+    matched: list[str] = []
+    seen: set[str] = set()
+    for desired in order:
+        key = desired.lower()
+        if key in by_lower and key not in seen:
+            matched.append(by_lower[key])
+            seen.add(key)
+    remaining = [title for title in titles if title.lower() not in seen]
+    assert [step["title"] for step in steps] == matched + remaining, (
+        "named subsections must lead in the named order, and the rest must "
+        "keep their original order"
+    )
+
+    for step, position in zip(steps, positions, strict=True):
+        assert step["anchor"] == f"guide-step-{step['number']}", (
+            "the positional anchor must follow the displayed order"
+        )
+        if position < len(anchors):
+            assert step["content_anchor"] == anchors[position], (
+                "a content anchor must travel with its own subsection"
+            )
+        else:
+            assert step["content_anchor"] == f"guide-step-{step['number']}", (
+                "a subsection with no anchor falls back to its step anchor"
+            )
 
 
 def test_no_subsections_yields_no_numbered_steps() -> None:

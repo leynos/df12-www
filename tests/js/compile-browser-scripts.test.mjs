@@ -317,7 +317,8 @@ describe("compile-browser-scripts.ts as a build step", () => {
     const js = readFileSync(join(out, "js", "widget.js"), "utf8");
     expect(js).toContain('"use strict"');
     expect(js).not.toContain("interface Pair");
-  });
+    // One nested `bun run` compiling swc; a loaded host can exceed five seconds.
+  }, 30_000);
 
   // Three nested `bun run` invocations, each compiling swc: a loaded host can
   // push this past the default budget, so it states the budget it needs.
@@ -340,7 +341,8 @@ describe("compile-browser-scripts.ts as a build step", () => {
     const { status, output } = runScript("compile-browser-scripts.ts", root);
     expect(status).toBe(0);
     expect(output).toContain("Skipping browser script compile");
-  });
+    // One nested `bun run`; a loaded host can exceed five seconds.
+  }, 30_000);
 
   test("fails when the source root cannot be read for any other reason", () => {
     /* `src` is a file here, so reading `src/static` fails with ENOTDIR rather
@@ -353,7 +355,8 @@ describe("compile-browser-scripts.ts as a build step", () => {
     expect(status).not.toBe(0);
     expect(output).not.toContain("Skipping browser script compile");
     expect(output).toContain("ENOTDIR");
-  });
+    // One nested `bun run`; a loaded host can exceed five seconds.
+  }, 30_000);
 });
 
 describe("copy-static.ts beside the compile step", () => {
@@ -371,7 +374,8 @@ describe("copy-static.ts beside the compile step", () => {
     expect(existsSync(join(out, "js", "vendor", "lib.ts"))).toBe(false);
     expect(existsSync(join(out, "js", "globals.d.ts"))).toBe(false);
     expect(existsSync(join(out, "styles", "helper.ts"))).toBe(false);
-  });
+    // One nested `bun run`; a loaded host can exceed five seconds.
+  }, 30_000);
 
   test("leaves no source in two forms once both steps have run", () => {
     const root = fixtureTree();
@@ -380,5 +384,6 @@ describe("copy-static.ts beside the compile step", () => {
     const out = join(root, "public", "site", "assets", "js");
     expect(existsSync(join(out, "widget.js"))).toBe(true);
     expect(existsSync(join(out, "widget.ts"))).toBe(false);
-  });
+    // Two nested `bun run` invocations; a loaded host can exceed five seconds.
+  }, 30_000);
 });
